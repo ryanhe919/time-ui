@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: github.event_name == 'push'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           files: ./packages/components/coverage/lcov.info
           flags: unit
