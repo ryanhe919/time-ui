@@ -24,7 +24,7 @@
     "shiki": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
+    "@types/node": "^25.6.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "rimraf": "^6.0.1",
