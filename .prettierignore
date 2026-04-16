@@ -5,3 +5,7 @@ storybook-static
 coverage
 pnpm-lock.yaml
 .turbo
+.next
+.playwright-mcp
+test-results
+playwright-report

@@ -23,6 +23,18 @@ export default [
   },
   js.configs.recommended,
   {
+    // Config / tooling files run under Node — expose Node globals so plain
+    // `process`, `__dirname`, `module`, etc. don't trip `no-undef`.
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: tsparser,

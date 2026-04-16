@@ -1,14 +1,19 @@
 /* ============================================================
- * Cupertino — Apple-inspired typography, color, and rhythm
+ * Cupertino × Editorial — typography, color, and rhythm
  * ============================================================ */
 
 :root {
-  /* Apple's actual web stack. SF Pro on Apple devices, system on others. */
+  /* Body sans: Geist (variable) + system fallback for CJK.
+     Display serif: Instrument Serif (with italic) — used for h1 only. */
   --docs-sans:
-    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica,
-    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    var(--docs-sans-body), -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --docs-display:
+    var(--docs-serif), 'Iowan Old Style', 'Apple Garamond', 'Palatino Linotype', Georgia,
+    'Songti SC', 'SimSun', serif;
   --docs-mono:
-    ui-monospace, 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+    var(--docs-mono-body), ui-monospace, 'SF Mono', 'SFMono-Regular', Menlo, Consolas,
+    'Liberation Mono', monospace;
 
   /* Light palette */
   --c-bg: #ffffff;
@@ -23,6 +28,13 @@
   --c-hairline-strong: rgba(0, 0, 0, 0.12);
   --c-nav-bg: rgba(251, 251, 253, 0.72);
   --c-shadow-card: 0 0 1px rgba(0, 0, 0, 0.04), 0 6px 24px rgba(0, 0, 0, 0.04);
+
+  /* Editorial accents */
+  --c-eyebrow: #0071e3;
+  --c-rule: rgba(0, 0, 0, 0.08);
+  --c-code-bg: rgba(0, 0, 0, 0.04);
+  --c-code-border: rgba(0, 0, 0, 0.06);
+  --c-code-text: #1d1d1f;
 
   /* Geometry */
   --r-card: 18px;
@@ -45,6 +57,12 @@ html[data-theme='dark'] {
   --c-hairline-strong: rgba(255, 255, 255, 0.16);
   --c-nav-bg: rgba(0, 0, 0, 0.72);
   --c-shadow-card: 0 0 1px rgba(255, 255, 255, 0.06), 0 6px 24px rgba(0, 0, 0, 0.4);
+
+  --c-eyebrow: #64b5ff;
+  --c-rule: rgba(255, 255, 255, 0.1);
+  --c-code-bg: rgba(255, 255, 255, 0.08);
+  --c-code-border: rgba(255, 255, 255, 0.1);
+  --c-code-text: #f5f5f7;
 }
 
 *,
@@ -65,12 +83,12 @@ html {
 
 body {
   font-family: var(--docs-sans);
-  font-size: 17px;
-  line-height: 1.47;
+  font-size: 16px;
+  line-height: 1.6;
   letter-spacing: var(--tracking-tight);
   background: var(--c-bg);
   color: var(--c-text);
-  font-feature-settings: 'kern', 'liga', 'calt';
+  font-feature-settings: 'kern', 'liga', 'calt', 'ss01';
 }
 
 a {
@@ -83,106 +101,330 @@ button {
 }
 
 /* ============================================================
- * MDX article — Apple typography
+ * MDX article — editorial Apple typography
  * ============================================================ */
 
 .mdx-article {
   font-family: var(--docs-sans);
   color: var(--c-text);
+  /* Kill the default tab-size of 8 inside code. */
+  tab-size: 2;
 }
 
-/* H1 — large, semibold, tight tracking. No serif, no underscore rule. */
+/* ----- H1: editorial serif display with italic accent ----- */
 .mdx-article h1 {
-  font-family: var(--docs-sans) !important;
-  font-weight: 600 !important;
-  font-size: clamp(40px, 5.2vw, 56px) !important;
-  line-height: 1.07 !important;
-  letter-spacing: -0.025em !important;
-  margin: 0 0 12px !important;
+  font-family: var(--docs-display) !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  font-size: clamp(44px, 5.6vw, 68px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 0 20px !important;
   padding: 0 !important;
   color: var(--c-text);
+  /* Optical refinements specific to serif display. */
+  font-feature-settings: 'kern', 'liga', 'dlig', 'onum';
+  text-wrap: balance;
+}
+
+/* If H1 contains mixed Chinese + English, let the CJK glyphs keep their
+   natural weight while the Latin falls on the serif. */
+.mdx-article h1 code {
+  font-family: var(--docs-mono) !important;
+  font-size: 0.78em;
+  padding: 0 6px;
+  vertical-align: 0.1em;
 }
 
 .mdx-article > h1:first-child {
   animation: docs-fade-up 600ms cubic-bezier(0.42, 0, 0.18, 1) both;
 }
 
-/* Lead paragraph — larger and dimmer, sits right after h1. */
+/* Lead paragraph — larger, slightly softer color, ample air below. */
 .mdx-article > h1 + p {
-  font-size: 21px;
-  line-height: 1.38;
-  letter-spacing: -0.012em;
+  font-size: 20px;
+  line-height: 1.55;
+  letter-spacing: -0.008em;
   color: var(--c-text-secondary);
-  max-width: 60ch;
-  margin: 0 0 56px !important;
+  max-width: 62ch;
+  margin: 0 0 48px !important;
   font-weight: 400;
   animation: docs-fade-up 720ms cubic-bezier(0.42, 0, 0.18, 1) both 80ms;
 }
 
-/* H2 — semibold sans, tight, lots of top air */
+/* ----- H2: sans with a discreet accent rule on the left ----- */
 .mdx-article h2 {
   font-family: var(--docs-sans) !important;
   font-weight: 600 !important;
-  font-size: 32px !important;
-  line-height: 1.125 !important;
-  letter-spacing: var(--tracking-display) !important;
-  margin: 88px 0 16px !important;
+  font-size: 30px !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.018em !important;
+  margin: 96px 0 20px !important;
   padding: 0 !important;
   scroll-margin-top: 96px;
   color: var(--c-text);
+  position: relative;
+  text-wrap: balance;
+}
+
+/* Small italic "§" before H2 for a subtle editorial touch. */
+.mdx-article h2::before {
+  content: '§';
+  font-family: var(--docs-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--c-accent);
+  margin-right: 14px;
+  font-size: 0.72em;
+  letter-spacing: 0;
+  vertical-align: 0.06em;
+  opacity: 0.9;
 }
 
 .mdx-article h3 {
   font-family: var(--docs-sans) !important;
   font-weight: 600 !important;
-  font-size: 21px !important;
+  font-size: 20px !important;
+  line-height: 1.35 !important;
   letter-spacing: -0.012em !important;
-  margin: 48px 0 12px !important;
+  margin: 52px 0 14px !important;
   scroll-margin-top: 96px;
   color: var(--c-text);
 }
 
-/* Paragraphs */
+/* H4 — small eyebrow label style, uppercase tracking. */
+.mdx-article h4 {
+  font-family: var(--docs-sans) !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--c-text-secondary) !important;
+  margin: 36px 0 10px !important;
+}
+
+/* ----- Paragraphs ----- */
 .mdx-article p {
   font-family: var(--docs-sans);
-  font-size: 17px;
-  line-height: 1.52;
+  font-size: 16px;
+  line-height: 1.72;
   letter-spacing: var(--tracking-tight);
-  margin: 16px 0;
-  max-width: 64ch;
+  margin: 18px 0;
+  max-width: 68ch;
   color: var(--c-text);
 }
 
-/* Lists */
-.mdx-article ul,
-.mdx-article ol {
-  padding-left: 22px;
-  margin: 16px 0;
-  max-width: 64ch;
-}
-.mdx-article li {
-  margin: 8px 0;
-  font-size: 17px;
-  line-height: 1.52;
+/* Adjacent paragraph after a heading gets snug margin so the header
+   owns the whitespace, not the paragraph. */
+.mdx-article h2 + p,
+.mdx-article h3 + p {
+  margin-top: 4px;
 }
 
-/* Strong */
+/* ----- Lists — custom markers, breathing space, hanging indent ----- */
+.mdx-article ul,
+.mdx-article ol {
+  padding-left: 0;
+  margin: 22px 0;
+  max-width: 68ch;
+  list-style: none;
+}
+
+.mdx-article li {
+  position: relative;
+  padding-left: 22px;
+  margin: 10px 0;
+  font-size: 16px;
+  line-height: 1.72;
+  color: var(--c-text);
+}
+
+/* Bulleted list — refined dot with accent ring. */
+.mdx-article ul > li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.85em;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--c-accent);
+  transform: translateY(-50%);
+}
+
+/* Numbered list — use rounded accent numerals. */
+.mdx-article ol {
+  counter-reset: docs-ol;
+}
+.mdx-article ol > li {
+  padding-left: 30px;
+  counter-increment: docs-ol;
+}
+.mdx-article ol > li::before {
+  content: counter(docs-ol);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--c-bg-tertiary);
+  color: var(--c-text-secondary);
+  font-family: var(--docs-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 22px;
+  text-align: center;
+  letter-spacing: 0;
+}
+
+/* Nested lists — slightly smaller marker, tighter gap. */
+.mdx-article li ul,
+.mdx-article li ol {
+  margin: 8px 0 4px;
+}
+.mdx-article li li {
+  font-size: 15px;
+}
+.mdx-article li li::before {
+  background: var(--c-text-tertiary);
+  width: 4px;
+  height: 4px;
+}
+
+/* ----- Strong — slight weight bump, no color shift. ----- */
 .mdx-article strong {
   font-weight: 600;
   color: var(--c-text);
+  letter-spacing: 0;
 }
 
-/* Links — Apple blue, no underline at rest, underline on hover */
+/* Em */
+.mdx-article em {
+  font-family: var(--docs-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.02em;
+  letter-spacing: 0;
+}
+
+/* ----- Links — Apple blue, subtle hover ----- */
 .mdx-article a {
   color: var(--c-accent);
   text-decoration: none;
-  transition: color 200ms ease;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  padding-bottom: 1px;
+  transition:
+    color 200ms ease,
+    background-size 200ms ease;
 }
 .mdx-article a:hover {
   color: var(--c-accent-hover);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
+  background-size: 100% 2px;
+}
+
+/* ----- Inline code — refined, quiet chip ----- */
+.mdx-article :not(pre) > code,
+.mdx-article p code,
+.mdx-article li code,
+.mdx-article td code,
+.mdx-article h2 code,
+.mdx-article h3 code,
+.mdx-article h4 code,
+.mdx-article a code,
+.mdx-article strong code,
+.mdx-article em code {
+  font-family: var(--docs-mono) !important;
+  font-size: 0.86em !important;
+  font-weight: 450 !important;
+  background: var(--c-code-bg) !important;
+  color: var(--c-code-text) !important;
+  border: 1px solid var(--c-code-border) !important;
+  border-radius: 5px !important;
+  padding: 1px 5px !important;
+  margin: 0 1px !important;
+  letter-spacing: -0.005em !important;
+  vertical-align: 0.02em;
+  /* Keep long identifiers from breaking awkwardly. */
+  white-space: nowrap;
+}
+
+/* Code inside links — inherit link color but keep mono + subtle bg. */
+.mdx-article a code {
+  color: inherit !important;
+  border-color: color-mix(in oklch, currentColor 14%, transparent) !important;
+  background: color-mix(in oklch, currentColor 6%, transparent) !important;
+}
+
+/* ----- Blockquote ----- */
+.mdx-article blockquote {
+  margin: 28px 0;
+  padding: 2px 0 2px 20px;
+  border-left: 2px solid var(--c-accent);
+  color: var(--c-text-secondary);
+  font-size: 17px;
+  line-height: 1.65;
+  max-width: 68ch;
+}
+.mdx-article blockquote p {
+  margin: 4px 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* ----- Horizontal rule: a refined centered mark ----- */
+.mdx-article hr {
+  border: 0;
+  margin: 80px auto;
+  height: 1px;
+  max-width: 120px;
+  background: var(--c-rule);
+  position: relative;
+}
+.mdx-article hr::after {
+  content: '✦';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -55%);
+  background: var(--c-bg);
+  color: var(--c-accent);
+  padding: 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+/* ----- Tables (used by some embedded HTML; PropsTable is a custom comp) ----- */
+.mdx-article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 14px;
+}
+.mdx-article th,
+.mdx-article td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--c-rule);
+}
+.mdx-article th {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-text-secondary);
+}
+
+/* ----- CJK rhythm — Chinese text sits slightly airier ----- */
+.mdx-article:lang(zh) p,
+.mdx-article:lang(zh) li {
+  line-height: 1.8;
+  letter-spacing: 0;
 }
 
 /* ============================================================

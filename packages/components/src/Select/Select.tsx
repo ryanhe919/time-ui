@@ -251,7 +251,10 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     if (isSearchable) {
       requestAnimationFrame(() => searchInputRef.current?.focus());
     }
-    // Intentionally omit filteredItems from deps — we want the seed only on open.
+    // Intentionally omit filteredItems / current / isSearchable from deps —
+    // we only want to seed the highlight once per open cycle, not on every
+    // filter change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   // Keep highlight valid as the filter narrows.

@@ -81,9 +81,6 @@ importers:
 
   apps/docs:
     dependencies:
-      '@emotion/cache':
-        specifier: ^11.14.0
-        version: 11.14.0
       '@emotion/react':
         specifier: ^11.13.3
         version: 11.14.0(@types/react@18.3.28)(react@18.3.1)
