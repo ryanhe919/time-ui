@@ -1,5 +1,9 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import createMDX from '@next/mdx';
 import remarkGfm from 'remark-gfm';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const withMDX = createMDX({
   options: {
@@ -61,6 +65,25 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'mdx'],
   output: 'standalone',
   poweredByHeader: false,
+
+  // Monorepo tracing root — anchor at the repo root so Next's dependency
+  // tracer can see hoisted pnpm deps (the `.pnpm/` store lives there).
+  // Without this Next auto-detects, but being explicit avoids false
+  // positives from lockfiles found in parent dirs on some CI runners.
+  outputFileTracingRoot: path.join(__dirname, '../..'),
+
+  // Force-include dependencies that Next's tracer misses inside a pnpm
+  // monorepo. `styled-jsx` is a *hard internal peer* of `next` itself —
+  // `next/dist/server/require-hook.js` calls `require.resolve('styled-jsx/
+  // package.json')` dynamically at boot. The file-tracer can't see that
+  // static-analysis-wise, so the standalone bundle ships without a
+  // resolvable copy and `server.js` crashes on startup. Listing it here
+  // forces the tracer to copy the files anyway; the deploy workflow then
+  // ensures they land where Node's resolver expects.
+  outputFileTracingIncludes: {
+    '*': ['node_modules/styled-jsx/**'],
+  },
+
   async headers() {
     return [
       {
