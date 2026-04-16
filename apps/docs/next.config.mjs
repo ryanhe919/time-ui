@@ -15,9 +15,15 @@ const withMDX = createMDX({
 // and a websocket connect-src for HMR. Prod keeps the stricter baseline.
 const isDev = process.env.NODE_ENV !== 'production';
 
+// `'wasm-unsafe-eval'` is required in prod so Shiki's vscode-oniguruma
+// WebAssembly regex engine can instantiate its wasm module. Without it,
+// `WebAssembly.instantiate(...)` throws silently, the CodeBlock falls back
+// to plain text, and you see unhighlighted code in prod. In dev we keep
+// the broader `'unsafe-eval'` which covers WASM + React Refresh's runtime
+// eval.
 const scriptSrc = isDev
   ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-  : "script-src 'self' 'unsafe-inline'";
+  : "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'";
 
 const connectSrc = isDev
   ? "connect-src 'self' ws: wss:"
@@ -41,7 +47,7 @@ const securityHeaders = [
       scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
-      "font-src 'self' data:",
+      "font-src 'self' data: https://cdn.jsdelivr.net",
       connectSrc,
       "frame-ancestors 'none'",
       "base-uri 'self'",

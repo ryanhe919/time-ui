@@ -11,8 +11,10 @@ coverage
 .env.*
 .env.local
 .claude
-CLAUDE.md
+!.claude/agents/
+!.claude/team-docs/
 storybook-static
+.playwright-mcp
 .tsbuildinfo
 *.tsbuildinfo
 !.env.example

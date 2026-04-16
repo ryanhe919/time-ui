@@ -81,8 +81,17 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
           defaultColor: theme.mode === 'dark' ? 'dark' : 'light',
         });
         if (!cancelled) setHighlightedHtml(html);
-      } catch {
-        /* shiki not installed, or grammar load failed — keep plain fallback */
+      } catch (err) {
+        // Shiki may fail to load for a few reasons — not installed, grammar
+        // missing, or (the nasty silent one) a CSP that blocks WebAssembly
+        // instantiation. Surface the error in dev so the failure mode is
+        // debuggable; in prod we still fall back to plain text.
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn(
+            '[TimeUI] CodeBlock: syntax highlighting unavailable — falling back to plain text.',
+            err,
+          );
+        }
         if (!cancelled) setHighlightedHtml(null);
       }
     })();

@@ -1,16 +1,43 @@
 /* ============================================================
  * Cupertino × Editorial — typography, color, and rhythm
+ *
+ * Font strategy (Combo A — Modern Editorial):
+ *   • Latin body    → Inter (next/font/google, self-hosted)
+ *   • Latin display → Fraunces italic-capable variable (next/font/google)
+ *   • CJK on Apple  → PingFang SC (system, zero download)
+ *   • CJK elsewhere → Noto Sans SC (next/font/google, self-hosted)
+ *   • CJK accent    → LXGW WenKai Screen (jsDelivr CDN, loaded only for
+ *                     <em> / blockquote via a scoped @font-face)
+ *   • Mono          → Geist Mono (next/font/google)
  * ============================================================ */
 
+/* LXGW WenKai Screen — open-source (SIL OFL 1.1) editorial Chinese font,
+   used only as an accent on `em` and blockquote. Scoped by unicode-range
+   so it's only fetched when CJK characters appear in those elements. */
+@font-face {
+  font-family: 'LXGW WenKai Screen';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/lxgwwenkaiscreen.woff2')
+    format('woff2');
+  unicode-range: U+4E00-9FFF, U+3000-303F, U+FF00-FFEF, U+2026, U+2014, U+2013;
+}
+
 :root {
-  /* Body sans: Geist (variable) + system fallback for CJK.
-     Display serif: Instrument Serif (with italic) — used for h1 only. */
+  /* Latin sans: Inter → Apple system SF → CJK fallback chain. */
   --docs-sans:
-    var(--docs-sans-body), -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
-    'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    var(--docs-sans-body), -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', var(--docs-sans-cjk),
+    'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  /* Display serif: Fraunces → classic serifs → CJK serif fallback. */
   --docs-display:
     var(--docs-serif), 'Iowan Old Style', 'Apple Garamond', 'Palatino Linotype', Georgia,
-    'Songti SC', 'SimSun', serif;
+    'Songti SC', 'Songti TC', 'SimSun', serif;
+  /* Editorial CJK accent — LXGW WenKai Screen (楷书气质) for `em` / blockquote.
+     On Latin characters it falls through to the display serif. */
+  --docs-cjk-accent:
+    var(--docs-serif), 'LXGW WenKai Screen', 'Kaiti SC', KaiTi, 'STKaiti', cursive, serif;
   --docs-mono:
     var(--docs-mono-body), ui-monospace, 'SF Mono', 'SFMono-Regular', Menlo, Consolas,
     'Liberation Mono', monospace;
@@ -300,13 +327,15 @@ button {
   letter-spacing: 0;
 }
 
-/* Em */
+/* Em — Fraunces italic for Latin, LXGW WenKai (楷) for CJK. */
 .mdx-article em {
-  font-family: var(--docs-display);
+  font-family: var(--docs-cjk-accent);
   font-style: italic;
   font-weight: 400;
-  font-size: 1.02em;
+  font-size: 1.04em;
   letter-spacing: 0;
+  /* Optical tweak so楷体 sits on the same baseline as surrounding sans. */
+  line-height: inherit;
 }
 
 /* ----- Links — Apple blue, subtle hover ----- */
@@ -349,8 +378,11 @@ button {
   margin: 0 1px !important;
   letter-spacing: -0.005em !important;
   vertical-align: 0.02em;
-  /* Keep long identifiers from breaking awkwardly. */
-  white-space: nowrap;
+  /* Allow long identifiers / union types to wrap inside narrow columns
+     (e.g. PropsTable TYPE column) without overflowing the grid cell. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 /* Code inside links — inherit link color but keep mono + subtle bg. */
@@ -360,15 +392,18 @@ button {
   background: color-mix(in oklch, currentColor 6%, transparent) !important;
 }
 
-/* ----- Blockquote ----- */
+/* ----- Blockquote — editorial楷体 accent for Chinese, italic Fraunces for Latin ----- */
 .mdx-article blockquote {
   margin: 28px 0;
-  padding: 2px 0 2px 20px;
+  padding: 4px 0 4px 22px;
   border-left: 2px solid var(--c-accent);
   color: var(--c-text-secondary);
-  font-size: 17px;
-  line-height: 1.65;
+  font-family: var(--docs-cjk-accent);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.7;
   max-width: 68ch;
+  font-feature-settings: 'kern', 'liga';
 }
 .mdx-article blockquote p {
   margin: 4px 0;
