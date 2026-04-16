@@ -74,11 +74,13 @@ jobs:
       - name: Restart on server
         run: |
           ssh -i ~/.ssh/deploy_key \
-              -p ${{ secrets.DEPLOY_PORT || 22 }} \
-              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
-              "cd ${{ secrets.DEPLOY_PATH }}/apps/docs && \
-               PORT=3000 pm2 restart timeui-docs 2>/dev/null || \
-               PORT=3000 pm2 start server.js --name timeui-docs"
+            -p ${{ secrets.DEPLOY_PORT || 22 }} \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+            'zsh -lc "
+              cd '"'${{ secrets.DEPLOY_PATH }}'"'/apps/docs && \
+              PORT=3000 pm2 restart timeui-docs 2>/dev/null || \
+              PORT=3000 pm2 start server.js --name timeui-docs
+            "'
 
       - name: Cleanup SSH key
         if: always()
