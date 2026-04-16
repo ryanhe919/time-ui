@@ -72,7 +72,7 @@ jobs:
             # One-shot copy of every sibling except `next` itself (tracer
             # already placed it). rsync walks the tree once instead of
             # spawning a cp per package.
-            rsync -a --exclude='/next' --exclude='/next/' \
+            rsync -aL --exclude='/next' --exclude='/next/' \
               "$NEXT_PEER_DIR"/ deploy/apps/docs/node_modules/
           else
             echo "::warning::Could not locate deploy/node_modules/.pnpm/next@*/node_modules — peer hoist skipped"
