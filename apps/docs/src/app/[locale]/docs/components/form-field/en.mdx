@@ -1,0 +1,234 @@
+# FormField
+
+The universal wrapper that carries **label / description / errorMessage /
+required** for any form control. `Input` / `Textarea` / `Select` / `Checkbox` /
+`Radio` / `Switch` wrap themselves in `FormField` **implicitly** when those
+props are supplied; you can also wrap them **explicitly** — or wrap any other
+control (including a bare `<input>`) — to plug it into the same visual and
+accessibility system.
+
+`FormField` is a pure container: it threads the `id`, composes
+`aria-describedby` / `aria-invalid` / `aria-required`, and renders the
+label / description / error layout. It never changes the child's behavior.
+
+<Callout variant="tip" title="Two ways to use it">
+  - **Implicit:** `<Input label="Username" description="2–24 characters" />` — the
+    control wraps itself in `FormField` internally. This is the common case.
+  - **Explicit:** `<FormField label="Username"><Input /></FormField>` — the outer
+    FormField takes precedence. Use this when composing with external form
+    state or wrapping a custom/native control.
+</Callout>
+
+## Basic usage
+
+Wrap any TimeUI input — `label` / `description` ride on the outer FormField
+while the inner `Input` keeps its own styling and interactions.
+
+<LiveDemo code={`<FormField label="Username" description="2–24 characters.">
+  <Input placeholder="Your handle" fullWidth />
+</FormField>`}>
+  <FormField label="Username" description="2–24 characters.">
+    <Input placeholder="Your handle" fullWidth />
+  </FormField>
+</LiveDemo>
+
+## Required
+
+`isRequired` renders a red `*` next to the label, sets `aria-required="true"`,
+and forwards the native `required` attribute down to the control.
+
+<LiveDemo code={`<FormField
+  label="Email"
+  description="We'll send a verification link here."
+  isRequired
+>
+  <Input type="email" placeholder="you@example.com" fullWidth />
+</FormField>`}>
+  <FormField label="Email" description="We'll send a verification link here." isRequired>
+    <Input type="email" placeholder="you@example.com" fullWidth />
+  </FormField>
+</LiveDemo>
+
+## Invalid
+
+Providing `errorMessage` automatically flags the field as `isInvalid=true` —
+the inner `Input` flips to the danger palette, and `aria-describedby` is wired
+to the error node. The error container carries `role="alert"` +
+`aria-live="polite"` so screen readers announce it immediately.
+
+<LiveDemo code={`<FormField
+  label="Verification code"
+  errorMessage="That code doesn't match. Try again."
+>
+  <Input defaultValue="1234" fullWidth />
+</FormField>`}>
+  <FormField label="Verification code" errorMessage="That code doesn't match. Try again.">
+    <Input defaultValue="1234" fullWidth />
+  </FormField>
+</LiveDemo>
+
+## Disabled
+
+`isDisabled` forwards to the inner control (`isDisabled` on TimeUI components,
+native `disabled` on DOM elements) and lowers the opacity of the whole field.
+
+<LiveDemo code={`<FormField
+  label="System note"
+  description="Editable by admins only."
+  isDisabled
+>
+  <Textarea defaultValue="This note is read-only." fullWidth />
+</FormField>`}>
+  <FormField label="System note" description="Editable by admins only." isDisabled>
+    <Textarea defaultValue="This note is read-only." fullWidth />
+  </FormField>
+</LiveDemo>
+
+## Label placement
+
+`labelPlacement='top'` (default) stacks vertically; `'start'` puts the label on
+the left — use it for settings pages and dense profile forms.
+
+<LiveDemo code={`<Stack spacing={16}>
+  <FormField label="Display name" labelPlacement="top">
+    <Input placeholder="top (default)" fullWidth />
+  </FormField>
+  <FormField label="Country / Region" labelPlacement="start">
+    <Select placeholder="Choose one" fullWidth>
+      <SelectOption value="cn">China</SelectOption>
+      <SelectOption value="us">United States</SelectOption>
+      <SelectOption value="jp">Japan</SelectOption>
+    </Select>
+  </FormField>
+</Stack>`}>
+  <Stack spacing={16}>
+    <FormField label="Display name" labelPlacement="top">
+      <Input placeholder="top (default)" fullWidth />
+    </FormField>
+    <FormField label="Country / Region" labelPlacement="start">
+      <Select placeholder="Choose one" fullWidth>
+        <SelectOption value="cn">China</SelectOption>
+        <SelectOption value="us">United States</SelectOption>
+        <SelectOption value="jp">Japan</SelectOption>
+      </Select>
+    </FormField>
+  </Stack>
+</LiveDemo>
+
+## Composing multiple controls
+
+A complete form — `FormField` as the common container, combining `Input`,
+`Textarea`, `Select`, and `Switch` in one visually consistent column.
+
+<LiveDemo code={`<Stack spacing={20} style={{ width: 'min(520px, 100%)' }}>
+  <FormField label="Project name" description="Shown in the sidebar and notifications." isRequired>
+    <Input placeholder="e.g. Weekly Ops Recap" fullWidth />
+  </FormField>
+
+  <FormField label="Description">
+    <Textarea placeholder="Goals, scope, or relevant links." rows={3} fullWidth />
+  </FormField>
+
+  <FormField label="Visibility" labelPlacement="start">
+    <Select defaultValue="team" fullWidth>
+      <SelectOption value="private">Only me</SelectOption>
+      <SelectOption value="team">Team members</SelectOption>
+      <SelectOption value="public">Public</SelectOption>
+    </Select>
+  </FormField>
+
+  <FormField label="Notifications" labelPlacement="start" description="Email me on new comments.">
+    <Switch defaultSelected />
+  </FormField>
+</Stack>`}>
+  <Stack spacing={20} style={{ width: 'min(520px, 100%)' }}>
+    <FormField label="Project name" description="Shown in the sidebar and notifications." isRequired>
+      <Input placeholder="e.g. Weekly Ops Recap" fullWidth />
+    </FormField>
+
+    <FormField label="Description">
+      <Textarea placeholder="Goals, scope, or relevant links." rows={3} fullWidth />
+    </FormField>
+
+    <FormField label="Visibility" labelPlacement="start">
+      <Select defaultValue="team" fullWidth>
+        <SelectOption value="private">Only me</SelectOption>
+        <SelectOption value="team">Team members</SelectOption>
+        <SelectOption value="public">Public</SelectOption>
+      </Select>
+    </FormField>
+
+    <FormField label="Notifications" labelPlacement="start" description="Email me on new comments.">
+      <Switch defaultSelected />
+    </FormField>
+  </Stack>
+</LiveDemo>
+
+## Wrapping native controls
+
+FormField is **agnostic** about its child — any single React element works.
+When the child is a native DOM element (`<input>`, `<select>`, ...) FormField
+translates automatically: `isDisabled` becomes the DOM-shape `disabled`, so
+no unknown attributes reach the DOM.
+
+<LiveDemo code={`<FormField label="Custom control" description="You can also wrap a native input.">
+  <input
+    type="text"
+    placeholder="A plain, un-styled native input"
+    style={{
+      width: '100%',
+      height: 36,
+      padding: '0 12px',
+      border: '1px solid #d1d5db',
+      borderRadius: 8,
+      background: '#fff',
+      fontSize: 14,
+    }}
+  />
+</FormField>`}>
+  <FormField label="Custom control" description="You can also wrap a native input.">
+    <input
+      type="text"
+      placeholder="A plain, un-styled native input"
+      style={{
+        width: '100%',
+        height: 36,
+        padding: '0 12px',
+        border: '1px solid #d1d5db',
+        borderRadius: 8,
+        background: '#fff',
+        fontSize: 14,
+      }}
+    />
+  </FormField>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', description: 'Field title. A string renders as `<label htmlFor>`; a ReactNode routes via `aria-labelledby`.' },
+  { name: 'labelPlacement', type: "'top' | 'start'", default: "'top'", description: '`top` stacks vertically; `start` puts the label on the left.' },
+  { name: 'description', type: 'ReactNode', description: 'Supporting helper text.' },
+  { name: 'errorMessage', type: 'ReactNode', description: 'Error message — presence implies `isInvalid=true`.' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'Renders `*` and forwards `required` / `aria-required`.' },
+  { name: 'isInvalid', type: 'boolean', description: 'Explicit override. Otherwise derived from `errorMessage`.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Forwards to the child (camelCase for TimeUI components, `disabled` for DOM elements) and lowers the wrapper opacity.' },
+  { name: 'id', type: 'string', description: 'Field id; auto-generated via `useId()` when omitted.' },
+  { name: 'children', type: 'ReactElement', required: true, description: 'A single React element — cloned with the injected id / aria-* / isDisabled (translated to `disabled` for DOM children).' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  A string `label` is wired via `<label htmlFor>`; a ReactNode label uses
+  `aria-labelledby`. `description` and `errorMessage` are merged into
+  `aria-describedby` (in that order). The error container carries
+  `role="alert"` + `aria-live="polite"` so assistive tech announces it
+  immediately when validation fails.
+</Callout>
+
+<Callout variant="tip" title="Implicit vs explicit">
+  TimeUI form components already support `label` / `description` /
+  `errorMessage` / `isRequired` / `isInvalid` / `isDisabled` — they wrap
+  themselves in `FormField` when **not** already nested inside one. So
+  `<FormField><Input /></FormField>` and `<Input label="..." />` are both
+  valid. When composed, the outer FormField wins — no double labels.
+</Callout>

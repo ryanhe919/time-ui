@@ -1,0 +1,221 @@
+# 单选按钮 Radio
+
+单选。`Radio` **必须**放在 `RadioGroup` 内部——Group 通过 Context 向每个 Radio 注入共享的 `name` 与当前 `value`，保证 HTML 原生 radio 组语义正确、键盘箭头切换行为可用。
+
+## 基础用法
+
+<LiveDemo code={`<RadioGroup label="性别" defaultValue="female">
+  <Radio value="female">女</Radio>
+  <Radio value="male">男</Radio>
+  <Radio value="other">其他</Radio>
+</RadioGroup>`}>
+  <RadioGroup label="性别" defaultValue="female">
+    <Radio value="female">女</Radio>
+    <Radio value="male">男</Radio>
+    <Radio value="other">其他</Radio>
+  </RadioGroup>
+</LiveDemo>
+
+## 颜色 Colors
+
+color 可在 group 级设置，也可以在单个 Radio 上覆盖。
+
+<LiveDemo code={`<RadioGroup label="主题色" defaultValue="primary" orientation="horizontal">
+  <Radio value="default" color="default">Default</Radio>
+  <Radio value="primary" color="primary">Primary</Radio>
+  <Radio value="success" color="success">Success</Radio>
+  <Radio value="warning" color="warning">Warning</Radio>
+  <Radio value="danger" color="danger">Danger</Radio>
+</RadioGroup>`}>
+  <RadioGroup label="主题色" defaultValue="primary" orientation="horizontal">
+    <Radio value="default" color="default">Default</Radio>
+    <Radio value="primary" color="primary">Primary</Radio>
+    <Radio value="success" color="success">Success</Radio>
+    <Radio value="warning" color="warning">Warning</Radio>
+    <Radio value="danger" color="danger">Danger</Radio>
+  </RadioGroup>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+三档 `sm` / `md` / `lg`。
+
+<LiveDemo code={`<Stack spacing={16}>
+  <RadioGroup label="Small" size="sm" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+  <RadioGroup label="Medium" size="md" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+  <RadioGroup label="Large" size="lg" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+</Stack>`}>
+  <Stack spacing={16}>
+    <RadioGroup label="Small" size="sm" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+    <RadioGroup label="Medium" size="md" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+    <RadioGroup label="Large" size="lg" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+  </Stack>
+</LiveDemo>
+
+## 布局方向 Orientation
+
+默认 `vertical`，可切换到 `horizontal`。
+
+<LiveDemo code={`<Stack spacing={24}>
+  <RadioGroup label="垂直（默认）" defaultValue="one">
+    <Radio value="one">选项一</Radio>
+    <Radio value="two">选项二</Radio>
+    <Radio value="three">选项三</Radio>
+  </RadioGroup>
+  <RadioGroup label="水平" orientation="horizontal" defaultValue="one">
+    <Radio value="one">选项一</Radio>
+    <Radio value="two">选项二</Radio>
+    <Radio value="three">选项三</Radio>
+  </RadioGroup>
+</Stack>`}>
+  <Stack spacing={24}>
+    <RadioGroup label="垂直（默认）" defaultValue="one">
+      <Radio value="one">选项一</Radio>
+      <Radio value="two">选项二</Radio>
+      <Radio value="three">选项三</Radio>
+    </RadioGroup>
+    <RadioGroup label="水平" orientation="horizontal" defaultValue="one">
+      <Radio value="one">选项一</Radio>
+      <Radio value="two">选项二</Radio>
+      <Radio value="three">选项三</Radio>
+    </RadioGroup>
+  </Stack>
+</LiveDemo>
+
+## 带说明的 Radio
+
+Radio 支持 per-item `description`，显示在 label 下方小字。
+
+<LiveDemo code={`<RadioGroup label="订阅计划" defaultValue="pro">
+  <Radio value="free" description="永久免费，最多 3 个项目。">
+    免费版
+  </Radio>
+  <Radio value="pro" description="无限项目 + 优先支持，每月 ¥38。">
+    Pro 版
+  </Radio>
+  <Radio value="team" description="团队协作 + SSO。">
+    Team 版
+  </Radio>
+</RadioGroup>`}>
+  <RadioGroup label="订阅计划" defaultValue="pro">
+    <Radio value="free" description="永久免费，最多 3 个项目。">
+      免费版
+    </Radio>
+    <Radio value="pro" description="无限项目 + 优先支持，每月 ¥38。">
+      Pro 版
+    </Radio>
+    <Radio value="team" description="团队协作 + SSO。">
+      Team 版
+    </Radio>
+  </RadioGroup>
+</LiveDemo>
+
+## 状态 States
+
+<LiveDemo code={`<Stack spacing={16}>
+  <RadioGroup label="禁用整组" isDisabled defaultValue="a">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+  <RadioGroup label="禁用单项" defaultValue="a">
+    <Radio value="a">A</Radio>
+    <Radio value="b" isDisabled>B（不可选）</Radio>
+    <Radio value="c">C</Radio>
+  </RadioGroup>
+  <RadioGroup label="错误态" errorMessage="请先选择一项。" isRequired>
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+</Stack>`}>
+  <Stack spacing={16}>
+    <RadioGroup label="禁用整组" isDisabled defaultValue="a">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+    <RadioGroup label="禁用单项" defaultValue="a">
+      <Radio value="a">A</Radio>
+      <Radio value="b" isDisabled>B（不可选）</Radio>
+      <Radio value="c">C</Radio>
+    </RadioGroup>
+    <RadioGroup label="错误态" errorMessage="请先选择一项。" isRequired>
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+  </Stack>
+</LiveDemo>
+
+## 受控用法
+
+<LiveDemo code={`import { useState } from 'react';
+import { Radio, RadioGroup } from '@timeui/react';
+
+export function ShippingPicker() {
+  const [value, setValue] = useState('standard');
+  return (
+    <RadioGroup
+      label="选择配送方式"
+      value={value}
+      onChange={setValue}
+    >
+      <Radio value="standard" description="3-5 个工作日送达">标准配送</Radio>
+      <Radio value="express" description="次日送达">次日达</Radio>
+      <Radio value="pickup" description="到门店自取">门店自提</Radio>
+    </RadioGroup>
+  );
+}`}>
+  <RadioGroupDemo />
+</LiveDemo>
+
+## API
+
+### Radio
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: '选项值。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: '覆盖 group 的 color。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: '覆盖 group 的 size。' },
+  { name: 'children', type: 'ReactNode', description: 'Label 文本。' },
+  { name: 'description', type: 'ReactNode', description: '显示在 label 下方的二级说明。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '单项禁用；group 的 isDisabled 优先。' },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: '原生事件逃生口（很少用）。' }
+]} />
+
+### RadioGroup
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', description: '组标题；渲染为 `<legend>`。' },
+  { name: 'description', type: 'ReactNode', description: '辅助文案。' },
+  { name: 'errorMessage', type: 'ReactNode', description: '错误提示；触发 invalid。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: '必填；fieldset 级 `aria-required`。' },
+  { name: 'isInvalid', type: 'boolean', description: '显式 invalid。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用整组；优先于子项。' },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'vertical'", description: '布局方向。' },
+  { name: 'value', type: 'string', description: '受控选中值。' },
+  { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: string) => void', description: '选中变化时回调。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: '子项默认 color。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: '子项默认 size。' },
+  { name: 'name', type: 'string', description: '共享给所有子 Radio 的 name；默认 `useId()`。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  RadioGroup 根节点是 `<fieldset>` + `<legend>`（或 `role="radiogroup"` + `aria-labelledby`）。键盘支持：Tab 进入当前选中项，`↑ / ↓ / ← / →` 在组内切换（原生 radio 行为）；禁用的项会被跳过。Radio 单独使用（脱离 RadioGroup）时 dev 环境会在控制台警告——请直接换成原生 `<input type="radio">`。
+</Callout>

@@ -92,6 +92,7 @@ export const t = (theme: Theme) => {
       raised: str(bg.raised, '#ffffff'),
       sunken: str(bg.sunken, '#fafafa'),
       muted: str(bg.muted, '#f5f5f5'),
+      codeBg: str(bg.muted, '#f5f5f5'),
       overlay: str(bg.overlay, 'rgba(0,0,0,0.45)'),
       // Border
       border: str(border.default, '#e5e5e5'),

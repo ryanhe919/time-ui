@@ -15,7 +15,6 @@ type PolyProps<C extends ElementType, P> = P & {
   sx?: SxProp;
 } & Omit<ComponentPropsWithRef<C>, keyof P | 'as'>;
 
-// Box
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type BoxProps<C extends ElementType = 'div'> = PolyProps<C, {}>;
 export const Box = forwardRef(function Box<C extends ElementType = 'div'>(
@@ -27,7 +26,6 @@ export const Box = forwardRef(function Box<C extends ElementType = 'div'>(
 }) as <C extends ElementType = 'div'>(p: BoxProps<C>) => React.ReactElement;
 (Box as unknown as { displayName: string }).displayName = 'Box';
 
-// Flex
 export interface FlexOwnProps {
   direction?: CSSProperties['flexDirection'];
   align?: CSSProperties['alignItems'];
@@ -62,7 +60,6 @@ export const Flex = forwardRef(function Flex<C extends ElementType = 'div'>(
 }) as <C extends ElementType = 'div'>(p: FlexProps<C>) => React.ReactElement;
 (Flex as unknown as { displayName: string }).displayName = 'Flex';
 
-// Grid
 export interface GridOwnProps {
   columns?: number | string;
   gap?: number | string;
@@ -97,7 +94,6 @@ export const Grid = forwardRef(function Grid<C extends ElementType = 'div'>(
 }) as <C extends ElementType = 'div'>(p: GridProps<C>) => React.ReactElement;
 (Grid as unknown as { displayName: string }).displayName = 'Grid';
 
-// Stack
 export interface StackOwnProps {
   direction?: 'row' | 'column';
   spacing?: number | string;
@@ -131,7 +127,6 @@ export const Stack = forwardRef(function Stack<C extends ElementType = 'div'>(
 }) as <C extends ElementType = 'div'>(p: StackProps<C>) => React.ReactElement;
 (Stack as unknown as { displayName: string }).displayName = 'Stack';
 
-// Container
 export interface ContainerOwnProps {
   maxWidth?: number | string;
   padded?: boolean;

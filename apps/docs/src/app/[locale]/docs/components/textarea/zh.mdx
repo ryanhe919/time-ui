@@ -1,0 +1,178 @@
+# 多行输入 Textarea
+
+多行文本输入。视觉与 [`Input`](./input) 一致——共享 4 种 variant、6 种语义色、5 档 size，区别在**高度**与**自适应**：支持固定 `rows`、`minRows` / `maxRows` 自适应、`showCount` 字数统计。
+
+## 样式 Variants
+
+同 Input，4 种：`flat` / `bordered` / `faded` / `underlined`。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Textarea variant="flat" placeholder="flat（默认）" />
+  <Textarea variant="bordered" placeholder="bordered" />
+  <Textarea variant="faded" placeholder="faded" />
+  <Textarea variant="underlined" placeholder="underlined" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Textarea variant="flat" placeholder="flat（默认）" />
+    <Textarea variant="bordered" placeholder="bordered" />
+    <Textarea variant="faded" placeholder="faded" />
+    <Textarea variant="underlined" placeholder="underlined" />
+  </Stack>
+</LiveDemo>
+
+## 颜色 Colors
+
+六种语义色与 Input 完全一致。`bordered` / `faded` 静态就显现；`flat` / `underlined` 在聚焦时显现。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Textarea variant="bordered" color="default" defaultValue="Default" />
+  <Textarea variant="bordered" color="primary" defaultValue="Primary" />
+  <Textarea variant="bordered" color="secondary" defaultValue="Secondary" />
+  <Textarea variant="bordered" color="success" defaultValue="Success" />
+  <Textarea variant="bordered" color="warning" defaultValue="Warning" />
+  <Textarea variant="bordered" color="danger" defaultValue="Danger" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Textarea variant="bordered" color="default" defaultValue="Default" />
+    <Textarea variant="bordered" color="primary" defaultValue="Primary" />
+    <Textarea variant="bordered" color="secondary" defaultValue="Secondary" />
+    <Textarea variant="bordered" color="success" defaultValue="Success" />
+    <Textarea variant="bordered" color="warning" defaultValue="Warning" />
+    <Textarea variant="bordered" color="danger" defaultValue="Danger" />
+  </Stack>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+五档与 Input 对齐。这里 `rows` 统一 3；实际高度受 `size` 的字号与行高影响。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Textarea size="xs" placeholder="XS" />
+  <Textarea size="sm" placeholder="Small" />
+  <Textarea size="md" placeholder="Medium" />
+  <Textarea size="lg" placeholder="Large" />
+  <Textarea size="xl" placeholder="XL" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Textarea size="xs" placeholder="XS" />
+    <Textarea size="sm" placeholder="Small" />
+    <Textarea size="md" placeholder="Medium" />
+    <Textarea size="lg" placeholder="Large" />
+    <Textarea size="xl" placeholder="XL" />
+  </Stack>
+</LiveDemo>
+
+## 状态 States
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Textarea label="Disabled" isDisabled defaultValue="不可编辑" />
+  <Textarea label="Read only" isReadOnly defaultValue="只读多行文字" />
+  <Textarea label="Required" isRequired placeholder="必填项" />
+  <Textarea label="Invalid" errorMessage="请至少填写 10 个字符。" defaultValue="太短" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Textarea label="Disabled" isDisabled defaultValue="不可编辑" />
+    <Textarea label="Read only" isReadOnly defaultValue="只读多行文字" />
+    <Textarea label="Required" isRequired placeholder="必填项" />
+    <Textarea label="Invalid" errorMessage="请至少填写 10 个字符。" defaultValue="太短" />
+  </Stack>
+</LiveDemo>
+
+## 固定 rows
+
+不传 `minRows` / `maxRows` 时用固定 `rows`（默认 3），高度不随内容变化。
+
+<LiveDemo code={`<Textarea rows={5} placeholder="固定 5 行高" />`}>
+  <Textarea rows={5} placeholder="固定 5 行高" />
+</LiveDemo>
+
+## 自适应 Auto-size
+
+`minRows` / `maxRows` 自动打开自适应模式：高度跟随内容，达到上限后出现滚动条。
+
+<LiveDemo code={`<Textarea
+  minRows={2}
+  maxRows={6}
+  placeholder="空时 2 行；继续输入会增长到最多 6 行然后滚动。"
+/>`}>
+  <Textarea
+    minRows={2}
+    maxRows={6}
+    placeholder="空时 2 行；继续输入会增长到最多 6 行然后滚动。"
+  />
+</LiveDemo>
+
+## 字数统计 showCount
+
+`showCount` 需要配合 `maxLength`；右下角显示 `n/max`，接近上限时变 warning 色，超过时变 danger 色。
+
+<LiveDemo code={`<Textarea
+  showCount
+  maxLength={80}
+  defaultValue="试着输入超过 80 个字符看看变化。"
+/>`}>
+  <Textarea
+    showCount
+    maxLength={80}
+    defaultValue="试着输入超过 80 个字符看看变化。"
+  />
+</LiveDemo>
+
+## 受控用法
+
+受控 + 自适应 + 字数统计的完整示例：
+
+<LiveDemo code={`import { useState } from 'react';
+import { Textarea } from '@timeui/react';
+
+export function FeedbackForm() {
+  const [value, setValue] = useState('');
+  return (
+    <Textarea
+      label="反馈"
+      description="按 Enter 换行；最多 120 字。"
+      value={value}
+      onChange={setValue}
+      minRows={3}
+      maxRows={8}
+      maxLength={120}
+      showCount
+      fullWidth
+    />
+  );
+}`}>
+  <TextareaDemo />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: '视觉样式。与 Input 共享。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '语义色。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设。' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: '圆角。' },
+  { name: 'value', type: 'string', description: '受控值。' },
+  { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: string) => void', description: '解包后的字符串回调。' },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLTextAreaElement>) => void', description: '原生事件逃生口。' },
+  { name: 'rows', type: 'number', default: '3', description: '固定行数（未开启自适应时生效）。' },
+  { name: 'minRows', type: 'number', description: '自适应下限。' },
+  { name: 'maxRows', type: 'number', description: '自适应上限；达到后滚动。' },
+  { name: 'isAutoSize', type: 'boolean', description: '显式开启/关闭自适应。默认当 `minRows`/`maxRows` 其一存在时为 true。' },
+  { name: 'showCount', type: 'boolean', default: 'false', description: '在右下角显示字数统计，需要配合 `maxLength`。' },
+  { name: 'maxLength', type: 'number', description: '原生 maxLength；开启 showCount 时必填。' },
+  { name: 'label', type: 'ReactNode', description: '字段标题；触发隐式 FormField 包装。' },
+  { name: 'description', type: 'ReactNode', description: '辅助文案。' },
+  { name: 'errorMessage', type: 'ReactNode', description: '错误提示；存在时自动置为 invalid。' },
+  { name: 'startContent', type: 'ReactNode', description: '左上角 slot。' },
+  { name: 'endContent', type: 'ReactNode', description: '右上角 slot。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用。' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: '只读。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },
+  { name: 'isInvalid', type: 'boolean', description: '显式 invalid。' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  `ref` 指向原生 `<textarea>`。`Enter` 不提交表单（符合原生行为）；`Escape` 也**不**清空 value（多行场景误触代价太高，行为与 Input 有意不同）。字数统计可见时通过 `aria-describedby` 指向 sr-only 节点，提供 "42 of 80 characters used" 的可读描述。所有过渡遵循 `prefers-reduced-motion`。
+</Callout>

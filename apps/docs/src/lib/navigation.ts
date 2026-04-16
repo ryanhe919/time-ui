@@ -25,7 +25,22 @@ export interface Navigation {
  */
 const SECTIONS: readonly { slug: string; pages: readonly string[] }[] = [
   { slug: 'getting-started', pages: ['introduction', 'installation'] },
-  { slug: 'components', pages: ['button', 'callout', 'code-block', 'search'] },
+  {
+    slug: 'components',
+    pages: [
+      'button',
+      'callout',
+      'code-block',
+      'search',
+      'form-field',
+      'input',
+      'textarea',
+      'select',
+      'checkbox',
+      'radio',
+      'switch',
+    ],
+  },
 ];
 
 export function getNavigation(locale: string): Navigation {

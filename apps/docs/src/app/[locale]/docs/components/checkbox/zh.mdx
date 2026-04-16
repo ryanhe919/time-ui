@@ -1,0 +1,199 @@
+# 复选框 Checkbox
+
+单个可选框（含 indeterminate 中间态）；**CheckboxGroup** 提供多选组的状态管理、共享 `name`、统一的 label/error 承载。
+
+## 基础用法
+
+单 Checkbox 天然是一个 `<label>` 包住 `<input type="checkbox">`，点击 label 文字等价于点击指示器。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Checkbox defaultSelected>已选中</Checkbox>
+  <Checkbox>未选中</Checkbox>
+  <Checkbox isIndeterminate>Indeterminate（中间态）</Checkbox>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Checkbox defaultSelected>已选中</Checkbox>
+    <Checkbox>未选中</Checkbox>
+    <Checkbox isIndeterminate>Indeterminate（中间态）</Checkbox>
+  </Stack>
+</LiveDemo>
+
+## 颜色 Colors
+
+六种语义色。color 作用于选中态背景，默认 `primary`。
+
+<LiveDemo code={`<Flex gap={16} align="center" wrap="wrap">
+  <Checkbox defaultSelected color="default">Default</Checkbox>
+  <Checkbox defaultSelected color="primary">Primary</Checkbox>
+  <Checkbox defaultSelected color="secondary">Secondary</Checkbox>
+  <Checkbox defaultSelected color="success">Success</Checkbox>
+  <Checkbox defaultSelected color="warning">Warning</Checkbox>
+  <Checkbox defaultSelected color="danger">Danger</Checkbox>
+</Flex>`}>
+  <Flex gap={16} align="center" wrap="wrap">
+    <Checkbox defaultSelected color="default">Default</Checkbox>
+    <Checkbox defaultSelected color="primary">Primary</Checkbox>
+    <Checkbox defaultSelected color="secondary">Secondary</Checkbox>
+    <Checkbox defaultSelected color="success">Success</Checkbox>
+    <Checkbox defaultSelected color="warning">Warning</Checkbox>
+    <Checkbox defaultSelected color="danger">Danger</Checkbox>
+  </Flex>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+三档 `sm` / `md` / `lg`——指示器分别 16 / 20 / 24 px。
+
+<LiveDemo code={`<Flex gap={16} align="center">
+  <Checkbox size="sm" defaultSelected>Small</Checkbox>
+  <Checkbox size="md" defaultSelected>Medium</Checkbox>
+  <Checkbox size="lg" defaultSelected>Large</Checkbox>
+</Flex>`}>
+  <Flex gap={16} align="center">
+    <Checkbox size="sm" defaultSelected>Small</Checkbox>
+    <Checkbox size="md" defaultSelected>Medium</Checkbox>
+    <Checkbox size="lg" defaultSelected>Large</Checkbox>
+  </Flex>
+</LiveDemo>
+
+## 状态 States
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Checkbox isDisabled>Disabled</Checkbox>
+  <Checkbox isDisabled defaultSelected>Disabled + selected</Checkbox>
+  <Checkbox isReadOnly defaultSelected>Read only</Checkbox>
+  <Checkbox isRequired>Required</Checkbox>
+  <Checkbox isInvalid>Invalid</Checkbox>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Checkbox isDisabled>Disabled</Checkbox>
+    <Checkbox isDisabled defaultSelected>Disabled + selected</Checkbox>
+    <Checkbox isReadOnly defaultSelected>Read only</Checkbox>
+    <Checkbox isRequired>Required</Checkbox>
+    <Checkbox isInvalid>Invalid</Checkbox>
+  </Stack>
+</LiveDemo>
+
+## Indeterminate 中间态
+
+用于"部分选中"的语义，例如父级勾选框汇总一组子项的状态。
+
+<LiveDemo code={`<Checkbox isIndeterminate>选中部分子项</Checkbox>`}>
+  <Checkbox isIndeterminate>选中部分子项</Checkbox>
+</LiveDemo>
+
+## CheckboxGroup 多选组
+
+Group 负责维护 `value: string[]`，自动给每个子 Checkbox 注入 `name`，并在外层提供 label / description / errorMessage。
+
+<LiveDemo code={`<CheckboxGroup label="兴趣爱好" description="可多选">
+  <Checkbox value="music">音乐</Checkbox>
+  <Checkbox value="reading">阅读</Checkbox>
+  <Checkbox value="sports">运动</Checkbox>
+</CheckboxGroup>`}>
+  <CheckboxGroup label="兴趣爱好" description="可多选">
+    <Checkbox value="music">音乐</Checkbox>
+    <Checkbox value="reading">阅读</Checkbox>
+    <Checkbox value="sports">运动</Checkbox>
+  </CheckboxGroup>
+</LiveDemo>
+
+## 水平布局
+
+<LiveDemo code={`<CheckboxGroup label="订阅频道" orientation="horizontal">
+  <Checkbox value="news">新闻</Checkbox>
+  <Checkbox value="tech">科技</Checkbox>
+  <Checkbox value="design">设计</Checkbox>
+</CheckboxGroup>`}>
+  <CheckboxGroup label="订阅频道" orientation="horizontal">
+    <Checkbox value="news">新闻</Checkbox>
+    <Checkbox value="tech">科技</Checkbox>
+    <Checkbox value="design">设计</Checkbox>
+  </CheckboxGroup>
+</LiveDemo>
+
+## Group 的错误态
+
+Group 级别的 `errorMessage` 会走一次 `aria-describedby` 串联到 group；同时每个 Checkbox 的 `aria-invalid` 都会是 `true`。
+
+<LiveDemo code={`<CheckboxGroup
+  label="服务条款"
+  errorMessage="请至少勾选一项以继续。"
+  isRequired
+>
+  <Checkbox value="tos">我已阅读并同意用户协议</Checkbox>
+  <Checkbox value="privacy">我已阅读并同意隐私政策</Checkbox>
+</CheckboxGroup>`}>
+  <CheckboxGroup label="服务条款" errorMessage="请至少勾选一项以继续。" isRequired>
+    <Checkbox value="tos">我已阅读并同意用户协议</Checkbox>
+    <Checkbox value="privacy">我已阅读并同意隐私政策</Checkbox>
+  </CheckboxGroup>
+</LiveDemo>
+
+## 受控用法
+
+<LiveDemo code={`import { useState } from 'react';
+import { Checkbox, CheckboxGroup } from '@timeui/react';
+
+export function SkillPicker() {
+  const [value, setValue] = useState(['ts', 'react']);
+  return (
+    <CheckboxGroup
+      label="你用过哪些技术？"
+      value={value}
+      onChange={setValue}
+    >
+      <Checkbox value="ts">TypeScript</Checkbox>
+      <Checkbox value="react">React</Checkbox>
+      <Checkbox value="emotion">Emotion</Checkbox>
+      <Checkbox value="storybook">Storybook</Checkbox>
+    </CheckboxGroup>
+  );
+}`}>
+  <CheckboxGroupDemo />
+</LiveDemo>
+
+## API
+
+### Checkbox
+
+<PropsTable props={[
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'", description: '选中态的语义色。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '尺寸。Checkbox 不支持 xs / xl。' },
+  { name: 'radius', type: "'sm' | 'md'", description: '指示器圆角。' },
+  { name: 'value', type: 'string', description: '选项值；在 CheckboxGroup 中必填。' },
+  { name: 'isSelected', type: 'boolean', description: '受控选中态。' },
+  { name: 'defaultSelected', type: 'boolean', default: 'false', description: '非受控初始态。' },
+  { name: 'isIndeterminate', type: 'boolean', default: 'false', description: '中间态（与 isSelected 正交）。' },
+  { name: 'onChange', type: '(checked: boolean) => void', description: '解包后的布尔回调。' },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: '原生事件逃生口。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用。' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: '只读。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: '错误态。' },
+  { name: 'children', type: 'ReactNode', description: 'label 文本。' },
+  { name: 'name', type: 'string', description: 'CheckboxGroup 会自动注入。' }
+]} />
+
+### CheckboxGroup
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', description: '组标题（渲染为 `<legend>`）。' },
+  { name: 'description', type: 'ReactNode', description: '辅助文案。' },
+  { name: 'errorMessage', type: 'ReactNode', description: '错误提示；触发 invalid。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },
+  { name: 'isInvalid', type: 'boolean', description: '显式 invalid。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用整组——优先级高于子项。' },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'vertical'", description: '布局方向。' },
+  { name: 'value', type: 'string[]', description: '受控选中值数组。' },
+  { name: 'defaultValue', type: 'string[]', default: '[]', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: string[]) => void', description: '变更时回调新的数组。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: '子项默认 color（子项可覆盖）。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: '子项默认 size。' },
+  { name: 'radius', type: "'sm' | 'md'", description: '子项默认 radius。' },
+  { name: 'name', type: 'string', description: '子 Checkbox 共享的 name；默认 `useId()`。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  单 Checkbox 用 `<label>` 包裹原生 `<input type="checkbox">`，天然有 accessible name，不需要额外 `aria-label`。Indeterminate 通过 `input.indeterminate = true` 设置，屏幕阅读器会读作 "mixed"。CheckboxGroup 根节点是 `<fieldset>` + `<legend>`（或 `role="group"` + `aria-labelledby`），支持键盘 Tab 进入，Space 切换。
+</Callout>

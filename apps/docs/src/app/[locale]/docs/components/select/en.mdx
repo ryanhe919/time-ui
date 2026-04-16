@@ -1,0 +1,328 @@
+# Select
+
+A **custom listbox** dropdown (no longer a native `<select>`), visually matched
+to [`Input`](./input) (same four variants × six colors × five sizes). Supports
+**search filtering**, **max-height + scroll**, and full keyboard + screen-reader
+access.
+
+Two ways to pass options: the declarative `items` array (preferred), or
+`<SelectOption>` children (whose props are read at render time — they don't
+emit DOM themselves).
+
+## Variants
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Select variant="flat" placeholder="flat (default)" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+  <Select variant="bordered" placeholder="bordered" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+  <Select variant="faded" placeholder="faded" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+  <Select variant="underlined" placeholder="underlined" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Select variant="flat" placeholder="flat (default)" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+    <Select variant="bordered" placeholder="bordered" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+    <Select variant="faded" placeholder="faded" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+    <Select variant="underlined" placeholder="underlined" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+  </Stack>
+</LiveDemo>
+
+## Colors
+
+The six semantic colors align with Input / Textarea. `bordered` / `faded` show the tint at rest; `flat` / `underlined` reveal it on focus.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Select variant="bordered" color="default" defaultValue="a" items={[{ value: 'a', label: 'Default' }]} />
+  <Select variant="bordered" color="primary" defaultValue="a" items={[{ value: 'a', label: 'Primary' }]} />
+  <Select variant="bordered" color="secondary" defaultValue="a" items={[{ value: 'a', label: 'Secondary' }]} />
+  <Select variant="bordered" color="success" defaultValue="a" items={[{ value: 'a', label: 'Success' }]} />
+  <Select variant="bordered" color="warning" defaultValue="a" items={[{ value: 'a', label: 'Warning' }]} />
+  <Select variant="bordered" color="danger" defaultValue="a" items={[{ value: 'a', label: 'Danger' }]} />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Select variant="bordered" color="default" defaultValue="a" items={[{ value: 'a', label: 'Default' }]} />
+    <Select variant="bordered" color="primary" defaultValue="a" items={[{ value: 'a', label: 'Primary' }]} />
+    <Select variant="bordered" color="secondary" defaultValue="a" items={[{ value: 'a', label: 'Secondary' }]} />
+    <Select variant="bordered" color="success" defaultValue="a" items={[{ value: 'a', label: 'Success' }]} />
+    <Select variant="bordered" color="warning" defaultValue="a" items={[{ value: 'a', label: 'Warning' }]} />
+    <Select variant="bordered" color="danger" defaultValue="a" items={[{ value: 'a', label: 'Danger' }]} />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Select size="xs" placeholder="XS" items={[{ value: 'a', label: 'A' }]} />
+  <Select size="sm" placeholder="Small" items={[{ value: 'a', label: 'A' }]} />
+  <Select size="md" placeholder="Medium" items={[{ value: 'a', label: 'A' }]} />
+  <Select size="lg" placeholder="Large" items={[{ value: 'a', label: 'A' }]} />
+  <Select size="xl" placeholder="XL" items={[{ value: 'a', label: 'A' }]} />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Select size="xs" placeholder="XS" items={[{ value: 'a', label: 'A' }]} />
+    <Select size="sm" placeholder="Small" items={[{ value: 'a', label: 'A' }]} />
+    <Select size="md" placeholder="Medium" items={[{ value: 'a', label: 'A' }]} />
+    <Select size="lg" placeholder="Large" items={[{ value: 'a', label: 'A' }]} />
+    <Select size="xl" placeholder="XL" items={[{ value: 'a', label: 'A' }]} />
+  </Stack>
+</LiveDemo>
+
+## States
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Select label="Disabled" isDisabled defaultValue="a" items={[{ value: 'a', label: 'Apple' }]} />
+  <Select label="Required" isRequired placeholder="Pick one…" items={[{ value: 'a', label: 'Apple' }]} />
+  <Select
+    label="Invalid"
+    errorMessage="Please select a valid option."
+    items={[{ value: 'a', label: 'Apple' }]}
+    placeholder="Pick one…"
+  />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Select label="Disabled" isDisabled defaultValue="a" items={[{ value: 'a', label: 'Apple' }]} />
+    <Select label="Required" isRequired placeholder="Pick one…" items={[{ value: 'a', label: 'Apple' }]} />
+    <Select
+      label="Invalid"
+      errorMessage="Please select a valid option."
+      items={[{ value: 'a', label: 'Apple' }]}
+      placeholder="Pick one…"
+    />
+  </Stack>
+</LiveDemo>
+
+## Searchable
+
+`isSearchable` mounts a search box at the top of the popover and filters
+options by case-insensitive substring match on the label. Ideal for long
+lists or when users can't remember the full option name.
+
+<LiveDemo code={`<Select
+  isSearchable
+  label="Country / Region"
+  placeholder="Click to select…"
+  searchPlaceholder="Search country…"
+  items={[
+    { value: 'cn', label: 'China' },
+    { value: 'us', label: 'United States' },
+    { value: 'jp', label: 'Japan' },
+    { value: 'kr', label: 'South Korea' },
+    { value: 'de', label: 'Germany' },
+    { value: 'fr', label: 'France' },
+    { value: 'gb', label: 'United Kingdom' },
+    { value: 'it', label: 'Italy' },
+    { value: 'es', label: 'Spain' },
+    { value: 'br', label: 'Brazil' },
+    { value: 'in', label: 'India' },
+    { value: 'ru', label: 'Russia' },
+  ]}
+  fullWidth
+/>`}>
+  <Select
+    isSearchable
+    label="Country / Region"
+    placeholder="Click to select…"
+    searchPlaceholder="Search country…"
+    items={[
+      { value: 'cn', label: 'China' },
+      { value: 'us', label: 'United States' },
+      { value: 'jp', label: 'Japan' },
+      { value: 'kr', label: 'South Korea' },
+      { value: 'de', label: 'Germany' },
+      { value: 'fr', label: 'France' },
+      { value: 'gb', label: 'United Kingdom' },
+      { value: 'it', label: 'Italy' },
+      { value: 'es', label: 'Spain' },
+      { value: 'br', label: 'Brazil' },
+      { value: 'in', label: 'India' },
+      { value: 'ru', label: 'Russia' },
+    ]}
+    fullWidth
+  />
+</LiveDemo>
+
+## Long list + scrolling
+
+When there are many options the popover clamps to a max height (280px by
+default) and a scrollbar appears. Customize with `maxListHeight`.
+
+<LiveDemo code={`<Select
+  isSearchable
+  label="Time zone"
+  placeholder="Pick a time zone…"
+  maxListHeight={240}
+  items={Array.from({ length: 30 }, (_, i) => ({
+    value: 'tz-' + i,
+    label: 'GMT' + (i - 12 >= 0 ? '+' : '') + (i - 12) + ':00',
+  }))}
+  fullWidth
+/>`}>
+  <Select
+    isSearchable
+    label="Time zone"
+    placeholder="Pick a time zone…"
+    maxListHeight={240}
+    items={Array.from({ length: 30 }, (_, i) => ({
+      value: 'tz-' + i,
+      label: 'GMT' + (i - 12 >= 0 ? '+' : '') + (i - 12) + ':00',
+    }))}
+    fullWidth
+  />
+</LiveDemo>
+
+## Options with descriptions
+
+`SelectItem.description` renders a secondary line beneath the label — great
+for enums that need a hint (permissions, plans, visibility, etc.).
+
+<LiveDemo code={`<Select
+  label="Visibility"
+  defaultValue="team"
+  items={[
+    { value: 'private', label: 'Only me', description: 'Visible to you only.' },
+    { value: 'team', label: 'Team members', description: 'Everyone in your team.' },
+    { value: 'public', label: 'Public', description: 'Anyone with the link.' },
+  ]}
+  fullWidth
+/>`}>
+  <Select
+    label="Visibility"
+    defaultValue="team"
+    items={[
+      { value: 'private', label: 'Only me', description: 'Visible to you only.' },
+      { value: 'team', label: 'Team members', description: 'Everyone in your team.' },
+      { value: 'public', label: 'Public', description: 'Anyone with the link.' },
+    ]}
+    fullWidth
+  />
+</LiveDemo>
+
+## Form 1: items array (preferred)
+
+<LiveDemo code={`<Select
+  label="City"
+  placeholder="Pick one…"
+  items={[
+    { value: 'beijing', label: 'Beijing' },
+    { value: 'shanghai', label: 'Shanghai' },
+    { value: 'guangzhou', label: 'Guangzhou' },
+    { value: 'shenzhen', label: 'Shenzhen', isDisabled: true },
+  ]}
+/>`}>
+  <Select
+    label="City"
+    placeholder="Pick one…"
+    items={[
+      { value: 'beijing', label: 'Beijing' },
+      { value: 'shanghai', label: 'Shanghai' },
+      { value: 'guangzhou', label: 'Guangzhou' },
+      { value: 'shenzhen', label: 'Shenzhen', isDisabled: true },
+    ]}
+  />
+</LiveDemo>
+
+## Form 2: `<SelectOption>` children
+
+The parent reads each SelectOption's `value` / `disabled` / `children` to
+build its custom listbox — at runtime `SelectOption` renders nothing itself.
+
+<LiveDemo code={`<Select label="Size" defaultValue="m">
+  <SelectOption value="s">S</SelectOption>
+  <SelectOption value="m">M</SelectOption>
+  <SelectOption value="l">L</SelectOption>
+  <SelectOption value="xl">XL</SelectOption>
+</Select>`}>
+  <Select label="Size" defaultValue="m">
+    <SelectOption value="s">S</SelectOption>
+    <SelectOption value="m">M</SelectOption>
+    <SelectOption value="l">L</SelectOption>
+    <SelectOption value="xl">XL</SelectOption>
+  </Select>
+</LiveDemo>
+
+## Controlled usage
+
+<LiveDemo code={`import { useState } from 'react';
+import { Select } from '@timeui/react';
+
+const FRAMEWORKS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', isDisabled: true },
+];
+
+export function FrameworkPicker() {
+  const [value, setValue] = useState('react');
+  return (
+    <Select
+      label="Pick your framework"
+      items={FRAMEWORKS}
+      value={value}
+      onChange={setValue}
+      fullWidth
+    />
+  );
+}`}>
+  <SelectDemo />
+</LiveDemo>
+
+## API
+
+### Select
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: 'Visual recipe — shared with Input.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Semantic color; forced to `danger` when invalid.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset.' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: 'Corner radius.' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to 100% width.' },
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: string) => void', description: 'Fires with the unwrapped string value when an option is picked.' },
+  { name: 'placeholder', type: 'string', description: 'Shown in the trigger when nothing is selected.' },
+  { name: 'items', type: 'SelectItem[]', description: 'Declarative options; mutually exclusive with children (items wins).' },
+  { name: 'children', type: 'ReactNode', description: '`<SelectOption>` nodes; only their props are read at runtime.' },
+  { name: 'isSearchable', type: 'boolean', default: 'false', description: 'Render a search input above the listbox and filter items by label substring.' },
+  { name: 'searchPlaceholder', type: 'string', default: "'Search…'", description: 'Placeholder for the search input.' },
+  { name: 'emptyMessage', type: 'ReactNode', default: "'No results'", description: 'Shown when the filter matches zero items.' },
+  { name: 'maxListHeight', type: 'number | string', default: '280', description: 'Max height of the scrollable option list.' },
+  { name: 'name', type: 'string', description: 'Forwarded to a hidden `<input>` so native form submission carries the value.' },
+  { name: 'label', type: 'ReactNode', description: 'Field title; triggers implicit FormField wrapping.' },
+  { name: 'description', type: 'ReactNode', description: 'Helper text.' },
+  { name: 'errorMessage', type: 'ReactNode', description: 'Error text; triggers invalid.' },
+  { name: 'startContent', type: 'ReactNode', description: 'Left slot inside the trigger (icon).' },
+  { name: 'endContent', type: 'ReactNode', description: 'Right slot; overrides the default chevron.' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'Required.' },
+  { name: 'isInvalid', type: 'boolean', description: 'Explicit invalid override.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disabled.' }
+]} />
+
+### SelectItem
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: 'Option value.' },
+  { name: 'label', type: 'ReactNode', required: true, description: 'Option content; its text form is used for search matching.' },
+  { name: 'isDisabled', type: 'boolean', description: 'Disable this option.' },
+  { name: 'description', type: 'ReactNode', description: 'Secondary text rendered below the label.' }
+]} />
+
+### SelectOption
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: 'Option value.' },
+  { name: 'children', type: 'ReactNode', description: 'Option content.' },
+  { name: 'disabled', type: 'boolean', description: 'Disable (equivalent to `isDisabled`; kept for native-alike ergonomics).' },
+  { name: 'isDisabled', type: 'boolean', description: 'Disable.' },
+  { name: 'description', type: 'ReactNode', description: 'Secondary text rendered below the label.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The trigger is `role="combobox"` + `aria-haspopup="listbox"` +
+  `aria-expanded`; the popover is `role="listbox"`; options are
+  `role="option"` with `aria-selected` / `aria-disabled`. Keyboard:
+  `↑/↓` moves the highlight, `Home/End` jumps to the ends, `Enter` selects,
+  `Space` selects (or opens when closed), `Esc` closes and returns focus.
+  With `isSearchable` the search input is focused on open; focus returns to
+  the trigger on close. Label / description / errorMessage wiring is handled
+  by the implicit FormField.
+</Callout>

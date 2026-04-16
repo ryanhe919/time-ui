@@ -1,0 +1,155 @@
+# 开关 Switch
+
+Apple HIG 风格的开关：圆形滑块、iOS 绿底色、带轻微阴影。**布尔开关**的首选——比 Checkbox 更适合"设置项"场景（立即生效、不需要"确认"）。
+
+底层渲染一个隐藏的原生 `<input type="checkbox" role="switch">`，保留表单提交和屏幕阅读器支持；视觉 track/thumb 由 CSS 绘制。
+
+## 基础用法
+
+<LiveDemo code={`<Flex gap={16} align="center">
+  <Switch aria-label="开启通知" />
+  <Switch defaultSelected aria-label="已开启" />
+  <Switch defaultSelected>带文字 Label</Switch>
+</Flex>`}>
+  <Flex gap={16} align="center">
+    <Switch aria-label="开启通知" />
+    <Switch defaultSelected aria-label="已开启" />
+    <Switch defaultSelected>带文字 Label</Switch>
+  </Flex>
+</LiveDemo>
+
+## 颜色 Colors
+
+默认 `success`（对齐 iOS 绿）。
+
+<LiveDemo code={`<Flex gap={16} align="center" wrap="wrap">
+  <Switch defaultSelected color="default">Default</Switch>
+  <Switch defaultSelected color="primary">Primary</Switch>
+  <Switch defaultSelected color="secondary">Secondary</Switch>
+  <Switch defaultSelected color="success">Success</Switch>
+  <Switch defaultSelected color="warning">Warning</Switch>
+  <Switch defaultSelected color="danger">Danger</Switch>
+</Flex>`}>
+  <Flex gap={16} align="center" wrap="wrap">
+    <Switch defaultSelected color="default">Default</Switch>
+    <Switch defaultSelected color="primary">Primary</Switch>
+    <Switch defaultSelected color="secondary">Secondary</Switch>
+    <Switch defaultSelected color="success">Success</Switch>
+    <Switch defaultSelected color="warning">Warning</Switch>
+    <Switch defaultSelected color="danger">Danger</Switch>
+  </Flex>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+三档 `sm` / `md` / `lg`，轨道宽度 32 / 48 / 56 px。
+
+<LiveDemo code={`<Flex gap={16} align="center">
+  <Switch size="sm" defaultSelected>Small</Switch>
+  <Switch size="md" defaultSelected>Medium</Switch>
+  <Switch size="lg" defaultSelected>Large</Switch>
+</Flex>`}>
+  <Flex gap={16} align="center">
+    <Switch size="sm" defaultSelected>Small</Switch>
+    <Switch size="md" defaultSelected>Medium</Switch>
+    <Switch size="lg" defaultSelected>Large</Switch>
+  </Flex>
+</LiveDemo>
+
+## 状态 States
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Switch isDisabled>Disabled</Switch>
+  <Switch isDisabled defaultSelected>Disabled + on</Switch>
+  <Switch isReadOnly defaultSelected>Read only（点击无效）</Switch>
+  <Switch isRequired>Required</Switch>
+  <Switch isInvalid>Invalid</Switch>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Switch isDisabled>Disabled</Switch>
+    <Switch isDisabled defaultSelected>Disabled + on</Switch>
+    <Switch isReadOnly defaultSelected>Read only（点击无效）</Switch>
+    <Switch isRequired>Required</Switch>
+    <Switch isInvalid>Invalid</Switch>
+  </Stack>
+</LiveDemo>
+
+## 图标 startContent / endContent
+
+`startContent` 在开启时显示（滑块左侧），`endContent` 在关闭时显示（滑块右侧）——常用于"太阳 / 月亮"主题切换的视觉隐喻。
+
+<LiveDemo code={`<Flex gap={16} align="center">
+  <Switch
+    size="lg"
+    defaultSelected
+    startContent={<span aria-hidden>☀</span>}
+    endContent={<span aria-hidden>🌙</span>}
+  >
+    主题切换
+  </Switch>
+</Flex>`}>
+  <Flex gap={16} align="center">
+    <Switch
+      size="lg"
+      defaultSelected
+      startContent={<span aria-hidden>☀</span>}
+      endContent={<span aria-hidden>🌙</span>}
+    >
+      主题切换
+    </Switch>
+  </Flex>
+</LiveDemo>
+
+## 受控用法：设置项列表
+
+iOS 风格的设置页典型场景——一个设置项一行，右侧 Switch。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Switch } from '@timeui/react';
+
+export function SettingsList() {
+  const [state, setState] = useState({
+    notifications: true,
+    autoSync: true,
+    beta: false,
+  });
+  return (
+    <div>
+      {Object.entries(state).map(([key, on]) => (
+        <label key={key}>
+          <span>{key}</span>
+          <Switch
+            isSelected={on}
+            onChange={(v) => setState((p) => ({ ...p, [key]: v }))}
+          />
+        </label>
+      ))}
+    </div>
+  );
+}`}>
+  <SwitchSettingsDemo />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'success'", description: '开启态的轨道色；默认 iOS 绿。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '尺寸预设。' },
+  { name: 'isSelected', type: 'boolean', description: '受控开关态。' },
+  { name: 'defaultSelected', type: 'boolean', default: 'false', description: '非受控初始状态。' },
+  { name: 'onChange', type: '(checked: boolean) => void', description: '解包后的布尔回调。' },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: '原生事件逃生口。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用。' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: '只读：focus 可聚焦但切换无效。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: '错误态：视觉变 danger + `aria-invalid`。' },
+  { name: 'startContent', type: 'ReactNode', description: '滑块左侧图标（`isSelected=true` 时可见）。' },
+  { name: 'endContent', type: 'ReactNode', description: '滑块右侧图标（`isSelected=false` 时可见）。' },
+  { name: 'children', type: 'ReactNode', description: '尾部 label（与 Switch 同一个 `<label>`）。' },
+  { name: 'name', type: 'string', description: '表单提交的字段名。' },
+  { name: 'value', type: 'string', description: '开启时提交到 FormData 的值。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  内部渲染 `<input type="checkbox" role="switch" aria-checked={isSelected}>`，天然有布尔语义且可被 Tab 聚焦。键盘：`Space` 切换（native），`Enter` 也切换（手动绑定以弥补 checkbox 的默认行为）。focus 态包裹整个 track 的 outline；`prefers-reduced-motion` 下滑块直接跳变，不做过渡动画。没有 label 时必须显式传 `aria-label`。
+</Callout>

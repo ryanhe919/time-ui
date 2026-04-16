@@ -16,6 +16,9 @@ export interface Messages {
     confirm: string;
     ok: string;
     loading: string;
+    clear: string;
+    showPassword: string;
+    hidePassword: string;
   };
   /** Button-specific (kept minimal — Button has no default text today). */
   button: {
@@ -43,6 +46,9 @@ export const zh: Messages = {
     confirm: '确定',
     ok: '好',
     loading: '加载中',
+    clear: '清除',
+    showPassword: '显示密码',
+    hidePassword: '隐藏密码',
   },
   button: {
     loadingLabel: '加载中',
@@ -65,6 +71,9 @@ export const en: Messages = {
     confirm: 'Confirm',
     ok: 'OK',
     loading: 'Loading',
+    clear: 'Clear',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
   },
   button: {
     loadingLabel: 'Loading',

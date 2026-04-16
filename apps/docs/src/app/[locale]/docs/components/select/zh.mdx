@@ -1,0 +1,311 @@
+# 下拉选择 Select
+
+**自定义 listbox**（不再是原生 `<select>`）——外观与 [`Input`](./input) 完全对齐的 4 × 6 × 5 组合，支持**搜索过滤**、**最大高度 + 滚动**、键盘与屏幕阅读器可达。
+
+数据源有两种写法：声明式 `items` 数组（推荐），或 `<SelectOption>` children（会被父组件读取 props 而非渲染为 DOM `<option>`）。
+
+## 样式 Variants
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Select variant="flat" placeholder="flat（默认）" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+  <Select variant="bordered" placeholder="bordered" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+  <Select variant="faded" placeholder="faded" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+  <Select variant="underlined" placeholder="underlined" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Select variant="flat" placeholder="flat（默认）" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+    <Select variant="bordered" placeholder="bordered" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+    <Select variant="faded" placeholder="faded" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+    <Select variant="underlined" placeholder="underlined" items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]} />
+  </Stack>
+</LiveDemo>
+
+## 颜色 Colors
+
+与 Input / Textarea 一致的六种语义色。`bordered` / `faded` 静态就显现；`flat` / `underlined` 在聚焦时显现。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Select variant="bordered" color="default" defaultValue="a" items={[{ value: 'a', label: 'Default' }]} />
+  <Select variant="bordered" color="primary" defaultValue="a" items={[{ value: 'a', label: 'Primary' }]} />
+  <Select variant="bordered" color="secondary" defaultValue="a" items={[{ value: 'a', label: 'Secondary' }]} />
+  <Select variant="bordered" color="success" defaultValue="a" items={[{ value: 'a', label: 'Success' }]} />
+  <Select variant="bordered" color="warning" defaultValue="a" items={[{ value: 'a', label: 'Warning' }]} />
+  <Select variant="bordered" color="danger" defaultValue="a" items={[{ value: 'a', label: 'Danger' }]} />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Select variant="bordered" color="default" defaultValue="a" items={[{ value: 'a', label: 'Default' }]} />
+    <Select variant="bordered" color="primary" defaultValue="a" items={[{ value: 'a', label: 'Primary' }]} />
+    <Select variant="bordered" color="secondary" defaultValue="a" items={[{ value: 'a', label: 'Secondary' }]} />
+    <Select variant="bordered" color="success" defaultValue="a" items={[{ value: 'a', label: 'Success' }]} />
+    <Select variant="bordered" color="warning" defaultValue="a" items={[{ value: 'a', label: 'Warning' }]} />
+    <Select variant="bordered" color="danger" defaultValue="a" items={[{ value: 'a', label: 'Danger' }]} />
+  </Stack>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Select size="xs" placeholder="XS" items={[{ value: 'a', label: 'A' }]} />
+  <Select size="sm" placeholder="Small" items={[{ value: 'a', label: 'A' }]} />
+  <Select size="md" placeholder="Medium" items={[{ value: 'a', label: 'A' }]} />
+  <Select size="lg" placeholder="Large" items={[{ value: 'a', label: 'A' }]} />
+  <Select size="xl" placeholder="XL" items={[{ value: 'a', label: 'A' }]} />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Select size="xs" placeholder="XS" items={[{ value: 'a', label: 'A' }]} />
+    <Select size="sm" placeholder="Small" items={[{ value: 'a', label: 'A' }]} />
+    <Select size="md" placeholder="Medium" items={[{ value: 'a', label: 'A' }]} />
+    <Select size="lg" placeholder="Large" items={[{ value: 'a', label: 'A' }]} />
+    <Select size="xl" placeholder="XL" items={[{ value: 'a', label: 'A' }]} />
+  </Stack>
+</LiveDemo>
+
+## 状态 States
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Select label="Disabled" isDisabled defaultValue="a" items={[{ value: 'a', label: 'Apple' }]} />
+  <Select label="Required" isRequired placeholder="请选择…" items={[{ value: 'a', label: 'Apple' }]} />
+  <Select
+    label="Invalid"
+    errorMessage="请选择一个有效选项。"
+    items={[{ value: 'a', label: 'Apple' }]}
+    placeholder="请选择…"
+  />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Select label="Disabled" isDisabled defaultValue="a" items={[{ value: 'a', label: 'Apple' }]} />
+    <Select label="Required" isRequired placeholder="请选择…" items={[{ value: 'a', label: 'Apple' }]} />
+    <Select
+      label="Invalid"
+      errorMessage="请选择一个有效选项。"
+      items={[{ value: 'a', label: 'Apple' }]}
+      placeholder="请选择…"
+    />
+  </Stack>
+</LiveDemo>
+
+## 搜索 Searchable
+
+`isSearchable` 会在 popover 顶部挂一个搜索框，按 label 做大小写无关子串过滤。适合**长列表**或用户记不全选项全名的场景。
+
+<LiveDemo code={`<Select
+  isSearchable
+  label="选择国家 / 地区"
+  placeholder="点击选择…"
+  searchPlaceholder="搜索国家名…"
+  items={[
+    { value: 'cn', label: '中国' },
+    { value: 'us', label: '美国' },
+    { value: 'jp', label: '日本' },
+    { value: 'kr', label: '韩国' },
+    { value: 'de', label: '德国' },
+    { value: 'fr', label: '法国' },
+    { value: 'gb', label: '英国' },
+    { value: 'it', label: '意大利' },
+    { value: 'es', label: '西班牙' },
+    { value: 'br', label: '巴西' },
+    { value: 'in', label: '印度' },
+    { value: 'ru', label: '俄罗斯' },
+  ]}
+  fullWidth
+/>`}>
+  <Select
+    isSearchable
+    label="选择国家 / 地区"
+    placeholder="点击选择…"
+    searchPlaceholder="搜索国家名…"
+    items={[
+      { value: 'cn', label: '中国' },
+      { value: 'us', label: '美国' },
+      { value: 'jp', label: '日本' },
+      { value: 'kr', label: '韩国' },
+      { value: 'de', label: '德国' },
+      { value: 'fr', label: '法国' },
+      { value: 'gb', label: '英国' },
+      { value: 'it', label: '意大利' },
+      { value: 'es', label: '西班牙' },
+      { value: 'br', label: '巴西' },
+      { value: 'in', label: '印度' },
+      { value: 'ru', label: '俄罗斯' },
+    ]}
+    fullWidth
+  />
+</LiveDemo>
+
+## 长列表 + 滚动
+
+选项很多时，popover 自动限制高度（默认 280px），多余部分出现滚动条。也可以用 `maxListHeight` 自定义。
+
+<LiveDemo code={`<Select
+  isSearchable
+  label="时区"
+  placeholder="选择时区…"
+  maxListHeight={240}
+  items={Array.from({ length: 30 }, (_, i) => ({
+    value: 'tz-' + i,
+    label: 'GMT' + (i - 12 >= 0 ? '+' : '') + (i - 12) + ':00',
+  }))}
+  fullWidth
+/>`}>
+  <Select
+    isSearchable
+    label="时区"
+    placeholder="选择时区…"
+    maxListHeight={240}
+    items={Array.from({ length: 30 }, (_, i) => ({
+      value: 'tz-' + i,
+      label: 'GMT' + (i - 12 >= 0 ? '+' : '') + (i - 12) + ':00',
+    }))}
+    fullWidth
+  />
+</LiveDemo>
+
+## 选项带描述
+
+`SelectItem.description` 会渲染为选项下方的辅助文字。适合需要稍作解释的枚举（权限、套餐、可见范围等）。
+
+<LiveDemo code={`<Select
+  label="可见范围"
+  defaultValue="team"
+  items={[
+    { value: 'private', label: '仅自己', description: '只有你能看到。' },
+    { value: 'team', label: '团队成员', description: '你的团队内可见。' },
+    { value: 'public', label: '公开', description: '任何拥有链接的人都能访问。' },
+  ]}
+  fullWidth
+/>`}>
+  <Select
+    label="可见范围"
+    defaultValue="team"
+    items={[
+      { value: 'private', label: '仅自己', description: '只有你能看到。' },
+      { value: 'team', label: '团队成员', description: '你的团队内可见。' },
+      { value: 'public', label: '公开', description: '任何拥有链接的人都能访问。' },
+    ]}
+    fullWidth
+  />
+</LiveDemo>
+
+## 用法一：items 数组（推荐）
+
+<LiveDemo code={`<Select
+  label="城市"
+  placeholder="请选择…"
+  items={[
+    { value: 'beijing', label: '北京' },
+    { value: 'shanghai', label: '上海' },
+    { value: 'guangzhou', label: '广州' },
+    { value: 'shenzhen', label: '深圳', isDisabled: true },
+  ]}
+/>`}>
+  <Select
+    label="城市"
+    placeholder="请选择…"
+    items={[
+      { value: 'beijing', label: '北京' },
+      { value: 'shanghai', label: '上海' },
+      { value: 'guangzhou', label: '广州' },
+      { value: 'shenzhen', label: '深圳', isDisabled: true },
+    ]}
+  />
+</LiveDemo>
+
+## 用法二：`<SelectOption>` children
+
+父组件会读取 SelectOption 的 `value` / `disabled` / `children` 来生成自定义 listbox 的选项——运行时 SelectOption 本身不渲染 DOM。
+
+<LiveDemo code={`<Select label="尺码" defaultValue="m">
+  <SelectOption value="s">S</SelectOption>
+  <SelectOption value="m">M</SelectOption>
+  <SelectOption value="l">L</SelectOption>
+  <SelectOption value="xl">XL</SelectOption>
+</Select>`}>
+  <Select label="尺码" defaultValue="m">
+    <SelectOption value="s">S</SelectOption>
+    <SelectOption value="m">M</SelectOption>
+    <SelectOption value="l">L</SelectOption>
+    <SelectOption value="xl">XL</SelectOption>
+  </Select>
+</LiveDemo>
+
+## 受控用法
+
+<LiveDemo code={`import { useState } from 'react';
+import { Select } from '@timeui/react';
+
+const FRAMEWORKS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', isDisabled: true },
+];
+
+export function FrameworkPicker() {
+  const [value, setValue] = useState('react');
+  return (
+    <Select
+      label="选择你的前端框架"
+      items={FRAMEWORKS}
+      value={value}
+      onChange={setValue}
+      fullWidth
+    />
+  );
+}`}>
+  <SelectDemo />
+</LiveDemo>
+
+## API
+
+### Select
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: '视觉样式。与 Input 共享。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '语义色；invalid 时强制 danger。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设。' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: '圆角。' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' },
+  { name: 'value', type: 'string', description: '受控值。' },
+  { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: string) => void', description: '选中后触发，回调参数为解包后的字符串。' },
+  { name: 'placeholder', type: 'string', description: '未选中时显示在 trigger 上的占位文案。' },
+  { name: 'items', type: 'SelectItem[]', description: '声明式选项数组；与 children 二选一（items 优先）。' },
+  { name: 'children', type: 'ReactNode', description: '`<SelectOption>` 节点列表；运行时仅读取 props。' },
+  { name: 'isSearchable', type: 'boolean', default: 'false', description: '在 popover 顶部显示搜索框，按 label 子串过滤。' },
+  { name: 'searchPlaceholder', type: 'string', default: "'Search…'", description: '搜索框占位符。' },
+  { name: 'emptyMessage', type: 'ReactNode', default: "'No results'", description: '搜索无结果时的空态文案。' },
+  { name: 'maxListHeight', type: 'number | string', default: '280', description: '选项列表的最大高度；超出时出现滚动条。' },
+  { name: 'name', type: 'string', description: '隐藏 `<input>` 的 name，用于原生表单提交。' },
+  { name: 'label', type: 'ReactNode', description: '字段标题；触发隐式 FormField 包装。' },
+  { name: 'description', type: 'ReactNode', description: '辅助文案。' },
+  { name: 'errorMessage', type: 'ReactNode', description: '错误提示；触发 invalid。' },
+  { name: 'startContent', type: 'ReactNode', description: 'trigger 内的左侧 slot（图标等）。' },
+  { name: 'endContent', type: 'ReactNode', description: '右侧 slot；覆盖默认 chevron。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },
+  { name: 'isInvalid', type: 'boolean', description: '显式 invalid。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用。' }
+]} />
+
+### SelectItem
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: '选项值。' },
+  { name: 'label', type: 'ReactNode', required: true, description: '选项内容；搜索过滤时按其文本形式匹配。' },
+  { name: 'isDisabled', type: 'boolean', description: '禁用该选项。' },
+  { name: 'description', type: 'ReactNode', description: '选项下方的辅助文字。' }
+]} />
+
+### SelectOption
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: '选项值。' },
+  { name: 'children', type: 'ReactNode', description: '选项内容。' },
+  { name: 'disabled', type: 'boolean', description: '禁用（与 `isDisabled` 等价，兼容原生写法）。' },
+  { name: 'isDisabled', type: 'boolean', description: '禁用。' },
+  { name: 'description', type: 'ReactNode', description: '选项下方的辅助文字。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  trigger 是 `role="combobox"` + `aria-haspopup="listbox"` + `aria-expanded`；popover 是 `role="listbox"`；选项是 `role="option"` 并带 `aria-selected` / `aria-disabled`。键盘支持：`↑/↓` 高亮切换，`Home/End` 跳首尾，`Enter` 选中，`Space` 选中（或在未打开时打开），`Esc` 关闭并返回焦点。`isSearchable` 打开后焦点先进搜索框；关闭时焦点回到 trigger。label / description / errorMessage 的串联由隐式 FormField 处理。
+</Callout>

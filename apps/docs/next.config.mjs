@@ -10,6 +10,19 @@ const withMDX = createMDX({
 // Security headers applied to every route. CodeBlock renders Shiki's HTML via
 // dangerouslySetInnerHTML — Shiki's output is trusted (it's our own server-side
 // tokenizer), but a conservative CSP still makes sense as defense-in-depth.
+//
+// Dev mode needs 'unsafe-eval' for Next.js Fast Refresh / React Refresh runtime
+// and a websocket connect-src for HMR. Prod keeps the stricter baseline.
+const isDev = process.env.NODE_ENV !== 'production';
+
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
+
+const connectSrc = isDev
+  ? "connect-src 'self' ws: wss:"
+  : "connect-src 'self'";
+
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -25,11 +38,11 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self'",
+      connectSrc,
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

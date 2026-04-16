@@ -36,6 +36,7 @@ export default function App() {
 - 排版：`Heading`、`Paragraph`、`Link`、`Code`
 - 布局：`Flex`、`Stack`
 - 文档类：`Callout`、`CodeBlock`（通过 sub-entry）
+- 表单类：`FormField`、`Input`、`Textarea`、`Checkbox` + `CheckboxGroup`、`Radio` + `RadioGroup`、`Switch`、`Select` + `SelectOption`
 - 测试工具：`renderWithProviders`、`expectA11y`（通过 `@timeui/react/test-utils`）
 
 ## 多入口
@@ -59,3 +60,13 @@ export default function App() {
 ## 组件文档
 
 组件级别的 API / 示例请看文档站 `/zh/docs/components/*` 或仓库里的 `apps/docs/src/app/[locale]/docs/components/` 下的 MDX。
+
+新增的表单组件文档路径：
+
+- `/zh/docs/components/form-field`（FormField）
+- `/zh/docs/components/input`（Input）
+- `/zh/docs/components/textarea`（Textarea）
+- `/zh/docs/components/select`（Select + SelectOption）
+- `/zh/docs/components/checkbox`（Checkbox + CheckboxGroup）
+- `/zh/docs/components/radio`（Radio + RadioGroup）
+- `/zh/docs/components/switch`（Switch）

@@ -1,0 +1,222 @@
+# Input
+
+The core single-line text field. Four visual **variants**, six semantic **colors**, five size steps, plus `startContent` / `endContent` slots, `isClearable`, and a built-in password toggle.
+
+Pass any of `label` / `description` / `errorMessage` and `Input` will implicitly wrap itself in a [`FormField`](./form-field) so label linking and `aria-describedby` just work.
+
+## Variants
+
+Four form-focused variants — a subset of Button's scale plus a new `underlined` recipe.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input variant="flat" placeholder="flat (default)" />
+  <Input variant="bordered" placeholder="bordered" />
+  <Input variant="faded" placeholder="faded" />
+  <Input variant="underlined" placeholder="underlined" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input variant="flat" placeholder="flat (default)" />
+    <Input variant="bordered" placeholder="bordered" />
+    <Input variant="faded" placeholder="faded" />
+    <Input variant="underlined" placeholder="underlined" />
+  </Stack>
+</LiveDemo>
+
+## Colors
+
+Six semantic colors. `color` tints the **border, focus ring, and soft
+background** — `bordered` / `faded` show it at rest; `flat` / `underlined`
+reveal it on focus. `isInvalid` always forces `danger`.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input variant="bordered" color="default" placeholder="Default" defaultValue="Default" />
+  <Input variant="bordered" color="primary" placeholder="Primary" defaultValue="Primary" />
+  <Input variant="bordered" color="secondary" placeholder="Secondary" defaultValue="Secondary" />
+  <Input variant="bordered" color="success" placeholder="Success" defaultValue="Success" />
+  <Input variant="bordered" color="warning" placeholder="Warning" defaultValue="Warning" />
+  <Input variant="bordered" color="danger" placeholder="Danger" defaultValue="Danger" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input variant="bordered" color="default" placeholder="Default" defaultValue="Default" />
+    <Input variant="bordered" color="primary" placeholder="Primary" defaultValue="Primary" />
+    <Input variant="bordered" color="secondary" placeholder="Secondary" defaultValue="Secondary" />
+    <Input variant="bordered" color="success" placeholder="Success" defaultValue="Success" />
+    <Input variant="bordered" color="warning" placeholder="Warning" defaultValue="Warning" />
+    <Input variant="bordered" color="danger" placeholder="Danger" defaultValue="Danger" />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+`xs` / `sm` / `md` / `lg` / `xl` — 28 / 32 / 40 / 48 / 56 px heights. Matches the Button scale.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input size="xs" placeholder="XS" />
+  <Input size="sm" placeholder="Small" />
+  <Input size="md" placeholder="Medium" />
+  <Input size="lg" placeholder="Large" />
+  <Input size="xl" placeholder="XL" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input size="xs" placeholder="XS" />
+    <Input size="sm" placeholder="Small" />
+    <Input size="md" placeholder="Medium" />
+    <Input size="lg" placeholder="Large" />
+    <Input size="xl" placeholder="XL" />
+  </Stack>
+</LiveDemo>
+
+## Radius
+
+Override the size-derived default.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input radius="sm" placeholder="sm radius" />
+  <Input radius="md" placeholder="md" />
+  <Input radius="lg" placeholder="lg" />
+  <Input radius="full" placeholder="pill" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input radius="sm" placeholder="sm radius" />
+    <Input radius="md" placeholder="md" />
+    <Input radius="lg" placeholder="lg" />
+    <Input radius="full" placeholder="pill" />
+  </Stack>
+</LiveDemo>
+
+## States
+
+`isDisabled` / `isReadOnly` / `isRequired` / `isInvalid` (implied when `errorMessage` is set).
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input label="Disabled" isDisabled defaultValue="Can't touch this" />
+  <Input label="Read only" isReadOnly defaultValue="Look, don't type" />
+  <Input label="Required" isRequired placeholder="Required field" />
+  <Input label="Invalid" errorMessage="Something's wrong here." defaultValue="invalid" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input label="Disabled" isDisabled defaultValue="Can't touch this" />
+    <Input label="Read only" isReadOnly defaultValue="Look, don't type" />
+    <Input label="Required" isRequired placeholder="Required field" />
+    <Input label="Invalid" errorMessage="Something's wrong here." defaultValue="invalid" />
+  </Stack>
+</LiveDemo>
+
+## Clearable
+
+`isClearable` reveals a ✕ button whenever the field has a value. Escape also clears (opt out with `clearOnEscape={false}`).
+
+<LiveDemo code={`<Input
+  isClearable
+  defaultValue="Try clearing me"
+  placeholder="Type anything…"
+/>`}>
+  <Input isClearable defaultValue="Try clearing me" placeholder="Type anything…" />
+</LiveDemo>
+
+## Password toggle
+
+`type="password"` renders an eye button by default — clicking flips between `text` and `password`. `aria-pressed` reflects the current visibility.
+
+<LiveDemo code={`<Input
+  type="password"
+  label="Password"
+  defaultValue="hunter2"
+/>`}>
+  <Input type="password" label="Password" defaultValue="hunter2" />
+</LiveDemo>
+
+## startContent / endContent
+
+Two slots for icons, currency glyphs, units, or small buttons.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input
+    startContent={<span aria-hidden>@</span>}
+    placeholder="twitter handle"
+  />
+  <Input
+    startContent={<span aria-hidden>$</span>}
+    endContent={<span aria-hidden>USD</span>}
+    placeholder="0.00"
+    type="number"
+  />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input startContent={<span aria-hidden>@</span>} placeholder="twitter handle" />
+    <Input
+      startContent={<span aria-hidden>$</span>}
+      endContent={<span aria-hidden>USD</span>}
+      placeholder="0.00"
+      type="number"
+    />
+  </Stack>
+</LiveDemo>
+
+## Controlled usage
+
+Controlled mode fires `onChange(value)` on every keystroke — with the **unwrapped string**, not the event. This demo combines email validation, password toggle, and clearable:
+
+<LiveDemo code={`import { useState } from 'react';
+import { Input, Stack } from '@timeui/react';
+
+export function SignUpForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const emailInvalid = email.length > 0 && !email.includes('@');
+
+  return (
+    <Stack spacing={16}>
+      <Input
+        type="email"
+        label="Email"
+        value={email}
+        onChange={setEmail}
+        isClearable
+        isRequired
+        errorMessage={emailInvalid ? 'Please enter a valid email' : undefined}
+      />
+      <Input
+        type="password"
+        label="Password"
+        value={password}
+        onChange={setPassword}
+        isRequired
+      />
+    </Stack>
+  );
+}`}>
+  <InputFormDemo />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: 'Visual recipe.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Semantic color; forced to `danger` when invalid.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset.' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: 'Corner radius. Defaults to the size-matched value.' },
+  { name: 'type', type: "'text' | 'email' | 'url' | 'tel' | 'password' | 'search' | 'number'", default: "'text'", description: 'Native input type; `password` enables the toggle.' },
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: string) => void', description: 'Unwrapped string change handler.' },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: 'Raw native-event escape hatch.' },
+  { name: 'onClear', type: '() => void', description: 'Fires when the clear button or Escape empties the input.' },
+  { name: 'label', type: 'ReactNode', description: 'Field title; presence triggers implicit FormField wrapping.' },
+  { name: 'description', type: 'ReactNode', description: 'Helper text.' },
+  { name: 'errorMessage', type: 'ReactNode', description: 'Error text; auto-sets `isInvalid`.' },
+  { name: 'startContent', type: 'ReactNode', description: 'Left slot (icon / prefix).' },
+  { name: 'endContent', type: 'ReactNode', description: 'Right slot (icon / suffix / button).' },
+  { name: 'isClearable', type: 'boolean', default: 'false', description: 'Show a ✕ button when non-empty.' },
+  { name: 'clearOnEscape', type: 'boolean', default: 'true', description: 'Press Escape while focused to clear.' },
+  { name: 'isPasswordToggleVisible', type: 'boolean', description: 'Show the password visibility toggle. Default `true` when `type="password"`.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the field.' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable but not editable.' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'Mark as required.' },
+  { name: 'isInvalid', type: 'boolean', description: 'Explicit invalid; auto-derived from errorMessage.' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand the root wrapper to 100% width.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  `ref` points at the native `<input>`. The label (via FormField) is linked to the input's `id`; `isInvalid` sets `aria-invalid="true"` and routes the error text through `aria-describedby`. Clear and password-toggle buttons default to `tabIndex={-1}` (configurable via `clearButtonTabIndex`) to avoid cluttering the Tab order. All transitions honour `prefers-reduced-motion`.
+</Callout>

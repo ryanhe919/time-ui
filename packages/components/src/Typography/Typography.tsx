@@ -136,7 +136,7 @@ export const Code = forwardRef<HTMLElement, HTMLAttributes<HTMLElement>>(functio
       css={css`
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 0.9em;
-        background: ${tt.color.muted};
+        background: ${tt.color.codeBg};
         color: ${tt.color.textPrimary};
         border: 1px solid ${tt.color.borderSubtle};
         padding: 1px 6px;

@@ -1,0 +1,205 @@
+# 表单域 FormField
+
+统一承载 **label / description / errorMessage / required** 的基础包装器。`Input` / `Textarea` / `Select` / `Checkbox` / `Radio` / `Switch` 内部在检测到这些 props 时会**隐式**使用它；你也可以**显式** `<FormField>` 包裹任意子元素——包括原生 `<input>`——把非 TimeUI 控件接入同一套视觉与 a11y 规则。
+
+`FormField` 只做**容器**：负责 `id` 串联、`aria-describedby` / `aria-invalid` / `aria-required` 的组装，以及视觉上的 label / description / error 排版；不改变 children 的任何行为。
+
+<Callout variant="tip" title="两种用法都可以">
+  - **隐式**：`<Input label="用户名" description="2 到 24 个字符" />`——最常见，组件内部自动套 FormField。
+  - **显式**：`<FormField label="用户名"><Input /></FormField>`——外层 label/state 优先生效，适合需要和外部表单状态联动或包裹自定义控件的场景。
+</Callout>
+
+## 基础用法
+
+显式 `<FormField>` 包裹 `<Input>`——label/description 走外层，Input 保留自己的样式与交互。
+
+<LiveDemo code={`<FormField label="用户名" description="2 到 24 个字符。">
+  <Input placeholder="请输入" fullWidth />
+</FormField>`}>
+  <FormField label="用户名" description="2 到 24 个字符。">
+    <Input placeholder="请输入" fullWidth />
+  </FormField>
+</LiveDemo>
+
+## 必填 Required
+
+`isRequired` 同时触发：label 后的红色 `*` 标记、`aria-required="true"` 以及原生 `required` 属性。
+
+<LiveDemo code={`<FormField
+  label="邮箱"
+  description="我们会向这个地址发送验证邮件。"
+  isRequired
+>
+  <Input type="email" placeholder="you@example.com" fullWidth />
+</FormField>`}>
+  <FormField label="邮箱" description="我们会向这个地址发送验证邮件。" isRequired>
+    <Input type="email" placeholder="you@example.com" fullWidth />
+  </FormField>
+</LiveDemo>
+
+## 错误态 Invalid
+
+传入 `errorMessage` 会**自动**把内部字段置为 `isInvalid=true`，Input 边框与文本变红，同时通过 `aria-describedby` 关联错误文案。错误容器带 `role="alert"` + `aria-live="polite"`，屏幕阅读器会即时播报。
+
+<LiveDemo code={`<FormField
+  label="验证码"
+  errorMessage="验证码不正确，请重试。"
+>
+  <Input defaultValue="1234" fullWidth />
+</FormField>`}>
+  <FormField label="验证码" errorMessage="验证码不正确，请重试。">
+    <Input defaultValue="1234" fullWidth />
+  </FormField>
+</LiveDemo>
+
+## 禁用 Disabled
+
+`isDisabled` 透传给子控件（走 camelCase 的 `isDisabled` prop），并降低整个 FormField 的 opacity。
+
+<LiveDemo code={`<FormField
+  label="系统备注"
+  description="管理员才能修改。"
+  isDisabled
+>
+  <Textarea defaultValue="这是一段只读的系统备注。" fullWidth />
+</FormField>`}>
+  <FormField label="系统备注" description="管理员才能修改。" isDisabled>
+    <Textarea defaultValue="这是一段只读的系统备注。" fullWidth />
+  </FormField>
+</LiveDemo>
+
+## Label 摆放 Placement
+
+`labelPlacement='top'`（默认）垂直堆叠；`'start'` 切换为左右布局，适合设置表单或紧凑的个人信息面板。
+
+<LiveDemo code={`<Stack spacing={16}>
+  <FormField label="昵称" labelPlacement="top">
+    <Input placeholder="top（默认）" fullWidth />
+  </FormField>
+  <FormField label="国家 / 地区" labelPlacement="start">
+    <Select placeholder="请选择" fullWidth>
+      <SelectOption value="cn">中国</SelectOption>
+      <SelectOption value="us">美国</SelectOption>
+      <SelectOption value="jp">日本</SelectOption>
+    </Select>
+  </FormField>
+</Stack>`}>
+  <Stack spacing={16}>
+    <FormField label="昵称" labelPlacement="top">
+      <Input placeholder="top（默认）" fullWidth />
+    </FormField>
+    <FormField label="国家 / 地区" labelPlacement="start">
+      <Select placeholder="请选择" fullWidth>
+        <SelectOption value="cn">中国</SelectOption>
+        <SelectOption value="us">美国</SelectOption>
+        <SelectOption value="jp">日本</SelectOption>
+      </Select>
+    </FormField>
+  </Stack>
+</LiveDemo>
+
+## 组合多种控件
+
+一个完整的表单示例——`FormField` 作为统一容器，把 `Input` / `Textarea` / `Select` / `Switch` 串成同一套视觉节奏。
+
+<LiveDemo code={`<Stack spacing={20} style={{ width: 'min(520px, 100%)' }}>
+  <FormField label="项目名称" description="会显示在侧边栏和通知中。" isRequired>
+    <Input placeholder="例如：月度运营周报" fullWidth />
+  </FormField>
+
+  <FormField label="项目描述">
+    <Textarea placeholder="一句话描述目标、范围或相关链接。" rows={3} fullWidth />
+  </FormField>
+
+  <FormField label="可见范围" labelPlacement="start">
+    <Select defaultValue="team" fullWidth>
+      <SelectOption value="private">仅自己</SelectOption>
+      <SelectOption value="team">团队成员</SelectOption>
+      <SelectOption value="public">公开</SelectOption>
+    </Select>
+  </FormField>
+
+  <FormField label="启用通知" labelPlacement="start" description="在有新评论时通过邮件提醒。">
+    <Switch defaultSelected />
+  </FormField>
+</Stack>`}>
+  <Stack spacing={20} style={{ width: 'min(520px, 100%)' }}>
+    <FormField label="项目名称" description="会显示在侧边栏和通知中。" isRequired>
+      <Input placeholder="例如：月度运营周报" fullWidth />
+    </FormField>
+
+    <FormField label="项目描述">
+      <Textarea placeholder="一句话描述目标、范围或相关链接。" rows={3} fullWidth />
+    </FormField>
+
+    <FormField label="可见范围" labelPlacement="start">
+      <Select defaultValue="team" fullWidth>
+        <SelectOption value="private">仅自己</SelectOption>
+        <SelectOption value="team">团队成员</SelectOption>
+        <SelectOption value="public">公开</SelectOption>
+      </Select>
+    </FormField>
+
+    <FormField label="启用通知" labelPlacement="start" description="在有新评论时通过邮件提醒。">
+      <Switch defaultSelected />
+    </FormField>
+  </Stack>
+</LiveDemo>
+
+## 包裹原生控件
+
+FormField 对 children 是**无感知**的——只要是单个 React element 都能接入。当 child 是原生 DOM 元素（`<input>` / `<select>` 等）时，FormField 会自动翻译：把 `isDisabled` 转成 DOM 形式的 `disabled`，不会向 DOM 透传无效属性。
+
+<LiveDemo code={`<FormField label="自定义控件" description="也可以直接包裹原生 input。">
+  <input
+    type="text"
+    placeholder="不走 TimeUI 样式的原生输入框"
+    style={{
+      width: '100%',
+      height: 36,
+      padding: '0 12px',
+      border: '1px solid #d1d5db',
+      borderRadius: 8,
+      background: '#fff',
+      fontSize: 14,
+    }}
+  />
+</FormField>`}>
+  <FormField label="自定义控件" description="也可以直接包裹原生 input。">
+    <input
+      type="text"
+      placeholder="不走 TimeUI 样式的原生输入框"
+      style={{
+        width: '100%',
+        height: 36,
+        padding: '0 12px',
+        border: '1px solid #d1d5db',
+        borderRadius: 8,
+        background: '#fff',
+        fontSize: 14,
+      }}
+    />
+  </FormField>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', description: '字段标题。字符串渲染为 `<label htmlFor>`；ReactNode 走 `aria-labelledby`。' },
+  { name: 'labelPlacement', type: "'top' | 'start'", default: "'top'", description: '`top` 纵向；`start` 左右布局。' },
+  { name: 'description', type: 'ReactNode', description: '辅助说明文字。' },
+  { name: 'errorMessage', type: 'ReactNode', description: '错误提示；存在时自动视为 `isInvalid=true`。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: '渲染 `*` 红色标记并透传 `required` / `aria-required`。' },
+  { name: 'isInvalid', type: 'boolean', description: '显式覆盖。默认从 `errorMessage` 自动推导。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '透传给子控件（camelCase → TimeUI 组件、`disabled` → 原生 DOM），并降低根节点 opacity。' },
+  { name: 'id', type: 'string', description: '字段 id；省略时由 `useId()` 生成。' },
+  { name: 'children', type: 'ReactElement', required: true, description: '单个 React element，会被注入 id / aria-* / isDisabled（DOM 子元素会自动翻译为 disabled）。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  string 形式的 `label` 用 `<label htmlFor>` 关联 children 的 `id`；ReactNode 形式用 `aria-labelledby`。`description` 与 `errorMessage` 会一起进入 `aria-describedby`（顺序：description → error）。`errorMessage` 容器带 `role="alert"` + `aria-live="polite"`，屏幕阅读器会在错误出现时即时播报。
+</Callout>
+
+<Callout variant="tip" title="隐式 vs 显式">
+  TimeUI 表单组件自身就支持 `label` / `description` / `errorMessage` / `isRequired` / `isInvalid` / `isDisabled`——内部会在**未被外层 FormField 包裹**时隐式创建一个。因此 `<FormField><Input /></FormField>` 和 `<Input label="..." />` 都是合法写法；组合时外层 FormField 会优先生效，避免"双层 label"问题。
+</Callout>

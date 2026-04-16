@@ -1,0 +1,182 @@
+# Textarea
+
+Multi-line text input. Visually identical to [`Input`](./input) — same four variants, six semantic colors, five size steps — but with height and auto-sizing controls: fixed `rows`, `minRows`/`maxRows` auto-grow, and a built-in `showCount` character counter.
+
+## Variants
+
+Same four recipes as Input: `flat` / `bordered` / `faded` / `underlined`.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Textarea variant="flat" placeholder="flat (default)" />
+  <Textarea variant="bordered" placeholder="bordered" />
+  <Textarea variant="faded" placeholder="faded" />
+  <Textarea variant="underlined" placeholder="underlined" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Textarea variant="flat" placeholder="flat (default)" />
+    <Textarea variant="bordered" placeholder="bordered" />
+    <Textarea variant="faded" placeholder="faded" />
+    <Textarea variant="underlined" placeholder="underlined" />
+  </Stack>
+</LiveDemo>
+
+## Colors
+
+The six semantic colors mirror Input exactly. `bordered` / `faded` show the tint at rest; `flat` / `underlined` reveal it on focus.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Textarea variant="bordered" color="default" defaultValue="Default" />
+  <Textarea variant="bordered" color="primary" defaultValue="Primary" />
+  <Textarea variant="bordered" color="secondary" defaultValue="Secondary" />
+  <Textarea variant="bordered" color="success" defaultValue="Success" />
+  <Textarea variant="bordered" color="warning" defaultValue="Warning" />
+  <Textarea variant="bordered" color="danger" defaultValue="Danger" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Textarea variant="bordered" color="default" defaultValue="Default" />
+    <Textarea variant="bordered" color="primary" defaultValue="Primary" />
+    <Textarea variant="bordered" color="secondary" defaultValue="Secondary" />
+    <Textarea variant="bordered" color="success" defaultValue="Success" />
+    <Textarea variant="bordered" color="warning" defaultValue="Warning" />
+    <Textarea variant="bordered" color="danger" defaultValue="Danger" />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+Five steps that map to Input. `rows` is fixed at 3 here; the perceived height scales with `size`'s font size and line height.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Textarea size="xs" placeholder="XS" />
+  <Textarea size="sm" placeholder="Small" />
+  <Textarea size="md" placeholder="Medium" />
+  <Textarea size="lg" placeholder="Large" />
+  <Textarea size="xl" placeholder="XL" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Textarea size="xs" placeholder="XS" />
+    <Textarea size="sm" placeholder="Small" />
+    <Textarea size="md" placeholder="Medium" />
+    <Textarea size="lg" placeholder="Large" />
+    <Textarea size="xl" placeholder="XL" />
+  </Stack>
+</LiveDemo>
+
+## States
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Textarea label="Disabled" isDisabled defaultValue="Can't touch this" />
+  <Textarea label="Read only" isReadOnly defaultValue="Look, don't type" />
+  <Textarea label="Required" isRequired placeholder="Required field" />
+  <Textarea label="Invalid" errorMessage="Please enter at least 10 characters." defaultValue="too short" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Textarea label="Disabled" isDisabled defaultValue="Can't touch this" />
+    <Textarea label="Read only" isReadOnly defaultValue="Look, don't type" />
+    <Textarea label="Required" isRequired placeholder="Required field" />
+    <Textarea
+      label="Invalid"
+      errorMessage="Please enter at least 10 characters."
+      defaultValue="too short"
+    />
+  </Stack>
+</LiveDemo>
+
+## Fixed rows
+
+Without `minRows` / `maxRows`, a fixed `rows` (default `3`) is used — the height doesn't change with content.
+
+<LiveDemo code={`<Textarea rows={5} placeholder="Fixed 5-row height" />`}>
+  <Textarea rows={5} placeholder="Fixed 5-row height" />
+</LiveDemo>
+
+## Auto-size
+
+Passing `minRows` / `maxRows` enables auto-grow — height tracks content until the upper bound, then scrolls.
+
+<LiveDemo code={`<Textarea
+  minRows={2}
+  maxRows={6}
+  placeholder="Starts at 2 rows; grows up to 6 before scrolling."
+/>`}>
+  <Textarea
+    minRows={2}
+    maxRows={6}
+    placeholder="Starts at 2 rows; grows up to 6 before scrolling."
+  />
+</LiveDemo>
+
+## Character count
+
+`showCount` (with a `maxLength`) draws `n/max` in the bottom-right corner. It turns `warning` near the cap and `danger` over it.
+
+<LiveDemo code={`<Textarea
+  showCount
+  maxLength={80}
+  defaultValue="Try typing past 80 characters and watch it flip."
+/>`}>
+  <Textarea
+    showCount
+    maxLength={80}
+    defaultValue="Try typing past 80 characters and watch it flip."
+  />
+</LiveDemo>
+
+## Controlled usage
+
+Controlled value + auto-size + counter in a single field:
+
+<LiveDemo code={`import { useState } from 'react';
+import { Textarea } from '@timeui/react';
+
+export function FeedbackForm() {
+  const [value, setValue] = useState('');
+  return (
+    <Textarea
+      label="Feedback"
+      description="Press Enter for a newline; 120 chars max."
+      value={value}
+      onChange={setValue}
+      minRows={3}
+      maxRows={8}
+      maxLength={120}
+      showCount
+      fullWidth
+    />
+  );
+}`}>
+  <TextareaDemo />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: 'Shares the Input recipe.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Semantic color.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset.' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: 'Corner radius.' },
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: string) => void', description: 'Unwrapped string change handler.' },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLTextAreaElement>) => void', description: 'Raw native-event escape hatch.' },
+  { name: 'rows', type: 'number', default: '3', description: 'Fixed row count when auto-size is off.' },
+  { name: 'minRows', type: 'number', description: 'Lower bound for auto-size.' },
+  { name: 'maxRows', type: 'number', description: 'Upper bound; content beyond scrolls.' },
+  { name: 'isAutoSize', type: 'boolean', description: 'Explicit toggle. Defaults to true when `minRows`/`maxRows` is set.' },
+  { name: 'showCount', type: 'boolean', default: 'false', description: 'Render `n/max` counter in the bottom-right corner; requires `maxLength`.' },
+  { name: 'maxLength', type: 'number', description: 'Native maxLength; required with `showCount`.' },
+  { name: 'label', type: 'ReactNode', description: 'Field title; triggers implicit FormField wrapping.' },
+  { name: 'description', type: 'ReactNode', description: 'Helper text.' },
+  { name: 'errorMessage', type: 'ReactNode', description: 'Error text; auto-sets `isInvalid`.' },
+  { name: 'startContent', type: 'ReactNode', description: 'Top-left slot.' },
+  { name: 'endContent', type: 'ReactNode', description: 'Top-right slot.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the field.' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable but not editable.' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'Mark as required.' },
+  { name: 'isInvalid', type: 'boolean', description: 'Explicit invalid.' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to 100% width.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  `ref` points at the native `<textarea>`. `Enter` never submits the form (native behavior). Unlike Input, **Escape does not clear** — accidental loss of long text is painful, so we deliberately differ. When the counter is visible it's mirrored into a sr-only node via `aria-describedby` (for example "42 of 80 characters used"). All transitions honour `prefers-reduced-motion`.
+</Callout>

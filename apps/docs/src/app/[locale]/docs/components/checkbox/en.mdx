@@ -1,0 +1,199 @@
+# Checkbox
+
+A single check box (with an `indeterminate` tri-state) plus **CheckboxGroup** — a wrapper that manages a `string[]` selection, auto-wires a shared `name`, and renders a single label / description / errorMessage across the group.
+
+## Basic usage
+
+A `Checkbox` is a `<label>` wrapping the native `<input type="checkbox">`, so clicking the text or the indicator both toggle the value.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Checkbox defaultSelected>Selected</Checkbox>
+  <Checkbox>Unselected</Checkbox>
+  <Checkbox isIndeterminate>Indeterminate (mixed)</Checkbox>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Checkbox defaultSelected>Selected</Checkbox>
+    <Checkbox>Unselected</Checkbox>
+    <Checkbox isIndeterminate>Indeterminate (mixed)</Checkbox>
+  </Stack>
+</LiveDemo>
+
+## Colors
+
+Six semantic colors. `color` drives the selected-state background; default is `primary`.
+
+<LiveDemo code={`<Flex gap={16} align="center" wrap="wrap">
+  <Checkbox defaultSelected color="default">Default</Checkbox>
+  <Checkbox defaultSelected color="primary">Primary</Checkbox>
+  <Checkbox defaultSelected color="secondary">Secondary</Checkbox>
+  <Checkbox defaultSelected color="success">Success</Checkbox>
+  <Checkbox defaultSelected color="warning">Warning</Checkbox>
+  <Checkbox defaultSelected color="danger">Danger</Checkbox>
+</Flex>`}>
+  <Flex gap={16} align="center" wrap="wrap">
+    <Checkbox defaultSelected color="default">Default</Checkbox>
+    <Checkbox defaultSelected color="primary">Primary</Checkbox>
+    <Checkbox defaultSelected color="secondary">Secondary</Checkbox>
+    <Checkbox defaultSelected color="success">Success</Checkbox>
+    <Checkbox defaultSelected color="warning">Warning</Checkbox>
+    <Checkbox defaultSelected color="danger">Danger</Checkbox>
+  </Flex>
+</LiveDemo>
+
+## Sizes
+
+Three steps `sm` / `md` / `lg` — indicator widths of 16 / 20 / 24 px respectively.
+
+<LiveDemo code={`<Flex gap={16} align="center">
+  <Checkbox size="sm" defaultSelected>Small</Checkbox>
+  <Checkbox size="md" defaultSelected>Medium</Checkbox>
+  <Checkbox size="lg" defaultSelected>Large</Checkbox>
+</Flex>`}>
+  <Flex gap={16} align="center">
+    <Checkbox size="sm" defaultSelected>Small</Checkbox>
+    <Checkbox size="md" defaultSelected>Medium</Checkbox>
+    <Checkbox size="lg" defaultSelected>Large</Checkbox>
+  </Flex>
+</LiveDemo>
+
+## States
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Checkbox isDisabled>Disabled</Checkbox>
+  <Checkbox isDisabled defaultSelected>Disabled + selected</Checkbox>
+  <Checkbox isReadOnly defaultSelected>Read only</Checkbox>
+  <Checkbox isRequired>Required</Checkbox>
+  <Checkbox isInvalid>Invalid</Checkbox>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Checkbox isDisabled>Disabled</Checkbox>
+    <Checkbox isDisabled defaultSelected>Disabled + selected</Checkbox>
+    <Checkbox isReadOnly defaultSelected>Read only</Checkbox>
+    <Checkbox isRequired>Required</Checkbox>
+    <Checkbox isInvalid>Invalid</Checkbox>
+  </Stack>
+</LiveDemo>
+
+## Indeterminate
+
+For the "partial selection" semantic — a parent checkbox summarizing some-on / some-off children.
+
+<LiveDemo code={`<Checkbox isIndeterminate>Some children selected</Checkbox>`}>
+  <Checkbox isIndeterminate>Some children selected</Checkbox>
+</LiveDemo>
+
+## CheckboxGroup
+
+The group owns `value: string[]`, injects a shared `name` into every child, and renders a single label / description / errorMessage.
+
+<LiveDemo code={`<CheckboxGroup label="Hobbies" description="Select any that apply">
+  <Checkbox value="music">Music</Checkbox>
+  <Checkbox value="reading">Reading</Checkbox>
+  <Checkbox value="sports">Sports</Checkbox>
+</CheckboxGroup>`}>
+  <CheckboxGroup label="Hobbies" description="Select any that apply">
+    <Checkbox value="music">Music</Checkbox>
+    <Checkbox value="reading">Reading</Checkbox>
+    <Checkbox value="sports">Sports</Checkbox>
+  </CheckboxGroup>
+</LiveDemo>
+
+## Horizontal layout
+
+<LiveDemo code={`<CheckboxGroup label="Subscribe to" orientation="horizontal">
+  <Checkbox value="news">News</Checkbox>
+  <Checkbox value="tech">Tech</Checkbox>
+  <Checkbox value="design">Design</Checkbox>
+</CheckboxGroup>`}>
+  <CheckboxGroup label="Subscribe to" orientation="horizontal">
+    <Checkbox value="news">News</Checkbox>
+    <Checkbox value="tech">Tech</Checkbox>
+    <Checkbox value="design">Design</Checkbox>
+  </CheckboxGroup>
+</LiveDemo>
+
+## Group-level error
+
+A group-level `errorMessage` hooks into `aria-describedby` on the group and flips every child's `aria-invalid` to `true`.
+
+<LiveDemo code={`<CheckboxGroup
+  label="Terms"
+  errorMessage="Please check at least one to continue."
+  isRequired
+>
+  <Checkbox value="tos">I agree to the Terms of Service</Checkbox>
+  <Checkbox value="privacy">I agree to the Privacy Policy</Checkbox>
+</CheckboxGroup>`}>
+  <CheckboxGroup label="Terms" errorMessage="Please check at least one to continue." isRequired>
+    <Checkbox value="tos">I agree to the Terms of Service</Checkbox>
+    <Checkbox value="privacy">I agree to the Privacy Policy</Checkbox>
+  </CheckboxGroup>
+</LiveDemo>
+
+## Controlled usage
+
+<LiveDemo code={`import { useState } from 'react';
+import { Checkbox, CheckboxGroup } from '@timeui/react';
+
+export function SkillPicker() {
+  const [value, setValue] = useState(['ts', 'react']);
+  return (
+    <CheckboxGroup
+      label="Which of these have you used?"
+      value={value}
+      onChange={setValue}
+    >
+      <Checkbox value="ts">TypeScript</Checkbox>
+      <Checkbox value="react">React</Checkbox>
+      <Checkbox value="emotion">Emotion</Checkbox>
+      <Checkbox value="storybook">Storybook</Checkbox>
+    </CheckboxGroup>
+  );
+}`}>
+  <CheckboxGroupDemo />
+</LiveDemo>
+
+## API
+
+### Checkbox
+
+<PropsTable props={[
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'", description: 'Selected-state semantic color.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size preset — Checkbox has no xs / xl.' },
+  { name: 'radius', type: "'sm' | 'md'", description: 'Indicator corner radius.' },
+  { name: 'value', type: 'string', description: 'Option value; required inside CheckboxGroup.' },
+  { name: 'isSelected', type: 'boolean', description: 'Controlled selection state.' },
+  { name: 'defaultSelected', type: 'boolean', default: 'false', description: 'Uncontrolled initial state.' },
+  { name: 'isIndeterminate', type: 'boolean', default: 'false', description: 'Mixed state (orthogonal to isSelected).' },
+  { name: 'onChange', type: '(checked: boolean) => void', description: 'Unwrapped boolean change handler.' },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: 'Raw native event.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disabled.' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Read only.' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'Required.' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: 'Invalid.' },
+  { name: 'children', type: 'ReactNode', description: 'Label text.' },
+  { name: 'name', type: 'string', description: 'Auto-injected by CheckboxGroup.' }
+]} />
+
+### CheckboxGroup
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', description: 'Group label (renders as `<legend>`).' },
+  { name: 'description', type: 'ReactNode', description: 'Helper text.' },
+  { name: 'errorMessage', type: 'ReactNode', description: 'Error text; triggers invalid.' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'Required.' },
+  { name: 'isInvalid', type: 'boolean', description: 'Explicit invalid override.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the whole group — wins over child props.' },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'vertical'", description: 'Layout direction.' },
+  { name: 'value', type: 'string[]', description: 'Controlled selection.' },
+  { name: 'defaultValue', type: 'string[]', default: '[]', description: 'Uncontrolled initial selection.' },
+  { name: 'onChange', type: '(value: string[]) => void', description: 'Fires with the next array.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: 'Default color for descendants (children can override).' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Default size for descendants.' },
+  { name: 'radius', type: "'sm' | 'md'", description: 'Default radius for descendants.' },
+  { name: 'name', type: 'string', description: 'Shared `name` for descendants; defaults to `useId()`.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Each `Checkbox` is a `<label>` wrapping a native `<input type="checkbox">`, giving it an implicit accessible name — no extra `aria-label` needed. Indeterminate is set imperatively via `input.indeterminate = true`; screen readers announce it as "mixed". `CheckboxGroup` renders `<fieldset>` + `<legend>` (or `role="group"` + `aria-labelledby` for ReactNode labels). Tab focuses the first checkbox and Space toggles.
+</Callout>

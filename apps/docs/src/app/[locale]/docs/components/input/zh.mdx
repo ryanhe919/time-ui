@@ -1,0 +1,220 @@
+# 输入框 Input
+
+单行文本输入——最核心的表单原子。提供 **4 种 variant** × **6 种语义色** × **5 档 size**，支持 `startContent` / `endContent` 插槽、`isClearable` 清除按钮与 `password` 的显隐切换。
+
+传入 `label` / `description` / `errorMessage` 时会隐式使用 [`FormField`](./form-field) 包装，得到统一的排版与 a11y 串联。
+
+## 样式 Variants
+
+四种表单专用样式——取 Button 的子集，并新增 `underlined` 适配 Material 风格表单。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input variant="flat" placeholder="flat（默认）" />
+  <Input variant="bordered" placeholder="bordered" />
+  <Input variant="faded" placeholder="faded" />
+  <Input variant="underlined" placeholder="underlined" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input variant="flat" placeholder="flat（默认）" />
+    <Input variant="bordered" placeholder="bordered" />
+    <Input variant="faded" placeholder="faded" />
+    <Input variant="underlined" placeholder="underlined" />
+  </Stack>
+</LiveDemo>
+
+## 颜色 Colors
+
+六种语义色。color 驱动 **边框 / 聚焦环 / 背景底色** 的语义着色——`bordered` / `faded` 在静态就能看到边框 tint；`flat` / `underlined` 在聚焦时显现；`isInvalid` 会强制覆盖为 `danger`。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input variant="bordered" color="default" placeholder="Default" defaultValue="Default" />
+  <Input variant="bordered" color="primary" placeholder="Primary" defaultValue="Primary" />
+  <Input variant="bordered" color="secondary" placeholder="Secondary" defaultValue="Secondary" />
+  <Input variant="bordered" color="success" placeholder="Success" defaultValue="Success" />
+  <Input variant="bordered" color="warning" placeholder="Warning" defaultValue="Warning" />
+  <Input variant="bordered" color="danger" placeholder="Danger" defaultValue="Danger" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input variant="bordered" color="default" placeholder="Default" defaultValue="Default" />
+    <Input variant="bordered" color="primary" placeholder="Primary" defaultValue="Primary" />
+    <Input variant="bordered" color="secondary" placeholder="Secondary" defaultValue="Secondary" />
+    <Input variant="bordered" color="success" placeholder="Success" defaultValue="Success" />
+    <Input variant="bordered" color="warning" placeholder="Warning" defaultValue="Warning" />
+    <Input variant="bordered" color="danger" placeholder="Danger" defaultValue="Danger" />
+  </Stack>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+`xs` / `sm` / `md` / `lg` / `xl` 五档，高度 28 / 32 / 40 / 48 / 56 px，与 Button 对齐。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input size="xs" placeholder="XS" />
+  <Input size="sm" placeholder="Small" />
+  <Input size="md" placeholder="Medium" />
+  <Input size="lg" placeholder="Large" />
+  <Input size="xl" placeholder="XL" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input size="xs" placeholder="XS" />
+    <Input size="sm" placeholder="Small" />
+    <Input size="md" placeholder="Medium" />
+    <Input size="lg" placeholder="Large" />
+    <Input size="xl" placeholder="XL" />
+  </Stack>
+</LiveDemo>
+
+## 圆角 Radius
+
+覆盖由 size 推导的默认圆角。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input radius="sm" placeholder="sm radius" />
+  <Input radius="md" placeholder="md" />
+  <Input radius="lg" placeholder="lg" />
+  <Input radius="full" placeholder="pill" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input radius="sm" placeholder="sm radius" />
+    <Input radius="md" placeholder="md" />
+    <Input radius="lg" placeholder="lg" />
+    <Input radius="full" placeholder="pill" />
+  </Stack>
+</LiveDemo>
+
+## 状态 States
+
+`isDisabled` / `isReadOnly` / `isRequired` / `isInvalid`（及 `errorMessage` 自动推导）。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input label="Disabled" isDisabled defaultValue="不可编辑" />
+  <Input label="Read only" isReadOnly defaultValue="只读内容" />
+  <Input label="Required" isRequired placeholder="必填项" />
+  <Input label="Invalid" errorMessage="这里出错了，请检查。" defaultValue="invalid" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input label="Disabled" isDisabled defaultValue="不可编辑" />
+    <Input label="Read only" isReadOnly defaultValue="只读内容" />
+    <Input label="Required" isRequired placeholder="必填项" />
+    <Input label="Invalid" errorMessage="这里出错了，请检查。" defaultValue="invalid" />
+  </Stack>
+</LiveDemo>
+
+## 清除按钮 Clearable
+
+`isClearable` 在有值时显示 ✕ 清除按钮；按 Escape 也会清空（`clearOnEscape={false}` 可关闭）。
+
+<LiveDemo code={`<Input
+  isClearable
+  defaultValue="试着清空我"
+  placeholder="输入任意内容…"
+/>`}>
+  <Input isClearable defaultValue="试着清空我" placeholder="输入任意内容…" />
+</LiveDemo>
+
+## 密码切换 Password
+
+`type="password"` 默认显示眼睛图标，点击在 `text` / `password` 之间切换；按钮带 `aria-pressed` 反映当前状态。
+
+<LiveDemo code={`<Input
+  type="password"
+  label="密码"
+  defaultValue="hunter2"
+/>`}>
+  <Input type="password" label="密码" defaultValue="hunter2" />
+</LiveDemo>
+
+## 前后插槽 startContent / endContent
+
+两个插槽用于放置图标、货币符号、单位或小按钮。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input
+    startContent={<span aria-hidden>@</span>}
+    placeholder="twitter handle"
+  />
+  <Input
+    startContent={<span aria-hidden>¥</span>}
+    endContent={<span aria-hidden>CNY</span>}
+    placeholder="0.00"
+    type="number"
+  />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input startContent={<span aria-hidden>@</span>} placeholder="twitter handle" />
+    <Input
+      startContent={<span aria-hidden>¥</span>}
+      endContent={<span aria-hidden>CNY</span>}
+      placeholder="0.00"
+      type="number"
+    />
+  </Stack>
+</LiveDemo>
+
+## 受控用法
+
+受控模式下 `value` + `onChange(value)` 每次键入都会触发回调（参数为**解包后的字符串**，不是 event）。下面的 demo 组合了邮箱校验、password toggle 与 clearable：
+
+<LiveDemo code={`import { useState } from 'react';
+import { Input, Stack } from '@timeui/react';
+
+export function SignUpForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const emailInvalid = email.length > 0 && !email.includes('@');
+
+  return (
+    <Stack spacing={16}>
+      <Input
+        type="email"
+        label="邮箱"
+        value={email}
+        onChange={setEmail}
+        isClearable
+        isRequired
+        errorMessage={emailInvalid ? '请输入合法的邮箱' : undefined}
+      />
+      <Input
+        type="password"
+        label="密码"
+        value={password}
+        onChange={setPassword}
+        isRequired
+      />
+    </Stack>
+  );
+}`}>
+  <InputFormDemo />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: '视觉样式。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '语义色；`isInvalid` 时强制 `danger`。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设。' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: '圆角。默认与 size 匹配。' },
+  { name: 'type', type: "'text' | 'email' | 'url' | 'tel' | 'password' | 'search' | 'number'", default: "'text'", description: '原生 input 类型；`password` 启用显隐切换。' },
+  { name: 'value', type: 'string', description: '受控值。' },
+  { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: string) => void', description: '解包后的字符串值回调。' },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: '原生事件逃生口。' },
+  { name: 'onClear', type: '() => void', description: 'clearable 按钮 / Escape 清空时触发。' },
+  { name: 'label', type: 'ReactNode', description: '字段标题；存在时隐式包裹 FormField。' },
+  { name: 'description', type: 'ReactNode', description: '辅助文案。' },
+  { name: 'errorMessage', type: 'ReactNode', description: '错误提示；存在时自动置为 invalid。' },
+  { name: 'startContent', type: 'ReactNode', description: '左侧 slot（图标 / 前缀）。' },
+  { name: 'endContent', type: 'ReactNode', description: '右侧 slot（图标 / 单位 / 按钮）。' },
+  { name: 'isClearable', type: 'boolean', default: 'false', description: '有值时显示 ✕ 清除按钮。' },
+  { name: 'clearOnEscape', type: 'boolean', default: 'true', description: 'focus 时按 Escape 清空。' },
+  { name: 'isPasswordToggleVisible', type: 'boolean', description: '是否显示密码显隐切换。默认仅在 `type="password"` 时 true。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用。' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: '只读。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },
+  { name: 'isInvalid', type: 'boolean', description: '显式 invalid，默认从 errorMessage 推导。' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: '根 wrapper 撑满父容器宽度。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  `ref` 指向原生 `<input>` 元素。label 通过 FormField 与 `<input>` 的 `id` 关联；`isInvalid` 设置 `aria-invalid="true"` 且错误文本进入 `aria-describedby`。clearable 与 password toggle 按钮默认 `tabIndex={-1}`（可用 `clearButtonTabIndex` 覆盖），避免污染 Tab 序列。所有过渡都遵循 `prefers-reduced-motion`。
+</Callout>

@@ -1,0 +1,221 @@
+# Radio
+
+Single-select. `Radio` **must** live inside a `RadioGroup` — the group hands each child a shared `name` and the current `value` via context, so native radio-group keyboard arrows and form submission behave correctly.
+
+## Basic usage
+
+<LiveDemo code={`<RadioGroup label="Gender" defaultValue="female">
+  <Radio value="female">Female</Radio>
+  <Radio value="male">Male</Radio>
+  <Radio value="other">Other</Radio>
+</RadioGroup>`}>
+  <RadioGroup label="Gender" defaultValue="female">
+    <Radio value="female">Female</Radio>
+    <Radio value="male">Male</Radio>
+    <Radio value="other">Other</Radio>
+  </RadioGroup>
+</LiveDemo>
+
+## Colors
+
+Set on the group or on each item. Per-item `color` wins.
+
+<LiveDemo code={`<RadioGroup label="Theme color" defaultValue="primary" orientation="horizontal">
+  <Radio value="default" color="default">Default</Radio>
+  <Radio value="primary" color="primary">Primary</Radio>
+  <Radio value="success" color="success">Success</Radio>
+  <Radio value="warning" color="warning">Warning</Radio>
+  <Radio value="danger" color="danger">Danger</Radio>
+</RadioGroup>`}>
+  <RadioGroup label="Theme color" defaultValue="primary" orientation="horizontal">
+    <Radio value="default" color="default">Default</Radio>
+    <Radio value="primary" color="primary">Primary</Radio>
+    <Radio value="success" color="success">Success</Radio>
+    <Radio value="warning" color="warning">Warning</Radio>
+    <Radio value="danger" color="danger">Danger</Radio>
+  </RadioGroup>
+</LiveDemo>
+
+## Sizes
+
+Three steps `sm` / `md` / `lg`.
+
+<LiveDemo code={`<Stack spacing={16}>
+  <RadioGroup label="Small" size="sm" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+  <RadioGroup label="Medium" size="md" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+  <RadioGroup label="Large" size="lg" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+</Stack>`}>
+  <Stack spacing={16}>
+    <RadioGroup label="Small" size="sm" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+    <RadioGroup label="Medium" size="md" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+    <RadioGroup label="Large" size="lg" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+  </Stack>
+</LiveDemo>
+
+## Orientation
+
+`vertical` by default, switchable to `horizontal`.
+
+<LiveDemo code={`<Stack spacing={24}>
+  <RadioGroup label="Vertical (default)" defaultValue="one">
+    <Radio value="one">Option one</Radio>
+    <Radio value="two">Option two</Radio>
+    <Radio value="three">Option three</Radio>
+  </RadioGroup>
+  <RadioGroup label="Horizontal" orientation="horizontal" defaultValue="one">
+    <Radio value="one">Option one</Radio>
+    <Radio value="two">Option two</Radio>
+    <Radio value="three">Option three</Radio>
+  </RadioGroup>
+</Stack>`}>
+  <Stack spacing={24}>
+    <RadioGroup label="Vertical (default)" defaultValue="one">
+      <Radio value="one">Option one</Radio>
+      <Radio value="two">Option two</Radio>
+      <Radio value="three">Option three</Radio>
+    </RadioGroup>
+    <RadioGroup label="Horizontal" orientation="horizontal" defaultValue="one">
+      <Radio value="one">Option one</Radio>
+      <Radio value="two">Option two</Radio>
+      <Radio value="three">Option three</Radio>
+    </RadioGroup>
+  </Stack>
+</LiveDemo>
+
+## Radio with description
+
+Each Radio supports a per-item `description` rendered in a smaller typography below the label.
+
+<LiveDemo code={`<RadioGroup label="Subscription" defaultValue="pro">
+  <Radio value="free" description="Free forever, up to 3 projects.">
+    Free
+  </Radio>
+  <Radio value="pro" description="Unlimited projects + priority support, $9/mo.">
+    Pro
+  </Radio>
+  <Radio value="team" description="Team collaboration + SSO.">
+    Team
+  </Radio>
+</RadioGroup>`}>
+  <RadioGroup label="Subscription" defaultValue="pro">
+    <Radio value="free" description="Free forever, up to 3 projects.">
+      Free
+    </Radio>
+    <Radio value="pro" description="Unlimited projects + priority support, $9/mo.">
+      Pro
+    </Radio>
+    <Radio value="team" description="Team collaboration + SSO.">
+      Team
+    </Radio>
+  </RadioGroup>
+</LiveDemo>
+
+## States
+
+<LiveDemo code={`<Stack spacing={16}>
+  <RadioGroup label="Group disabled" isDisabled defaultValue="a">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+  <RadioGroup label="Single option disabled" defaultValue="a">
+    <Radio value="a">A</Radio>
+    <Radio value="b" isDisabled>B (unavailable)</Radio>
+    <Radio value="c">C</Radio>
+  </RadioGroup>
+  <RadioGroup label="Invalid" errorMessage="Please pick one." isRequired>
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+</Stack>`}>
+  <Stack spacing={16}>
+    <RadioGroup label="Group disabled" isDisabled defaultValue="a">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+    <RadioGroup label="Single option disabled" defaultValue="a">
+      <Radio value="a">A</Radio>
+      <Radio value="b" isDisabled>B (unavailable)</Radio>
+      <Radio value="c">C</Radio>
+    </RadioGroup>
+    <RadioGroup label="Invalid" errorMessage="Please pick one." isRequired>
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+  </Stack>
+</LiveDemo>
+
+## Controlled usage
+
+<LiveDemo code={`import { useState } from 'react';
+import { Radio, RadioGroup } from '@timeui/react';
+
+export function ShippingPicker() {
+  const [value, setValue] = useState('standard');
+  return (
+    <RadioGroup
+      label="Select a shipping method"
+      value={value}
+      onChange={setValue}
+    >
+      <Radio value="standard" description="3–5 business days">Standard</Radio>
+      <Radio value="express" description="Next-day delivery">Express</Radio>
+      <Radio value="pickup" description="Pick up in store">In-store pickup</Radio>
+    </RadioGroup>
+  );
+}`}>
+  <RadioGroupDemo />
+</LiveDemo>
+
+## API
+
+### Radio
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: 'Option value.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: "Overrides the group's color for this item." },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: "Overrides the group's size for this item." },
+  { name: 'children', type: 'ReactNode', description: 'Label text.' },
+  { name: 'description', type: 'ReactNode', description: 'Secondary caption below the label.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: "Per-item disable; the group's isDisabled always wins." },
+  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: 'Native event escape hatch (rarely needed).' }
+]} />
+
+### RadioGroup
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', description: 'Group label (renders as `<legend>`).' },
+  { name: 'description', type: 'ReactNode', description: 'Helper text.' },
+  { name: 'errorMessage', type: 'ReactNode', description: 'Error text; triggers invalid.' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'Required; sets `aria-required` on the fieldset.' },
+  { name: 'isInvalid', type: 'boolean', description: 'Explicit invalid override.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the whole group — wins over per-item props.' },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'vertical'", description: 'Layout direction.' },
+  { name: 'value', type: 'string', description: 'Controlled selection.' },
+  { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial selection.' },
+  { name: 'onChange', type: '(value: string) => void', description: 'Fires with the newly selected value.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: 'Default color for descendants.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Default size for descendants.' },
+  { name: 'name', type: 'string', description: 'Shared `name` for descendants; defaults to `useId()`.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  RadioGroup renders `<fieldset>` + `<legend>` (or `role="radiogroup"` + `aria-labelledby` for ReactNode labels). Keyboard: Tab focuses the currently selected radio, then `↑ / ↓ / ← / →` cycle through the group (native behavior). Disabled items are skipped. A `Radio` rendered outside a `RadioGroup` logs a dev warning — use a native `<input type="radio">` instead for that case.
+</Callout>

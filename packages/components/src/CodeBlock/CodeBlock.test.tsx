@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { renderWithProviders } from '../test-utils';
+import { expectA11y, renderWithProviders } from '../test-utils';
 import { CodeBlock } from './CodeBlock';
 
 const sample = "const x = 'hi';";
@@ -54,5 +54,19 @@ describe('CodeBlock', () => {
   it('hides copy button when copyable=false', () => {
     renderWithProviders(<CodeBlock code={sample} copyable={false} />);
     expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('passes axe with default props', async () => {
+    const { container } = renderWithProviders(
+      <CodeBlock code="const x = 1;" title="example.ts" noHighlight />,
+    );
+    await expectA11y(container);
+  });
+
+  it('passes axe without copy button', async () => {
+    const { container } = renderWithProviders(
+      <CodeBlock code="const x = 1;" copyable={false} noHighlight />,
+    );
+    await expectA11y(container);
   });
 });
