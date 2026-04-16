@@ -75,9 +75,9 @@ export function SearchDialogDemo() {
             background: rgba(0, 0, 0, 0.32);
             backdrop-filter: saturate(180%) blur(4px);
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
-            padding-top: 15vh;
+            padding: 24px;
             animation: fadeIn 160ms ease-out;
             @keyframes fadeIn {
               from {
@@ -92,12 +92,15 @@ export function SearchDialogDemo() {
           <div
             css={css`
               width: min(560px, 92vw);
+              max-height: min(640px, calc(100vh - 48px));
               background: var(--c-bg, #ffffff);
               border-radius: 16px;
               box-shadow:
                 0 24px 48px rgba(0, 0, 0, 0.18),
                 0 0 0 1px rgba(0, 0, 0, 0.06);
               overflow: hidden;
+              display: flex;
+              flex-direction: column;
               font-family: var(--docs-sans, -apple-system, BlinkMacSystemFont, sans-serif);
             `}
           >
@@ -164,8 +167,22 @@ export function SearchDialogDemo() {
                 list-style: none;
                 margin: 0;
                 padding: 6px;
+                flex: 1;
                 max-height: 360px;
                 overflow: auto;
+
+                & > li {
+                  padding-left: 0 !important;
+                  margin: 0 !important;
+                }
+
+                & > li::before {
+                  content: none !important;
+                  display: none !important;
+                  background: transparent !important;
+                  width: 0 !important;
+                  height: 0 !important;
+                }
               `}
             >
               {filtered.length === 0 ? (

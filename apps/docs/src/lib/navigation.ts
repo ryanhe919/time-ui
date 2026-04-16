@@ -40,7 +40,16 @@ const SECTIONS: readonly SectionConfig[] = [
       },
       {
         slug: 'forms',
-        pages: ['form-field', 'input', 'textarea', 'select', 'checkbox', 'radio', 'switch'],
+        pages: [
+          'form-field',
+          'input',
+          'textarea',
+          'select',
+          'checkbox',
+          'radio',
+          'switch',
+          'slider',
+        ],
       },
     ],
   },

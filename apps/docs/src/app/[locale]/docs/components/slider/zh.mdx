@@ -1,0 +1,205 @@
+# 滑块 Slider
+
+数值连续输入控件：拖拽圆形 thumb 在轨道上选取一个值，或选取范围。底层渲染原生 `<input type="range">`，因此键盘（方向键 / Home / End / PageUp / PageDown）和屏幕阅读器开箱即用。
+
+## 基础用法
+
+横向单值，最常见的"音量 / 进度"场景。
+
+<LiveDemo code={`<Stack spacing={24} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider aria-label="Volume" defaultValue={30} />
+  <Slider label="Volume" defaultValue={30} showValue />
+</Stack>`}>
+  <Stack spacing={24} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider aria-label="Volume" defaultValue={30} />
+    <Slider label="Volume" defaultValue={30} showValue />
+  </Stack>
+</LiveDemo>
+
+## 范围选择
+
+把 `value` / `defaultValue` 传成 `[min, max]` 数组，自动切换为双 thumb 模式。两个 thumb 互相约束，不会越过对方。
+
+<LiveDemo code={`<Slider
+  label="Price Range"
+  max={1000}
+  defaultValue={[100, 500]}
+  showValue
+  formatValue={(v) =>
+    Array.isArray(v)
+      ? \`US$\${v[0].toFixed(2)} – US$\${v[1].toFixed(2)}\`
+      : \`US$\${v.toFixed(2)}\`
+  }
+/>`}>
+  <SliderRangeDemo />
+</LiveDemo>
+
+## 纵向 Vertical
+
+`orientation="vertical"`：值在上方，标题在下方，符合常见的"音量条"形态。`length` 控制轨道长度（横向是宽，纵向是高）。
+
+<LiveDemo code={`<Flex gap={32} align="center" justify="center">
+  <Slider
+    orientation="vertical"
+    label="Volume"
+    defaultValue={46}
+    showValue
+  />
+  <Slider
+    orientation="vertical"
+    color="success"
+    defaultValue={[20, 70]}
+    showValue
+    length={200}
+  />
+</Flex>`}>
+  <Flex gap={32} align="center" justify="center">
+    <Slider orientation="vertical" label="Volume" defaultValue={46} showValue />
+    <Slider orientation="vertical" color="success" defaultValue={[20, 70]} showValue length={200} />
+  </Flex>
+</LiveDemo>
+
+## 颜色 Colors
+
+默认 `primary`。`isInvalid` 会强制走 `danger`。
+
+<LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider color="default" defaultValue={40} aria-label="default" />
+  <Slider color="primary" defaultValue={40} aria-label="primary" />
+  <Slider color="secondary" defaultValue={40} aria-label="secondary" />
+  <Slider color="success" defaultValue={40} aria-label="success" />
+  <Slider color="warning" defaultValue={40} aria-label="warning" />
+  <Slider color="danger" defaultValue={40} aria-label="danger" />
+</Stack>`}>
+  <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider color="default" defaultValue={40} aria-label="default" />
+    <Slider color="primary" defaultValue={40} aria-label="primary" />
+    <Slider color="secondary" defaultValue={40} aria-label="secondary" />
+    <Slider color="success" defaultValue={40} aria-label="success" />
+    <Slider color="warning" defaultValue={40} aria-label="warning" />
+    <Slider color="danger" defaultValue={40} aria-label="danger" />
+  </Stack>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+<LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider size="sm" defaultValue={40} aria-label="sm" />
+  <Slider size="md" defaultValue={40} aria-label="md" />
+  <Slider size="lg" defaultValue={40} aria-label="lg" />
+</Stack>`}>
+  <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider size="sm" defaultValue={40} aria-label="sm" />
+    <Slider size="md" defaultValue={40} aria-label="md" />
+    <Slider size="lg" defaultValue={40} aria-label="lg" />
+  </Stack>
+</LiveDemo>
+
+## 步长 Step
+
+`step` 同时影响键盘步进和拖拽吸附。小数 `step` 会自动按精度补齐（避免浮点漂移）。
+
+<LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider label="step=10" defaultValue={50} step={10} showValue />
+  <Slider label="step=0.1" min={0} max={1} defaultValue={0.4} step={0.1} showValue />
+</Stack>`}>
+  <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider label="step=10" defaultValue={50} step={10} showValue />
+    <Slider label="step=0.1" min={0} max={1} defaultValue={0.4} step={0.1} showValue />
+  </Stack>
+</LiveDemo>
+
+## 状态 States
+
+<LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider label="Disabled" defaultValue={30} isDisabled showValue />
+  <Slider label="Read only" defaultValue={60} isReadOnly showValue />
+  <Slider label="Invalid" defaultValue={[20, 80]} isInvalid showValue />
+</Stack>`}>
+  <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider label="Disabled" defaultValue={30} isDisabled showValue />
+    <Slider label="Read only" defaultValue={60} isReadOnly showValue />
+    <Slider label="Invalid" defaultValue={[20, 80]} isInvalid showValue />
+  </Stack>
+</LiveDemo>
+
+## startContent / endContent
+
+横向时位于轨道两侧，常用于音量、亮度的图标提示。
+
+<LiveDemo code={`<Slider
+  aria-label="brightness"
+  defaultValue={60}
+  startContent={<span aria-hidden>🔅</span>}
+  endContent={<span aria-hidden>🔆</span>}
+/>`}>
+  <Slider
+    aria-label="brightness"
+    defaultValue={60}
+    startContent={<span aria-hidden>🔅</span>}
+    endContent={<span aria-hidden>🔆</span>}
+  />
+</LiveDemo>
+
+## 受控用法
+
+`onChange` 在每次值变化时触发；`onChangeEnd` 在拖拽结束 / 键盘释放时触发，常用于"提交一次"的场景。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Slider } from '@timeui/react';
+
+export function VolumeAndPrice() {
+  const [vol, setVol] = useState(30);
+  const [price, setPrice] = useState<[number, number]>([100, 500]);
+  return (
+    <>
+      <Slider label="Volume" showValue value={vol} onChange={(v) => setVol(v as number)} />
+      <Slider
+        label="Price Range"
+        max={1000}
+        showValue
+        formatValue={(v) =>
+          Array.isArray(v)
+            ? \`US$\${v[0].toFixed(2)} – US$\${v[1].toFixed(2)}\`
+            : \`US$\${v.toFixed(2)}\`
+        }
+        value={price}
+        onChange={(v) => Array.isArray(v) && setPrice(v)}
+      />
+    </>
+  );
+}`}>
+  <SliderVolumeDemo />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'value', type: 'number | [number, number]', description: '受控值。数组形式自动切换为范围模式。' },
+  { name: 'defaultValue', type: 'number | [number, number]', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: SliderValue) => void', description: '值变化时触发。' },
+  { name: 'onChangeEnd', type: '(value: SliderValue) => void', description: '拖拽结束 / 键盘释放后触发，适合"提交一次"。' },
+  { name: 'min', type: 'number', default: '0' },
+  { name: 'max', type: 'number', default: '100' },
+  { name: 'step', type: 'number', default: '1', description: '键盘步进 + 拖拽吸附。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
+  { name: 'label', type: 'ReactNode', description: '标题；横向在顶部，纵向在底部。' },
+  { name: 'showValue', type: 'boolean', default: 'false', description: '展示当前值。' },
+  { name: 'formatValue', type: '(value: SliderValue) => string', description: '同时影响显示文本和 `aria-valuetext`。' },
+  { name: 'startContent', type: 'ReactNode', description: '横向轨道左侧 / 纵向上方插槽。' },
+  { name: 'endContent', type: 'ReactNode', description: '横向轨道右侧 / 纵向下方插槽。' },
+  { name: 'length', type: 'string | number', description: '轨道长度（横向 width / 纵向 height）。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: '强制 `danger` 配色 + `aria-invalid`。' },
+  { name: 'isRequired', type: 'boolean', default: 'false' },
+  { name: 'name', type: 'string', description: '单值模式提交字段名。' },
+  { name: 'minName', type: 'string', description: '范围模式：起始值字段名。' },
+  { name: 'maxName', type: 'string', description: '范围模式：结束值字段名。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  每个 thumb 都是真实的 `<input type="range">`，自带 `role="slider"`、`aria-valuemin/max/now`、键盘步进和表单提交。范围模式下两个 thumb 都可独立 Tab 聚焦，并自带"最小值/最大值"前缀的 `aria-label`。`prefers-reduced-motion` 下取消填充色和 thumb 的过渡动画。
+</Callout>

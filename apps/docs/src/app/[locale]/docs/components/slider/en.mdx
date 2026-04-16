@@ -1,0 +1,205 @@
+# Slider
+
+A continuous numeric input: drag a circular thumb along a track to pick a single value, or pick a range. Internally each thumb is a real `<input type="range">`, so keyboard (arrows / Home / End / PageUp / PageDown), screen readers, and native form submission work out of the box.
+
+## Basic usage
+
+Single horizontal value — the canonical "volume / progress" slider.
+
+<LiveDemo code={`<Stack spacing={24} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider aria-label="Volume" defaultValue={30} />
+  <Slider label="Volume" defaultValue={30} showValue />
+</Stack>`}>
+  <Stack spacing={24} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider aria-label="Volume" defaultValue={30} />
+    <Slider label="Volume" defaultValue={30} showValue />
+  </Stack>
+</LiveDemo>
+
+## Range
+
+Pass `value` / `defaultValue` as a `[min, max]` tuple to switch into two-thumb mode. The thumbs constrain each other and cannot cross.
+
+<LiveDemo code={`<Slider
+  label="Price Range"
+  max={1000}
+  defaultValue={[100, 500]}
+  showValue
+  formatValue={(v) =>
+    Array.isArray(v)
+      ? \`US$\${v[0].toFixed(2)} – US$\${v[1].toFixed(2)}\`
+      : \`US$\${v.toFixed(2)}\`
+  }
+/>`}>
+  <SliderRangeDemo />
+</LiveDemo>
+
+## Vertical
+
+`orientation="vertical"` puts the value above the track and the label below it — the traditional volume-bar shape. Use `length` to control the track length (width when horizontal, height when vertical).
+
+<LiveDemo code={`<Flex gap={32} align="center" justify="center">
+  <Slider
+    orientation="vertical"
+    label="Volume"
+    defaultValue={46}
+    showValue
+  />
+  <Slider
+    orientation="vertical"
+    color="success"
+    defaultValue={[20, 70]}
+    showValue
+    length={200}
+  />
+</Flex>`}>
+  <Flex gap={32} align="center" justify="center">
+    <Slider orientation="vertical" label="Volume" defaultValue={46} showValue />
+    <Slider orientation="vertical" color="success" defaultValue={[20, 70]} showValue length={200} />
+  </Flex>
+</LiveDemo>
+
+## Colors
+
+Defaults to `primary`. `isInvalid` overrides the color to `danger`.
+
+<LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider color="default" defaultValue={40} aria-label="default" />
+  <Slider color="primary" defaultValue={40} aria-label="primary" />
+  <Slider color="secondary" defaultValue={40} aria-label="secondary" />
+  <Slider color="success" defaultValue={40} aria-label="success" />
+  <Slider color="warning" defaultValue={40} aria-label="warning" />
+  <Slider color="danger" defaultValue={40} aria-label="danger" />
+</Stack>`}>
+  <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider color="default" defaultValue={40} aria-label="default" />
+    <Slider color="primary" defaultValue={40} aria-label="primary" />
+    <Slider color="secondary" defaultValue={40} aria-label="secondary" />
+    <Slider color="success" defaultValue={40} aria-label="success" />
+    <Slider color="warning" defaultValue={40} aria-label="warning" />
+    <Slider color="danger" defaultValue={40} aria-label="danger" />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+<LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider size="sm" defaultValue={40} aria-label="sm" />
+  <Slider size="md" defaultValue={40} aria-label="md" />
+  <Slider size="lg" defaultValue={40} aria-label="lg" />
+</Stack>`}>
+  <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider size="sm" defaultValue={40} aria-label="sm" />
+    <Slider size="md" defaultValue={40} aria-label="md" />
+    <Slider size="lg" defaultValue={40} aria-label="lg" />
+  </Stack>
+</LiveDemo>
+
+## Step
+
+`step` controls both keyboard increments and pointer-drag snapping. Decimal `step` values are rounded to the same precision so floating-point drift doesn't leak into your state.
+
+<LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider label="step=10" defaultValue={50} step={10} showValue />
+  <Slider label="step=0.1" min={0} max={1} defaultValue={0.4} step={0.1} showValue />
+</Stack>`}>
+  <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider label="step=10" defaultValue={50} step={10} showValue />
+    <Slider label="step=0.1" min={0} max={1} defaultValue={0.4} step={0.1} showValue />
+  </Stack>
+</LiveDemo>
+
+## States
+
+<LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider label="Disabled" defaultValue={30} isDisabled showValue />
+  <Slider label="Read only" defaultValue={60} isReadOnly showValue />
+  <Slider label="Invalid" defaultValue={[20, 80]} isInvalid showValue />
+</Stack>`}>
+  <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider label="Disabled" defaultValue={30} isDisabled showValue />
+    <Slider label="Read only" defaultValue={60} isReadOnly showValue />
+    <Slider label="Invalid" defaultValue={[20, 80]} isInvalid showValue />
+  </Stack>
+</LiveDemo>
+
+## startContent / endContent
+
+In horizontal mode these flank the track — handy for brightness or volume icons.
+
+<LiveDemo code={`<Slider
+  aria-label="brightness"
+  defaultValue={60}
+  startContent={<span aria-hidden>🔅</span>}
+  endContent={<span aria-hidden>🔆</span>}
+/>`}>
+  <Slider
+    aria-label="brightness"
+    defaultValue={60}
+    startContent={<span aria-hidden>🔅</span>}
+    endContent={<span aria-hidden>🔆</span>}
+  />
+</LiveDemo>
+
+## Controlled
+
+`onChange` fires on every value change; `onChangeEnd` fires once when the drag ends or a key is released — perfect for "commit once" flows.
+
+<LiveDemo code={`import { useState } from 'react';
+import { Slider } from '@timeui/react';
+
+export function VolumeAndPrice() {
+  const [vol, setVol] = useState(30);
+  const [price, setPrice] = useState<[number, number]>([100, 500]);
+  return (
+    <>
+      <Slider label="Volume" showValue value={vol} onChange={(v) => setVol(v as number)} />
+      <Slider
+        label="Price Range"
+        max={1000}
+        showValue
+        formatValue={(v) =>
+          Array.isArray(v)
+            ? \`US$\${v[0].toFixed(2)} – US$\${v[1].toFixed(2)}\`
+            : \`US$\${v.toFixed(2)}\`
+        }
+        value={price}
+        onChange={(v) => Array.isArray(v) && setPrice(v)}
+      />
+    </>
+  );
+}`}>
+  <SliderVolumeDemo />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'value', type: 'number | [number, number]', description: 'Controlled value. Array form switches into range mode.' },
+  { name: 'defaultValue', type: 'number | [number, number]', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: SliderValue) => void', description: 'Fires on every value change.' },
+  { name: 'onChangeEnd', type: '(value: SliderValue) => void', description: 'Fires once after drag-end / key-release — use for "commit once".' },
+  { name: 'min', type: 'number', default: '0' },
+  { name: 'max', type: 'number', default: '100' },
+  { name: 'step', type: 'number', default: '1', description: 'Keyboard step + pointer-drag snap.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
+  { name: 'label', type: 'ReactNode', description: 'Title; on top in horizontal mode, below the track in vertical mode.' },
+  { name: 'showValue', type: 'boolean', default: 'false', description: 'Display the current value.' },
+  { name: 'formatValue', type: '(value: SliderValue) => string', description: 'Drives both the visible text and `aria-valuetext`.' },
+  { name: 'startContent', type: 'ReactNode', description: 'Slot before the track (left when horizontal, top when vertical).' },
+  { name: 'endContent', type: 'ReactNode', description: 'Slot after the track (right when horizontal, bottom when vertical).' },
+  { name: 'length', type: 'string | number', description: 'Track length (width when horizontal, height when vertical).' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: 'Forces `danger` palette + `aria-invalid`.' },
+  { name: 'isRequired', type: 'boolean', default: 'false' },
+  { name: 'name', type: 'string', description: 'Form field name (single value).' },
+  { name: 'minName', type: 'string', description: 'Range mode: low-thumb form field name.' },
+  { name: 'maxName', type: 'string', description: 'Range mode: high-thumb form field name.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Each thumb is a real `<input type="range">`, with `role="slider"`, `aria-valuemin/max/now`, keyboard stepping, and form submission for free. In range mode both thumbs are independently Tab-focusable and ship with "minimum"/"maximum" `aria-label` suffixes. `prefers-reduced-motion` disables the fill and thumb transitions.
+</Callout>

@@ -134,15 +134,41 @@ export const switchSizes = {
   },
 } as const;
 
+export const sliderSizes = {
+  sm: {
+    trackThickness: '6px',
+    thumbSize: '16px',
+    fontSize: '12px',
+    labelGap: '8px',
+    verticalLength: '160px',
+  },
+  md: {
+    trackThickness: '8px',
+    thumbSize: '20px',
+    fontSize: '14px',
+    labelGap: '10px',
+    verticalLength: '200px',
+  },
+  lg: {
+    trackThickness: '10px',
+    thumbSize: '24px',
+    fontSize: '15px',
+    labelGap: '12px',
+    verticalLength: '240px',
+  },
+} as const;
+
 export const components = {
   button: buttonSizes,
   input: inputSizes,
   checkbox: checkboxSizes,
   switch: switchSizes,
+  slider: sliderSizes,
 } as const;
 
 export type ButtonSizes = typeof buttonSizes;
 export type InputSizes = typeof inputSizes;
 export type CheckboxSizes = typeof checkboxSizes;
 export type SwitchSizes = typeof switchSizes;
+export type SliderSizes = typeof sliderSizes;
 export type Components = typeof components;

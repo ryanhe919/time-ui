@@ -28,6 +28,7 @@ export {
   Radio,
   RadioGroup,
   Switch,
+  Slider,
   Select,
   SelectOption,
 } from '@timeui/react';

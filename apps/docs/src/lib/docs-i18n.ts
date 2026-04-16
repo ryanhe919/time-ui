@@ -50,6 +50,7 @@ const zh: DocsMessages = {
     checkbox: '复选框',
     radio: '单选按钮',
     switch: '开关',
+    slider: '滑块',
   },
   nav: {
     onThisPage: '本页目录',
@@ -89,6 +90,7 @@ const en: DocsMessages = {
     checkbox: 'Checkbox',
     radio: 'Radio',
     switch: 'Switch',
+    slider: 'Slider',
   },
   nav: {
     onThisPage: 'On this page',
