@@ -6,6 +6,9 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   release:
     name: Changesets Release
@@ -19,11 +22,10 @@ jobs:
         with: { fetch-depth: 0 }
 
       - uses: pnpm/action-setup@v4
-        with: { version: 9 }
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
           registry-url: https://registry.npmjs.org
 

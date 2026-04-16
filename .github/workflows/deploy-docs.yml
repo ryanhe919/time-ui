@@ -9,19 +9,21 @@ concurrency:
   group: deploy-docs
   cancel-in-progress: true
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   deploy:
-    name: Build & Deploy to Cloud Server
+    name: Build & Deploy to CentOS Server
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with: { version: 9 }
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Install
@@ -30,42 +32,53 @@ jobs:
       - name: Build packages (docs depends on library)
         run: pnpm -r --filter "./packages/*" build
 
-      - name: Build docs
+      - name: Build docs (standalone output)
         run: pnpm --filter @timeui/docs build
 
-      # ── Deploy via SSH + rsync ──────────────────────────────────
-      # Prerequisites: set these secrets in your GitHub repo settings:
-      #   DEPLOY_HOST     — server IP or hostname (e.g. 1.2.3.4)
-      #   DEPLOY_USER     — SSH user (e.g. root or deploy)
-      #   DEPLOY_KEY      — private SSH key (ed25519 recommended)
-      #   DEPLOY_PATH     — remote directory (e.g. /var/www/timeui-docs)
-      #   DEPLOY_PORT     — SSH port, defaults to 22
+      # Next.js standalone output produces a self-contained folder:
+      #   apps/docs/.next/standalone/  — server.js + node_modules (minimal)
+      #   apps/docs/.next/static/      — static assets (JS/CSS chunks)
+      #   apps/docs/public/            — public assets (if any)
+      #
+      # On the server: `node server.js` — no npm install needed.
 
-      - name: Setup SSH key
+      - name: Prepare deploy bundle
+        run: |
+          mkdir -p deploy
+          cp -r apps/docs/.next/standalone/* deploy/
+          cp -r apps/docs/.next/static deploy/apps/docs/.next/static
+          [ -d apps/docs/public ] && cp -r apps/docs/public deploy/apps/docs/public || true
+
+      # ── SSH deploy to CentOS / Alibaba Cloud ──────────────────
+      # Required secrets:
+      #   DEPLOY_HOST  — server IP (e.g. 47.x.x.x)
+      #   DEPLOY_USER  — SSH user (e.g. root)
+      #   DEPLOY_KEY   — ed25519 private key
+      #   DEPLOY_PATH  — remote dir (e.g. /opt/timeui-docs)
+      #   DEPLOY_PORT  — SSH port (default 22)
+
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p ${{ secrets.DEPLOY_PORT || 22 }} -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
-      - name: Deploy to server
+      - name: Sync to server
         run: |
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.DEPLOY_PORT || 22 }}" \
-            apps/docs/.next/ \
-            apps/docs/public/ \
-            apps/docs/package.json \
-            apps/docs/next.config.mjs \
+            deploy/ \
             ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
 
-      - name: Restart app on server
+      - name: Restart on server
         run: |
           ssh -i ~/.ssh/deploy_key \
               -p ${{ secrets.DEPLOY_PORT || 22 }} \
               ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
-              "cd ${{ secrets.DEPLOY_PATH }} && \
-               npm install --production next react react-dom && \
-               pm2 restart timeui-docs || pm2 start npx --name timeui-docs -- next start -p 3000"
+              "cd ${{ secrets.DEPLOY_PATH }}/apps/docs && \
+               PORT=3000 pm2 restart timeui-docs 2>/dev/null || \
+               PORT=3000 pm2 start server.js --name timeui-docs"
 
       - name: Cleanup SSH key
         if: always()
