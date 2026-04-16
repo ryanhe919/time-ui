@@ -1,17 +1,19 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现应用布局结构与页面壳逻辑。
+ */
+
 import type { Metadata } from 'next';
 import { Inter, Fraunces, Noto_Sans_SC, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
-// Body sans — Inter. Variable font, Latin only; CJK falls through the
-// fallback chain in globals.css to Noto Sans SC / PingFang / system.
 const sans = Inter({
   subsets: ['latin'],
   variable: '--docs-sans-body',
   display: 'swap',
 });
 
-// Editorial display serif — Fraunces. Variable font with italic; used for
-// h1, em, and the § accent before h2.
 const serif = Fraunces({
   subsets: ['latin'],
   style: ['normal', 'italic'],
@@ -19,8 +21,6 @@ const serif = Fraunces({
   display: 'swap',
 });
 
-// CJK body fallback for non-Apple devices. Two weights keep bundle size
-// manageable while supporting the 400/500 pair the MDX typography uses.
 const cjk = Noto_Sans_SC({
   subsets: ['latin'],
   weight: ['400', '500', '600'],

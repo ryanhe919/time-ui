@@ -1,0 +1,190 @@
+# Layout
+
+TimeUI 内置了一组偏日常产品开发的轻量布局原语：`Box`、`Flex`、`Grid`、`Stack` 和 `Container`。
+它们本质上是对 CSS 布局能力的薄封装，并共享两个核心能力：
+
+- `as`：切换最终渲染的元素标签，同时保留组件 API。
+- `sx`：接受样式对象，借助 Emotion 做一次性的布局微调。
+
+## Box
+
+`Box` 是零预设包装器。当你只想得到一个带样式的语义容器，而不希望它自带布局行为时，用它最合适。
+
+<LiveDemo code={`<Box
+  as="section"
+  sx={{
+    padding: 16,
+    border: '1px solid rgba(127,127,127,0.24)',
+    borderRadius: 12,
+  }}
+>
+  普通语义容器
+</Box>`}>
+  <Box
+    as="section"
+    sx={{
+      padding: 16,
+      border: '1px solid rgba(127,127,127,0.24)',
+      borderRadius: 12,
+    }}
+  >
+    普通语义容器
+  </Box>
+</LiveDemo>
+
+## Flex
+
+`Flex` 是通用的 flex 布局原语，支持 `direction`、`align`、`justify`、`wrap` 和 `gap`。
+
+<LiveDemo code={`<Flex gap={12} align="center" wrap="wrap">
+  <Button size="sm">Alpha</Button>
+  <Button size="sm" variant="bordered">Beta</Button>
+  <Button size="sm" variant="light">Gamma</Button>
+</Flex>`}>
+  <Flex gap={12} align="center" wrap="wrap">
+    <Button size="sm">Alpha</Button>
+    <Button size="sm" variant="bordered">Beta</Button>
+    <Button size="sm" variant="light">Gamma</Button>
+  </Flex>
+</LiveDemo>
+
+## Grid
+
+`Grid` 用来构建 CSS Grid 布局。你既可以传数字生成等宽列，也可以直接传原始的 `grid-template-columns` 字符串。
+
+<LiveDemo code={`<Grid columns={3} gap={12}>
+  <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>1</Box>
+  <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>2</Box>
+  <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>3</Box>
+</Grid>`}>
+  <Grid columns={3} gap={12}>
+    <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>1</Box>
+    <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>2</Box>
+    <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>3</Box>
+  </Grid>
+</LiveDemo>
+
+## Stack
+
+`Stack` 是对最常见“纵向排列并保持统一间距”场景的封装，本质上仍然是 flex；通过 `direction="row"` 也可以切到横向。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input placeholder="项目名称" />
+  <Input placeholder="仓库地址" />
+  <Input placeholder="负责人" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input placeholder="项目名称" />
+    <Input placeholder="仓库地址" />
+    <Input placeholder="负责人" />
+  </Stack>
+</LiveDemo>
+
+## Container
+
+`Container` 用来居中内容、限制最大宽度，并可选地加上水平内边距。
+
+<LiveDemo code={`<Container maxWidth={520}>
+  <Box
+    sx={{
+      padding: 16,
+      border: '1px solid rgba(127,127,127,0.24)',
+      borderRadius: 12,
+    }}
+  >
+    带最大宽度限制的居中内容。
+  </Box>
+</Container>`}>
+  <Container maxWidth={520}>
+    <Box
+      sx={{
+        padding: 16,
+        border: '1px solid rgba(127,127,127,0.24)',
+        borderRadius: 12,
+      }}
+    >
+      带最大宽度限制的居中内容。
+    </Box>
+  </Container>
+</LiveDemo>
+
+## 混合组合
+
+这些布局原语的设计目标就是能稳定嵌套组合。
+
+<LiveDemo code={`<Container maxWidth={720}>
+  <Stack spacing={16}>
+    <Flex align="center" justify="space-between" wrap="wrap" gap={12}>
+      <Heading level={3}>团队概览</Heading>
+      <Button size="sm" color="primary">邀请成员</Button>
+    </Flex>
+    <Grid columns="repeat(auto-fit, minmax(180px, 1fr))" gap={12}>
+      <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>设计</Box>
+      <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>工程</Box>
+      <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>运营</Box>
+    </Grid>
+  </Stack>
+</Container>`}>
+  <Container maxWidth={720}>
+    <Stack spacing={16}>
+      <Flex align="center" justify="space-between" wrap="wrap" gap={12}>
+        <Heading level={3}>团队概览</Heading>
+        <Button size="sm" color="primary">邀请成员</Button>
+      </Flex>
+      <Grid columns="repeat(auto-fit, minmax(180px, 1fr))" gap={12}>
+        <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>设计</Box>
+        <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>工程</Box>
+        <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>运营</Box>
+      </Grid>
+    </Stack>
+  </Container>
+</LiveDemo>
+
+## API
+
+### 共享多态属性
+
+<PropsTable props={[
+  { name: 'as', type: 'ElementType', description: '改用其他元素渲染，例如 `section`、`main`、`ul`。' },
+  { name: 'sx', type: 'CSSProperties', description: '一次性的样式对象，会通过 Emotion 注入。' }
+]} />
+
+### Flex
+
+<PropsTable props={[
+  { name: 'direction', type: 'CSSProperties["flexDirection"]', default: "'row'", description: '主轴方向。' },
+  { name: 'align', type: 'CSSProperties["alignItems"]', default: "'stretch'", description: '交叉轴对齐方式。' },
+  { name: 'justify', type: 'CSSProperties["justifyContent"]', default: "'flex-start'", description: '主轴分布方式。' },
+  { name: 'wrap', type: 'CSSProperties["flexWrap"]', default: "'nowrap'", description: '是否换行。' },
+  { name: 'gap', type: 'number | string', default: '0', description: '子项间距；数字会自动补成 px。' }
+]} />
+
+### Grid
+
+<PropsTable props={[
+  { name: 'columns', type: 'number | string', default: '12', description: '列数，或原始 `grid-template-columns` 字符串。' },
+  { name: 'gap', type: 'number | string', description: '统一行列间距。' },
+  { name: 'rowGap', type: 'number | string', description: '单独覆盖行间距。' },
+  { name: 'columnGap', type: 'number | string', description: '单独覆盖列间距。' }
+]} />
+
+### Stack
+
+<PropsTable props={[
+  { name: 'direction', type: "'row' | 'column'", default: "'column'", description: '堆叠方向。' },
+  { name: 'spacing', type: 'number | string', default: '8', description: '子元素间距。' },
+  { name: 'align', type: 'CSSProperties["alignItems"]', description: '交叉轴对齐方式。' },
+  { name: 'justify', type: 'CSSProperties["justifyContent"]', description: '主轴分布方式。' }
+]} />
+
+### Container
+
+<PropsTable props={[
+  { name: 'maxWidth', type: 'number | string', default: '1200', description: '居中容器的最大宽度。' },
+  { name: 'padded', type: 'boolean', default: 'true', description: '是否应用 16px 的水平内边距。' }
+]} />
+
+<Callout variant="info" title="说明">
+  `Box` 没有额外自定义属性，只有共享的 `as` / `sx`。所有布局组件都会继续透传最终元素的原生属性，
+  所以你依然可以传 `id`、`role`、`aria-*`、`data-*` 和各种事件处理函数。
+</Callout>

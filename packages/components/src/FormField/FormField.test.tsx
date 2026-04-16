@@ -1,13 +1,14 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 FormField 模块的行为与回归。
+ */
+
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { renderWithProviders, expectA11y } from '../test-utils';
 import { FormField } from './FormField';
 
-/**
- * Minimal "field-like" input used across the test cases — accepts all the
- * shape props FormField injects (`isDisabled`, `isInvalid`, `isRequired`)
- * so we can assert the injection works without pulling in the real Input.
- */
 const NativeField = ({
   id,
   required,
@@ -83,8 +84,6 @@ describe('FormField', () => {
     const input = screen.getByTestId('field');
     expect(input).toHaveAttribute('required');
     expect(input).toHaveAttribute('aria-required', 'true');
-    // The visual star is aria-hidden so it shouldn't participate in the
-    // accessible name, but it must be in the DOM.
     const label = screen.getByText('Name');
     expect(label.textContent).toContain('*');
     const star = label.querySelector('[aria-hidden="true"]');
@@ -99,11 +98,7 @@ describe('FormField', () => {
     );
     const root = container.firstElementChild as HTMLElement;
     expect(root).toHaveAttribute('data-disabled', 'true');
-    // The prop is forwarded; for a native input it becomes a DOM attribute.
     const input = screen.getByTestId('field') as HTMLInputElement & { isDisabled?: unknown };
-    // Our NativeField test stub destructures `isDisabled`, so the injected
-    // prop is observable via the spread props forwarded to the element.
-    // We mostly want to assert the root reflects the state.
     expect(input).toBeInTheDocument();
   });
 
@@ -156,8 +151,74 @@ describe('FormField', () => {
     const input = screen.getByTestId('field');
     const labelledBy = input.getAttribute('aria-labelledby');
     expect(labelledBy).toBeTruthy();
-    // The id points to a <span> containing the label text.
     const labelEl = labelledBy ? document.getElementById(labelledBy) : null;
     expect(labelEl?.textContent).toContain('Custom');
+  });
+
+  it('ReactNode label with isRequired renders the visual star and keeps aria-labelledby', () => {
+    renderWithProviders(
+      <FormField
+        label={
+          <span>
+            Custom <strong>Label</strong>
+          </span>
+        }
+        id="f7"
+        isRequired
+      >
+        <NativeField />
+      </FormField>,
+    );
+    const input = screen.getByTestId('field');
+    const labelledBy = input.getAttribute('aria-labelledby');
+    expect(labelledBy).toBeTruthy();
+    const labelEl = labelledBy ? document.getElementById(labelledBy) : null;
+    expect(labelEl?.textContent).toContain('Custom Label*');
+    expect(labelEl?.querySelector('[aria-hidden="true"]')).not.toBeNull();
+  });
+
+  it('merges existing aria-describedby ids without duplicates', () => {
+    renderWithProviders(
+      <FormField label="Email" id="f8" description="Help text" errorMessage="Required">
+        <NativeField aria-describedby="external-id f8-description external-id" />
+      </FormField>,
+    );
+    const ids = screen.getByTestId('field').getAttribute('aria-describedby');
+    expect(ids).toBe('f8-description f8-error external-id');
+  });
+
+  it('supports left label placement layout branch', () => {
+    const { container } = renderWithProviders(
+      <FormField label="Email" id="f9" labelPlacement="start">
+        <NativeField />
+      </FormField>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveAttribute('role', 'group');
+    expect(document.head.textContent ?? '').toContain('flex-direction:row');
+    expect(document.head.textContent ?? '').toContain('align-items:flex-start');
+    expect(document.head.textContent ?? '').toContain('width:30%');
+  });
+
+  it('omits group role when no label is provided and still wires descriptions', () => {
+    const { container } = renderWithProviders(
+      <FormField id="f10" description="Only help text">
+        <NativeField />
+      </FormField>,
+    );
+    expect(container.firstElementChild).not.toHaveAttribute('role');
+    expect(screen.getByTestId('field').getAttribute('aria-describedby')).toBe('f10-description');
+  });
+
+  it('propagates required and disabled to native DOM children', () => {
+    renderWithProviders(
+      <FormField id="f11" isRequired isDisabled>
+        <input data-testid="native-dom" />
+      </FormField>,
+    );
+    const input = screen.getByTestId('native-dom');
+    expect(input).toHaveAttribute('required');
+    expect(input).toHaveAttribute('disabled');
+    expect(input).toHaveAttribute('aria-required', 'true');
   });
 });

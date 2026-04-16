@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Search 组件的核心渲染与交互逻辑。
+ */
+
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useTheme, css } from '@emotion/react';
 import { useI18n } from '@timeui/core';
@@ -7,17 +14,11 @@ export type SearchSize = 'sm' | 'md' | 'lg';
 export type SearchVariant = 'bordered' | 'flat';
 
 export interface SearchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
-  /** Visible placeholder. Defaults to `useI18n().search.placeholder`. */
   placeholder?: string;
-  /** Optional keyboard-shortcut hint (e.g. `'⌘K'`) shown on the right. */
   shortcut?: string;
-  /** Size preset. Default `'md'`. */
   size?: SearchSize;
-  /** Visual variant. Default `'bordered'`. */
   variant?: SearchVariant;
-  /** Override the leading icon. */
   icon?: ReactNode;
-  /** Expand to fill its container. */
   fullWidth?: boolean;
 }
 
@@ -44,14 +45,6 @@ const DefaultIcon = () => (
   </svg>
 );
 
-/**
- * Search — a pill-shaped trigger that **looks** like a search input but is
- * actually a `<button>`. Mirrors the affordance used by Apple, Vercel, Tailwind
- * and Linear docs (open a `⌘K` palette / cmdk dialog).
- *
- * For an actual editable search field, use a real `<input type="search">` or a
- * forthcoming `SearchInput` component.
- */
 export const Search = forwardRef<HTMLButtonElement, SearchProps>(function Search(
   {
     placeholder,

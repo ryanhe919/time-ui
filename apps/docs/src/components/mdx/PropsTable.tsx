@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 PropsTable。
+ */
+
 'use client';
 
 import { Code } from '@timeui/react';
@@ -16,7 +23,6 @@ export interface PropsTableProps {
   props: PropDef[];
 }
 
-/** Apple-style props reference: hairline-divided rows, generous breathing. */
 export function PropsTable({ props }: PropsTableProps) {
   return (
     <div
@@ -68,9 +74,6 @@ export function PropsTable({ props }: PropsTableProps) {
             align-items: start;
             border-top: ${i === 0 ? 'none' : '1px solid var(--c-hairline)'};
             font-size: 14px;
-            /* Let every child cell shrink below its content-size so long
-               union types wrap inside the Type column instead of bleeding
-               over the next column. */
             & > * {
               min-width: 0;
             }
@@ -104,8 +107,6 @@ export function PropsTable({ props }: PropsTableProps) {
           </div>
           <div
             css={css`
-              /* Inline code inherits the global wrap rules; ensure the
-                 wrapper itself doesn't prop the grid track open. */
               overflow-wrap: anywhere;
               line-height: 1.65;
             `}

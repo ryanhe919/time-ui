@@ -12,6 +12,10 @@
     },
     "test": {
       "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
     },
     "lint": {
@@ -19,7 +23,7 @@
     },
     "typecheck": {
       "dependsOn": ["^build"],
-      "outputs": ["*.tsbuildinfo"]
+      "outputs": []
     },
     "clean": {
       "cache": false

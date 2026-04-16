@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 ThemeToggle 布局组件。
+ */
+
 'use client';
 
 import { useEffect, useState } from 'react';

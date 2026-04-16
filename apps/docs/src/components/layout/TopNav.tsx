@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 TopNav 布局组件。
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -63,7 +70,6 @@ export function TopNav({ navigation, messages, locale }: Props) {
           font-family: var(--docs-sans);
         `}
       >
-        {/* Brand — Apple-style: clean wordmark, no chip */}
         <Link
           href={`/${locale}/docs/getting-started/introduction`}
           css={css`
@@ -81,7 +87,6 @@ export function TopNav({ navigation, messages, locale }: Props) {
           TimeUI
         </Link>
 
-        {/* Primary tabs — Apple's text-only rhythm */}
         <nav
           aria-label="Primary"
           css={css`
@@ -125,7 +130,6 @@ export function TopNav({ navigation, messages, locale }: Props) {
           `}
         />
 
-        {/* Search trigger — library Search component */}
         <Search size="sm" placeholder={messages.nav.searchPlaceholder} shortcut="⌘K" disabled />
 
         <div

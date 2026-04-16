@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 RadioGroup 模块的行为与回归。
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -97,6 +103,51 @@ describe('RadioGroup', () => {
     expect(alert).toHaveTextContent('Please pick one');
     const fieldset = alert.closest('fieldset');
     expect(fieldset).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('description and errorMessage are both wired into aria-describedby', () => {
+    renderWithProviders(
+      <RadioGroup label="Required" description="Choose one" errorMessage="Please pick one">
+        <Radio value="a">A</Radio>
+      </RadioGroup>,
+    );
+    const fieldset = screen.getByRole('radiogroup').closest('fieldset');
+    const description = screen.getByText('Choose one');
+    const alert = screen.getByRole('alert');
+    const describedBy = fieldset?.getAttribute('aria-describedby') ?? '';
+    expect(describedBy).toContain(description.id);
+    expect(describedBy).toContain(alert.id);
+  });
+
+  it('supports horizontal orientation and explicit invalid state without label', () => {
+    const { container } = renderWithProviders(
+      <RadioGroup orientation="horizontal" isInvalid name="choices">
+        <Radio value="a">A</Radio>
+        <Radio value="b">B</Radio>
+      </RadioGroup>,
+    );
+    const group = screen.getByRole('radiogroup');
+    const fieldset = container.querySelector('fieldset');
+    expect(group).not.toHaveAttribute('aria-labelledby');
+    expect(group).toHaveAttribute('aria-invalid', 'true');
+    expect(fieldset).toHaveAttribute('data-orientation', 'horizontal');
+    expect(fieldset).toHaveAttribute('aria-invalid', 'true');
+    expect(document.head.textContent ?? '').toContain('flex-direction:row');
+    expect(document.head.textContent ?? '').toContain('flex-wrap:wrap');
+  });
+
+  it('marks radiogroup as required and uses generated shared names when name is omitted', () => {
+    renderWithProviders(
+      <RadioGroup isRequired>
+        <Radio value="a">A</Radio>
+        <Radio value="b">B</Radio>
+      </RadioGroup>,
+    );
+    const group = screen.getByRole('radiogroup');
+    expect(group).toHaveAttribute('aria-required', 'true');
+    const radios = screen.getAllByRole('radio') as HTMLInputElement[];
+    expect(radios[0]?.name).toMatch(/^timeui-radio-name-/);
+    expect(radios[0]?.name).toBe(radios[1]?.name);
   });
 
   it.each([['light'], ['dark']] as const)(

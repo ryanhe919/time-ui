@@ -1,5 +1,7 @@
 /**
- * @timeui/utils — pure, tree-shakable helpers.
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 统一导出当前包的对外公共 API。
  */
 
 export const cx = (...parts: Array<string | false | null | undefined>): string =>
@@ -8,6 +10,4 @@ export const cx = (...parts: Array<string | false | null | undefined>): string =
 export const isBrowser = (): boolean =>
   typeof window !== 'undefined' && typeof document !== 'undefined';
 
-export const noop = (): void => {
-  /* intentionally empty */
-};
+export const noop = (): void => {};

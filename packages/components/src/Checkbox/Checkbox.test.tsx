@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 Checkbox 模块的行为与回归。
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -50,8 +56,6 @@ describe('Checkbox', () => {
     const input = getInput();
     expect(input.indeterminate).toBe(true);
 
-    // Click toggles checked; component consumer is expected to clear
-    // isIndeterminate on the next render (Apple-style batch select pattern).
     await userEvent.click(input);
     expect(onChange).toHaveBeenCalledWith(true);
 
@@ -105,8 +109,6 @@ describe('Checkbox', () => {
     );
     const input = getInput();
     await userEvent.click(input);
-    // The handler early-returns under readOnly; state stays put and no
-    // onChange is dispatched.
     expect(onChange).not.toHaveBeenCalled();
     expect(input.checked).toBe(false);
   });

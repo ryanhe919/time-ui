@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Input 组件的核心渲染与交互逻辑。
+ */
+
 import {
   forwardRef,
   useCallback,
@@ -82,13 +89,6 @@ const EyeOffIcon = ({ size }: { size: number }) => (
   </svg>
 );
 
-/**
- * Props the inner `InputControl` accepts — a superset of the native `<input>`
- * shape plus the FormField injection surface. FormField does `cloneElement`
- * on its child with the injected props; InputControl receives them and
- * applies them to the real `<input>` instead of the wrapper `<div>` (a div
- * doesn't understand `required`, `aria-required`, etc.).
- */
 interface InputControlProps {
   variant: NonNullable<InputProps['variant']>;
   effectiveColor: NonNullable<InputProps['color']>;
@@ -129,11 +129,6 @@ interface InputControlProps {
   required?: boolean;
 }
 
-/**
- * Internal wrapper whose sole job is to be a valid FormField child: it accepts
- * the props FormField `cloneElement`-injects and routes them onto the inner
- * `<input>` rather than the wrapper `<div>`.
- */
 function InputControl({
   variant,
   effectiveColor,
@@ -367,16 +362,6 @@ function InputControl({
   );
 }
 
-/**
- * Input — TimeUI's single-line text field.
- *
- * - 4 variants × 6 semantic colors × 5 sizes via `getFieldVariantStyles`.
- * - Controlled / uncontrolled via `useControllableState`.
- * - Implicit `FormField` wrapping when `label` / `description` / `errorMessage`
- *   is provided (id/aria threading delegated to FormField).
- * - Clearable + Escape-to-clear + password toggle with `aria-pressed`.
- * - `forwardRef` points at the real `<input>` element.
- */
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   {
     variant = 'flat',

@@ -1,7 +1,9 @@
 /**
- * 4px-based spacing scale. Keys are grid steps; values are CSS lengths.
- * Example: `spacing[4]` == `'16px'` (4 × 4px).
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 spacing 设计令牌。
  */
+
 export const spacing = {
   0: '0px',
   0.5: '2px',

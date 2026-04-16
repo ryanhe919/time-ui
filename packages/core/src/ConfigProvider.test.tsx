@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 ConfigProvider 模块的行为与回归。
+ */
+
 import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { ConfigProvider, useConfig, __defaultConfig } from './ConfigProvider';

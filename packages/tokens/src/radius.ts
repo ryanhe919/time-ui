@@ -1,4 +1,9 @@
-/** Corner radius primitives. */
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 radius 设计令牌。
+ */
+
 export const radius = {
   none: '0px',
   sm: '2px',
@@ -9,11 +14,6 @@ export const radius = {
   full: '9999px',
 } as const;
 
-/**
- * HeroUI-aligned radii used by component-level size maps (e.g. Button).
- * Kept separate from the generic `radius` scale so existing consumers
- * aren't broken by the rename of sm/md/lg values.
- */
 export const componentRadius = {
   none: '0px',
   sm: '8px',

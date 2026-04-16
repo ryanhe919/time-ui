@@ -1,6 +1,11 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现主题模块 helpers。
+ */
+
 import type { TimeUITheme } from './types';
 
-/** Dot-delimited path into a nested object. */
 export type Path = string;
 
 function getAtPath(obj: unknown, path: Path): unknown {
@@ -12,28 +17,11 @@ function getAtPath(obj: unknown, path: Path): unknown {
   }, obj);
 }
 
-/**
- * Resolve a token path against a theme object.
- *
- * ```ts
- * token(theme, 'colors.bg.surface'); // → '#ffffff'
- * ```
- */
 export function token(theme: TimeUITheme, path: Path): string | number | undefined {
   const value = getAtPath(theme, path);
   return typeof value === 'string' || typeof value === 'number' ? value : undefined;
 }
 
-/**
- * Convert a token path to a CSS custom-property name.
- *
- * ```ts
- * cssVar('colors.bg.surface'); // → 'var(--timeui-colors-bg-surface)'
- * ```
- *
- * Useful if you opt into CSS-variables theming later; TimeUI itself does not
- * require CSS variables — Emotion props power the runtime.
- */
 export function cssVar(path: Path, prefix = 'timeui'): string {
   const name = path.replace(/\./g, '-').replace(/[^a-zA-Z0-9-]/g, '-');
   return `var(--${prefix}-${name})`;

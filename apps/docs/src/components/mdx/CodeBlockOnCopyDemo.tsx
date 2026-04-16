@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 CodeBlockOnCopyDemo。
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -9,11 +16,6 @@ export interface CodeBlockOnCopyDemoProps {
   hint?: string;
 }
 
-/**
- * Wraps CodeBlock with an onCopy handler in client scope — MDX pages are RSC,
- * so function props can't be passed inline. This demo shows the callback firing
- * by surfacing the copied length below the block.
- */
 export function CodeBlockOnCopyDemo({ hint = 'copied' }: CodeBlockOnCopyDemoProps) {
   const [last, setLast] = useState<number | null>(null);
 

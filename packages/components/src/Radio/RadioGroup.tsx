@@ -1,19 +1,17 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Radio 组件的核心渲染与交互逻辑。
+ */
+
 import { forwardRef, useId, useMemo } from 'react';
 import { css, useTheme } from '@emotion/react';
 import { useControllableState } from '../utils/useControllableState';
 import { RadioGroupContext, type RadioGroupContextValue } from './context';
 import type { RadioGroupProps } from './Radio.types';
 
-/**
- * `RadioGroup` — single-select wrapper that manages the selected value and
- * shares `name` + color + size with descendant `<Radio>` items via context.
- *
- * Layout uses a native `<fieldset>` + `<legend>` for standards-compliant a11y
- * without FormField's single-child `cloneElement` constraint. Keyboard
- * navigation between radio items is handled entirely by the browser because
- * every child `<input type="radio">` carries the same `name`.
- */
 export const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(function RadioGroup(
   {
     label,

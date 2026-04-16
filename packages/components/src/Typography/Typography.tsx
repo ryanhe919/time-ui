@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Typography 组件的核心渲染与交互逻辑。
+ */
+
 import { forwardRef, type HTMLAttributes, type AnchorHTMLAttributes } from 'react';
 import { useTheme, css } from '@emotion/react';
 import { t } from '../utils/theme';

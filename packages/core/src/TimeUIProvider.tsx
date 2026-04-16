@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现核心模块 TimeUIProvider。
+ */
+
 import type { ReactNode } from 'react';
 import { ConfigProvider, type ConfigProviderProps } from './ConfigProvider';
 import { ThemeProvider, type ThemeProviderProps } from './ThemeProvider';
@@ -7,15 +13,6 @@ export interface TimeUIProviderProps
   children: ReactNode;
 }
 
-/**
- * Top-level TimeUI provider. Composes `ConfigProvider` and `ThemeProvider`.
- *
- * ```tsx
- * <TimeUIProvider mode="dark" locale="zh-CN">
- *   <App />
- * </TimeUIProvider>
- * ```
- */
 export const TimeUIProvider = ({
   children,
   theme,

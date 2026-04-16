@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Layout 组件的核心渲染与交互逻辑。
+ */
+
 import * as React from 'react';
 import {
   forwardRef,

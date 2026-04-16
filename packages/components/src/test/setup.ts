@@ -1,10 +1,14 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Test 组件的核心渲染与交互逻辑。
+ */
+
 import '@testing-library/jest-dom/vitest';
 import 'vitest-axe/extend-expect';
 import * as axeMatchers from 'vitest-axe/matchers';
 import { expect } from 'vitest';
 
-// jsdom doesn't implement ResizeObserver, which Radix primitives (Slider,
-// Tooltip, …) reach for via @radix-ui/react-use-size. Stub it.
 class ResizeObserverStub {
   observe() {}
   unobserve() {}
@@ -15,7 +19,6 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
     ResizeObserverStub;
 }
 
-// jsdom lacks DOMRect.fromRect / matchMedia in some Radix code paths.
 if (typeof globalThis.matchMedia === 'undefined') {
   Object.defineProperty(globalThis, 'matchMedia', {
     writable: true,
@@ -32,6 +35,48 @@ if (typeof globalThis.matchMedia === 'undefined') {
   });
 }
 
-// Register axe matchers globally so `expectA11y()` (and any direct
-// `expect(results).toHaveNoViolations()`) just work in every test.
+if (typeof window !== 'undefined') {
+  const originalGetComputedStyle = window.getComputedStyle.bind(window);
+  Object.defineProperty(window, 'getComputedStyle', {
+    configurable: true,
+    value: (element: Element, pseudoElt?: string) => {
+      if (pseudoElt) {
+        return originalGetComputedStyle(element);
+      }
+      return originalGetComputedStyle(element);
+    },
+  });
+}
+
+if (typeof HTMLCanvasElement !== 'undefined') {
+  const canvasContextStub = {
+    measureText: () => ({ width: 0 }),
+    fillRect: () => {},
+    clearRect: () => {},
+    getImageData: () => ({ data: new Uint8ClampedArray(4) }),
+    putImageData: () => {},
+    createImageData: () => ({ data: new Uint8ClampedArray(4) }),
+    setTransform: () => {},
+    drawImage: () => {},
+    save: () => {},
+    fillText: () => {},
+    restore: () => {},
+    beginPath: () => {},
+    moveTo: () => {},
+    lineTo: () => {},
+    closePath: () => {},
+    stroke: () => {},
+    translate: () => {},
+    scale: () => {},
+    rotate: () => {},
+    arc: () => {},
+    fill: () => {},
+  };
+
+  Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+    configurable: true,
+    value: () => canvasContextStub,
+  });
+}
+
 expect.extend(axeMatchers);

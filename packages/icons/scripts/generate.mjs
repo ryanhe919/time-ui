@@ -1,15 +1,11 @@
 #!/usr/bin/env node
+
 /**
- * SVG → React component generator for @timeui/icons.
- *
- * Reads packages/icons/svg/*.svg, converts each into a forwardRef React
- * component at packages/icons/src/icons/<Name>.tsx accepting `size` and
- * `color` (via `currentColor`), then regenerates src/index.ts as a
- * tree-shakeable named-export barrel.
- *
- * This is a lightweight stand-in for @svgr/cli — same output shape, no
- * extra install.
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现图标源码生成脚本。
  */
+
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,14 +25,12 @@ const toPascal = (s) =>
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join('');
 
-// Extract the inner contents of the outer <svg ...> ... </svg>.
 function extractInner(svg) {
   const match = svg.match(/<svg[^>]*>([\s\S]*)<\/svg>\s*$/i);
   if (!match) throw new Error('Invalid SVG (no root <svg> element)');
   return match[1].trim();
 }
 
-// Convert kebab-case attributes to camelCase for JSX.
 function toJsxAttrs(inner) {
   return inner.replace(/\s([a-z]+)-([a-z]+)=/g, (_m, a, b) => ` ${a}${b.charAt(0).toUpperCase() + b.slice(1)}=`);
 }
@@ -53,9 +47,7 @@ for (const file of files) {
 import type { SVGProps } from 'react';
 
 export interface ${name}Props extends Omit<SVGProps<SVGSVGElement>, 'color'> {
-  /** Square icon dimension in pixels (or any CSS length). Defaults to 24. */
   size?: number | string;
-  /** Stroke/fill color. Applied via currentColor. Defaults to \`currentColor\`. */
   color?: string;
 }
 
@@ -91,7 +83,6 @@ ${name}.displayName = '${name}';
   components.push(name);
 }
 
-// Regenerate barrel.
 const barrel = `/**
  * @timeui/icons — auto-generated barrel. Run \`pnpm --filter @timeui/icons generate\` to update.
  */

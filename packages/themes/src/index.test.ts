@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 index 模块的行为与回归。
+ */
+
 import { describe, it, expect } from 'vitest';
 import { lightTheme, darkTheme, createTheme, token, cssVar, themes } from './index';
 
@@ -54,7 +60,6 @@ describe('createTheme', () => {
     });
     expect(t.colors.action.primary.default).toBe('#ff00aa');
     expect(t.colors.action.primary.hover).toBe('#ff33bb');
-    // untouched keys survive
     expect(t.colors.action.primary.active).toBe(lightTheme.colors.action.primary.active);
     expect(t.colors.bg.surface).toBe(lightTheme.colors.bg.surface);
   });

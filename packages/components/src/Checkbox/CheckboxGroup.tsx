@@ -1,22 +1,17 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Checkbox 组件的核心渲染与交互逻辑。
+ */
+
 import { forwardRef, useCallback, useId, useMemo } from 'react';
 import { css, useTheme } from '@emotion/react';
 import { useControllableState } from '../utils';
 import { CheckboxGroupContext, type CheckboxGroupContextValue } from './context';
 import type { CheckboxGroupProps } from './Checkbox.types';
 
-/**
- * `CheckboxGroup` — multi-select wrapper that manages a shared `string[]` of
- * selected values, propagates a common `name` + color + size to descendant
- * `<Checkbox>` instances, and renders the group with native `<fieldset>` +
- * `<legend>` semantics.
- *
- * We deliberately opt **out** of `FormField` here: `FormField.cloneElement`
- * targets a single interactive child, whereas a checkbox group wraps N
- * children inside a container — `<fieldset>` is both more standard and avoids
- * the clone gymnastics. Error messages are rendered with `role="alert"` +
- * `aria-live="polite"` to match FormField's a11y behaviour.
- */
 export const CheckboxGroup = forwardRef<HTMLFieldSetElement, CheckboxGroupProps>(
   function CheckboxGroup(
     {

@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Checkbox 组件的核心渲染与交互逻辑。
+ */
+
 import {
   forwardRef,
   useCallback,
@@ -24,18 +31,6 @@ const radiusPx: Record<CheckboxRadius, string> = {
   md: '6px',
 };
 
-/**
- * `Checkbox` — multi-select input with optional `indeterminate` state.
- *
- * Works stand-alone (uncontrolled via `defaultSelected`, or controlled via
- * `isSelected` + `onChange(boolean)`) and as a child of `<CheckboxGroup>`,
- * which injects `name`, shared selection state, color, size, and disabled.
- *
- * Visual structure: a `<label>` containing a visually-hidden-but-focusable
- * native `<input type="checkbox">`, a painted indicator `<span>`, and the
- * label text. `focus-visible` on the native input drives the ring on the
- * sibling indicator via a CSS adjacent-sibling selector.
- */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
   {
     color: colorProp,
@@ -93,10 +88,6 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      // readOnly checkboxes never mutate state. Native `readOnly` is ignored
-      // by `<input type=checkbox>` (and `preventDefault` on the change event
-      // is a no-op for booleans), so we revert the DOM back to the logical
-      // state — matching what Switch does for the same reason.
       if (isReadOnly) {
         event.currentTarget.checked = selected;
         return;

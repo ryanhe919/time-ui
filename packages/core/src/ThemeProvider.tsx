@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现核心模块 ThemeProvider。
+ */
+
 import { ThemeProvider as EmotionThemeProvider } from '@emotion/react';
 import { darkTheme, lightTheme, type TimeUITheme } from '@timeui/themes';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
@@ -5,9 +11,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 export type ThemeMode = 'light' | 'dark' | 'auto';
 
 export interface ThemeProviderProps {
-  /** Explicit theme object. Overrides `mode`. */
   theme?: TimeUITheme;
-  /** Pick a built-in theme by mode. `'auto'` follows `prefers-color-scheme`. */
   mode?: ThemeMode;
   children: ReactNode;
 }
@@ -27,13 +31,6 @@ function usePrefersDark(enabled: boolean): boolean {
   return isDark;
 }
 
-/**
- * Wraps Emotion's `ThemeProvider` with TimeUI defaults.
- *
- * - Pass a `theme` to use a custom theme (from `createTheme`).
- * - Pass `mode="dark"` (or `"auto"`) to pick a built-in theme.
- * - With no props it defaults to `lightTheme`.
- */
 export const ThemeProvider = ({ theme, mode = 'light', children }: ThemeProviderProps) => {
   const prefersDark = usePrefersDark(mode === 'auto');
   const resolved = useMemo<TimeUITheme>(() => {

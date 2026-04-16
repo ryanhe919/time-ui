@@ -1,9 +1,14 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现主题模块 darkTheme。
+ */
+
 import { tokens } from '@timeui/tokens';
 import type { TimeUITheme } from './types';
 
 const { palette } = tokens;
 
-/** The default dark theme. Same semantic keys as `lightTheme`. */
 export const darkTheme: TimeUITheme = {
   mode: 'dark',
   tokens,

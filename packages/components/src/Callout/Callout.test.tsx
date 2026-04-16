@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 Callout 模块的行为与回归。
+ */
+
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../test-utils';
@@ -24,12 +30,9 @@ describe('Callout', () => {
 
   it('hides the icon slot when icon={false}', () => {
     const { container } = renderWithProviders(<Callout icon={false}>No glyph here.</Callout>);
-    // Root has two grid tracks with the glyph, one without.
     const root = container.firstChild as HTMLElement;
     expect(root).toBeTruthy();
-    // Grid template columns '1fr' when hidden vs 'auto 1fr' when shown.
     expect((root.style.gridTemplateColumns || '').trim()).toBe('');
-    // But we can still assert there is no decorative glyph column via role/aria:
     expect(root.querySelectorAll('[aria-hidden]').length).toBe(0);
   });
 

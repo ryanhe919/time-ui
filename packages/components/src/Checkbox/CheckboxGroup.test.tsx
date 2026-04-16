@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 CheckboxGroup 模块的行为与回归。
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -62,8 +68,6 @@ describe('CheckboxGroup', () => {
     expect(fieldset).not.toBeNull();
     const legend = container.querySelector('legend');
     expect(legend?.textContent).toContain('Colors');
-    // <fieldset> has implicit role="group"; testing-library's getByRole picks
-    // it up and the <legend> is the accessible name per HTML semantics.
     expect(screen.getByRole('group', { name: /Colors/i })).toBe(fieldset);
   });
 

@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 SearchDialogDemo。
+ */
+
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -20,11 +27,6 @@ const ITEMS: Item[] = [
   { label: '安装 Installation', hint: '/zh/docs/getting-started/installation' },
 ];
 
-/**
- * 演示"Search 是触发器、点击后才打开可编辑面板"的心智模型。
- * 点击 Search 按钮 → 打开一个可输入的命令面板，并把输入过滤匹配的结果。
- * 这是一个纯文档站的演示组件，不属于 `@timeui/react` 的公开 API。
- */
 export function SearchDialogDemo() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');

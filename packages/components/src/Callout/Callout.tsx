@@ -1,23 +1,23 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Callout 组件的核心渲染与交互逻辑。
+ */
+
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 import { useTheme, css } from '@emotion/react';
 
 export type CalloutVariant = 'info' | 'success' | 'warning' | 'danger' | 'tip';
 
 export interface CalloutProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  /** Visual + semantic variant. Default `'info'`. */
   variant?: CalloutVariant;
-  /** Optional heading shown above the body. */
   title?: ReactNode;
-  /**
-   * Leading glyph. Pass a node to override, or `false` to hide entirely.
-   * Defaults to a variant-appropriate monospace character.
-   */
   icon?: ReactNode | false;
   children: ReactNode;
 }
 
-/** Map each variant to the color-scale key that drives its accent + fg. */
 const scaleKey: Record<CalloutVariant, 'primary' | 'success' | 'warning' | 'danger'> = {
   info: 'primary',
   tip: 'primary',
@@ -26,7 +26,6 @@ const scaleKey: Record<CalloutVariant, 'primary' | 'success' | 'warning' | 'dang
   danger: 'danger',
 };
 
-/** Variant → ARIA role. Errors/warnings get assertive announcements. */
 const role: Record<CalloutVariant, 'status' | 'alert'> = {
   info: 'status',
   tip: 'status',
@@ -35,7 +34,6 @@ const role: Record<CalloutVariant, 'status' | 'alert'> = {
   danger: 'alert',
 };
 
-/** Default glyph per variant — simple mono-safe symbols. */
 const defaultGlyph: Record<CalloutVariant, string> = {
   info: '—',
   tip: '★',
@@ -44,13 +42,6 @@ const defaultGlyph: Record<CalloutVariant, string> = {
   danger: '✕',
 };
 
-/**
- * Callout — a prose-friendly notice block for documentation, inline hints,
- * and other non-dismissible messages.
- *
- * Use `Alert`-style patterns (closable, actions) with a dedicated Alert
- * component instead. Callout is intentionally structural and static.
- */
 export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function Callout(
   { variant = 'info', title, icon, children, ...rest },
   ref,

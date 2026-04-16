@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 FormField 组件的核心渲染与交互逻辑。
+ */
+
 import {
   Children,
   cloneElement,
@@ -10,10 +17,6 @@ import {
 import { useTheme, css } from '@emotion/react';
 import type { FormFieldProps, FormFieldInjectedChildProps } from './FormField.types';
 
-/**
- * Merge two space-separated id lists (e.g. `aria-describedby`) while
- * preserving order and removing duplicates/empties.
- */
 function mergeIdList(...parts: (string | undefined | null | false)[]): string | undefined {
   const seen = new Set<string>();
   const out: string[] = [];
@@ -29,15 +32,6 @@ function mergeIdList(...parts: (string | undefined | null | false)[]): string | 
   return out.length > 0 ? out.join(' ') : undefined;
 }
 
-/**
- * `FormField` — the universal wrapper that binds a form control to its
- * `label`, `description`, and `errorMessage` via ARIA, with a visual layout
- * controlled by `labelPlacement`.
- *
- * The component is entirely presentational + a11y plumbing: it never holds
- * its own state. Its single responsibility is to clone the child control
- * and thread through the generated ids / invalid / required flags.
- */
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function FormField(
   {
     label,
@@ -63,12 +57,8 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function For
   const errorId = `${fieldId}-error`;
 
   const hasError = errorMessage !== undefined && errorMessage !== null && errorMessage !== false;
-  // When the caller passes `isInvalid` explicitly (including `false`), honour
-  // it — else derive from `errorMessage` presence.
   const isInvalid = isInvalidProp ?? hasError;
 
-  // Validate child at dev time: must be a single React element so
-  // `cloneElement` works. In production we still try to degrade gracefully.
   if (process.env.NODE_ENV !== 'production') {
     Children.only(children);
   }
@@ -76,22 +66,12 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function For
   const isLabelString = typeof label === 'string';
   const hasLabel = label !== undefined && label !== null && label !== false;
 
-  // Compose describedby: description first (visual order), then error.
   const describedBy = mergeIdList(
     description ? descriptionId : null,
     hasError ? errorId : null,
-    // Preserve any describedby the child already had.
     (children as ReactElement<FormFieldInjectedChildProps>).props?.['aria-describedby'],
   );
 
-  // Compute child overrides. We merge rather than replace so the child can
-  // keep its own explicit props as lower-priority fallbacks.
-  //
-  // camelCase flags (`isDisabled` / `isInvalid` / `isRequired`) are TimeUI
-  // conventions — only inject them when the child is a React component that
-  // understands them. For native DOM children (e.g. a bare `<input>` inside
-  // a manually-wrapped FormField) we translate to DOM-shaped props instead,
-  // otherwise React warns about unknown attributes being spread to the DOM.
   const childProps =
     (children as ReactElement<FormFieldInjectedChildProps & { disabled?: boolean }>).props ?? {};
   const isDomChild = isValidElement(children) && typeof children.type === 'string';
@@ -117,8 +97,6 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function For
         isRequired: isRequired || childProps.isRequired,
       };
 
-  // `cloneElement` narrows the type based on the element's props; cast to
-  // our injected shape.
   const injectedChild = isValidElement(children)
     ? cloneElement(children as ReactElement<FormFieldInjectedChildProps>, merged)
     : children;
@@ -126,8 +104,6 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function For
   const isVertical = labelPlacement === 'top';
   const rootGap = theme.spacing?.['1.5'] ?? '6px';
 
-  // Typography tokens (graceful fallbacks keep FormField rendering even if
-  // a consumer supplies a reduced Theme).
   const labelFontSize = '13px';
   const helpFontSize = '12px';
   const labelColor = theme.colors.text.primary;
@@ -188,8 +164,6 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function For
     )
   ) : null;
 
-  // When label is a ReactNode (non-string) we use `aria-labelledby` on the
-  // child element. Re-clone to add it alongside the already-injected props.
   const finalChild =
     hasLabel && !isLabelString && isValidElement(injectedChild)
       ? cloneElement(
@@ -199,6 +173,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function For
           { 'aria-labelledby': labelId },
         )
       : injectedChild;
+  // 非纯文本 label 没有可直接关联的 htmlFor，需要通过 aria-labelledby 建立语义关系。
 
   return (
     <div
@@ -255,8 +230,6 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function For
           </div>
         ) : null}
         {description && hasError ? (
-          // Keep description in the DOM for `aria-describedby` even when
-          // visually superseded by the error (screen readers still announce it).
           <div
             id={descriptionId}
             css={css`

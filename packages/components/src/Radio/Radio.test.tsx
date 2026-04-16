@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 Radio 模块的行为与回归。
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -42,7 +48,6 @@ describe('Radio (inside RadioGroup)', () => {
         </Radio>
       </RadioGroup>,
     );
-    // Both the label text and the description are present.
     expect(screen.getByText('Option A')).toBeInTheDocument();
     const desc = screen.getByText('Detailed note for A');
     expect(desc.getAttribute('data-description')).toBe('');

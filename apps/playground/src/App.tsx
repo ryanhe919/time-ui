@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Playground 应用的示例页面。
+ */
+
 import { useState } from 'react';
 import { Button, ThemeProvider, lightTheme, darkTheme } from '@timeui/react';
 

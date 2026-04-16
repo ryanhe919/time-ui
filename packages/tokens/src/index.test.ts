@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 index 模块的行为与回归。
+ */
+
 import { describe, it, expect } from 'vitest';
 import { tokens, palette, spacing, radius, shadows, zIndex, breakpoints, motion } from './index';
 

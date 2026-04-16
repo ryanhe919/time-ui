@@ -2,9 +2,7 @@ import { forwardRef } from 'react';
 import type { SVGProps } from 'react';
 
 export interface SearchIconProps extends Omit<SVGProps<SVGSVGElement>, 'color'> {
-  /** Square icon dimension in pixels (or any CSS length). Defaults to 24. */
   size?: number | string;
-  /** Stroke/fill color. Applied via currentColor. Defaults to `currentColor`. */
   color?: string;
 }
 

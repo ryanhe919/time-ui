@@ -1,15 +1,14 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现主题模块 lightTheme。
+ */
+
 import { tokens } from '@timeui/tokens';
 import type { TimeUITheme } from './types';
 
 const { palette } = tokens;
 
-/**
- * The default light theme.
- *
- * Every component in TimeUI renders correctly against this theme out of the
- * box — it acts both as the reference implementation of the semantic surface
- * and as the fallback when no `<ThemeProvider>` wraps the tree.
- */
 export const lightTheme: TimeUITheme = {
   mode: 'light',
   tokens,

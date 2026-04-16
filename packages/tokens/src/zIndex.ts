@@ -1,4 +1,9 @@
-/** Named z-index layers. Keep popovers above overlays, tooltips on top. */
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 zIndex 设计令牌。
+ */
+
 export const zIndex = {
   hide: -1,
   base: 0,

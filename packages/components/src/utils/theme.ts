@@ -1,11 +1,9 @@
 /**
- * Defensive theme access helpers. Bridges the component layer onto the
- * semantic-token shape exposed by `@timeui/themes`.
- *
- * Components should reach for `t(theme).color.text.primary` etc. rather than
- * touching theme paths directly, so refactors at the design-system layer
- * stay contained.
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Utils 组件的核心渲染与交互逻辑。
  */
+
 import type { Theme } from '@emotion/react';
 
 type AnyRec = Record<string, unknown>;
@@ -67,18 +65,14 @@ export const t = (theme: Theme) => {
     },
     z: (k: string) => Number(get(theme, ['zIndex', k]) ?? get(theme, ['tokens', 'zIndex', k]) ?? 0),
     color: {
-      // Action — primary
       primary: str(primary.default, str(blueRamp[500], '#1677ff')),
       primaryHover: str(primary.hover, str(blueRamp[400], '#4096ff')),
       primaryActive: str(primary.active, str(blueRamp[600], '#0958d9')),
       primaryDisabled: str(primary.disabled, str(blueRamp[200], '#91caff')),
-      // Action — secondary
       secondary: str(secondary.default, str(grayRamp[100], '#f5f5f5')),
       secondaryHover: str(secondary.hover, str(grayRamp[200], '#e5e5e5')),
-      // Action — danger family + status danger fallback
       dangerAction: str(danger.default, str(redRamp[500], '#f5222d')),
       dangerActionHover: str(danger.hover, str(redRamp[400], '#ff4d4f')),
-      // Text
       text: str(txt.primary, '#171717'),
       textPrimary: str(txt.primary, '#171717'),
       textSecondary: str(txt.secondary, '#404040'),
@@ -86,7 +80,6 @@ export const t = (theme: Theme) => {
       textInverse: str(txt.inverse, '#ffffff'),
       textDisabled: str(txt.disabled, '#a3a3a3'),
       textLink: str(txt.link, '#0958d9'),
-      // Surfaces
       bg: str(bg.canvas, '#ffffff'),
       surface: str(bg.surface, '#ffffff'),
       raised: str(bg.raised, '#ffffff'),
@@ -94,12 +87,10 @@ export const t = (theme: Theme) => {
       muted: str(bg.muted, '#f5f5f5'),
       codeBg: str(bg.muted, '#f5f5f5'),
       overlay: str(bg.overlay, 'rgba(0,0,0,0.45)'),
-      // Border
       border: str(border.default, '#e5e5e5'),
       borderSubtle: str(border.subtle, '#f5f5f5'),
       borderStrong: str(border.strong, '#a3a3a3'),
       borderFocus: str(border.focus, '#1677ff'),
-      // Status
       success: str(status.success, str(greenRamp[500], '#52c41a')),
       warning: str(status.warning, str(orangeRamp[500], '#faad14')),
       danger: str(status.danger, str(redRamp[500], '#f5222d')),
@@ -108,7 +99,6 @@ export const t = (theme: Theme) => {
       warningBg: str(status.warningBg, str(orangeRamp[50], '#fff7e6')),
       dangerBg: str(status.dangerBg, str(redRamp[50], '#fff1f0')),
       infoBg: str(status.infoBg, str(blueRamp[50], '#e6f4ff')),
-      // Primitive ramp escape hatch
       neutral: (shade: number | string) => str(grayRamp[shade], '#999'),
     },
   };

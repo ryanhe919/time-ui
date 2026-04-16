@@ -1,4 +1,9 @@
-/** Border width primitives. */
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 borders 设计令牌。
+ */
+
 export const borderWidth = {
   0: '0px',
   hairline: '0.5px',

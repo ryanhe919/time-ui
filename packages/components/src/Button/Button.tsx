@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Button 组件的核心渲染与交互逻辑。
+ */
+
 import { forwardRef, type ElementType, type ReactElement } from 'react';
 import { useTheme, css } from '@emotion/react';
 import type {
@@ -9,11 +16,6 @@ import type {
   ButtonRadius,
 } from './Button.types';
 
-/**
- * Mix an alpha into an rgb/rgba/hex color string without adding a dependency.
- * Returns an `rgba(r, g, b, a)` string. Falls back to the original string if
- * the color cannot be parsed.
- */
 function withAlpha(color: string, alpha: number): string {
   const a = Math.max(0, Math.min(1, alpha));
   const c = color.trim();
@@ -50,11 +52,6 @@ interface Resolved {
   color: ButtonColor;
 }
 
-/**
- * Resolve the HeroUI-style (variant, color) pair from potentially-legacy
- * inputs. When both a new `color` prop and a legacy variant (e.g. `'primary'`)
- * are supplied, the new `color` wins.
- */
 function resolveVariantColor(
   variant: ButtonVariant | undefined,
   color: ButtonColor | undefined,
@@ -71,12 +68,6 @@ function resolveVariantColor(
   if (variant && (newVariants as string[]).includes(variant)) {
     return { variant: variant as NewVariant, color: color ?? 'default' };
   }
-  // Legacy mapping:
-  //   primary  -> solid + primary
-  //   secondary-> solid + secondary (visually closer to original filled look)
-  //   outline  -> bordered + primary
-  //   danger   -> solid + danger
-  //   ghost    -> light + default (legacy ghost was a transparent neutral pill)
   switch (variant) {
     case 'primary':
       return { variant: 'solid', color: color ?? 'primary' };
@@ -87,9 +78,6 @@ function resolveVariantColor(
     case 'danger':
       return { variant: 'solid', color: color ?? 'danger' };
     case 'ghost':
-      // New 'ghost' behavior only applies when caller explicitly uses the new
-      // API *with* a color; the bare legacy `variant="ghost"` kept the muted
-      // neutral look, which maps cleanest to `light` + `default`.
       return color ? { variant: 'ghost', color } : { variant: 'light', color: 'default' };
     default:
       return { variant: 'solid', color: color ?? 'default' };
@@ -120,9 +108,6 @@ const Spinner = ({ size = 14 }: { size?: number }) => (
   />
 );
 
-/**
- * Map size → spinner diameter (roughly tracks the size's font-size).
- */
 const spinnerSize: Record<ButtonSize, number> = {
   xs: 12,
   sm: 14,
@@ -131,22 +116,6 @@ const spinnerSize: Record<ButtonSize, number> = {
   xl: 20,
 };
 
-/**
- * Button — HeroUI-aligned action primitive.
- *
- * Accepts the new `variant` + `color` + `radius` API. Legacy variant values
- * (`'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'`) remain
- * supported via internal mapping:
- *
- *   - `variant="primary"`   → `variant="solid"`    color="primary"
- *   - `variant="secondary"` → `variant="solid"`    color="secondary"
- *   - `variant="outline"`   → `variant="bordered"` color="primary"
- *   - `variant="ghost"`     → `variant="light"`    color="default"
- *   - `variant="danger"`    → `variant="solid"`    color="danger"
- *
- * If both a new `color` and a legacy `variant` are supplied, the new `color`
- * wins.
- */
 export const Button = forwardRef<Element, ButtonProps>(function Button(
   {
     as,
@@ -187,7 +156,6 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
   const radiusKey: ButtonRadius = radiusProp ?? sizeRadiusMap[size];
   const borderRadius = theme.componentRadius[radiusKey];
 
-  // Variant recipe (rest state + hover state).
   let bg = 'transparent';
   let fg: string = scale.DEFAULT;
   let border = '0 solid transparent';
@@ -202,8 +170,6 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
       hoverBg = withAlpha(scale.DEFAULT, 0.9);
       break;
     case 'bordered':
-      // Use scale[600] for text (per-theme contrast-safe) while keeping
-      // scale.DEFAULT for the border to preserve brand vibrance.
       bg = 'transparent';
       fg = scale[600];
       border = `${borderThick} solid ${scale.DEFAULT}`;
@@ -217,14 +183,12 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
     case 'flat':
       bg = withAlpha(scale.DEFAULT, 0.2);
       fg = scale[600];
-      // Spec says color/50 feels too strong; use 0.3 (documented deviation).
       hoverBg = withAlpha(scale.DEFAULT, 0.3);
       break;
     case 'faded':
       bg = neutral[100];
       fg = scale[600];
       border = `${borderThick} solid ${neutral[500]}`;
-      // Faded: no visible hover change.
       break;
     case 'shadow':
       bg = scale.DEFAULT;

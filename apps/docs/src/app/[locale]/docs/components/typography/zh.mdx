@@ -1,0 +1,167 @@
+# Typography
+
+TimeUI 提供的是一组偏产品界面的排版原语，而不是长篇内容排版系统：`Text`、`Heading`、`Paragraph`、`Link` 和行内 `Code`。
+它们都走同一套主题 token，因此会和按钮、表单控件、文档正文保持一致的视觉语言。
+
+## Text
+
+`Text` 是默认的行内文本原语，覆盖字号、字重、弱化颜色以及单行截断。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Text size="xs">超小标签</Text>
+  <Text size="sm">较小辅助文案</Text>
+  <Text size="md">默认正文</Text>
+  <Text size="lg" weight="medium">中等强调</Text>
+  <Text size="xl" weight="bold">更大的粗体文本</Text>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Text size="xs">超小标签</Text>
+    <Text size="sm">较小辅助文案</Text>
+    <Text size="md">默认正文</Text>
+    <Text size="lg" weight="medium">中等强调</Text>
+    <Text size="xl" weight="bold">更大的粗体文本</Text>
+  </Stack>
+</LiveDemo>
+
+## muted 与 truncate
+
+`muted` 适合元信息、次要说明。`truncate` 会启用单行省略号，因此通常需要父容器提供宽度限制。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Text muted>这是一段弱化显示的辅助信息</Text>
+  <Box sx={{ width: 220 }}>
+    <Text truncate>
+      这是一段很长很长的文本，当容器宽度不足时会在单行内自动截断并显示省略号。
+    </Text>
+  </Box>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Text muted>这是一段弱化显示的辅助信息</Text>
+    <Box sx={{ width: 220 }}>
+      <Text truncate>
+        这是一段很长很长的文本，当容器宽度不足时会在单行内自动截断并显示省略号。
+      </Text>
+    </Box>
+  </Stack>
+</LiveDemo>
+
+## Heading 层级
+
+`Heading` 通过 `level={1..6}` 映射到语义化标题标签，并内置一套字号梯度。
+
+<LiveDemo code={`<Stack spacing={8}>
+  <Heading level={1}>一级标题</Heading>
+  <Heading level={2}>二级标题</Heading>
+  <Heading level={3}>三级标题</Heading>
+  <Heading level={4}>四级标题</Heading>
+  <Heading level={5}>五级标题</Heading>
+  <Heading level={6}>六级标题</Heading>
+</Stack>`}>
+  <Stack spacing={8}>
+    <Heading level={1}>一级标题</Heading>
+    <Heading level={2}>二级标题</Heading>
+    <Heading level={3}>三级标题</Heading>
+    <Heading level={4}>四级标题</Heading>
+    <Heading level={5}>五级标题</Heading>
+    <Heading level={6}>六级标题</Heading>
+  </Stack>
+</LiveDemo>
+
+## Paragraph、Link 与 Code
+
+这三个组件覆盖最常见的正文场景：段落、链接、行内代码。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Paragraph>
+    Paragraph 是默认的正文块，带更易读的行高和段后间距。
+  </Paragraph>
+  <Paragraph>
+    访问 <Link href="https://timeui.dev">timeui.dev</Link>，或者执行 <Code>pnpm add @timeui/react</Code>。
+  </Paragraph>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Paragraph>{'Paragraph 是默认的正文块，带更易读的行高和段后间距。'}</Paragraph>
+    <Paragraph>
+      {'访问 '}
+      <Link href="https://timeui.dev">timeui.dev</Link>
+      {'，或者执行 '}
+      <Code>pnpm add @timeui/react</Code>
+      {'。'}
+    </Paragraph>
+  </Stack>
+</LiveDemo>
+
+## 组合产品文案
+
+这些原语刻意保持轻量，因此可以直接和布局组件搭配，快速组成产品卡片或信息区块。
+
+<LiveDemo code={`<Box
+  sx={{
+    padding: 16,
+    border: '1px solid rgba(127,127,127,0.24)',
+    borderRadius: 12,
+  }}
+>
+  <Stack spacing={6}>
+    <Text size="sm" muted>项目状态</Text>
+    <Heading level={3}>迁移已经完成</Heading>
+    <Paragraph>
+      所有工作区包都已经接入统一主题 token，文档站内容也同步对齐。
+    </Paragraph>
+  </Stack>
+</Box>`}>
+  <Box
+    sx={{
+      padding: 16,
+      border: '1px solid rgba(127,127,127,0.24)',
+      borderRadius: 12,
+    }}
+  >
+    <Stack spacing={6}>
+      <Text size="sm" muted>项目状态</Text>
+      <Heading level={3}>迁移已经完成</Heading>
+      <Paragraph>{'所有工作区包都已经接入统一主题 token，文档站内容也同步对齐。'}</Paragraph>
+    </Stack>
+  </Box>
+</LiveDemo>
+
+## API
+
+### Text
+
+<PropsTable props={[
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '字号预设。' },
+  { name: 'weight', type: "'regular' | 'medium' | 'semibold' | 'bold'", default: "'regular'", description: '字重预设。' },
+  { name: 'muted', type: 'boolean', default: 'false', description: '使用主题中的弱化文本颜色。' },
+  { name: 'truncate', type: 'boolean', default: 'false', description: '启用单行省略号截断。' }
+]} />
+
+### Heading
+
+<PropsTable props={[
+  { name: 'level', type: '1 | 2 | 3 | 4 | 5 | 6', default: '2', description: '语义标题层级，同时决定对应字号。' }
+]} />
+
+### Paragraph
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode', required: true, description: '段落内容。' }
+]} />
+
+### Link
+
+<PropsTable props={[
+  { name: 'href', type: 'string', description: '链接目标地址。' },
+  { name: 'children', type: 'ReactNode', required: true, description: '链接文本。' }
+]} />
+
+### Code
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode', required: true, description: '行内代码内容。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  `Heading` 渲染原生 `h1`-`h6`，`Link` 渲染原生锚点并带有可见焦点环，`Code` 使用语义化的行内 `<code>`。
+  `Text` 默认仍然是 `<span>`，所以当文档结构本身有语义要求时，优先使用 `Paragraph` 或 `Heading`。
+</Callout>

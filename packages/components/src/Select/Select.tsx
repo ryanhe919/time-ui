@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Select 组件的核心渲染与交互逻辑。
+ */
+
 import {
   Children,
   forwardRef,
@@ -33,7 +40,6 @@ import type {
   SelectOptionProps,
 } from './Select.types';
 
-/** Size → default radius bucket (mirrors Button's mapping). */
 const sizeRadiusMap: Record<SelectSize, SelectRadius> = {
   xs: 'sm',
   sm: 'sm',
@@ -42,7 +48,6 @@ const sizeRadiusMap: Record<SelectSize, SelectRadius> = {
   xl: 'lg',
 };
 
-/** Default chevron — inherits currentColor. Rotates 180° when open. */
 const ChevronIcon = ({ sizePx, open }: { sizePx: number; open: boolean }) => (
   <svg
     aria-hidden
@@ -63,10 +68,6 @@ const ChevronIcon = ({ sizePx, open }: { sizePx: number; open: boolean }) => (
   </svg>
 );
 
-/**
- * Walk `<Select>`'s children to extract `<SelectOption>` metadata. Non-
- * SelectOption children are ignored in dev with a warning.
- */
 function childrenToItems(children: ReactNode): SelectItem[] {
   const out: SelectItem[] = [];
   Children.forEach(children, (child) => {
@@ -82,11 +83,7 @@ function childrenToItems(children: ReactNode): SelectItem[] {
       type?.name === 'SelectOption';
     const props = child.props as SelectOptionProps;
     const hasValue = props && typeof props.value !== 'undefined';
-    // Under React Server Components the component identity comes through as a
-    // client-reference object rather than the real function, so direct
-    // identity / tag checks can misfire. As a fallback, treat any element
-    // with a `value` prop as a SelectOption-shaped child — only elements
-    // that look nothing like one trip the warning.
+    // 兼容 RSC / 打包后组件标识变化：若能识别到 value，也按 SelectOption 处理。
     if (!isKnownTag && !hasValue) {
       if (isDev) {
         console.warn(
@@ -105,11 +102,9 @@ function childrenToItems(children: ReactNode): SelectItem[] {
   return out;
 }
 
-/** Stringify a label for case-insensitive substring filtering. */
 function labelToString(label: ReactNode): string {
   if (label == null || label === false) return '';
   if (typeof label === 'string' || typeof label === 'number') return String(label);
-  // Best-effort: walk React children recursively for strings.
   const acc: string[] = [];
   Children.forEach(label as ReactNode, (child) => {
     if (typeof child === 'string' || typeof child === 'number') {
@@ -126,11 +121,6 @@ function cssLength(v: number | string | undefined, fallback: string): string {
   return typeof v === 'number' ? `${v}px` : v;
 }
 
-/**
- * Inner renderer — emits the trigger + popover pair, **without** any
- * FormField plumbing. The public `Select` wraps this in a FormField when
- * the user supplies label / description / errorMessage.
- */
 const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function SelectControl(
   {
     variant = 'flat',
@@ -167,7 +157,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
 ) {
   const theme = useTheme();
 
-  // Mutual-exclusion warning (items wins).
   if (isDev && items && children) {
     console.warn(
       '[TimeUI] Select: received both `items` and `children`. `items` wins; children are ignored.',
@@ -175,11 +164,11 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   }
 
   const sourceItems = useMemo<SelectItem[]>(
+    // items 显式传入优先；否则从子节点推导，保证两种用法行为一致。
     () => items ?? childrenToItems(children),
     [items, children],
   );
 
-  // Controlled / uncontrolled value (mirrors Input).
   const [rawValue, setValue] = useControllableState<string>({
     value,
     defaultValue: defaultValue as string,
@@ -196,8 +185,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [highlight, setHighlight] = useState(-1);
-  // Popover is position:fixed so it escapes any ancestor's overflow clip.
-  // We mirror the trigger rect on open + on scroll/resize while open.
   const [popoverRect, setPopoverRect] = useState<{
     top: number;
     left: number;
@@ -214,16 +201,12 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const triggerId = idProp ?? `timeui-select-${autoId}`;
   const listboxId = `${triggerId}-listbox`;
 
-  // Filter by search query.
   const filteredItems = useMemo(() => {
     if (!isSearchable || !search) return sourceItems;
     const q = search.toLowerCase();
     return sourceItems.filter((it) => labelToString(it.label).toLowerCase().includes(q));
   }, [sourceItems, search, isSearchable]);
 
-  // Close on outside click. The popover is portaled to document.body, so
-  // mousedown on the popover must be excluded from the "outside" check
-  // explicitly (it's no longer a DOM descendant of the wrapper).
   useEffect(() => {
     if (!open) return;
     const onDocMouseDown = (e: MouseEvent) => {
@@ -240,7 +223,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     };
   }, [open]);
 
-  // When opening: seed highlight at current value and (if searchable) focus search.
   useEffect(() => {
     if (!open) {
       setSearch('');
@@ -251,13 +233,9 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     if (isSearchable) {
       requestAnimationFrame(() => searchInputRef.current?.focus());
     }
-    // Intentionally omit filteredItems / current / isSearchable from deps —
-    // we only want to seed the highlight once per open cycle, not on every
-    // filter change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  // Keep highlight valid as the filter narrows.
   useEffect(() => {
     if (!open) return;
     if (highlight >= filteredItems.length) {
@@ -266,21 +244,16 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     }
   }, [filteredItems, highlight, open]);
 
-  // Scroll the highlighted option into view.
   useEffect(() => {
     if (!open || highlight < 0) return;
     const list = listRef.current;
     if (!list) return;
     const el = list.querySelector<HTMLLIElement>(`[data-index="${highlight}"]`);
-    // jsdom doesn't implement scrollIntoView; guard for test environments.
     if (el && typeof el.scrollIntoView === 'function') {
       el.scrollIntoView({ block: 'nearest' });
     }
   }, [highlight, open]);
 
-  // Mirror the trigger's bounding box while the popover is open. Position
-  // with `fixed` so ancestor `overflow: hidden` (e.g. card wrappers) can't
-  // clip the dropdown.
   useIsomorphicLayoutEffect(() => {
     if (!open) {
       setPopoverRect(null);
@@ -330,12 +303,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     [filteredItems, highlight],
   );
 
-  /**
-   * Shared keyboard logic. Called from the trigger (focus stays there when
-   * `isSearchable=false`) and from the search input (focus moves there when
-   * `isSearchable=true`). Returns `true` when the key was handled so the
-   * caller can preventDefault.
-   */
   const handleNavKey = useCallback(
     (key: string): boolean => {
       if (!open) {
@@ -387,8 +354,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
 
   const onTriggerKeyDown = (e: ReactKeyboardEvent<HTMLButtonElement>) => {
     if (isDisabled) return;
-    // Space on a button normally clicks — let the native click path open it
-    // when closed, but avoid double handling when already open.
     if (e.key === ' ' && open) {
       e.preventDefault();
       const it = filteredItems[highlight];
@@ -401,7 +366,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   };
 
   const onSearchKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
-    // Let plain typing flow into the input; intercept only navigation keys.
     const navKeys = ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape', 'Tab'];
     if (!navKeys.includes(e.key)) return;
     if (handleNavKey(e.key)) {
@@ -415,7 +379,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     commit(it.value);
   };
 
-  // Styling ---------------------------------------------------------
   const resolvedColor = isInvalid ? 'danger' : color;
   const sizeTokens = theme.components.input[size];
   const radiusKey: SelectRadius = radiusProp ?? sizeRadiusMap[size];
@@ -471,8 +434,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     ${isDisabled ? 'cursor: not-allowed;' : 'cursor: pointer;'}
   `;
 
-  // Soft tint used on the selected row — pulled from the active palette so
-  // the selection picks up the Select's `color` prop (primary tint by default).
   const selectedBg =
     resolvedColor === 'default'
       ? (theme.colors.bg.muted ?? theme.colors.bg.sunken)
@@ -483,9 +444,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const popoverCss = css`
     position: fixed;
     z-index: 9999;
-    /* Typography lockdown — the popover is portaled, but we also cancel any
-       host-app descendant cascades (e.g. MDX typography rules) that could
-       have bled in before the portal, by setting these explicitly here. */
     font-family:
       ui-sans-serif,
       -apple-system,
@@ -511,7 +469,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    /* Subtle mount animation. */
     transform-origin: top center;
     animation: timeui-select-pop 140ms cubic-bezier(0.16, 1, 0.3, 1);
     @keyframes timeui-select-pop {
@@ -562,7 +519,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     max-height: ${cssLength(maxListHeight, '280px')};
     overflow-y: auto;
     overscroll-behavior: contain;
-    /* Thin, unobtrusive scrollbar that matches the surface. */
     scrollbar-width: thin;
     scrollbar-color: ${theme.colors.border.default} transparent;
     &::-webkit-scrollbar {
@@ -596,8 +552,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     const isSelected = it.value === current;
     const isHighlighted = idx === highlight;
     const isHighlightedSelected = isSelected && isHighlighted;
-    // Highlight uses a slightly darker shade than the selected tint so the two
-    // states stay visually distinguishable.
     const highlightedBg = isSelected
       ? resolvedColor === 'default'
         ? theme.colors.bg.sunken
@@ -721,6 +675,19 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       ? `${listboxId}-opt-${highlight}`
       : undefined;
 
+  // Trigger 是 button，仅占文本部分；chevron / startContent / 文本与图标之间的
+  // 间隙在 button 之外。把 wrapper 上"非 trigger 区域"的 mousedown 转发到 button
+  // 自身的 click，整条 select 都能响应点击（HeroUI / Radix 同样行为）。
+  const onWrapperMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (isDisabled) return;
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    if (trigger.contains(e.target as Node)) return;
+    e.preventDefault();
+    trigger.click();
+    trigger.focus();
+  };
+
   return (
     <div
       ref={wrapperRef}
@@ -732,6 +699,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       data-open={open || undefined}
       className={className}
       style={style}
+      onMouseDown={onWrapperMouseDown}
       css={[wrapperCss, variantStyles]}
     >
       {startContent ? (
@@ -801,7 +769,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
         {endContent ?? <ChevronIcon sizePx={iconSizePx} open={open} />}
       </span>
 
-      {/* Hidden native input so native form submission still carries the value. */}
       {name ? <input type="hidden" name={name} value={current} /> : null}
 
       {open && popoverRect && typeof document !== 'undefined'
@@ -876,11 +843,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
 
 (SelectControl as unknown as { displayName: string }).displayName = 'SelectControl';
 
-/**
- * `Select` — custom listbox dropdown with optional search. When any of
- * `label`, `description`, or `errorMessage` is supplied, the component
- * auto-wraps itself in `FormField` so ARIA and layout come for free.
- */
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select(props, ref) {
   const {
     label,

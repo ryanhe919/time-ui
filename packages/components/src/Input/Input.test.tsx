@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 Input 模块的行为与回归。
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { createRef, useState } from 'react';
 import { screen, fireEvent } from '@testing-library/react';
@@ -5,10 +11,6 @@ import userEvent from '@testing-library/user-event';
 import { renderWithProviders, expectA11y } from '../test-utils';
 import { Input } from './Input';
 
-/**
- * Reusable controlled test harness — avoids copy-pasting useState into every
- * controlled-mode test.
- */
 function Controlled({
   initial = '',
   onChange,
@@ -50,7 +52,6 @@ describe('Input — rendering & refs', () => {
     expect(root).not.toBeNull();
     expect(root.tagName).toBe('DIV');
     expect(root.style.marginTop).toBe('8px');
-    // The <input> inside should NOT carry the className.
     expect(root.querySelector('input')).not.toHaveClass('my-root');
   });
 });
@@ -62,7 +63,6 @@ describe('Input — controlled / uncontrolled', () => {
     const input = screen.getByRole('textbox', { name: 'field' });
     await userEvent.type(input, 'ab');
     expect(onChange).toHaveBeenCalled();
-    // Last call should be the final value, not the event.
     expect(onChange.mock.calls.at(-1)?.[0]).toBe('ab');
     expect(input).toHaveValue('ab');
   });
@@ -85,7 +85,6 @@ describe('Input — controlled / uncontrolled', () => {
     expect(input.value).toBe('foo');
     await userEvent.type(input, 'z');
     expect(input.value).toBe('fooz');
-    // onChange still fires in uncontrolled mode (that's the contract).
     expect(onChange).toHaveBeenCalled();
   });
 });
@@ -171,7 +170,6 @@ describe('Input — disabled & readOnly', () => {
     const input = screen.getByRole('textbox') as HTMLInputElement;
     expect(input.disabled).toBe(true);
     const btn = screen.queryByRole('button');
-    // Clear button is suppressed when disabled (spec: "有值且非 disabled/readOnly 时显示")
     expect(btn).toBeNull();
   });
 
@@ -179,7 +177,6 @@ describe('Input — disabled & readOnly', () => {
     renderWithProviders(<Input aria-label="x" defaultValue="hello" isClearable isReadOnly />);
     const input = screen.getByRole('textbox') as HTMLInputElement;
     expect(input.readOnly).toBe(true);
-    // readOnly keeps focusability but hides the clear button (spec §2.2).
     expect(screen.queryByRole('button')).toBeNull();
   });
 });
@@ -216,7 +213,6 @@ describe('Input — wrapper click focuses the input', () => {
     const { container } = renderWithProviders(<Input aria-label="x" />);
     const root = container.firstElementChild as HTMLElement;
     const input = screen.getByRole('textbox');
-    // Explicitly simulate a mousedown whose target IS the wrapper.
     fireEvent.mouseDown(root, { target: root });
     expect(document.activeElement).toBe(input);
   });
@@ -233,8 +229,6 @@ describe('Input — start/end content', () => {
     );
     expect(screen.getByTestId('start')).toBeInTheDocument();
     expect(screen.getByTestId('end')).toBeInTheDocument();
-    // Wrapper has the onMouseDown focus-forwarder; clicking the empty edge
-    // (the root wrapper itself) moves focus to the input.
     const root = container.firstElementChild as HTMLElement;
     const input = screen.getByRole('textbox');
     fireEvent.mouseDown(root, { target: root });
@@ -271,16 +265,10 @@ describe('Input — a11y', () => {
   );
 
   it('ships a prefers-reduced-motion rule that disables its adornment transitions', () => {
-    // jsdom's `getComputedStyle` does NOT evaluate `@media` queries, so we
-    // instead assert the emitted stylesheet contains the "reduce → none" rule
-    // that Emotion serialises into the document's `<style>` tags. This is the
-    // same guarantee a real browser would apply when the user opts in.
     renderWithProviders(<Input aria-label="x" defaultValue="x" isClearable onChange={() => {}} />);
     const styles = Array.from(document.querySelectorAll('style'))
       .map((s) => s.textContent ?? '')
       .join('\n');
-    // The adornment button declares a non-trivial transition and the reduce
-    // block; both must be present so motion-averse users get `transition:none`.
     expect(styles).toMatch(/prefers-reduced-motion:\s*reduce/);
     expect(styles).toMatch(/@media \(prefers-reduced-motion: reduce\)[^}]*transition:\s*none/);
   });

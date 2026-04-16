@@ -1,16 +1,17 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 InputFormDemo。
+ */
+
 'use client';
 
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Input, Stack } from '@timeui/react';
 
-/**
- * 演示 Input 的受控用法 + label/description/errorMessage 联动：
- *   - email 字段做一个很朴素的"包含 @"校验，失败时进入 isInvalid 态
- *   - password 字段默认显示 password toggle
- *   - 同时展示 startContent / endContent 的排版
- */
 export function InputFormDemo() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

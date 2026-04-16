@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 RadioGroupDemo。
+ */
+
 'use client';
 
 import { useState } from 'react';

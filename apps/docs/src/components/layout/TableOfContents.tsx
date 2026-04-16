@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 TableOfContents 布局组件。
+ */
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -15,6 +22,16 @@ interface Props {
   label: string;
 }
 
+function toSlug(text: string): string {
+  const slug = text
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return slug || 'section';
+}
+
 export function TableOfContents({ label }: Props) {
   const pathname = usePathname();
   const [headings, setHeadings] = useState<Heading[]>([]);
@@ -28,16 +45,20 @@ export function TableOfContents({ label }: Props) {
     if (!article) return;
 
     const els = Array.from(article.querySelectorAll<HTMLHeadingElement>('h2, h3'));
+    const seen = new Map<string, number>();
     const collected: Heading[] = els.map((el) => {
-      if (!el.id) {
-        el.id = (el.textContent ?? '')
-          .trim()
-          .toLowerCase()
-          .replace(/[^\p{L}\p{N}]+/gu, '-')
-          .replace(/^-+|-+$/g, '');
+      const baseId = el.id || toSlug(el.textContent ?? '');
+      const occurrence = seen.get(baseId) ?? 0;
+      const nextId = occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`;
+
+      seen.set(baseId, occurrence + 1);
+
+      if (el.id !== nextId) {
+        el.id = nextId;
       }
+
       return {
-        id: el.id,
+        id: nextId,
         text: el.textContent?.trim() ?? '',
         level: el.tagName === 'H2' ? 2 : 3,
       };

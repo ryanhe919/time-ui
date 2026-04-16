@@ -1,14 +1,11 @@
 #!/usr/bin/env node
+
 /**
- * TimeUI component scaffolder.
- *
- * Usage:
- *   pnpm new:component MyThing
- *
- * Generates packages/components/src/<Name>/ with:
- *   <Name>.tsx, <Name>.types.ts, <Name>.test.tsx, <Name>.stories.tsx, index.ts
- * and appends `export * from './<Name>'` to packages/components/src/index.ts.
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现组件模板文件生成命令行工具。
  */
+
 import { mkdirSync, existsSync, writeFileSync, readFileSync, appendFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,7 +40,6 @@ const files = {
   [`${Name}.types.ts`]: `import type { HTMLAttributes, ReactNode } from 'react';
 
 export interface ${Name}Props extends HTMLAttributes<HTMLDivElement> {
-  /** Content rendered inside the ${Name}. */
   children?: ReactNode;
 }
 `,

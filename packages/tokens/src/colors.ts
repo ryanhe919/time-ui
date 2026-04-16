@@ -1,9 +1,7 @@
 /**
- * Primitive color ramps (50–900) for TimeUI.
- *
- * These are raw palette values with no semantic meaning. Components should
- * never consume these directly — they consume semantic tokens from
- * `@timeui/themes`, which map these primitives onto roles (bg, text, border…).
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 colors 设计令牌。
  */
 
 export const gray = {

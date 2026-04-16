@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 LiveDemo。
+ */
+
 'use client';
 
 import { useState, type ReactNode } from 'react';
@@ -11,11 +18,6 @@ export interface LiveDemoProps {
   language?: string;
 }
 
-/**
- * Apple-flavored preview card. Pure white surface in light mode (off-white in
- * dark), generously rounded corners, soft drop shadow, no grid pattern. Lets
- * the colorful TimeUI components inside become the visual focus.
- */
 export function LiveDemo({ children, code, language = 'tsx' }: LiveDemoProps) {
   const [showCode, setShowCode] = useState(false);
 
@@ -32,6 +34,7 @@ export function LiveDemo({ children, code, language = 'tsx' }: LiveDemoProps) {
       `}
     >
       <div
+        data-live-preview=""
         css={css`
           padding: 56px 32px;
           display: flex;

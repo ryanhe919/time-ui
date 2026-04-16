@@ -1,14 +1,17 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 Breadcrumb 布局组件。
+ */
+
 'use client';
 
 import { usePathname } from 'next/navigation';
 import { css } from '@emotion/react';
 import type { DocsMessages } from '@/lib/docs-i18n';
 
-/**
- * Eyebrow label rendered above the page H1 — Apple's "section + page" pattern.
- * Renders nothing on landing pages without a section/page slug.
- */
 export function Breadcrumb({ messages }: { messages: DocsMessages }) {
   const pathname = usePathname();
   const match = pathname.match(/\/docs\/([^/]+)\/([^/]+)/);

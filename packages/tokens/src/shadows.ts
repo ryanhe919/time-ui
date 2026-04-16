@@ -1,7 +1,9 @@
 /**
- * Elevation scale. 0 is flat, 5 is highest (modal / popover).
- * Tuned for light backgrounds; dark themes typically override.
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 shadows 设计令牌。
  */
+
 export const shadows = {
   none: 'none',
   xs: '0 1px 2px 0 rgba(0, 0, 0, 0.04)',

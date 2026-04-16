@@ -1,19 +1,16 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现核心模块 ConfigProvider。
+ */
+
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { defaultLocale, type Locale } from './i18n/messages';
 
-/** Global configuration shared across every TimeUI component in the tree. */
 export interface TimeUIConfig {
-  /** Class-name prefix applied to every component (`${prefixCls}-button`, …). */
   prefixCls: string;
-  /** Writing direction. */
   direction: 'ltr' | 'rtl';
-  /** Active locale. Supported: `'zh'` | `'en'`. Defaults to `'zh'`. */
   locale: Locale;
-  /**
-   * Returns the DOM node that overlays (popovers, modals, …) should portal
-   * into. Defaults to `document.body`. Return `null`/`undefined` to let the
-   * component fall back to its own default.
-   */
   getPopupContainer: (triggerNode?: HTMLElement) => HTMLElement;
 }
 
@@ -34,10 +31,6 @@ export interface ConfigProviderProps extends Partial<TimeUIConfig> {
   children: ReactNode;
 }
 
-/**
- * Provides app-wide TimeUI configuration. Nested `ConfigProvider`s merge their
- * overrides onto the parent config.
- */
 export const ConfigProvider = ({ children, ...overrides }: ConfigProviderProps) => {
   const parent = useContext(ConfigContext);
   const value = useMemo<TimeUIConfig>(
@@ -63,11 +56,6 @@ export const ConfigProvider = ({ children, ...overrides }: ConfigProviderProps) 
   return <ConfigContext.Provider value={value}>{children}</ConfigContext.Provider>;
 };
 
-/**
- * Read TimeUI's global config. Safely returns defaults if no `ConfigProvider`
- * is mounted above the caller.
- */
 export const useConfig = (): TimeUIConfig => useContext(ConfigContext);
 
-/** Exposed for tests and advanced integrations. */
 export const __defaultConfig = defaultConfig;

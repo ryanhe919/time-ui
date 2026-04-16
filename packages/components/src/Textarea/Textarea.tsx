@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Textarea 组件的核心渲染与交互逻辑。
+ */
+
 import {
   forwardRef,
   useCallback,
@@ -22,11 +29,6 @@ const SIZE_TO_RADIUS: Record<TextareaSize, TextareaRadius> = {
   xl: 'lg',
 };
 
-/**
- * Parse a `line-height` style value into a number of px. Returns `null` when
- * the computed value is unusable (`normal` or unparsable) so callers can fall
- * back to a font-size-derived estimate.
- */
 function parseLineHeightPx(node: HTMLElement): number | null {
   if (typeof window === 'undefined') return null;
   const computed = window.getComputedStyle(node);
@@ -37,7 +39,6 @@ function parseLineHeightPx(node: HTMLElement): number | null {
   return parsed;
 }
 
-/** Return vertical padding (px) from computed style. */
 function getVerticalPaddingPx(node: HTMLElement): number {
   if (typeof window === 'undefined') return 0;
   const computed = window.getComputedStyle(node);
@@ -272,17 +273,6 @@ function TextareaShell({
   );
 }
 
-/**
- * Textarea — TimeUI's multi-line field.
- *
- * Auto-sizing approach: when `isAutoSize` (implicit when `minRows` / `maxRows`
- * is provided), we resize the real `<textarea>` directly: reset `height` to
- * `auto` to let the browser remeasure, then clamp against the bounds derived
- * from `line-height * {min,max}Rows + paddings`. No hidden mirror element is
- * needed — this gives us pixel-perfect sizing with minimal DOM, at the small
- * cost of a layout effect on every value change. `useIsomorphicLayoutEffect` keeps the
- * measurement synchronous so the user never sees a flicker.
- */
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
   {
     variant = 'flat',

@@ -52,29 +52,28 @@ jobs:
 
           # pnpm monorepo safety net. Next's standalone file-tracer ships
           # its runtime peers (styled-jsx, @swc/helpers, …) only inside
-          # `node_modules/.pnpm/next@.../node_modules/` — a path Node's
+          # `node_modules/.pnpm/next@*/node_modules/` — a path Node's
           # CommonJS resolver never walks to, so `server.js` crashes at
-          # boot with `Cannot find module 'styled-jsx/package.json'` (or
-          # @swc/helpers, etc.). Hoist every sibling package next/ has in
-          # the pnpm store alongside apps/docs/node_modules/next so the
-          # normal upward `require.resolve()` walk finds them.
-          NEXT_PEER_DIR=$(ls -d deploy/node_modules/.pnpm/next@*/node_modules 2>/dev/null | head -1 || true)
+          # boot with `Cannot find module 'styled-jsx/package.json'`.
+          # Mirror every sibling of `next/` in that pnpm store alongside
+          # `apps/docs/node_modules/next` so the normal upward walk finds
+          # them. Pinned to pnpm's virtual-store layout (v7+); revalidate
+          # if the pnpm major version changes.
+          shopt -s nullglob
+          peer_dirs=(deploy/node_modules/.pnpm/next@*/node_modules)
+          if [ "${#peer_dirs[@]}" -gt 1 ]; then
+            echo "::error::multiple next@* pnpm stores found: ${peer_dirs[*]}"
+            exit 1
+          fi
+          NEXT_PEER_DIR="${peer_dirs[0]:-}"
           if [ -n "$NEXT_PEER_DIR" ]; then
             echo "Hoisting Next.js peer dependencies from $NEXT_PEER_DIR"
             mkdir -p deploy/apps/docs/node_modules
-            # shellcheck disable=SC2045
-            for pkg in "$NEXT_PEER_DIR"/* "$NEXT_PEER_DIR"/@*/*; do
-              [ -d "$pkg" ] || continue
-              name=${pkg#"$NEXT_PEER_DIR"/}
-              # Skip next itself — Next's tracer already placed it.
-              [ "$name" = "next" ] && continue
-              dest=deploy/apps/docs/node_modules/$name
-              if [ ! -e "$dest" ]; then
-                mkdir -p "$(dirname "$dest")"
-                cp -r "$pkg" "$dest"
-                echo "  + $name"
-              fi
-            done
+            # One-shot copy of every sibling except `next` itself (tracer
+            # already placed it). rsync walks the tree once instead of
+            # spawning a cp per package.
+            rsync -a --exclude='/next' --exclude='/next/' \
+              "$NEXT_PEER_DIR"/ deploy/apps/docs/node_modules/
           else
             echo "::warning::Could not locate deploy/node_modules/.pnpm/next@*/node_modules — peer hoist skipped"
           fi

@@ -1,0 +1,191 @@
+# Layout
+
+TimeUI includes a compact layout layer for day-to-day product UI composition:
+`Box`, `Flex`, `Grid`, `Stack`, and `Container`. They are intentionally thin wrappers
+over CSS layout primitives, with two shared capabilities:
+
+- `as` lets you swap the rendered element while preserving the component API.
+- `sx` accepts inline style objects and is forwarded through Emotion for one-off layout tuning.
+
+## Box
+
+`Box` is the zero-op wrapper. Use it when you need a styled semantic wrapper without opinionated layout behavior.
+
+<LiveDemo code={`<Box
+  as="section"
+  sx={{
+    padding: 16,
+    border: '1px solid rgba(127,127,127,0.24)',
+    borderRadius: 12,
+  }}
+>
+  Plain semantic box
+</Box>`}>
+  <Box
+    as="section"
+    sx={{
+      padding: 16,
+      border: '1px solid rgba(127,127,127,0.24)',
+      borderRadius: 12,
+    }}
+  >
+    Plain semantic box
+  </Box>
+</LiveDemo>
+
+## Flex
+
+`Flex` is the general-purpose flex row/column primitive with `direction`, `align`, `justify`, `wrap`, and `gap`.
+
+<LiveDemo code={`<Flex gap={12} align="center" wrap="wrap">
+  <Button size="sm">Alpha</Button>
+  <Button size="sm" variant="bordered">Beta</Button>
+  <Button size="sm" variant="light">Gamma</Button>
+</Flex>`}>
+  <Flex gap={12} align="center" wrap="wrap">
+    <Button size="sm">Alpha</Button>
+    <Button size="sm" variant="bordered">Beta</Button>
+    <Button size="sm" variant="light">Gamma</Button>
+  </Flex>
+</LiveDemo>
+
+## Grid
+
+`Grid` builds CSS grid layouts with equal columns by number or accepts a raw `grid-template-columns` string.
+
+<LiveDemo code={`<Grid columns={3} gap={12}>
+  <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>1</Box>
+  <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>2</Box>
+  <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>3</Box>
+</Grid>`}>
+  <Grid columns={3} gap={12}>
+    <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>1</Box>
+    <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>2</Box>
+    <Box sx={{ padding: 12, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 10 }}>3</Box>
+  </Grid>
+</LiveDemo>
+
+## Stack
+
+`Stack` is a convenience wrapper over flex for the common "vertical list with spacing" case. It can also flip to horizontal with `direction="row"`.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Input placeholder="Project name" />
+  <Input placeholder="Repository" />
+  <Input placeholder="Owner" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Input placeholder="Project name" />
+    <Input placeholder="Repository" />
+    <Input placeholder="Owner" />
+  </Stack>
+</LiveDemo>
+
+## Container
+
+`Container` centers content, constrains max width, and optionally applies horizontal padding.
+
+<LiveDemo code={`<Container maxWidth={520}>
+  <Box
+    sx={{
+      padding: 16,
+      border: '1px solid rgba(127,127,127,0.24)',
+      borderRadius: 12,
+    }}
+  >
+    Centered content with a max width.
+  </Box>
+</Container>`}>
+  <Container maxWidth={520}>
+    <Box
+      sx={{
+        padding: 16,
+        border: '1px solid rgba(127,127,127,0.24)',
+        borderRadius: 12,
+      }}
+    >
+      Centered content with a max width.
+    </Box>
+  </Container>
+</LiveDemo>
+
+## Mixed composition
+
+These primitives are designed to nest cleanly.
+
+<LiveDemo code={`<Container maxWidth={720}>
+  <Stack spacing={16}>
+    <Flex align="center" justify="space-between" wrap="wrap" gap={12}>
+      <Heading level={3}>Team overview</Heading>
+      <Button size="sm" color="primary">Invite member</Button>
+    </Flex>
+    <Grid columns="repeat(auto-fit, minmax(180px, 1fr))" gap={12}>
+      <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>Design</Box>
+      <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>Engineering</Box>
+      <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>Operations</Box>
+    </Grid>
+  </Stack>
+</Container>`}>
+  <Container maxWidth={720}>
+    <Stack spacing={16}>
+      <Flex align="center" justify="space-between" wrap="wrap" gap={12}>
+        <Heading level={3}>Team overview</Heading>
+        <Button size="sm" color="primary">Invite member</Button>
+      </Flex>
+      <Grid columns="repeat(auto-fit, minmax(180px, 1fr))" gap={12}>
+        <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>Design</Box>
+        <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>Engineering</Box>
+        <Box sx={{ padding: 16, border: '1px solid rgba(127,127,127,0.24)', borderRadius: 12 }}>Operations</Box>
+      </Grid>
+    </Stack>
+  </Container>
+</LiveDemo>
+
+## API
+
+### Shared polymorphic props
+
+<PropsTable props={[
+  { name: 'as', type: 'ElementType', description: 'Render a different element such as `section`, `main`, or `ul`.' },
+  { name: 'sx', type: 'CSSProperties', description: 'One-off inline styling object passed through Emotion.' }
+]} />
+
+### Flex
+
+<PropsTable props={[
+  { name: 'direction', type: 'CSSProperties["flexDirection"]', default: "'row'", description: 'Flex direction.' },
+  { name: 'align', type: 'CSSProperties["alignItems"]', default: "'stretch'", description: 'Cross-axis alignment.' },
+  { name: 'justify', type: 'CSSProperties["justifyContent"]', default: "'flex-start'", description: 'Main-axis distribution.' },
+  { name: 'wrap', type: 'CSSProperties["flexWrap"]', default: "'nowrap'", description: 'Wrapping behavior.' },
+  { name: 'gap', type: 'number | string', default: '0', description: 'Gap between items; numbers are converted to px.' }
+]} />
+
+### Grid
+
+<PropsTable props={[
+  { name: 'columns', type: 'number | string', default: '12', description: 'Column count or raw `grid-template-columns` string.' },
+  { name: 'gap', type: 'number | string', description: 'Shared row/column gap.' },
+  { name: 'rowGap', type: 'number | string', description: 'Row gap override.' },
+  { name: 'columnGap', type: 'number | string', description: 'Column gap override.' }
+]} />
+
+### Stack
+
+<PropsTable props={[
+  { name: 'direction', type: "'row' | 'column'", default: "'column'", description: 'Stack axis.' },
+  { name: 'spacing', type: 'number | string', default: '8', description: 'Gap between children.' },
+  { name: 'align', type: 'CSSProperties["alignItems"]', description: 'Cross-axis alignment.' },
+  { name: 'justify', type: 'CSSProperties["justifyContent"]', description: 'Main-axis distribution.' }
+]} />
+
+### Container
+
+<PropsTable props={[
+  { name: 'maxWidth', type: 'number | string', default: '1200', description: 'Maximum width of the centered container.' },
+  { name: 'padded', type: 'boolean', default: 'true', description: 'Apply 16px horizontal padding.' }
+]} />
+
+<Callout variant="info" title="Notes">
+  `Box` has no custom props beyond the shared polymorphic `as` / `sx`. All layout components forward
+  native props for the rendered element, so you can still pass `id`, `role`, `aria-*`, `data-*`, and event handlers.
+</Callout>

@@ -1,20 +1,19 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Test-utils 组件的核心渲染与交互逻辑。
+ */
+
 import type { ReactElement, ReactNode } from 'react';
 import { render, type RenderOptions, type RenderResult } from '@testing-library/react';
 import { ConfigProvider, ThemeProvider, type TimeUIConfig } from '@timeui/core';
 import { lightTheme, darkTheme, type TimeUITheme } from '@timeui/themes';
 
 export interface RenderWithProvidersOptions extends Omit<RenderOptions, 'wrapper'> {
-  /** Theme object or a named theme mode (`'light' | 'dark'`). Defaults to `lightTheme`. */
   theme?: TimeUITheme | 'light' | 'dark';
-  /** Optional overrides for `ConfigProvider`. */
   config?: Partial<TimeUIConfig>;
 }
 
-/**
- * `TimeUIProvider` — wraps children in the canonical TimeUI context stack
- * (`ConfigProvider` + `ThemeProvider`). Exported from test-utils so component
- * tests exercise the exact provider tree the app-level consumer would use.
- */
 export const TimeUIProvider = ({
   children,
   theme,
@@ -36,11 +35,6 @@ const resolveTheme = (theme: RenderWithProvidersOptions['theme']): TimeUITheme |
   return theme;
 };
 
-/**
- * Render a React element inside the full TimeUI provider stack. Use this
- * helper in every component test instead of bare `render()` so behaviour
- * stays consistent with production consumers.
- */
 export const renderWithProviders = (
   ui: ReactElement,
   { theme, config, ...options }: RenderWithProvidersOptions = {},

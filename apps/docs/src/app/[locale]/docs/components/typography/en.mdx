@@ -1,0 +1,169 @@
+# Typography
+
+TimeUI ships a lightweight typography set for product UI rather than long-form editorial layout:
+`Text`, `Heading`, `Paragraph`, `Link`, and inline `Code`. These primitives share the same theme
+tokens, so they stay visually consistent with form controls, buttons, and docs prose.
+
+## Text
+
+`Text` is the default inline primitive. It covers size, weight, muted tone, and single-line truncation.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Text size="xs">Extra small label</Text>
+  <Text size="sm">Small helper text</Text>
+  <Text size="md">Default body text</Text>
+  <Text size="lg" weight="medium">Medium emphasis</Text>
+  <Text size="xl" weight="bold">Large bold text</Text>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Text size="xs">Extra small label</Text>
+    <Text size="sm">Small helper text</Text>
+    <Text size="md">Default body text</Text>
+    <Text size="lg" weight="medium">Medium emphasis</Text>
+    <Text size="xl" weight="bold">Large bold text</Text>
+  </Stack>
+</LiveDemo>
+
+## Muted and truncate
+
+`muted` is useful for secondary UI copy. `truncate` applies single-line ellipsis and expects a width-constrained parent.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Text muted>Muted metadata text</Text>
+  <Box sx={{ width: 220 }}>
+    <Text truncate>
+      This is a very long line that will truncate when the container is narrower than the content.
+    </Text>
+  </Box>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Text muted>Muted metadata text</Text>
+    <Box sx={{ width: 220 }}>
+      <Text truncate>
+        This is a very long line that will truncate when the container is narrower than the content.
+      </Text>
+    </Box>
+  </Stack>
+</LiveDemo>
+
+## Heading levels
+
+`Heading` maps `level={1..6}` to semantic heading tags with a built-in size ramp.
+
+<LiveDemo code={`<Stack spacing={8}>
+  <Heading level={1}>Heading 1</Heading>
+  <Heading level={2}>Heading 2</Heading>
+  <Heading level={3}>Heading 3</Heading>
+  <Heading level={4}>Heading 4</Heading>
+  <Heading level={5}>Heading 5</Heading>
+  <Heading level={6}>Heading 6</Heading>
+</Stack>`}>
+  <Stack spacing={8}>
+    <Heading level={1}>Heading 1</Heading>
+    <Heading level={2}>Heading 2</Heading>
+    <Heading level={3}>Heading 3</Heading>
+    <Heading level={4}>Heading 4</Heading>
+    <Heading level={5}>Heading 5</Heading>
+    <Heading level={6}>Heading 6</Heading>
+  </Stack>
+</LiveDemo>
+
+## Paragraph, Link, and Code
+
+These three cover the common prose cases: block copy, inline navigation, and inline code tokens.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Paragraph>
+    Paragraph is the default prose block with a readable line-height and bottom margin.
+  </Paragraph>
+  <Paragraph>
+    Visit <Link href="https://timeui.dev">timeui.dev</Link> or run <Code>pnpm add @timeui/react</Code>.
+  </Paragraph>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Paragraph>{'Paragraph is the default prose block with a readable line-height and bottom margin.'}</Paragraph>
+    <Paragraph>
+      {'Visit '}
+      <Link href="https://timeui.dev">timeui.dev</Link>
+      {' or run '}
+      <Code>pnpm add @timeui/react</Code>
+      {'.'}
+    </Paragraph>
+  </Stack>
+</LiveDemo>
+
+## Composing UI copy
+
+The primitives are intentionally small, so they pair naturally with layout components.
+
+<LiveDemo code={`<Box
+  sx={{
+    padding: 16,
+    border: '1px solid rgba(127,127,127,0.24)',
+    borderRadius: 12,
+  }}
+>
+  <Stack spacing={6}>
+    <Text size="sm" muted>PROJECT STATUS</Text>
+    <Heading level={3}>Migration complete</Heading>
+    <Paragraph>
+      All workspace packages now consume the shared theme tokens and docs are aligned.
+    </Paragraph>
+  </Stack>
+</Box>`}>
+  <Box
+    sx={{
+      padding: 16,
+      border: '1px solid rgba(127,127,127,0.24)',
+      borderRadius: 12,
+    }}
+  >
+    <Stack spacing={6}>
+      <Text size="sm" muted>PROJECT STATUS</Text>
+      <Heading level={3}>Migration complete</Heading>
+      <Paragraph>{'All workspace packages now consume the shared theme tokens and docs are aligned.'}</Paragraph>
+    </Stack>
+  </Box>
+</LiveDemo>
+
+## API
+
+### Text
+
+<PropsTable props={[
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Font size preset.' },
+  { name: 'weight', type: "'regular' | 'medium' | 'semibold' | 'bold'", default: "'regular'", description: 'Font weight preset.' },
+  { name: 'muted', type: 'boolean', default: 'false', description: 'Use the theme muted text color.' },
+  { name: 'truncate', type: 'boolean', default: 'false', description: 'Apply single-line ellipsis overflow treatment.' }
+]} />
+
+### Heading
+
+<PropsTable props={[
+  { name: 'level', type: '1 | 2 | 3 | 4 | 5 | 6', default: '2', description: 'Semantic heading level and matching size preset.' }
+]} />
+
+### Paragraph
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode', required: true, description: 'Paragraph content.' }
+]} />
+
+### Link
+
+<PropsTable props={[
+  { name: 'href', type: 'string', description: 'Destination URL.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Link label.' }
+]} />
+
+### Code
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode', required: true, description: 'Inline code content.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  `Heading` renders native `h1`-`h6` tags, `Link` renders a native anchor with a visible focus ring,
+  and `Code` is semantic inline `<code>`. `Text` stays a `<span>` by default, so use semantic block
+  elements like `Paragraph` or `Heading` when structure matters.
+</Callout>

@@ -129,6 +129,14 @@ button {
 
 /* ============================================================
  * MDX article — editorial Apple typography
+ *
+ * NOTE: the editorial heading recipes below intentionally use !important
+ * because they override Tailwind / browser defaults for the docs prose.
+ * They MUST stop at the LiveDemo preview boundary, otherwise any component
+ * that renders <h1>…<h6> inside a demo (e.g. <Heading>) inherits this
+ * editorial styling and the demo no longer reflects the component's real
+ * appearance. The `[data-live-preview]` reset block at the bottom of this
+ * section neutralises the cascade inside that boundary.
  * ============================================================ */
 
 .mdx-article {
@@ -219,16 +227,67 @@ button {
   color: var(--c-text);
 }
 
-/* H4 — small eyebrow label style, uppercase tracking. */
+/* H4 — quiet sub-heading. Smaller than H3, still scannable. */
 .mdx-article h4 {
   font-family: var(--docs-sans) !important;
   font-weight: 600 !important;
-  font-size: 12px !important;
+  font-size: 16px !important;
   line-height: 1.4 !important;
-  letter-spacing: 0.08em !important;
+  letter-spacing: -0.008em !important;
+  color: var(--c-text) !important;
+  margin: 36px 0 10px !important;
+  scroll-margin-top: 96px;
+}
+
+/* H5 — minor heading, on the body baseline. */
+.mdx-article h5 {
+  font-family: var(--docs-sans) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  letter-spacing: -0.005em !important;
+  color: var(--c-text) !important;
+  margin: 28px 0 8px !important;
+  scroll-margin-top: 96px;
+}
+
+/* H6 — eyebrow label (uppercase only renders on Latin; gracefully ignored
+   on CJK so it just reads as a small caps-like caption). */
+.mdx-article h6 {
+  font-family: var(--docs-sans) !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
   color: var(--c-text-secondary) !important;
-  margin: 36px 0 10px !important;
+  margin: 24px 0 6px !important;
+  scroll-margin-top: 96px;
+}
+
+/* H6 in CJK contexts: drop uppercase + tracking (no-op on glyphs but
+   keeps the visual rhythm clean). */
+.mdx-article:lang(zh) h6 {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+/* ----- Reset inside LiveDemo preview boundary -----
+   Components rendered inside a LiveDemo (e.g. <Heading level={1..6}/>) emit
+   real <h1>…<h6> tags. Without this reset they inherit the editorial recipes
+   above and look nothing like the real component. `all: revert` cancels these
+   author rules, allowing the component's own emotion class styles to take
+   over. We also kill the H2 "§" prefix and the H1 fade-in animation. */
+.mdx-article [data-live-preview] h1,
+.mdx-article [data-live-preview] h2,
+.mdx-article [data-live-preview] h3,
+.mdx-article [data-live-preview] h4,
+.mdx-article [data-live-preview] h5,
+.mdx-article [data-live-preview] h6 {
+  all: revert !important;
+}
+.mdx-article [data-live-preview] h2::before {
+  content: none !important;
 }
 
 /* ----- Paragraphs ----- */

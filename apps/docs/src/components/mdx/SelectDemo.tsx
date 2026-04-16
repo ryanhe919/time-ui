@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 SelectDemo。
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -13,7 +20,6 @@ const FRAMEWORKS = [
   { value: 'angular', label: 'Angular', isDisabled: true },
 ];
 
-/** Select 的受控用法：一个下拉 + 显示当前选中的 value。 */
 export function SelectDemo() {
   const [value, setValue] = useState('react');
 

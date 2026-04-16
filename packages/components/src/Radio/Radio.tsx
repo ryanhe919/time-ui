@@ -1,21 +1,17 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Radio 组件的核心渲染与交互逻辑。
+ */
+
 import { forwardRef, useCallback, useEffect, useId, useRef, type ChangeEvent } from 'react';
 import { css, useTheme } from '@emotion/react';
 import { isDev, mergeRefs } from '../utils';
 import { useRadioGroupContext } from './context';
 import type { RadioProps, RadioSize } from './Radio.types';
 
-/**
- * `Radio` — **must** be used inside `<RadioGroup>`. Rendering a stand-alone
- * Radio is an anti-pattern (for "single native radio" behaviour the user
- * should write `<input type="radio">` directly), so Radio warns once and
- * disables itself if its context is absent.
- *
- * Visual structure: a `<label>` containing a visually-hidden native
- * `<input type="radio">`, a painted outer circle, and (when selected) a
- * filled inner dot that scales in via `duration.fast`. Reduced-motion users
- * get a snap-in transition.
- */
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
   {
     value,

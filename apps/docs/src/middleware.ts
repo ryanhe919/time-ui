@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Docs 应用的中间件路由与本地化处理逻辑。
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 
 const SUPPORTED = ['zh', 'en'] as const;

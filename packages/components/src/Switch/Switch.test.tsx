@@ -1,14 +1,15 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 Switch 模块的行为与回归。
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders, expectA11y } from '../test-utils';
 import { Switch } from './Switch';
 
-/**
- * Helper — Switch hides the `<input>` visually, so `getByRole('switch')` is
- * the canonical accessor (it reads the `role="switch"`). The label click
- * target itself is also the full `<label>` wrapper.
- */
 const getSwitchInput = (): HTMLInputElement => screen.getByRole('switch') as HTMLInputElement;
 
 describe('Switch', () => {
@@ -27,7 +28,6 @@ describe('Switch', () => {
     const input = getSwitchInput();
     expect(input.checked).toBe(true);
     await userEvent.click(input);
-    // DOM flips to false (uncontrolled) and onChange fires with the new value.
     expect(input.checked).toBe(false);
     expect(onChange).toHaveBeenLastCalledWith(false);
   });
@@ -68,7 +68,6 @@ describe('Switch', () => {
   });
 
   it('submits name + value to the enclosing form when selected', () => {
-    // Render inside a <form> and verify FormData reads the value.
     const { container } = renderWithProviders(
       <form data-testid="f">
         <Switch name="notif" value="on" defaultSelected aria-label="x" />
@@ -77,6 +76,17 @@ describe('Switch', () => {
     const form = container.querySelector('form') as HTMLFormElement;
     const fd = new FormData(form);
     expect(fd.get('notif')).toBe('on');
+  });
+
+  it('does not submit form data when unchecked', () => {
+    const { container } = renderWithProviders(
+      <form>
+        <Switch name="notif" value="on" aria-label="x" />
+      </form>,
+    );
+    const form = container.querySelector('form') as HTMLFormElement;
+    const fd = new FormData(form);
+    expect(fd.get('notif')).toBeNull();
   });
 
   it.each([['light'], ['dark']] as const)('has zero axe violations in %s theme', async (theme) => {
@@ -107,9 +117,6 @@ describe('Switch', () => {
     );
     const input = getSwitchInput();
     expect(input).toBeDisabled();
-    // With pointer-events:none on the label `userEvent.click` bails out
-    // before the event fires; force it through to confirm the wired handler
-    // still respects `isDisabled`.
     await userEvent.click(input, { pointerEventsCheck: 0 });
     expect(onChange).not.toHaveBeenCalled();
     expect(input.checked).toBe(false);
@@ -118,6 +125,30 @@ describe('Switch', () => {
   it('isInvalid sets aria-invalid="true" on the input', () => {
     renderWithProviders(<Switch isInvalid defaultSelected aria-label="x" />);
     expect(getSwitchInput()).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('forwards required and describedby attributes', () => {
+    renderWithProviders(
+      <Switch isRequired aria-label="x" aria-describedby="help-id" aria-labelledby="label-id" />,
+    );
+    const input = getSwitchInput();
+    expect(input).toHaveAttribute('required');
+    expect(input).toHaveAttribute('aria-required', 'true');
+    expect(input).toHaveAttribute('aria-describedby', 'help-id');
+    expect(input).toHaveAttribute('aria-labelledby', 'label-id');
+  });
+
+  it('fires onChangeEvent with the native event in uncontrolled mode', async () => {
+    const onChange = vi.fn();
+    const onChangeEvent = vi.fn();
+    renderWithProviders(
+      <Switch onChange={onChange} onChangeEvent={onChangeEvent} aria-label="wifi" />,
+    );
+    const input = getSwitchInput();
+    await userEvent.click(input);
+    expect(onChange).toHaveBeenCalledWith(true);
+    expect(onChangeEvent).toHaveBeenCalledTimes(1);
+    expect(onChangeEvent.mock.calls[0]?.[0]?.target).toBe(input);
   });
 
   it('renders startContent / endContent slots that track the selected state', () => {
@@ -129,7 +160,6 @@ describe('Switch', () => {
         endContent={<span data-testid="off-icon">OFF</span>}
       />,
     );
-    // Both slots are rendered unconditionally — opacity drives visibility.
     expect(screen.getByTestId('on-icon')).toBeInTheDocument();
     expect(screen.getByTestId('off-icon')).toBeInTheDocument();
     rerender(
@@ -140,15 +170,15 @@ describe('Switch', () => {
         endContent={<span data-testid="off-icon">OFF</span>}
       />,
     );
-    // Still in DOM when flipped on.
     expect(screen.getByTestId('on-icon')).toBeInTheDocument();
   });
 
+  it('renders children label text next to the switch', () => {
+    renderWithProviders(<Switch aria-label="x">Wi-Fi</Switch>);
+    expect(screen.getByText('Wi-Fi')).toBeInTheDocument();
+  });
+
   it('emits the prefers-reduced-motion override rule so the thumb does not animate', () => {
-    // jsdom doesn't evaluate @media queries in getComputedStyle, so we
-    // inspect the emitted stylesheet directly — the presence of the
-    // `prefers-reduced-motion: reduce { transition: none }` block is the
-    // guarantee real browsers will honour.
     renderWithProviders(<Switch defaultSelected aria-label="x" />);
     const styles = Array.from(document.querySelectorAll('style'))
       .map((s) => s.textContent ?? '')

@@ -1,4 +1,8 @@
-/** Typography primitives: families, size scale, weights, line-heights, tracking. */
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 typography 设计令牌。
+ */
 
 export const fontFamily = {
   sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
@@ -6,10 +10,6 @@ export const fontFamily = {
   mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
 } as const;
 
-/**
- * Modular type scale. Roughly ~1.2 ratio from `md`.
- * Values are strings so they drop straight into CSS.
- */
 export const fontSize = {
   xs: '12px',
   sm: '13px',

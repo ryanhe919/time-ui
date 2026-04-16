@@ -52,6 +52,26 @@ pnpm add shiki  # 可选：启用语法高亮`}
 not real code`} />
 </LiveDemo>
 
+## 关闭语法高亮
+
+传入 `noHighlight` 可以强制使用纯文本渲染，即使项目已经安装了 `shiki` 也不会触发异步高亮。
+这适合超长代码片段、未知语言，或你希望拿到稳定静态 DOM 的场景。
+
+<LiveDemo code={`<CodeBlock
+  title="raw.txt"
+  language="text"
+  noHighlight
+  code={\`这里不会做高亮。\\n只保留原始代码表面。\`}
+/>`}>
+  <CodeBlock
+    title="raw.txt"
+    language="text"
+    noHighlight
+    code={`这里不会做高亮。
+只保留原始代码表面。`}
+  />
+</LiveDemo>
+
 ## 复制成功回调
 
 `onCopy` 在复制成功后触发，可以用来埋点或弹出提示。
@@ -70,7 +90,8 @@ not real code`} />
   { name: 'language', type: 'string', default: "'tsx'", description: '语言提示，作为标签展示并传给 shiki。' },
   { name: 'title', type: 'ReactNode', description: '可选的顶部标题栏（通常填文件名）。' },
   { name: 'copyable', type: 'boolean', default: 'true', description: '是否显示复制按钮。' },
-  { name: 'onCopy', type: '(code: string) => void', description: '复制成功后的回调（复制本身已通过 navigator.clipboard 完成）。' }
+  { name: 'onCopy', type: '(code: string) => void', description: '复制成功后的回调（复制本身已通过 navigator.clipboard 完成）。' },
+  { name: 'noHighlight', type: 'boolean', default: 'false', description: '强制关闭 shiki 高亮，直接按纯文本输出。' }
 ]} />
 
 <Callout variant="tip" title="国际化">

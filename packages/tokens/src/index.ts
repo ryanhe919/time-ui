@@ -1,12 +1,7 @@
 /**
- * @timeui/tokens — primitive design tokens.
- *
- * These are raw, theme-agnostic values (color ramps, type scale, spacing grid,
- * etc.). UI components never consume primitives directly: `@timeui/themes`
- * maps them onto semantic roles (bg.primary, text.muted, …).
- *
- * Every export uses `as const` so TypeScript infers literal types, giving
- * consumers full autocomplete on token paths.
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 统一导出当前包的对外公共 API。
  */
 
 export * from './colors';
@@ -31,7 +26,6 @@ import { motion } from './motion';
 import { borders } from './borders';
 import { components } from './components';
 
-/** The full primitive token set, grouped by category. */
 export const tokens = {
   palette,
   typography,

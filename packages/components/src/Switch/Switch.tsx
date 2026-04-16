@@ -1,24 +1,22 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 Switch 组件的核心渲染与交互逻辑。
+ */
+
 import { forwardRef, useCallback, useRef, type KeyboardEvent, type ChangeEvent } from 'react';
 import { useTheme, css } from '@emotion/react';
 import { mergeRefs, useControllableState } from '../utils';
 import type { SwitchProps, SwitchColor } from './Switch.types';
 
-/** Parse a CSS pixel value like `'28px'` into a number. Returns `0` on miss. */
 function px(value: string | undefined): number {
   if (!value) return 0;
   const m = value.match(/(-?\d+(?:\.\d+)?)/);
   return m && m[1] ? parseFloat(m[1]) : 0;
 }
 
-/**
- * `Switch` — Apple-style boolean toggle.
- *
- * Internally renders a visually hidden `<input type="checkbox" role="switch">`
- * (so native form submission and screen-reader semantics come for free) and
- * paints the track / thumb in CSS. Enter is manually wired because browsers
- * don't toggle checkboxes on Enter by default.
- */
 export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
   {
     color = 'success',
@@ -78,9 +76,8 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
+      // 只读态下浏览器会先乐观切换 checked，这里立即回滚到受控值。
       if (isReadOnly) {
-        // Revert DOM to the logical state — native checkboxes flip themselves
-        // optimistically on click; we must undo it to honour `isReadOnly`.
         e.currentTarget.checked = checked;
         return;
       }

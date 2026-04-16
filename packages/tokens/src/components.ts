@@ -1,10 +1,7 @@
 /**
- * Component-level size / geometry tokens.
- *
- * These are "primitive-adjacent": they name specific component sizes
- * (e.g. `button.md.height`) so component implementations don't have to
- * hard-code magic numbers. Spec baseline comes from HeroUI Button; xs/xl
- * extrapolate the same scale.
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 components 设计令牌。
  */
 
 export const buttonSizes = {
@@ -55,13 +52,6 @@ export const buttonSizes = {
   },
 } as const;
 
-/**
- * Input / Textarea / Select shared size table.
- *
- * Heights align with `buttonSizes` for visual harmony when an Input and a
- * Button sit side-by-side in a form row. `iconSize` drives `startContent` /
- * `endContent` / clear / password-toggle glyphs.
- */
 export const inputSizes = {
   xs: {
     height: '28px',
@@ -105,11 +95,6 @@ export const inputSizes = {
   },
 } as const;
 
-/**
- * Checkbox / Radio indicator sizes. `indicator` is the square side; Radio
- * re-uses the same dimension for its outer circle so inline Checkbox + Radio
- * mixes stay visually balanced.
- */
 export const checkboxSizes = {
   sm: {
     indicator: '16px',
@@ -128,11 +113,6 @@ export const checkboxSizes = {
   },
 } as const;
 
-/**
- * Switch track / thumb geometry. `padding` is the gap between the thumb and
- * track edge at rest. Thumb diameter equals `trackHeight - padding * 2`
- * (see `Switch` spec §2.6).
- */
 export const switchSizes = {
   sm: {
     trackWidth: '32px',

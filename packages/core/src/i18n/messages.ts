@@ -1,15 +1,12 @@
 /**
- * TimeUI message dictionaries.
- *
- * Each component group gets its own namespace. Keep keys terse and
- * camelCased; values are user-facing strings surfaced by the component
- * library (aria-labels, placeholders, error hints, …).
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 i18n 模块 messages。
  */
 
 export type Locale = 'zh' | 'en';
 
 export interface Messages {
-  /** Generic, shared across multiple components. */
   common: {
     close: string;
     cancel: string;
@@ -20,21 +17,16 @@ export interface Messages {
     showPassword: string;
     hidePassword: string;
   };
-  /** Button-specific (kept minimal — Button has no default text today). */
   button: {
     loadingLabel: string;
   };
-  /** CodeBlock — copy-to-clipboard affordance. */
   codeBlock: {
     copy: string;
     copied: string;
-    /** Accessible label for the copy button. */
     copyLabel: string;
   };
-  /** Search — trigger button + future input variants. */
   search: {
     placeholder: string;
-    /** Accessible label when the visible placeholder isn't enough. */
     label: string;
   };
 }

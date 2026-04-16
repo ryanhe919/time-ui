@@ -1,14 +1,17 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 TextareaDemo。
+ */
+
 'use client';
 
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { Textarea } from '@timeui/react';
 
-/**
- * Textarea 的受控 + auto-size + showCount 演示。
- * 绑定一个 state，实时反映字符数并触发 warning/danger 色切换。
- */
 export function TextareaDemo() {
   const [value, setValue] = useState('');
 

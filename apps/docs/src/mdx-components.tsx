@@ -1,11 +1,24 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 mdx-components 模块。
+ */
+
 import type { ComponentPropsWithoutRef } from 'react';
 import {
   Callout,
   CodeBlock,
   Code,
   Button,
+  Box,
+  Grid,
+  Container,
   Flex,
   Stack,
+  Text,
+  Heading,
+  Paragraph,
+  Link,
   FormField,
   Input,
   Textarea,
@@ -30,14 +43,6 @@ import { CodeBlockOnCopyDemo } from '@/components/mdx/CodeBlockOnCopyDemo';
 
 type MDXComponents = Record<string, unknown>;
 
-/**
- * MDX components. Plain h1-h6/p/a/ul/ol/li are kept as native HTML — they're
- * styled by `.mdx-article *` selectors in `globals.css`, which lets the
- * editorial typography system (Instrument Serif / Geist) flow through without
- * being overridden by `@timeui/react`'s Typography component defaults.
- *
- * Inline `<code>` still routes through TimeUI's themed Code chip.
- */
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     Callout,
@@ -54,8 +59,16 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     CodeBlockOnCopyDemo,
 
     Button,
+    Box,
+    Grid,
+    Container,
     Flex,
     Stack,
+    Text,
+    Heading,
+    Paragraph,
+    Link,
+    Code,
 
     FormField,
     Input,

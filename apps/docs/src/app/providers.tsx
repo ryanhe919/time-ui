@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 集中封装应用级 Provider 组合逻辑。
+ */
+
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';

@@ -1,7 +1,14 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 Textarea 模块的行为与回归。
+ */
+
 import { describe, it, expect, vi } from 'vitest';
 import { createRef, useState } from 'react';
 import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { lightTheme } from '@timeui/themes';
 import { renderWithProviders, expectA11y } from '../test-utils';
 import { Textarea } from './Textarea';
 
@@ -76,13 +83,10 @@ describe('Textarea — controlled / uncontrolled', () => {
 
 describe('Textarea — auto-size', () => {
   it('uses auto-size mode when minRows / maxRows is supplied', () => {
-    // jsdom doesn't do layout, but we can at least verify the auto-size path
-    // wrote an inline height onto the textarea on mount.
     renderWithProviders(
       <Textarea aria-label="x" minRows={2} maxRows={6} defaultValue="one\ntwo" />,
     );
     const ta = screen.getByRole('textbox') as HTMLTextAreaElement;
-    // After the layout effect, inline height should be set (even if 0px).
     expect(ta.style.height).not.toBe('');
   });
 
@@ -97,9 +101,7 @@ describe('Textarea — auto-size', () => {
 describe('Textarea — showCount', () => {
   it('renders `n/max` counter and sr-only a11y message', () => {
     renderWithProviders(<Textarea aria-label="x" showCount maxLength={10} defaultValue="hi" />);
-    // Visible counter.
     expect(screen.getByText('2/10')).toBeInTheDocument();
-    // sr-only message (inline aria-live node).
     expect(screen.getByText('2 of 10 characters used')).toBeInTheDocument();
   });
 
@@ -114,6 +116,21 @@ describe('Textarea — showCount', () => {
     expect(screen.getByText('3/5')).toBeInTheDocument();
     const describedBy = ta.getAttribute('aria-describedby') ?? '';
     expect(describedBy).toBeTruthy();
+  });
+
+  it('adds the generated count id to aria-describedby when showCount is enabled', () => {
+    renderWithProviders(
+      <Textarea
+        aria-label="x"
+        aria-describedby="external-help"
+        showCount
+        maxLength={10}
+        defaultValue="abc"
+      />,
+    );
+    const ta = screen.getByRole('textbox');
+    const describedBy = ta.getAttribute('aria-describedby') ?? '';
+    expect(describedBy).toContain('-count');
   });
 });
 
@@ -149,6 +166,13 @@ describe('Textarea — error state & FormField integration', () => {
     expect(label.htmlFor).toBe('bio-xyz');
     expect(screen.getByLabelText('Bio')).toHaveAttribute('id', 'bio-xyz');
   });
+
+  it('description alone still wraps with FormField and wires aria-describedby', () => {
+    renderWithProviders(<Textarea aria-label="x" id="bio-desc" description="Helpful text" />);
+    const ta = screen.getByRole('textbox');
+    const description = screen.getByText('Helpful text');
+    expect(ta.getAttribute('aria-describedby')).toContain(description.id);
+  });
 });
 
 describe('Textarea — disabled / readOnly', () => {
@@ -171,15 +195,83 @@ describe('Textarea — disabled / readOnly', () => {
       return <Textarea aria-label="x" showCount maxLength={10} value={v} onChange={() => {}} />;
     }
     const { rerender } = renderWithProviders(<Harness v="aaaa" />);
-    // 4/10 — still muted (under 90%); we just assert the count renders.
     expect(screen.getByText('4/10')).toBeInTheDocument();
-    rerender(<Harness v="aaaaaaaaa" />);
-    // 9/10 — warning threshold (>90% of maxLength).
-    expect(screen.getByText('9/10')).toBeInTheDocument();
+    rerender(<Harness v="aaaaaaaaaa" />);
+    expect(screen.getByText('10/10')).toBeInTheDocument();
+    expect(document.head.textContent ?? '').toContain(lightTheme.colors.status.warning);
     rerender(<Harness v="aaaaaaaaaaa" />);
-    // 11/10 — danger.
     expect(screen.getByText('11/10')).toBeInTheDocument();
     expect(screen.getByText('11 of 10 characters used')).toBeInTheDocument();
+    expect(document.head.textContent ?? '').toContain(lightTheme.colors.status.danger);
+  });
+
+  it('keeps muted counter color before the 90% threshold', () => {
+    renderWithProviders(<Textarea aria-label="x" showCount maxLength={10} defaultValue="abc" />);
+    expect(screen.getByText('3/10')).toBeInTheDocument();
+    expect(document.head.textContent ?? '').toContain('color:');
+  });
+});
+
+describe('Textarea — layout branches', () => {
+  it('supports fullWidth and renders start/end slots', () => {
+    const { container } = renderWithProviders(
+      <Textarea
+        aria-label="x"
+        fullWidth
+        startContent={<span data-testid="ta-start">S</span>}
+        endContent={<span data-testid="ta-end">E</span>}
+      />,
+    );
+    expect(screen.getByTestId('ta-start')).toBeInTheDocument();
+    expect(screen.getByTestId('ta-end')).toBeInTheDocument();
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveAttribute('data-full-width', 'true');
+  });
+
+  it('falls back when computed line-height is normal during auto-size', () => {
+    const original = window.getComputedStyle;
+    vi.spyOn(window, 'getComputedStyle').mockImplementation((element: Element) => {
+      const computed = original(element);
+      return new Proxy(computed, {
+        get(target, prop, receiver) {
+          if (prop === 'lineHeight') return 'normal';
+          return Reflect.get(target, prop, receiver);
+        },
+      });
+    });
+
+    renderWithProviders(<Textarea aria-label="x" minRows={2} defaultValue="one\ntwo" />);
+    const ta = screen.getByRole('textbox') as HTMLTextAreaElement;
+    expect(ta.style.height).not.toBe('');
+  });
+
+  it('clamps auto-size to maxRows and enables overflow when content exceeds the cap', () => {
+    const originalDescriptor = Object.getOwnPropertyDescriptor(
+      HTMLTextAreaElement.prototype,
+      'scrollHeight',
+    );
+    Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', {
+      configurable: true,
+      get() {
+        return 240;
+      },
+    });
+
+    renderWithProviders(<Textarea aria-label="x" minRows={2} maxRows={3} defaultValue="many" />);
+    const ta = screen.getByRole('textbox') as HTMLTextAreaElement;
+    expect(ta.style.overflowY).toBe('auto');
+
+    if (originalDescriptor) {
+      Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', originalDescriptor);
+    }
+  });
+
+  it('renders without FormField wrappers when no label, description or error is provided', () => {
+    const { container } = renderWithProviders(<Textarea aria-label="plain" />);
+    expect(container.querySelector('label')).toBeNull();
+    expect(container.querySelector('[role="alert"]')).toBeNull();
+    expect(container.firstElementChild?.tagName).toBe('DIV');
+    expect(screen.getByRole('textbox', { name: 'plain' })).toBeInTheDocument();
   });
 });
 

@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现应用布局结构与页面壳逻辑。
+ */
+
 import type { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { Providers } from '../providers';

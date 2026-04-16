@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 统一导出当前包的对外公共 API。
+ */
+
 export { ConfigProvider, ThemeProvider, useConfig, useTheme, useI18n } from '@timeui/core';
 export type {
   TimeUIConfig,

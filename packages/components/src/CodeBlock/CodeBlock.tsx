@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现 CodeBlock 组件的核心渲染与交互逻辑。
+ */
+
 import {
   forwardRef,
   useCallback,
@@ -11,38 +18,14 @@ import { useTheme, css } from '@emotion/react';
 import { useI18n } from '@timeui/core';
 
 export interface CodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'onCopy'> {
-  /** Raw source. Rendered inside a `<pre><code>` block. */
   code: string;
-  /** Language hint. Drives both the label and Shiki's grammar pick. */
   language?: string;
-  /** Optional header title. */
   title?: ReactNode;
-  /** Hide the copy button. Default `true` (shown). */
   copyable?: boolean;
-  /** Fires after a successful copy. */
   onCopy?: (code: string) => void;
-  /**
-   * Disable syntax highlighting even if `shiki` is installed. Useful when the
-   * caller wants the lightweight plain-text fallback explicitly.
-   */
   noHighlight?: boolean;
 }
 
-/**
- * CodeBlock — read-only code display with optional syntax highlighting.
- *
- * **Highlighting is opt-in by installation.** If consumers install
- * [`shiki`](https://shiki.style) (declared as an *optional* peerDependency),
- * CodeBlock dynamically loads it at first render and renders highlighted HTML.
- * If `shiki` is absent, CodeBlock falls back to a plain `<pre><code>` —
- * importing `Button` (or any other TimeUI component) does **not** require
- * `shiki` in the consumer's dependency tree.
- *
- * The dynamic import lives inside `useEffect`, so the bundle that reaches the
- * browser before CodeBlock renders contains zero highlighter code. Combined
- * with the package's `sideEffects: false` declaration, callers who never
- * import `CodeBlock` ship zero highlighter bytes.
- */
 export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function CodeBlock(
   { code, language = 'tsx', title, copyable = true, noHighlight = false, onCopy, ...rest },
   ref,
@@ -52,8 +35,6 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
   const [copied, setCopied] = useState(false);
   const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
 
-  /* Lazy-load the highlighter. Skipped entirely when `noHighlight` is true,
-   * or when `shiki` is not installed in the consumer project. */
   useEffect(() => {
     if (noHighlight) {
       setHighlightedHtml(null);
@@ -62,15 +43,12 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
     let cancelled = false;
     (async () => {
       try {
-        // shiki is an OPTIONAL peer dependency. The dynamic import keeps
-        // it out of the bundle until CodeBlock first renders; consumers
-        // who don't use CodeBlock never pull shiki in.
+        // 按需加载 shiki，避免未使用 CodeBlock 的场景引入高亮开销。
         const shiki = await import('shiki');
         const highlighter = await shiki.getSingletonHighlighter({
           themes: ['github-light', 'github-dark'],
           langs: [language],
         });
-        // Lazily load language if it wasn't in the singleton's preload set.
         const loaded = highlighter.getLoadedLanguages();
         if (!loaded.includes(language as never)) {
           await highlighter.loadLanguage(language as never);
@@ -82,10 +60,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
         });
         if (!cancelled) setHighlightedHtml(html);
       } catch (err) {
-        // Shiki may fail to load for a few reasons — not installed, grammar
-        // missing, or (the nasty silent one) a CSP that blocks WebAssembly
-        // instantiation. Surface the error in dev so the failure mode is
-        // debuggable; in prod we still fall back to plain text.
+        // 高亮失败时回退到纯文本，保证内容可读且不阻塞渲染。
         if (process.env.NODE_ENV !== 'production') {
           console.warn(
             '[TimeUI] CodeBlock: syntax highlighting unavailable — falling back to plain text.',
@@ -107,7 +82,8 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
       onCopy?.(code);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      /* clipboard unavailable — swallow silently */
+      // 忽略剪贴板不可用或权限受限场景，避免打断页面交互。
+      void 0;
     }
   }, [code, onCopy]);
 
@@ -130,7 +106,6 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
         font-family:
           ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
-        /* Style overrides for Shiki's emitted <pre> so it inherits our chrome */
         .shiki {
           margin: 0 !important;
           padding: 16px ${copyable ? 56 : 16}px 16px 16px;
@@ -165,10 +140,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
       )}
 
       {highlightedHtml ? (
-        <div
-          // shiki output is escaped; safe to inject.
-          dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-        />
+        <div dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
       ) : (
         <pre
           css={css`

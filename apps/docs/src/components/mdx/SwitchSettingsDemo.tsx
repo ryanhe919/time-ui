@@ -1,4 +1,11 @@
 /** @jsxImportSource @emotion/react */
+
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 MDX 示例组件 SwitchSettingsDemo。
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -17,7 +24,6 @@ const SETTINGS: Setting[] = [
   { key: 'beta', label: '加入 Beta 通道', hint: '提前体验实验性功能，可能有 bug。' },
 ];
 
-/** iOS 设置页风格：一个设置项一行，右侧 Switch。 */
 export function SwitchSettingsDemo() {
   const [state, setState] = useState<Record<string, boolean>>({
     notifications: true,

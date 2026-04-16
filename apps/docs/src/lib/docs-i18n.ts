@@ -1,9 +1,16 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现文档站 docs-i18n 基础能力。
+ */
+
 import type { Locale } from '@timeui/react';
 
-/** Docs-app-scoped UI strings. Library-scoped strings live in `@timeui/core`. */
 export interface DocsMessages {
   brand: string;
   sections: Record<string, string>;
+  /** 侧边栏小标题（section 内按类型分组时用）。 */
+  groups: Record<string, string>;
   pages: Record<string, string>;
   nav: {
     onThisPage: string;
@@ -23,6 +30,10 @@ const zh: DocsMessages = {
     'getting-started': '开始使用',
     components: '组件',
   },
+  groups: {
+    general: '通用',
+    forms: '表单',
+  },
   pages: {
     introduction: '介绍',
     installation: '安装',
@@ -30,6 +41,8 @@ const zh: DocsMessages = {
     callout: '提示块',
     'code-block': '代码块',
     search: '搜索',
+    typography: '排版',
+    layout: '布局',
     'form-field': '表单域',
     input: '输入框',
     textarea: '多行输入',
@@ -56,6 +69,10 @@ const en: DocsMessages = {
     'getting-started': 'Getting Started',
     components: 'Components',
   },
+  groups: {
+    general: 'General',
+    forms: 'Forms',
+  },
   pages: {
     introduction: 'Introduction',
     installation: 'Installation',
@@ -63,6 +80,8 @@ const en: DocsMessages = {
     callout: 'Callout',
     'code-block': 'Code Block',
     search: 'Search',
+    typography: 'Typography',
+    layout: 'Layout',
     'form-field': 'Form Field',
     input: 'Input',
     textarea: 'Textarea',

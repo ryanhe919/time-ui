@@ -1,10 +1,11 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义 Button 模块的 TypeScript 类型约束。
+ */
+
 import type { ElementType, ReactNode, ComponentPropsWithRef, Ref } from 'react';
 
-/**
- * HeroUI-aligned button variants.
- * Legacy values ('primary' | 'secondary' | 'outline' | 'danger') remain
- * accepted for backward compatibility and are mapped internally.
- */
 export type ButtonVariant =
   | 'solid'
   | 'bordered'
@@ -13,7 +14,6 @@ export type ButtonVariant =
   | 'faded'
   | 'shadow'
   | 'ghost'
-  // legacy
   | 'primary'
   | 'secondary'
   | 'outline'
@@ -26,13 +26,9 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type ButtonRadius = 'sm' | 'md' | 'lg' | 'full';
 
 export interface ButtonOwnProps {
-  /** Visual style. Default `'solid'`. */
   variant?: ButtonVariant;
-  /** Semantic color. Default `'default'`. */
   color?: ButtonColor;
-  /** Size preset. Default `'md'`. */
   size?: ButtonSize;
-  /** Corner radius. Defaults to size's natural radius. */
   radius?: ButtonRadius;
   loading?: boolean;
   disabled?: boolean;

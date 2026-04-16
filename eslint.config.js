@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 定义项目 ESLint 规则与检查范围配置。
+ */
+
 import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
@@ -23,8 +29,6 @@ export default [
   },
   js.configs.recommended,
   {
-    // Config / tooling files run under Node — expose Node globals so plain
-    // `process`, `__dirname`, `module`, etc. don't trip `no-undef`.
     files: ['**/*.{js,mjs,cjs}'],
     languageOptions: {
       ecmaVersion: 'latest',

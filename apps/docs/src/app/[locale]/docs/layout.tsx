@@ -1,3 +1,9 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 实现应用布局结构与页面壳逻辑。
+ */
+
 import { TopNav } from '@/components/layout/TopNav';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TableOfContents } from '@/components/layout/TableOfContents';

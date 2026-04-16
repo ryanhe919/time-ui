@@ -1,6 +1,13 @@
+/**
+ * @author Ryan He
+ * @date 2026-04-16
+ * @description 验证 Select 模块的行为与回归。
+ */
+
 import { describe, it, expect, vi } from 'vitest';
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { lightTheme } from '@timeui/themes';
 import { renderWithProviders, expectA11y } from '../test-utils';
 import { Select } from './Select';
 import { SelectOption } from './SelectOption';
@@ -13,7 +20,7 @@ const ITEMS = [
 
 async function openListbox() {
   await userEvent.click(screen.getByRole('combobox'));
-  return screen.getByRole('listbox');
+  return screen.findByRole('listbox');
 }
 
 describe('Select', () => {
@@ -63,6 +70,22 @@ describe('Select', () => {
     const listbox = await openListbox();
     const options = within(listbox).getAllByRole('option');
     expect(options.map((o) => o.textContent?.trim())).toEqual(['X', 'Y']);
+  });
+
+  it('warns and skips unsupported child nodes without a value prop', async () => {
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    renderWithProviders(
+      <Select aria-label="fruit">
+        <div>Invalid child</div>
+        <SelectOption value="ok">Okay</SelectOption>
+      </Select>,
+    );
+    const listbox = await openListbox();
+    const options = within(listbox).getAllByRole('option');
+    expect(options).toHaveLength(1);
+    expect(options[0]).toHaveTextContent('Okay');
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
   });
 
   it('errorMessage → aria-invalid + aria-describedby wired through FormField', () => {
@@ -134,8 +157,8 @@ describe('Select', () => {
     );
     await openListbox();
     const search = screen.getByRole('searchbox');
-    await userEvent.type(search, 'ap');
-    const listbox = screen.getByRole('listbox');
+    fireEvent.change(search, { target: { value: 'ap' } });
+    const listbox = await screen.findByRole('listbox');
     const options = within(listbox).getAllByRole('option');
     expect(options.map((o) => o.textContent?.trim())).toEqual(['Apple', 'Apricot']);
   });
@@ -145,8 +168,52 @@ describe('Select', () => {
       <Select isSearchable emptyMessage="Nothing found" items={ITEMS} aria-label="fruit" />,
     );
     await openListbox();
-    await userEvent.type(screen.getByRole('searchbox'), 'zzz');
-    expect(screen.getByText('Nothing found')).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'zzz' } });
+    expect(await screen.findByText('Nothing found')).toBeInTheDocument();
+  });
+
+  it('renders startContent and option descriptions', async () => {
+    renderWithProviders(
+      <Select
+        aria-label="fruit"
+        startContent={<span data-testid="start-slot">@</span>}
+        items={[
+          { value: 'a', label: 'Apple', description: 'Red fruit' },
+          { value: 'b', label: 'Banana' },
+        ]}
+      />,
+    );
+    expect(screen.getByTestId('start-slot')).toBeInTheDocument();
+    const listbox = await openListbox();
+    expect(within(listbox).getByText('Red fruit')).toBeInTheDocument();
+  });
+
+  it('supports full radius and custom maxListHeight', async () => {
+    const { container } = renderWithProviders(
+      <Select aria-label="fruit" radius="full" maxListHeight={120} items={ITEMS} />,
+    );
+    const wrapper = container.firstElementChild as HTMLElement;
+    expect(wrapper).toBeInTheDocument();
+    await openListbox();
+    const popover = document.querySelector('[data-timeui-select-popover]') as HTMLElement;
+    expect(popover).toBeInTheDocument();
+    expect(document.head.textContent ?? '').toContain('max-height:120px');
+  });
+
+  it('uses custom search placeholder and empty message', async () => {
+    renderWithProviders(
+      <Select
+        isSearchable
+        searchPlaceholder="Filter fruits"
+        emptyMessage="Nothing here"
+        items={ITEMS}
+        aria-label="fruit"
+      />,
+    );
+    await openListbox();
+    expect(screen.getByPlaceholderText('Filter fruits')).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'zzz' } });
+    expect(await screen.findByText('Nothing here')).toBeInTheDocument();
   });
 
   it('keyboard: ArrowDown / Enter selects the next non-disabled option', async () => {
@@ -156,10 +223,8 @@ describe('Select', () => {
     );
     const trigger = screen.getByRole('combobox');
     trigger.focus();
-    // Open with ArrowDown
     await userEvent.keyboard('{ArrowDown}');
     expect(screen.getByRole('listbox')).toBeInTheDocument();
-    // Move highlight from Apple (current) → Banana.
     await userEvent.keyboard('{ArrowDown}');
     await userEvent.keyboard('{Enter}');
     expect(onChange).toHaveBeenLastCalledWith('b');
@@ -172,6 +237,94 @@ describe('Select', () => {
     expect(screen.getByRole('listbox')).toBeInTheDocument();
     await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('listbox')).toBeNull();
+  });
+
+  it('Tab closes the listbox without trapping focus handling', async () => {
+    renderWithProviders(<Select defaultValue="a" items={ITEMS} aria-label="fruit" />);
+    const trigger = screen.getByRole('combobox');
+    await userEvent.click(trigger);
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    await userEvent.keyboard('{Tab}');
+    expect(screen.queryByRole('listbox')).toBeNull();
+  });
+
+  it('clicking outside closes the popover', async () => {
+    renderWithProviders(<Select defaultValue="a" items={ITEMS} aria-label="fruit" />);
+    await openListbox();
+    await userEvent.click(document.body);
+    expect(screen.queryByRole('listbox')).toBeNull();
+  });
+
+  it('searchbox navigation supports Home and End keys', async () => {
+    renderWithProviders(
+      <Select
+        isSearchable
+        items={[
+          { value: 'a', label: 'Apple' },
+          { value: 'b', label: 'Banana' },
+          { value: 'c', label: 'Cherry', isDisabled: true },
+        ]}
+        aria-label="fruit"
+      />,
+    );
+    await openListbox();
+    const search = screen.getByRole('searchbox');
+    search.focus();
+    await userEvent.keyboard('{End}');
+    expect(screen.getByRole('combobox')).toHaveAttribute(
+      'aria-activedescendant',
+      expect.stringContaining('-opt-1'),
+    );
+    await userEvent.keyboard('{Home}');
+    expect(screen.getByRole('combobox')).toHaveAttribute(
+      'aria-activedescendant',
+      expect.stringContaining('-opt-0'),
+    );
+  });
+
+  it('selects nested ReactNode labels via search text extraction', async () => {
+    renderWithProviders(
+      <Select
+        isSearchable
+        items={[
+          {
+            value: 'x',
+            label: (
+              <span>
+                <strong>Green</strong> Apple
+              </span>
+            ),
+          },
+          { value: 'y', label: 'Banana' },
+        ]}
+        aria-label="fruit"
+      />,
+    );
+    await openListbox();
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'green' } });
+    await waitFor(() => {
+      const listbox = screen.getByRole('listbox');
+      const options = within(listbox).getAllByRole('option');
+      expect(options).toHaveLength(1);
+      expect(options[0]).toHaveTextContent('Green Apple');
+    });
+  });
+
+  it('renders selected non-default description styling branch', async () => {
+    renderWithProviders(
+      <Select
+        aria-label="fruit"
+        color="primary"
+        defaultValue="a"
+        items={[
+          { value: 'a', label: 'Apple', description: 'Primary description' },
+          { value: 'b', label: 'Banana' },
+        ]}
+      />,
+    );
+    const listbox = await openListbox();
+    expect(within(listbox).getByText('Primary description')).toBeInTheDocument();
+    expect(document.head.textContent ?? '').toContain(lightTheme.colors.primary[600]);
   });
 
   it('name prop renders a hidden input that carries the current value', () => {
