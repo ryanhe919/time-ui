@@ -1,6 +1,6 @@
 {
   "name": "@timeui/tokens",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "TimeUI design tokens — colors, spacing, typography, radius, shadows.",
   "license": "MIT",
   "sideEffects": false,
