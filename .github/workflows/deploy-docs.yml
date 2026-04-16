@@ -72,15 +72,24 @@ jobs:
             ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
 
       - name: Restart on server
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || 22 }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
-          ssh -i ~/.ssh/deploy_key \
-            -p ${{ secrets.DEPLOY_PORT || 22 }} \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
-            'zsh -lc "
-              cd '"'${{ secrets.DEPLOY_PATH }}'"'/apps/docs && \
-              PORT=3000 pm2 restart timeui-docs 2>/dev/null || \
-              PORT=3000 pm2 start server.js --name timeui-docs
-            "'
+          ssh -T -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" \
+              "$DEPLOY_USER@$DEPLOY_HOST" \
+              "bash -s" <<EOF
+          set -e
+          # Pick up node/pm2 from nvm or system install paths
+          export PATH="/usr/local/bin:/usr/bin:/bin:\$PATH"
+          [ -s "\$HOME/.nvm/nvm.sh" ] && . "\$HOME/.nvm/nvm.sh"
+          cd "$DEPLOY_PATH/apps/docs"
+          PORT=3000 pm2 restart timeui-docs 2>/dev/null \\
+            || PORT=3000 pm2 start server.js --name timeui-docs
+          pm2 save
+          EOF
 
       - name: Cleanup SSH key
         if: always()
