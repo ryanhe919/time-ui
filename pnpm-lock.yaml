@@ -84,8 +84,8 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(webpack@5.106.1)
       '@next/mdx':
-        specifier: ^15.5.15
-        version: 15.5.15(@mdx-js/loader@3.1.1(webpack@5.106.1))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))
+        specifier: ^16.2.4
+        version: 16.2.4(@mdx-js/loader@3.1.1(webpack@5.106.1))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))
       '@timeui/react':
         specifier: workspace:*
         version: link:../../packages/components
@@ -1228,8 +1228,8 @@ packages:
   '@next/env@15.5.15':
     resolution: {integrity: sha512-vcmyu5/MyFzN7CdqRHO3uHO44p/QPCZkuTUXroeUmhNP8bL5PHFEhik22JUazt+CDDoD6EpBYRCaS2pISL+/hg==}
 
-  '@next/mdx@15.5.15':
-    resolution: {integrity: sha512-4F4A89eL7ZoBjh4MEBQQzZvgKfS24hXHbqS9CsncwtLctgWYTilXlvDxTWYDokgq8jJxeJnBEooBLogZzW/vRw==}
+  '@next/mdx@16.2.4':
+    resolution: {integrity: sha512-e/3bgla+/oF3vDlndI0eFPa0bnP47HPVA0InsAJi7Jr3DwV8WpEGuOcm/3PdI5/93FfNiBhMVeVHZpm1sFlmJw==}
     peerDependencies:
       '@mdx-js/loader': '>=0.15.0'
       '@mdx-js/react': '>=0.15.0'
@@ -5854,7 +5854,7 @@ snapshots:
 
   '@next/env@15.5.15': {}
 
-  '@next/mdx@15.5.15(@mdx-js/loader@3.1.1(webpack@5.106.1))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))':
+  '@next/mdx@16.2.4(@mdx-js/loader@3.1.1(webpack@5.106.1))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))':
     dependencies:
       source-map: 0.7.6
     optionalDependencies:
