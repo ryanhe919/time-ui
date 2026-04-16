@@ -1,6 +1,6 @@
 {
   "name": "@timeui/themes",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "TimeUI theme engine (light/dark) built on Emotion ThemeProvider.",
   "license": "MIT",
   "sideEffects": false,
