@@ -1,0 +1,33 @@
+{
+  "name": "@timeui/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --config ../../eslint.config.js",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"(no docs tests)\" && exit 0",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@mdx-js/loader": "^3.1.1",
+    "@next/mdx": "^15.5.15",
+    "@timeui/react": "workspace:*",
+    "next": "^15.5.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remark-gfm": "^4.0.1",
+    "shiki": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.3"
+  }
+}

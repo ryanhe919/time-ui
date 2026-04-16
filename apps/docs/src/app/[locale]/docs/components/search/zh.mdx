@@ -1,0 +1,72 @@
+import { Search } from '@/components/timeui-client';
+
+# 搜索 Search
+
+Pill 形状的"搜索触发器"——视觉上像输入框，实际上是 `<button>`。点击后由调用方自行打开 ⌘K 命令面板 / 搜索弹层。占位文案默认走 `useI18n()`，跟随当前 locale 自动切换。
+
+## 基础用法
+
+<LiveDemo code={`<Search />`}>
+  <Search />
+</LiveDemo>
+
+## 带快捷键提示
+
+`shortcut` 在右侧渲染一个 `<kbd>` 标签，常见值是 `⌘K` / `Ctrl K`。
+
+<LiveDemo code={`<Search placeholder="搜索文档…" shortcut="⌘K" />`}>
+  <Search placeholder="搜索文档…" shortcut="⌘K" />
+</LiveDemo>
+
+## 尺寸 Sizes
+
+`sm` / `md` / `lg` 三档，高度 28 / 36 / 44 像素。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Search size="sm" placeholder="Small" shortcut="⌘K" />
+  <Search size="md" placeholder="Medium" shortcut="⌘K" />
+  <Search size="lg" placeholder="Large" shortcut="⌘K" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Search size="sm" placeholder="Small" shortcut="⌘K" />
+    <Search size="md" placeholder="Medium" shortcut="⌘K" />
+    <Search size="lg" placeholder="Large" shortcut="⌘K" />
+  </Stack>
+</LiveDemo>
+
+## 视觉变体 Variants
+
+`bordered`（默认）边框 hairline；`flat` 底色 muted。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Search variant="bordered" placeholder="bordered" shortcut="⌘K" />
+  <Search variant="flat" placeholder="flat" shortcut="⌘K" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Search variant="bordered" placeholder="bordered" shortcut="⌘K" />
+    <Search variant="flat" placeholder="flat" shortcut="⌘K" />
+  </Stack>
+</LiveDemo>
+
+## 撑满父容器
+
+<LiveDemo code={`<Search fullWidth placeholder="撑满宽度" shortcut="⌘K" />`}>
+  <Search fullWidth placeholder="撑满宽度" shortcut="⌘K" />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'placeholder', type: 'string', description: '占位文案。省略时使用 i18n 默认值「搜索…」/「Search…」。' },
+  { name: 'shortcut', type: 'string', description: '右侧快捷键提示（如 `⌘K`），渲染为 `<kbd>`。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '尺寸预设。' },
+  { name: 'variant', type: "'bordered' | 'flat'", default: "'bordered'", description: '视觉变体。' },
+  { name: 'icon', type: 'ReactNode', description: '替换前置搜索图标。' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: '撑满父容器。' },
+  { name: 'onClick', type: '(e) => void', description: '通常用来打开命令面板 / 搜索弹层。' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: '禁用状态。' }
+]} />
+
+<Callout variant="tip" title="为什么是按钮，不是输入框？">
+  现代文档站普遍把搜索做成 ⌘K 命令面板（Apple、Vercel、Tailwind、Linear），顶栏的"搜索框"只负责打开面板。`Search` 与这个心智模型对齐，本身不接受输入。需要真正的输入字段时使用原生 `<input type="search">`。
+</Callout>

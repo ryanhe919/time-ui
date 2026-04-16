@@ -1,0 +1,49 @@
+# 代码块 CodeBlock
+
+只读代码展示，自带**复制**按钮。主题自适应（深色模式自动换深底），复制按钮的文案走 `useI18n()`——切换语言时会自动跟着变。
+
+## 基础用法
+
+<LiveDemo code={`<CodeBlock code={\`import { Button } from '@timeui/react';\\n\\nexport function Demo() {\\n  return <Button color="primary">Save</Button>;\\n}\`} />`}>
+  <CodeBlock code={`import { Button } from '@timeui/react';
+
+export function Demo() {
+  return <Button color="primary">Save</Button>;
+}`} />
+</LiveDemo>
+
+## 带标题与语言标记
+
+传入 `title` 会在顶部渲染一条文件名栏，同时把 `language` 显示在右侧。
+
+<LiveDemo code={`<CodeBlock title="button.tsx" language="tsx" code={\`<Button color="success">Confirm</Button>\`} />`}>
+  <CodeBlock
+    title="button.tsx"
+    language="tsx"
+    code={`<Button color="success">Confirm</Button>`}
+  />
+</LiveDemo>
+
+## 隐藏复制按钮
+
+当代码片段只是**示意**、无需复制时，传 `copyable={false}`。
+
+<LiveDemo code={`<CodeBlock copyable={false} code={\`// This is an illustration\nnot real code\`} />`}>
+  <CodeBlock copyable={false} code={`// This is an illustration
+not real code`} />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'code', type: 'string', required: true, description: '要展示的源代码。' },
+  { name: 'language', type: 'string', default: "'tsx'", description: '语言提示，目前仅作为标签展示。' },
+  { name: 'title', type: 'ReactNode', description: '可选的顶部标题栏（通常填文件名）。' },
+  { name: 'copyable', type: 'boolean', default: 'true', description: '是否显示复制按钮。' },
+  { name: 'onCopy', type: '(code: string) => void', description: '复制成功后的回调。' }
+]} />
+
+<Callout variant="tip" title="国际化">
+  复制按钮的文案（`复制 / 已复制`）通过 `@timeui/core` 的 `useI18n()` 从当前 locale 读取。
+  为应用包裹 `<ConfigProvider locale="en">` 即可切换为英文，组件本身无需额外配置。
+</Callout>

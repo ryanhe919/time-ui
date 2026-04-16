@@ -1,0 +1,122 @@
+# 按钮 Button
+
+为操作提供清晰、可访问的入口。TimeUI 的 `Button` 提供 **七种视觉样式**、**六种语义色**、**三种尺寸**，以及可控的**圆角** —— 适配各类界面组合。
+
+## 样式 Variants
+
+七种视觉样式，可与任意 `color` 组合使用。
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="primary" variant="solid">Solid</Button>
+  <Button color="primary" variant="bordered">Bordered</Button>
+  <Button color="primary" variant="light">Light</Button>
+  <Button color="primary" variant="flat">Flat</Button>
+  <Button color="primary" variant="faded">Faded</Button>
+  <Button color="primary" variant="shadow">Shadow</Button>
+  <Button color="primary" variant="ghost">Ghost</Button>
+</Flex>`}>
+  <Button color="primary" variant="solid">Solid</Button>
+  <Button color="primary" variant="bordered">Bordered</Button>
+  <Button color="primary" variant="light">Light</Button>
+  <Button color="primary" variant="flat">Flat</Button>
+  <Button color="primary" variant="faded">Faded</Button>
+  <Button color="primary" variant="shadow">Shadow</Button>
+  <Button color="primary" variant="ghost">Ghost</Button>
+</LiveDemo>
+
+## 颜色 Colors
+
+六种语义色，在浅色与深色主题下都已经过对比度调校。
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="default">Default</Button>
+  <Button color="primary">Primary</Button>
+  <Button color="secondary">Secondary</Button>
+  <Button color="success">Success</Button>
+  <Button color="warning">Warning</Button>
+  <Button color="danger">Danger</Button>
+</Flex>`}>
+  <Button color="default">Default</Button>
+  <Button color="primary">Primary</Button>
+  <Button color="secondary">Secondary</Button>
+  <Button color="success">Success</Button>
+  <Button color="warning">Warning</Button>
+  <Button color="danger">Danger</Button>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+五档尺寸 `xs` / `sm` / `md` / `lg` / `xl`，高度对应 28 / 32 / 40 / 48 / 56 像素，圆角与字号同步缩放。
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button size="xs" color="primary">XS</Button>
+  <Button size="sm" color="primary">Small</Button>
+  <Button size="md" color="primary">Medium</Button>
+  <Button size="lg" color="primary">Large</Button>
+  <Button size="xl" color="primary">XL</Button>
+</Flex>`}>
+  <Button size="xs" color="primary">XS</Button>
+  <Button size="sm" color="primary">Small</Button>
+  <Button size="md" color="primary">Medium</Button>
+  <Button size="lg" color="primary">Large</Button>
+  <Button size="xl" color="primary">XL</Button>
+</LiveDemo>
+
+## 圆角 Radius
+
+通过 `radius` 覆盖由尺寸推导出的默认圆角。
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="primary" radius="sm">Small radius</Button>
+  <Button color="primary" radius="md">Medium</Button>
+  <Button color="primary" radius="lg">Large</Button>
+  <Button color="primary" radius="full">Pill</Button>
+</Flex>`}>
+  <Button color="primary" radius="sm">Small radius</Button>
+  <Button color="primary" radius="md">Medium</Button>
+  <Button color="primary" radius="lg">Large</Button>
+  <Button color="primary" radius="full">Pill</Button>
+</LiveDemo>
+
+## 加载与禁用
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="primary" loading>保存中…</Button>
+  <Button color="primary" disabled>已禁用</Button>
+</Flex>`}>
+  <Button color="primary" loading>保存中…</Button>
+  <Button color="primary" disabled>已禁用</Button>
+</LiveDemo>
+
+## 带图标
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="primary" startIcon={<span>←</span>}>返回</Button>
+  <Button color="success" endIcon={<span>→</span>}>继续</Button>
+</Flex>`}>
+  <Button color="primary" startIcon={<span>←</span>}>返回</Button>
+  <Button color="success" endIcon={<span>→</span>}>继续</Button>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'variant', type: "'solid' | 'bordered' | 'light' | 'flat' | 'faded' | 'shadow' | 'ghost'", default: "'solid'", description: '按钮的视觉样式。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '作用于所选样式的语义色。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设（高度 / 内边距 / 字号）。' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: '圆角大小。默认匹配 size。' },
+  { name: 'loading', type: 'boolean', default: 'false', description: '显示加载态并禁用交互。' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: '禁用按钮。' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' },
+  { name: 'startIcon', type: 'ReactNode', description: '标签前方渲染的节点。' },
+  { name: 'endIcon', type: 'ReactNode', description: '标签后方渲染的节点。' },
+  { name: 'as', type: 'ElementType', default: "'button'", description: '以其它元素渲染（例如链接）。' }
+]} />
+
+<Callout variant="info" title="兼容旧属性">
+  旧的 `variant` 取值（`'primary' | 'secondary' | 'outline' | 'danger'`）仍被支持，内部会映射到新的 `variant` + `color` 模型。新代码请优先使用新 API —— 显式的 `color` + `variant` 可组合出全部 42 种视觉形态。
+</Callout>
+
+<Callout variant="info" title="可访问性">
+  渲染为原生 `<button>` 元素。键盘焦点有明显 outline，按压使用 `transform: scale(0.97)`，所有动画都遵循 `prefers-reduced-motion`。`loading` 会设置 `aria-busy="true"`，并在 spinner 旁保留标签文本。
+</Callout>

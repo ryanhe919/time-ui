@@ -1,0 +1,72 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & Deploy to Cloud Server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages (docs depends on library)
+        run: pnpm -r --filter "./packages/*" build
+
+      - name: Build docs
+        run: pnpm --filter @timeui/docs build
+
+      # ── Deploy via SSH + rsync ──────────────────────────────────
+      # Prerequisites: set these secrets in your GitHub repo settings:
+      #   DEPLOY_HOST     — server IP or hostname (e.g. 1.2.3.4)
+      #   DEPLOY_USER     — SSH user (e.g. root or deploy)
+      #   DEPLOY_KEY      — private SSH key (ed25519 recommended)
+      #   DEPLOY_PATH     — remote directory (e.g. /var/www/timeui-docs)
+      #   DEPLOY_PORT     — SSH port, defaults to 22
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.DEPLOY_PORT || 22 }} -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Deploy to server
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.DEPLOY_PORT || 22 }}" \
+            apps/docs/.next/ \
+            apps/docs/public/ \
+            apps/docs/package.json \
+            apps/docs/next.config.mjs \
+            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
+
+      - name: Restart app on server
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -p ${{ secrets.DEPLOY_PORT || 22 }} \
+              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+              "cd ${{ secrets.DEPLOY_PATH }} && \
+               npm install --production next react react-dom && \
+               pm2 restart timeui-docs || pm2 start npx --name timeui-docs -- next start -p 3000"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

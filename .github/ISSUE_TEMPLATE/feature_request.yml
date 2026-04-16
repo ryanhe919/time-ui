@@ -1,0 +1,42 @@
+name: Feature request
+description: Suggest a new component, prop, or capability.
+title: '[Feat]: '
+labels: ['enhancement', 'triage']
+body:
+  - type: input
+    id: package
+    attributes:
+      label: Target package
+      placeholder: '@timeui/react'
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem are you trying to solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: a11y
+    attributes:
+      label: Accessibility considerations
+      description: WAI-ARIA patterns, keyboard, screen reader behavior.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I searched existing issues and RFCs.
+          required: true
+        - label: This is additive and does not conflict with existing APIs (or is flagged as breaking).

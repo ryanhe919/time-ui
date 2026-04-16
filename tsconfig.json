@@ -1,0 +1,5 @@
+{
+  "files": [],
+  "include": [],
+  "comment": "Per-package tsconfigs are used directly. Project references would require composite mode, which conflicts with tsup's dts build."
+}

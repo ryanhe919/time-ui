@@ -1,0 +1,56 @@
+# 提示块 Callout
+
+散落在正文中的**提示、告警、小贴士**。5 种语义 variant，自带字形图标与左色条，不可关闭——用于**静态**说明场景（需要可关闭/带按钮请考虑 Alert）。
+
+## Variants
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Callout variant="info" title="Info">中性信息，默认样式。</Callout>
+  <Callout variant="tip" title="Tip">友情提示，更软的语气。</Callout>
+  <Callout variant="success" title="Success">操作成功的反馈。</Callout>
+  <Callout variant="warning" title="Warning">需要注意的风险。</Callout>
+  <Callout variant="danger" title="Danger">严重警告或错误。</Callout>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Callout variant="info" title="Info">中性信息，默认样式。</Callout>
+    <Callout variant="tip" title="Tip">友情提示，更软的语气。</Callout>
+    <Callout variant="success" title="Success">操作成功的反馈。</Callout>
+    <Callout variant="warning" title="Warning">需要注意的风险。</Callout>
+    <Callout variant="danger" title="Danger">严重警告或错误。</Callout>
+  </Stack>
+</LiveDemo>
+
+## 不带标题
+
+`title` 可选。省略后仅显示正文，适合一行短提示。
+
+<LiveDemo code={`<Callout variant="info">这是一条不带标题的提示。</Callout>`}>
+  <Callout variant="info">这是一条不带标题的提示。</Callout>
+</LiveDemo>
+
+## 自定义图标
+
+传入 `icon` 可替换前置字形，传入 `false` 则完全隐藏图标列。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Callout variant="tip" icon="🛠" title="Custom icon">传入任意 ReactNode 作为图标。</Callout>
+  <Callout variant="info" icon={false}>隐藏图标时，文字占满整行。</Callout>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Callout variant="tip" icon="🛠" title="Custom icon">传入任意 ReactNode 作为图标。</Callout>
+    <Callout variant="info" icon={false}>隐藏图标时，文字占满整行。</Callout>
+  </Stack>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'variant', type: "'info' | 'tip' | 'success' | 'warning' | 'danger'", default: "'info'", description: '语义与配色。' },
+  { name: 'title', type: 'ReactNode', description: '可选标题，粗体渲染于正文上方。' },
+  { name: 'icon', type: 'ReactNode | false', description: '自定义前置图标。传入 false 则隐藏图标列。' },
+  { name: 'children', type: 'ReactNode', required: true, description: '提示正文。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  `variant="warning"` 与 `variant="danger"` 使用 `role="alert"`，其余使用 `role="status"` —— 屏幕阅读器会按严重性做相应提示。
+</Callout>

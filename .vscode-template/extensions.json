@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "stylelint.vscode-stylelint",
+    "vitest.explorer",
+    "ms-playwright.playwright",
+    "editorconfig.editorconfig",
+    "unifiedjs.vscode-mdx"
+  ],
+  "unwantedRecommendations": ["octref.vetur", "hookyqr.beautify"]
+}

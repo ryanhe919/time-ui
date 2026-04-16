@@ -1,0 +1,35 @@
+# TimeUI CODEOWNERS
+# Every PR requires review from the matching owner(s).
+
+# Fallback — core maintainers own everything not otherwise claimed.
+*                                   @timeui/maintainers
+
+# Architecture, build, release
+/turbo.json                         @timeui/architects
+/pnpm-workspace.yaml                @timeui/architects
+/tsconfig*.json                     @timeui/architects
+/.github/                           @timeui/architects @timeui/dx
+/.changeset/                        @timeui/architects @timeui/dx
+
+# DX / tooling
+/tools/                             @timeui/dx
+/.vscode/                           @timeui/dx
+/.editorconfig                      @timeui/dx
+/.nvmrc                             @timeui/dx
+/eslint.config.js                   @timeui/dx
+/commitlint.config.js               @timeui/dx
+
+# Design system foundations
+/packages/tokens/                   @timeui/design-system
+/packages/themes/                   @timeui/design-system
+
+# Components
+/packages/components/               @timeui/components
+/packages/core/                     @timeui/components
+/packages/utils/                    @timeui/components
+
+# Icons
+/packages/icons/                    @timeui/design-system
+
+# Docs site
+/apps/docs/                         @timeui/docs

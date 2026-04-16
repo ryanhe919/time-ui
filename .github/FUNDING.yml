@@ -1,0 +1,8 @@
+# TimeUI sponsorship configuration.
+# Uncomment and fill in the channels we want to expose once set up.
+#
+# github: [timeui]
+# open_collective: timeui
+# patreon: timeui
+# tidelift: npm/@timeui/react
+# custom: ["https://timeui.dev/sponsor"]

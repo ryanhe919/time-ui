@@ -1,0 +1,13 @@
+{
+  "name": "@timeui/create-component",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Internal scaffolder for new TimeUI components.",
+  "type": "module",
+  "bin": {
+    "create-component": "./bin/create-component.mjs"
+  },
+  "scripts": {
+    "start": "node ./bin/create-component.mjs"
+  }
+}

@@ -1,0 +1,129 @@
+# Button
+
+Trigger actions with a clear, accessible affordance. TimeUI's `Button` ships with
+seven visual variants, six semantic colors, three sizes, and a controllable
+corner radius — designed to compose cleanly across interfaces.
+
+## Variants
+
+Seven visual styles. Pair each with any `color`.
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="primary" variant="solid">Solid</Button>
+  <Button color="primary" variant="bordered">Bordered</Button>
+  <Button color="primary" variant="light">Light</Button>
+  <Button color="primary" variant="flat">Flat</Button>
+  <Button color="primary" variant="faded">Faded</Button>
+  <Button color="primary" variant="shadow">Shadow</Button>
+  <Button color="primary" variant="ghost">Ghost</Button>
+</Flex>`}>
+  <Button color="primary" variant="solid">Solid</Button>
+  <Button color="primary" variant="bordered">Bordered</Button>
+  <Button color="primary" variant="light">Light</Button>
+  <Button color="primary" variant="flat">Flat</Button>
+  <Button color="primary" variant="faded">Faded</Button>
+  <Button color="primary" variant="shadow">Shadow</Button>
+  <Button color="primary" variant="ghost">Ghost</Button>
+</LiveDemo>
+
+## Colors
+
+Six semantic colors. Each pulls from the theme's color scale (light + dark).
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="default">Default</Button>
+  <Button color="primary">Primary</Button>
+  <Button color="secondary">Secondary</Button>
+  <Button color="success">Success</Button>
+  <Button color="warning">Warning</Button>
+  <Button color="danger">Danger</Button>
+</Flex>`}>
+  <Button color="default">Default</Button>
+  <Button color="primary">Primary</Button>
+  <Button color="secondary">Secondary</Button>
+  <Button color="success">Success</Button>
+  <Button color="warning">Warning</Button>
+  <Button color="danger">Danger</Button>
+</LiveDemo>
+
+## Sizes
+
+Five steps: `xs` / `sm` / `md` / `lg` / `xl` — heights 28 / 32 / 40 / 48 / 56 px,
+with radius and font size scaling in lockstep.
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button size="xs" color="primary">XS</Button>
+  <Button size="sm" color="primary">Small</Button>
+  <Button size="md" color="primary">Medium</Button>
+  <Button size="lg" color="primary">Large</Button>
+  <Button size="xl" color="primary">XL</Button>
+</Flex>`}>
+  <Button size="xs" color="primary">XS</Button>
+  <Button size="sm" color="primary">Small</Button>
+  <Button size="md" color="primary">Medium</Button>
+  <Button size="lg" color="primary">Large</Button>
+  <Button size="xl" color="primary">XL</Button>
+</LiveDemo>
+
+## Radius
+
+Override the default size-derived corner radius with `radius`.
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="primary" radius="sm">Small radius</Button>
+  <Button color="primary" radius="md">Medium</Button>
+  <Button color="primary" radius="lg">Large</Button>
+  <Button color="primary" radius="full">Pill</Button>
+</Flex>`}>
+  <Button color="primary" radius="sm">Small radius</Button>
+  <Button color="primary" radius="md">Medium</Button>
+  <Button color="primary" radius="lg">Large</Button>
+  <Button color="primary" radius="full">Pill</Button>
+</LiveDemo>
+
+## Loading & disabled
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="primary" loading>Saving…</Button>
+  <Button color="primary" disabled>Disabled</Button>
+</Flex>`}>
+  <Button color="primary" loading>Saving…</Button>
+  <Button color="primary" disabled>Disabled</Button>
+</LiveDemo>
+
+## With icons
+
+<LiveDemo code={`<Flex gap={12} align="center">
+  <Button color="primary" startIcon={<span>←</span>}>Back</Button>
+  <Button color="success" endIcon={<span>→</span>}>Continue</Button>
+</Flex>`}>
+  <Button color="primary" startIcon={<span>←</span>}>Back</Button>
+  <Button color="success" endIcon={<span>→</span>}>Continue</Button>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'variant', type: "'solid' | 'bordered' | 'light' | 'flat' | 'faded' | 'shadow' | 'ghost'", default: "'solid'", description: 'Visual style of the button.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Semantic color applied to the chosen variant.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset (height / padding / font-size).' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: 'Corner radius. Defaults to the size-matched value.' },
+  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner and disables interaction.' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the button.' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to the width of the container.' },
+  { name: 'startIcon', type: 'ReactNode', description: 'Node rendered before the label.' },
+  { name: 'endIcon', type: 'ReactNode', description: 'Node rendered after the label.' },
+  { name: 'as', type: 'ElementType', default: "'button'", description: 'Render as a different element (e.g. an anchor).' }
+]} />
+
+<Callout variant="info" title="Legacy props">
+  The legacy `variant` values (`'primary' | 'secondary' | 'outline' | 'danger'`) are still
+  accepted and mapped internally to the new `variant` + `color` model. Prefer the new
+  API — explicit `color` + `variant` composes across all 42 visual combinations.
+</Callout>
+
+<Callout variant="info" title="Accessibility">
+  Renders a native `<button>`. Keyboard focus is visible (`outline` + `outline-offset`),
+  press uses `transform: scale(0.97)`, and animations respect `prefers-reduced-motion`.
+  `loading` sets `aria-busy="true"` and keeps the label alongside the spinner.
+</Callout>

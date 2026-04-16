@@ -1,0 +1,60 @@
+# Callout
+
+An inline notice block for **hints, warnings, and tips** embedded in prose. Five
+semantic variants, a glyph prefix, and a colored left rail. Non-dismissible by
+design — reach for `Alert` when you need a closable action bar.
+
+## Variants
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Callout variant="info" title="Info">Neutral informational note.</Callout>
+  <Callout variant="tip" title="Tip">Softer, friendly aside.</Callout>
+  <Callout variant="success" title="Success">Positive confirmation.</Callout>
+  <Callout variant="warning" title="Warning">Something to be careful about.</Callout>
+  <Callout variant="danger" title="Danger">Serious error or blocker.</Callout>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Callout variant="info" title="Info">Neutral informational note.</Callout>
+    <Callout variant="tip" title="Tip">Softer, friendly aside.</Callout>
+    <Callout variant="success" title="Success">Positive confirmation.</Callout>
+    <Callout variant="warning" title="Warning">Something to be careful about.</Callout>
+    <Callout variant="danger" title="Danger">Serious error or blocker.</Callout>
+  </Stack>
+</LiveDemo>
+
+## Without a title
+
+`title` is optional — omit it for a concise single-line notice.
+
+<LiveDemo code={`<Callout variant="info">A short inline notice with no heading.</Callout>`}>
+  <Callout variant="info">A short inline notice with no heading.</Callout>
+</LiveDemo>
+
+## Custom icon
+
+Pass any `ReactNode` as `icon` to override the glyph, or `false` to collapse the
+icon column entirely.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Callout variant="tip" icon="🛠" title="Custom icon">Any ReactNode works.</Callout>
+  <Callout variant="info" icon={false}>When the icon is hidden, prose spans full width.</Callout>
+</Stack>`}>
+  <Stack spacing={12}>
+    <Callout variant="tip" icon="🛠" title="Custom icon">Any ReactNode works.</Callout>
+    <Callout variant="info" icon={false}>When the icon is hidden, prose spans full width.</Callout>
+  </Stack>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'variant', type: "'info' | 'tip' | 'success' | 'warning' | 'danger'", default: "'info'", description: 'Semantic variant driving accent color and glyph.' },
+  { name: 'title', type: 'ReactNode', description: 'Optional heading above the body.' },
+  { name: 'icon', type: 'ReactNode | false', description: 'Override the leading glyph. Pass false to hide the icon column.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Body content.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  `warning` and `danger` variants use `role="alert"`; others use `role="status"`. Assistive
+  tech will announce them at the appropriate severity.
+</Callout>

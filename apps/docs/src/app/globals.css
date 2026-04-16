@@ -1,0 +1,241 @@
+/* ============================================================
+ * Cupertino — Apple-inspired typography, color, and rhythm
+ * ============================================================ */
+
+:root {
+  /* Apple's actual web stack. SF Pro on Apple devices, system on others. */
+  --docs-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica,
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --docs-mono:
+    ui-monospace, 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* Light palette */
+  --c-bg: #ffffff;
+  --c-bg-secondary: #fbfbfd;
+  --c-bg-tertiary: #f5f5f7;
+  --c-text: #1d1d1f;
+  --c-text-secondary: #6e6e73;
+  --c-text-tertiary: #86868b;
+  --c-accent: #0071e3;
+  --c-accent-hover: #0077ed;
+  --c-hairline: rgba(0, 0, 0, 0.08);
+  --c-hairline-strong: rgba(0, 0, 0, 0.12);
+  --c-nav-bg: rgba(251, 251, 253, 0.72);
+  --c-shadow-card: 0 0 1px rgba(0, 0, 0, 0.04), 0 6px 24px rgba(0, 0, 0, 0.04);
+
+  /* Geometry */
+  --r-card: 18px;
+  --r-cta: 980px;
+  --r-control: 12px;
+  --tracking-display: -0.022em;
+  --tracking-tight: -0.005em;
+}
+
+html[data-theme='dark'] {
+  --c-bg: #000000;
+  --c-bg-secondary: #0a0a0a;
+  --c-bg-tertiary: #161617;
+  --c-text: #f5f5f7;
+  --c-text-secondary: #a1a1a6;
+  --c-text-tertiary: #6e6e73;
+  --c-accent: #2997ff;
+  --c-accent-hover: #0a84ff;
+  --c-hairline: rgba(255, 255, 255, 0.1);
+  --c-hairline-strong: rgba(255, 255, 255, 0.16);
+  --c-nav-bg: rgba(0, 0, 0, 0.72);
+  --c-shadow-card: 0 0 1px rgba(255, 255, 255, 0.06), 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--docs-sans);
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: var(--tracking-tight);
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-feature-settings: 'kern', 'liga', 'calt';
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+/* ============================================================
+ * MDX article — Apple typography
+ * ============================================================ */
+
+.mdx-article {
+  font-family: var(--docs-sans);
+  color: var(--c-text);
+}
+
+/* H1 — large, semibold, tight tracking. No serif, no underscore rule. */
+.mdx-article h1 {
+  font-family: var(--docs-sans) !important;
+  font-weight: 600 !important;
+  font-size: clamp(40px, 5.2vw, 56px) !important;
+  line-height: 1.07 !important;
+  letter-spacing: -0.025em !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  color: var(--c-text);
+}
+
+.mdx-article > h1:first-child {
+  animation: docs-fade-up 600ms cubic-bezier(0.42, 0, 0.18, 1) both;
+}
+
+/* Lead paragraph — larger and dimmer, sits right after h1. */
+.mdx-article > h1 + p {
+  font-size: 21px;
+  line-height: 1.38;
+  letter-spacing: -0.012em;
+  color: var(--c-text-secondary);
+  max-width: 60ch;
+  margin: 0 0 56px !important;
+  font-weight: 400;
+  animation: docs-fade-up 720ms cubic-bezier(0.42, 0, 0.18, 1) both 80ms;
+}
+
+/* H2 — semibold sans, tight, lots of top air */
+.mdx-article h2 {
+  font-family: var(--docs-sans) !important;
+  font-weight: 600 !important;
+  font-size: 32px !important;
+  line-height: 1.125 !important;
+  letter-spacing: var(--tracking-display) !important;
+  margin: 88px 0 16px !important;
+  padding: 0 !important;
+  scroll-margin-top: 96px;
+  color: var(--c-text);
+}
+
+.mdx-article h3 {
+  font-family: var(--docs-sans) !important;
+  font-weight: 600 !important;
+  font-size: 21px !important;
+  letter-spacing: -0.012em !important;
+  margin: 48px 0 12px !important;
+  scroll-margin-top: 96px;
+  color: var(--c-text);
+}
+
+/* Paragraphs */
+.mdx-article p {
+  font-family: var(--docs-sans);
+  font-size: 17px;
+  line-height: 1.52;
+  letter-spacing: var(--tracking-tight);
+  margin: 16px 0;
+  max-width: 64ch;
+  color: var(--c-text);
+}
+
+/* Lists */
+.mdx-article ul,
+.mdx-article ol {
+  padding-left: 22px;
+  margin: 16px 0;
+  max-width: 64ch;
+}
+.mdx-article li {
+  margin: 8px 0;
+  font-size: 17px;
+  line-height: 1.52;
+}
+
+/* Strong */
+.mdx-article strong {
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+/* Links — Apple blue, no underline at rest, underline on hover */
+.mdx-article a {
+  color: var(--c-accent);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+.mdx-article a:hover {
+  color: var(--c-accent-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+/* ============================================================
+ * Motion
+ * ============================================================ */
+
+@keyframes docs-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mdx-article > h1:first-child,
+  .mdx-article > h1 + p {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================
+ * Selection — Apple blue
+ * ============================================================ */
+
+::selection {
+  background: rgba(0, 113, 227, 0.22);
+  color: inherit;
+}
+html[data-theme='dark'] ::selection {
+  background: rgba(41, 151, 255, 0.32);
+}
+
+/* Subtle scrollbar in dark mode (matches macOS) */
+html[data-theme='dark'] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+}
+html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}

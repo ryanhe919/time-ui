@@ -1,0 +1,78 @@
+import { Search } from '@/components/timeui-client';
+
+# Search
+
+A pill-shaped *search trigger* — visually an input, semantically a `<button>`.
+Clicking it opens a command palette / search dialog (your responsibility).
+The placeholder defaults to `useI18n().search.placeholder` and follows the
+active locale automatically.
+
+## Basic usage
+
+<LiveDemo code={`<Search />`}>
+  <Search />
+</LiveDemo>
+
+## With shortcut hint
+
+`shortcut` renders a `<kbd>` chip on the right — commonly `⌘K` or `Ctrl K`.
+
+<LiveDemo code={`<Search placeholder="Search docs…" shortcut="⌘K" />`}>
+  <Search placeholder="Search docs…" shortcut="⌘K" />
+</LiveDemo>
+
+## Sizes
+
+`sm` / `md` / `lg` — heights 28 / 36 / 44 px.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Search size="sm" placeholder="Small" shortcut="⌘K" />
+  <Search size="md" placeholder="Medium" shortcut="⌘K" />
+  <Search size="lg" placeholder="Large" shortcut="⌘K" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Search size="sm" placeholder="Small" shortcut="⌘K" />
+    <Search size="md" placeholder="Medium" shortcut="⌘K" />
+    <Search size="lg" placeholder="Large" shortcut="⌘K" />
+  </Stack>
+</LiveDemo>
+
+## Variants
+
+`bordered` (default) shows a hairline border; `flat` uses a muted fill.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Search variant="bordered" placeholder="bordered" shortcut="⌘K" />
+  <Search variant="flat" placeholder="flat" shortcut="⌘K" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Search variant="bordered" placeholder="bordered" shortcut="⌘K" />
+    <Search variant="flat" placeholder="flat" shortcut="⌘K" />
+  </Stack>
+</LiveDemo>
+
+## Full width
+
+<LiveDemo code={`<Search fullWidth placeholder="Spans the container" shortcut="⌘K" />`}>
+  <Search fullWidth placeholder="Spans the container" shortcut="⌘K" />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'placeholder', type: 'string', description: 'Visible placeholder. Defaults to the i18n value (Chinese 搜索… / English Search…).' },
+  { name: 'shortcut', type: 'string', description: 'Right-aligned shortcut hint (e.g. `⌘K`), rendered as `<kbd>`.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size preset.' },
+  { name: 'variant', type: "'bordered' | 'flat'", default: "'bordered'", description: 'Visual variant.' },
+  { name: 'icon', type: 'ReactNode', description: 'Override the leading search icon.' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to fill its container.' },
+  { name: 'onClick', type: '(e) => void', description: 'Typically opens a command palette / search dialog.' },
+  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disabled state.' }
+]} />
+
+<Callout variant="tip" title="Why a button, not an input?">
+  Modern docs sites (Apple, Vercel, Tailwind, Linear) implement search as a
+  `⌘K` command palette — the visible "search box" only opens the palette.
+  `Search` mirrors this mental model and does not accept text input. For an
+  actual editable field, use a native `<input type="search">`.
+</Callout>

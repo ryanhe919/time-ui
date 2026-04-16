@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+    open-pull-requests-limit: 10
+    labels: ['dependencies']
+    commit-message:
+      prefix: 'chore(deps)'
+      include: scope
+    groups:
+      eslint:
+        patterns: ['eslint*', '@typescript-eslint/*']
+      testing:
+        patterns: ['vitest', '@testing-library/*', 'jsdom', 'playwright', '@playwright/*']
+      types:
+        patterns: ['@types/*']
+      emotion:
+        patterns: ['@emotion/*']
+      build:
+        patterns: ['tsup', 'turbo', 'rimraf']
+
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+    labels: ['dependencies', 'ci']
+    commit-message:
+      prefix: 'chore(ci)'

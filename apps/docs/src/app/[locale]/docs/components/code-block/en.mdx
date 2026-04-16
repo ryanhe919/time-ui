@@ -1,0 +1,53 @@
+# CodeBlock
+
+Read-only code display with a built-in **Copy** button. Theme-aware (flips to a
+dark surface in dark mode), and the copy button labels route through
+`useI18n()` so they follow the app's active locale automatically.
+
+## Basic usage
+
+<LiveDemo code={`<CodeBlock code={\`import { Button } from '@timeui/react';\\n\\nexport function Demo() {\\n  return <Button color="primary">Save</Button>;\\n}\`} />`}>
+  <CodeBlock code={`import { Button } from '@timeui/react';
+
+export function Demo() {
+  return <Button color="primary">Save</Button>;
+}`} />
+</LiveDemo>
+
+## Title and language label
+
+Providing a `title` renders a filename bar on top, with `language` shown on the
+right.
+
+<LiveDemo code={`<CodeBlock title="button.tsx" language="tsx" code={\`<Button color="success">Confirm</Button>\`} />`}>
+  <CodeBlock
+    title="button.tsx"
+    language="tsx"
+    code={`<Button color="success">Confirm</Button>`}
+  />
+</LiveDemo>
+
+## Hide the copy button
+
+When the snippet is illustrative and shouldn't be copyable, pass `copyable={false}`.
+
+<LiveDemo code={`<CodeBlock copyable={false} code={\`// This is an illustration\nnot real code\`} />`}>
+  <CodeBlock copyable={false} code={`// This is an illustration
+not real code`} />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'code', type: 'string', required: true, description: 'The source to display.' },
+  { name: 'language', type: 'string', default: "'tsx'", description: 'Language hint (currently shown as a label).' },
+  { name: 'title', type: 'ReactNode', description: 'Optional header title (usually a filename).' },
+  { name: 'copyable', type: 'boolean', default: 'true', description: 'Whether to render the copy button.' },
+  { name: 'onCopy', type: '(code: string) => void', description: 'Fires after a successful copy.' }
+]} />
+
+<Callout variant="tip" title="Internationalization">
+  The copy button labels (`Copy / Copied`) are read from `@timeui/core`'s `useI18n()`.
+  Wrap your app in `<ConfigProvider locale="zh">` to switch — no prop changes needed on
+  the component itself.
+</Callout>

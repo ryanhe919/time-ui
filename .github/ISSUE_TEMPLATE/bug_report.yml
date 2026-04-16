@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a reproducible problem in TimeUI.
+title: '[Bug]: '
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug! Please fill out the sections below.
+  - type: input
+    id: package
+    attributes:
+      label: Package
+      description: Which TimeUI package is affected?
+      placeholder: '@timeui/react, @timeui/icons, @timeui/tokens, …'
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: 'e.g. 0.3.1'
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal repro — StackBlitz/CodeSandbox link preferred, or a code snippet.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: 'React 18.3, Node 22, Chrome 124, macOS 14'
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: I am on the latest minor version of the affected package.
+          required: true

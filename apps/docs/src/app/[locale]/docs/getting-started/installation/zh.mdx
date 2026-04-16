@@ -1,0 +1,59 @@
+# 安装
+
+TimeUI 以 `@timeui/react` 包的形式发布在 npm。
+
+## 环境要求
+
+- React 18 或更高版本
+- TypeScript 5.0+（可选，但推荐）
+
+## 安装
+
+```bash
+# npm
+npm install @timeui/react @emotion/react
+
+# pnpm
+pnpm add @timeui/react @emotion/react
+
+# yarn
+yarn add @timeui/react @emotion/react
+```
+
+## Provider 配置
+
+在应用外层包裹 `ConfigProvider` + `ThemeProvider`。语言默认 `'zh'`（中文），需要英文可传 `locale="en"`。
+
+```tsx
+import {
+  ConfigProvider,
+  ThemeProvider,
+  lightTheme,
+} from '@timeui/react';
+
+export default function App({ children }) {
+  return (
+    <ConfigProvider locale="zh">
+      <ThemeProvider theme={lightTheme}>{children}</ThemeProvider>
+    </ConfigProvider>
+  );
+}
+```
+
+## 使用组件
+
+```tsx
+import { Button } from '@timeui/react';
+
+export function Demo() {
+  return <Button color="primary">保存</Button>;
+}
+```
+
+<Callout variant="warning" title="SSR 框架">
+  在 Next.js App Router 中使用时，请把 Provider 放在 `'use client'` 组件里引入，避免 Emotion 的水合错位。
+</Callout>
+
+## 验证
+
+看到一个带主题样式的蓝色按钮就说明就绪了。接下来可以查看 [按钮](/zh/docs/components/button) 组件文档。

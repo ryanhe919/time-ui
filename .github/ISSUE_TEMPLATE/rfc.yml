@@ -1,0 +1,57 @@
+name: RFC (Request for Comments)
+description: Propose a substantial change to TimeUI — new subsystem, breaking API, governance, or policy.
+title: '[RFC]: '
+labels: ['rfc']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        RFCs are for meaningful changes that deserve design review. See `GOVERNANCE.md` for the lifecycle.
+  - type: input
+    id: title
+    attributes:
+      label: Short title
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One-paragraph explanation.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why are we doing this? What use cases does it support?
+    validations:
+      required: true
+  - type: textarea
+    id: detailed-design
+    attributes:
+      label: Detailed design
+      description: APIs, types, examples, edge cases, migration strategy.
+    validations:
+      required: true
+  - type: textarea
+    id: drawbacks
+    attributes:
+      label: Drawbacks
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+    validations:
+      required: true
+  - type: textarea
+    id: adoption
+    attributes:
+      label: Adoption strategy
+      description: Breaking change? Codemod? Deprecation window?
+  - type: textarea
+    id: unresolved
+    attributes:
+      label: Unresolved questions

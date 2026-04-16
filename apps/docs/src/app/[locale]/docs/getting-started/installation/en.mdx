@@ -1,0 +1,63 @@
+# Installation
+
+TimeUI is available as the `@timeui/react` package on npm.
+
+## Requirements
+
+- React 18 or later
+- TypeScript 5.0+ (optional but recommended)
+
+## Install
+
+```bash
+# npm
+npm install @timeui/react @emotion/react
+
+# pnpm
+pnpm add @timeui/react @emotion/react
+
+# yarn
+yarn add @timeui/react @emotion/react
+```
+
+## Provider setup
+
+Wrap your app with `ConfigProvider` + `ThemeProvider`. Locale defaults to
+`'zh'` (Chinese) — pass `locale="en"` to opt into English.
+
+```tsx
+import {
+  ConfigProvider,
+  ThemeProvider,
+  lightTheme,
+} from '@timeui/react';
+
+export default function App({ children }) {
+  return (
+    <ConfigProvider locale="en">
+      <ThemeProvider theme={lightTheme}>{children}</ThemeProvider>
+    </ConfigProvider>
+  );
+}
+```
+
+## Using components
+
+```tsx
+import { Button } from '@timeui/react';
+
+export function Demo() {
+  return <Button color="primary">Save</Button>;
+}
+```
+
+<Callout variant="warning" title="SSR frameworks">
+  When using TimeUI with Next.js App Router, keep provider imports inside a
+  client component (mark the module with `'use client'`) to avoid hydration
+  issues with Emotion.
+</Callout>
+
+## Verify
+
+If you see a styled blue button, you're ready. Next, jump to the
+[Button](/en/docs/components/button) reference.
