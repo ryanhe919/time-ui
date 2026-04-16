@@ -2,7 +2,32 @@ import { Search } from '@/components/timeui-client';
 
 # 搜索 Search
 
-Pill 形状的"搜索触发器"——视觉上像输入框，实际上是 `<button>`。点击后由调用方自行打开 ⌘K 命令面板 / 搜索弹层。占位文案默认走 `useI18n()`，跟随当前 locale 自动切换。
+Pill 形状的"搜索触发器"——视觉上像输入框，**语义上是 `<button>`**。点击后由调用方自行打开 ⌘K 命令面板 / 搜索弹层。占位文案默认走 `useI18n()`，跟随当前 locale 自动切换。
+
+<Callout variant="warning" title="它不是一个可输入的输入框">
+  `Search` 本身**不接受文字输入**。它是一个触发器按钮，点击之后打开真正承载输入与结果展示的对话框。这种"⌘K 命令面板"模式被 Apple、Vercel、Tailwind、Linear 等现代文档站广泛采用——顶栏的"搜索框"只负责开面板。
+  <br />
+  如果你需要真正的可编辑搜索字段，请使用原生 `<input type="search">`，或等待即将推出的 `SearchInput` 组件。
+</Callout>
+
+## 交互示例 ← 点击试试
+
+点击下方按钮，会弹出一个真实的命令面板，**里面**是一个原生 `<input>`——这才是可输入的部分。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Search } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Search placeholder="点击打开命令面板…" shortcut="⌘K" onClick={() => setOpen(true)} />
+      {open && <CommandPalette onClose={() => setOpen(false)} />}
+    </>
+  );
+}`}>
+  <SearchDialogDemo />
+</LiveDemo>
 
 ## 基础用法
 
@@ -54,6 +79,12 @@ Pill 形状的"搜索触发器"——视觉上像输入框，实际上是 `<butt
   <Search fullWidth placeholder="撑满宽度" shortcut="⌘K" />
 </LiveDemo>
 
+## 禁用
+
+<LiveDemo code={`<Search disabled placeholder="已禁用" shortcut="⌘K" />`}>
+  <Search disabled placeholder="已禁用" shortcut="⌘K" />
+</LiveDemo>
+
 ## API
 
 <PropsTable props={[
@@ -67,6 +98,12 @@ Pill 形状的"搜索触发器"——视觉上像输入框，实际上是 `<butt
   { name: 'disabled', type: 'boolean', default: 'false', description: '禁用状态。' }
 ]} />
 
-<Callout variant="tip" title="为什么是按钮，不是输入框？">
-  现代文档站普遍把搜索做成 ⌘K 命令面板（Apple、Vercel、Tailwind、Linear），顶栏的"搜索框"只负责打开面板。`Search` 与这个心智模型对齐，本身不接受输入。需要真正的输入字段时使用原生 `<input type="search">`。
+<Callout variant="info" title="可访问性">
+  渲染为原生 `<button type="button">`，`aria-label` 默认取 `placeholder`。键盘可聚焦，焦点态有可见 outline，全部动画遵循 `prefers-reduced-motion`。弹出面板的 `<input>` 与关闭快捷键（Esc）由调用方负责实现。
 </Callout>
+
+## 最佳实践
+
+- 顶栏的 `Search` 永远**不要**携带 `value`——它不是输入框，语义上应该只有 `placeholder` + `onClick`。
+- 打开的命令面板建议：首次打开自动 focus 原生 `<input>`、支持 Esc 关闭、`role="dialog"` + `aria-modal="true"`。
+- 如果你的场景只需要一个常规搜索输入，而不是命令面板，请直接用原生 `<input type="search">`——下一版 TimeUI 会补充一个专用的 `SearchInput` 组件。

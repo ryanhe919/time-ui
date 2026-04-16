@@ -1,51 +1,66 @@
-# Contributing to TimeUI
+# 贡献指南
 
-Thanks for considering a contribution. TimeUI is an enterprise component library; we hold a high bar.
+感谢你考虑为 TimeUI 贡献。TimeUI 定位企业级组件库，我们对质量把关较严。
 
-## RFC process
+如果还没熟悉本地开发环境，请先阅读 [`docs/guides/development.md`](./docs/guides/development.md)。
 
-Any new component, breaking API change, or cross-cutting design-system decision (theme tokens,
-accessibility contract, layout primitives) must start as an RFC:
+## RFC 流程
 
-1. Open an issue using the "RFC" template describing the problem, prior art, proposed API, and alternatives.
-2. Link mockups or Storybook prototypes where helpful.
-3. Maintainers will tag the RFC for discussion; once accepted it is labeled `rfc:accepted`.
-4. Implementation PRs reference the RFC issue.
+以下情况**必须走 RFC**：
 
-Small additions (one variant, a prop) can skip the RFC if they're obviously compatible.
+- 新增公开组件（非显而易见的小增补）
+- 破坏性 API 变更
+- 跨包 / 跨主题系统的设计决策（token、可访问性契约、布局原语）
 
-## Component quality checklist
+步骤：
 
-Every component PR must tick:
+1. 用 **"RFC"** Issue 模板描述：问题、先例、拟议 API、备选方案、迁移策略。
+2. 如有可行的 mockup / 原型，贴链接。
+3. 核心维护者给 RFC 打标签开启讨论；接受后打 `rfc:accepted`。
+4. 实现 PR 在描述里引用 RFC Issue。
 
-- [ ] TypeScript strict, no `any`, props fully documented via JSDoc.
-- [ ] Forwards `ref` where it wraps a DOM node.
-- [ ] Supports controlled & uncontrolled patterns if stateful.
-- [ ] Styles via Emotion, consuming theme tokens — no hard-coded colors or spacing.
-- [ ] Works in both `lightTheme` and `darkTheme`.
-- [ ] Respects `prefers-reduced-motion` for any animation.
-- [ ] Accessibility:
-  - [ ] Correct ARIA roles/attributes.
-  - [ ] Keyboard navigable, visible focus ring.
-  - [ ] Tested with a screen reader.
-  - [ ] Passes axe with zero violations.
-- [ ] Vitest + Testing Library tests cover: render, variants, interaction, a11y baseline.
-- [ ] Storybook story with controls for every variant/size/state.
-- [ ] Exported from `@timeui/react`.
-- [ ] `pnpm changeset` entry recorded.
-- [ ] No new `dependencies` without maintainer approval; prefer `peerDependencies`.
+小改动（单一 variant、单一 prop）若明显向后兼容，可以跳过 RFC。
 
-## Commit convention
+完整 RFC 生命周期见 [`docs/guides/governance.md`](./docs/guides/governance.md)。
 
-Conventional Commits, enforced by commitlint. Examples:
+## 组件质量清单
+
+每一个组件 PR 在合并前必须满足：
+
+- [ ] TypeScript strict，不使用 `any`，props 通过 JSDoc 完整记录。
+- [ ] 若包 DOM 节点则 `forwardRef`。
+- [ ] 有状态的组件支持受控 + 非受控两种模式。
+- [ ] 样式通过 Emotion `css` prop + `useTheme()` 消费 theme token；**禁止**硬编码颜色/间距。
+- [ ] 在 `lightTheme` 与 `darkTheme` 下表现均正常（含 WCAG AA 对比度）。
+- [ ] 动画遵循 `prefers-reduced-motion`。
+- [ ] 可访问性：
+  - [ ] 正确的 ARIA role / attribute
+  - [ ] 可键盘操作，`focus-visible` 有可见焦点样式
+  - [ ] 至少跑过一次屏幕阅读器手测
+  - [ ] axe-core 零违规（`expectA11y()`）
+- [ ] Vitest 测试覆盖：渲染、variant、交互、a11y 基线。
+- [ ] 组件从 `@timeui/react` barrel 导出。
+- [ ] 文档站的 MDX 页面同步更新（`apps/docs/src/app/[locale]/docs/components/<name>/` 下 `zh.mdx` + `en.mdx` + `page.tsx`）。
+- [ ] `pnpm changeset` 写了一条条目（新组件 `minor`）。
+- [ ] 不新增 `dependencies`，除非维护者同意；能放 `peerDependencies` 就放。
+
+## 提交规范
+
+[Conventional Commits](https://www.conventionalcommits.org/)，由 commitlint + Husky 强制。示例：
 
 ```
-feat(button): add loading state
-fix(select): prevent focus trap on disabled options
-docs(theme): document module augmentation
+feat(button): 新增 loading 状态
+fix(select): 禁用项不再触发 focus trap
+docs(theme): 补充 module augmentation 说明
+chore(deps): 升级 emotion 到 11.13
 ```
 
-## Release flow
+提交时 lint-staged 会对 `*.{ts,tsx,js,jsx}` 自动跑 `eslint --fix` + Prettier。
 
-Versioning is handled by Changesets. CI publishes to npm on merge to `main`
-when pending changesets exist.
+## 发版
+
+版本号由 Changesets 管理。`main` 合并后会由 bot 开 "Version Packages" PR，合并即触发 npm 发布。**不要手动 `npm publish`。** 细节见 [`docs/guides/releasing.md`](./docs/guides/releasing.md)。
+
+## 行为准则
+
+请保持专业、友善。对技术方案可以严苛，但对人永远尊重。

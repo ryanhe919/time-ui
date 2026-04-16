@@ -4,7 +4,17 @@ Read-only code display with a built-in **Copy** button. Theme-aware (flips to a
 dark surface in dark mode), and the copy button labels route through
 `useI18n()` so they follow the app's active locale automatically.
 
+<Callout variant="tip" title="Optional syntax highlighting">
+  Syntax highlighting is powered by [`shiki`](https://shiki.matsu.io/), loaded
+  dynamically. `shiki` is an **optional peer dependency** — install it for
+  highlighting, skip it for a plain-text fallback. The main bundle is unaffected.
+  Install with `pnpm add shiki`.
+</Callout>
+
 ## Basic usage
+
+> Hover the top-right of the block to reveal the **Copy** button — clicking it
+> flips to "Copied" for 1.5 s, then resets.
 
 <LiveDemo code={`<CodeBlock code={\`import { Button } from '@timeui/react';\\n\\nexport function Demo() {\\n  return <Button color="primary">Save</Button>;\\n}\`} />`}>
   <CodeBlock code={`import { Button } from '@timeui/react';
@@ -27,6 +37,20 @@ right.
   />
 </LiveDemo>
 
+## Multiple languages
+
+Beyond the visible label, `language` is also passed to shiki for grammar
+selection — set it correctly for accurate highlighting.
+
+<LiveDemo code={`<CodeBlock title="install.sh" language="bash" code={\`pnpm add @timeui/react @timeui/themes @emotion/react\\npnpm add shiki  # optional: enable syntax highlighting\`} />`}>
+  <CodeBlock
+    title="install.sh"
+    language="bash"
+    code={`pnpm add @timeui/react @timeui/themes @emotion/react
+pnpm add shiki  # optional: enable syntax highlighting`}
+  />
+</LiveDemo>
+
 ## Hide the copy button
 
 When the snippet is illustrative and shouldn't be copyable, pass `copyable={false}`.
@@ -36,18 +60,45 @@ When the snippet is illustrative and shouldn't be copyable, pass `copyable={fals
 not real code`} />
 </LiveDemo>
 
+## Copy callback
+
+`onCopy` fires after a successful copy. Use it for analytics or toast notifications.
+
+<LiveDemo code={`<CodeBlock
+  code={\`git clone git@github.com:timeui/timeui.git\`}
+  onCopy={(code) => console.log('copied', code.length, 'chars')}
+/>`}>
+  <CodeBlock
+    code={`git clone git@github.com:timeui/timeui.git`}
+    onCopy={(code) => console.log('copied', code.length, 'chars')}
+  />
+</LiveDemo>
+
 ## API
 
 <PropsTable props={[
   { name: 'code', type: 'string', required: true, description: 'The source to display.' },
-  { name: 'language', type: 'string', default: "'tsx'", description: 'Language hint (currently shown as a label).' },
+  { name: 'language', type: 'string', default: "'tsx'", description: 'Language hint — shown as a label and passed to shiki.' },
   { name: 'title', type: 'ReactNode', description: 'Optional header title (usually a filename).' },
   { name: 'copyable', type: 'boolean', default: 'true', description: 'Whether to render the copy button.' },
-  { name: 'onCopy', type: '(code: string) => void', description: 'Fires after a successful copy.' }
+  { name: 'onCopy', type: '(code: string) => void', description: 'Fires after a successful copy (copy itself is handled via navigator.clipboard).' }
 ]} />
 
 <Callout variant="tip" title="Internationalization">
   The copy button labels (`Copy / Copied`) are read from `@timeui/core`'s `useI18n()`.
   Wrap your app in `<ConfigProvider locale="zh">` to switch — no prop changes needed on
   the component itself.
+</Callout>
+
+<Callout variant="info" title="Accessibility">
+  The copy button is a native `<button type="button">`; its `aria-label` toggles
+  between "Copy" and "Copied". Upon success it sets `aria-live="polite"` so
+  screen readers announce the feedback.
+</Callout>
+
+<Callout variant="info" title="Shiki as an optional peer">
+  The main `@timeui/react` entry **does not** bundle shiki — it's dynamically
+  imported by `@timeui/react/code-block`. If your project doesn't install shiki,
+  CodeBlock falls back to plain text (still functional). The size-limit budget
+  for the `code-block` entry is **5 KB gzipped**, shiki-exclusive.
 </Callout>

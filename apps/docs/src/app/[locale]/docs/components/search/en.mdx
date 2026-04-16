@@ -2,10 +2,40 @@ import { Search } from '@/components/timeui-client';
 
 # Search
 
-A pill-shaped *search trigger* — visually an input, semantically a `<button>`.
+A pill-shaped **search trigger** — visually an input, **semantically a `<button>`**.
 Clicking it opens a command palette / search dialog (your responsibility).
 The placeholder defaults to `useI18n().search.placeholder` and follows the
 active locale automatically.
+
+<Callout variant="warning" title="It is not a typable input">
+  `Search` does **not** accept text input. It's a trigger button: clicking it
+  opens a dialog which hosts the actual editable field and results. This "⌘K
+  command palette" pattern is the same approach used by Apple, Vercel, Tailwind,
+  and Linear — the header "search box" only opens the palette.
+  <br />
+  For a truly editable search field, use a native `<input type="search">` or
+  wait for the upcoming `SearchInput` component.
+</Callout>
+
+## Interactive demo ← try it
+
+Click the button below — it opens a real command palette whose **inner** `<input>`
+is where you can actually type.
+
+<LiveDemo code={`import { useState } from 'react';
+import { Search } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Search placeholder="Open command palette…" shortcut="⌘K" onClick={() => setOpen(true)} />
+      {open && <CommandPalette onClose={() => setOpen(false)} />}
+    </>
+  );
+}`}>
+  <SearchDialogDemo />
+</LiveDemo>
 
 ## Basic usage
 
@@ -57,6 +87,12 @@ active locale automatically.
   <Search fullWidth placeholder="Spans the container" shortcut="⌘K" />
 </LiveDemo>
 
+## Disabled
+
+<LiveDemo code={`<Search disabled placeholder="Disabled" shortcut="⌘K" />`}>
+  <Search disabled placeholder="Disabled" shortcut="⌘K" />
+</LiveDemo>
+
 ## API
 
 <PropsTable props={[
@@ -70,9 +106,12 @@ active locale automatically.
   { name: 'disabled', type: 'boolean', default: 'false', description: 'Disabled state.' }
 ]} />
 
-<Callout variant="tip" title="Why a button, not an input?">
-  Modern docs sites (Apple, Vercel, Tailwind, Linear) implement search as a
-  `⌘K` command palette — the visible "search box" only opens the palette.
-  `Search` mirrors this mental model and does not accept text input. For an
-  actual editable field, use a native `<input type="search">`.
+<Callout variant="info" title="Accessibility">
+  Renders a native `<button type="button">`; `aria-label` defaults to `placeholder`. Keyboard focusable with a visible outline, and all animation honors `prefers-reduced-motion`. The hosted dialog is responsible for focusing its inner input and handling <kbd>Esc</kbd>.
 </Callout>
+
+## Best practices
+
+- Never pass `value` to `Search` — it's a button, not an input.
+- For the command palette: auto-focus the inner `<input>` on open, close on <kbd>Esc</kbd>, and set `role="dialog"` + `aria-modal="true"`.
+- If you just need a conventional search field (not a command palette), use a native `<input type="search">`; a dedicated `SearchInput` component is on the roadmap.

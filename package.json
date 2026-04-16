@@ -62,5 +62,11 @@
     "*.{json,md,yml,yaml,css}": [
       "prettier --write"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "vite@<6.4.2": ">=6.4.2",
+      "esbuild@<0.25.0": ">=0.25.0"
+    }
   }
 }

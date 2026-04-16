@@ -2,7 +2,13 @@
 
 只读代码展示，自带**复制**按钮。主题自适应（深色模式自动换深底），复制按钮的文案走 `useI18n()`——切换语言时会自动跟着变。
 
+<Callout variant="tip" title="可选的语法高亮">
+  语法高亮由 [`shiki`](https://shiki.matsu.io/) 动态加载——`shiki` 是 **optional peer dependency**。装了则高亮，不装则纯文本回退，主包体积完全不受影响。按需安装：`pnpm add shiki`。
+</Callout>
+
 ## 基础用法
+
+> 把鼠标悬到代码块右上角会看到**复制**按钮——点击后会变为"已复制"，1.5 秒后恢复。
 
 <LiveDemo code={`<CodeBlock code={\`import { Button } from '@timeui/react';\\n\\nexport function Demo() {\\n  return <Button color="primary">Save</Button>;\\n}\`} />`}>
   <CodeBlock code={`import { Button } from '@timeui/react';
@@ -24,26 +30,60 @@ export function Demo() {
   />
 </LiveDemo>
 
+## 多语言示例
+
+`language` 除了展示标签外，也会传给 shiki 用作语法规则——确认设置正确能得到最准的高亮。
+
+<LiveDemo code={`<CodeBlock title="install.sh" language="bash" code={\`pnpm add @timeui/react @timeui/themes @emotion/react\\npnpm add shiki  # 可选：启用语法高亮\`} />`}>
+  <CodeBlock
+    title="install.sh"
+    language="bash"
+    code={`pnpm add @timeui/react @timeui/themes @emotion/react
+pnpm add shiki  # 可选：启用语法高亮`}
+  />
+</LiveDemo>
+
 ## 隐藏复制按钮
 
 当代码片段只是**示意**、无需复制时，传 `copyable={false}`。
 
-<LiveDemo code={`<CodeBlock copyable={false} code={\`// This is an illustration\nnot real code\`} />`}>
-  <CodeBlock copyable={false} code={`// This is an illustration
+<LiveDemo code={`<CodeBlock copyable={false} code={\`// 仅作示意\nnot real code\`} />`}>
+  <CodeBlock copyable={false} code={`// 仅作示意
 not real code`} />
+</LiveDemo>
+
+## 复制成功回调
+
+`onCopy` 在复制成功后触发，可以用来埋点或弹出提示。
+
+<LiveDemo code={`<CodeBlock
+  code={\`git clone git@github.com:timeui/timeui.git\`}
+  onCopy={(code) => console.log('copied', code.length, 'chars')}
+/>`}>
+  <CodeBlock
+    code={`git clone git@github.com:timeui/timeui.git`}
+    onCopy={(code) => console.log('copied', code.length, 'chars')}
+  />
 </LiveDemo>
 
 ## API
 
 <PropsTable props={[
   { name: 'code', type: 'string', required: true, description: '要展示的源代码。' },
-  { name: 'language', type: 'string', default: "'tsx'", description: '语言提示，目前仅作为标签展示。' },
+  { name: 'language', type: 'string', default: "'tsx'", description: '语言提示，作为标签展示并传给 shiki。' },
   { name: 'title', type: 'ReactNode', description: '可选的顶部标题栏（通常填文件名）。' },
   { name: 'copyable', type: 'boolean', default: 'true', description: '是否显示复制按钮。' },
-  { name: 'onCopy', type: '(code: string) => void', description: '复制成功后的回调。' }
+  { name: 'onCopy', type: '(code: string) => void', description: '复制成功后的回调（复制本身已通过 navigator.clipboard 完成）。' }
 ]} />
 
 <Callout variant="tip" title="国际化">
-  复制按钮的文案（`复制 / 已复制`）通过 `@timeui/core` 的 `useI18n()` 从当前 locale 读取。
-  为应用包裹 `<ConfigProvider locale="en">` 即可切换为英文，组件本身无需额外配置。
+  复制按钮的文案（`复制 / 已复制`）通过 `@timeui/core` 的 `useI18n()` 从当前 locale 读取。为应用包裹 `<ConfigProvider locale="en">` 即可切换为英文，组件本身无需额外配置。
+</Callout>
+
+<Callout variant="info" title="可访问性">
+  复制按钮是原生 `<button type="button">`，`aria-label` 会随状态在"复制"/"已复制"之间切换；复制成功时一并设置 `aria-live="polite"`，屏幕阅读器会朗读成功反馈。
+</Callout>
+
+<Callout variant="info" title="按需安装 shiki">
+  `@timeui/react` 主包**不包含** shiki 本体——它通过 `@timeui/react/code-block` 子入口动态 `import('shiki')`。如果你的项目没装 shiki，CodeBlock 会自动回退为纯文本展示（功能不受影响）。Size-limit 对 `code-block` 入口的预算是 **5 KB gzipped**，不含 shiki。
 </Callout>

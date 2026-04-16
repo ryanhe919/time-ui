@@ -15,13 +15,24 @@ updates:
       eslint:
         patterns: ['eslint*', '@typescript-eslint/*']
       testing:
-        patterns: ['vitest', '@testing-library/*', 'jsdom', 'playwright', '@playwright/*']
+        patterns: ['vitest', '@vitest/*', '@testing-library/*', 'jsdom', 'vitest-axe']
       types:
         patterns: ['@types/*']
       emotion:
         patterns: ['@emotion/*']
       build:
-        patterns: ['tsup', 'turbo', 'rimraf']
+        patterns: ['tsup', 'turbo', 'rimraf', 'vite', '@vitejs/*']
+    ignore:
+      # React 18 is pinned intentionally — promote to 19 only after confirming
+      # peer-range compatibility with downstream consumers.
+      - dependency-name: react
+        update-types: ['version-update:semver-major']
+      - dependency-name: react-dom
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/react-dom'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: '/'

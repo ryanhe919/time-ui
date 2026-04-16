@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        RFCs are for meaningful changes that deserve design review. See `GOVERNANCE.md` for the lifecycle.
+        RFC 用于需要设计 review 的重大变更。生命周期详见 [`docs/guides/governance.md`](../../docs/guides/governance.md)。
   - type: input
     id: title
     attributes:

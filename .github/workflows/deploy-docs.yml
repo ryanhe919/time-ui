@@ -51,46 +51,112 @@ jobs:
 
       # ── SSH deploy to CentOS / Alibaba Cloud ──────────────────
       # Required secrets:
-      #   DEPLOY_HOST  — server IP (e.g. 47.x.x.x)
-      #   DEPLOY_USER  — SSH user (e.g. root)
-      #   DEPLOY_KEY   — ed25519 private key
-      #   DEPLOY_PATH  — remote dir (e.g. /opt/timeui-docs)
-      #   DEPLOY_PORT  — SSH port (default 22)
+      #   DEPLOY_HOST         — server IP (e.g. 47.x.x.x)
+      #   DEPLOY_USER         — SSH user (e.g. root)
+      #   DEPLOY_KEY          — ed25519 private key
+      #   DEPLOY_PATH         — remote absolute dir (e.g. /opt/timeui-docs)
+      #   DEPLOY_PORT         — SSH port (default 22)
+      #   DEPLOY_KNOWN_HOSTS  — (optional but recommended) pre-verified known_hosts entry
+      #                         for DEPLOY_HOST. Pin this once from a trusted machine via
+      #                         `ssh-keyscan -H -p <port> <host>` and commit its output
+      #                         to the secret — this defeats first-use MITM attacks.
 
-      - name: Setup SSH
+      - name: Setup SSH (key + host verification)
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || 22 }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
+          set -euo pipefail
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          chmod 700 ~/.ssh
+
+          # Private key
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p ${{ secrets.DEPLOY_PORT || 22 }} -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          # Host key: prefer the pinned secret (trust-on-first-use done locally
+          # by the operator); fall back to a live ssh-keyscan. Either way, we
+          # do NOT swallow errors — an empty known_hosts must fail the step
+          # so we never silently accept any host key.
+          : > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          if [ -n "$DEPLOY_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$DEPLOY_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+          else
+            echo "::warning::DEPLOY_KNOWN_HOSTS not set — falling back to live ssh-keyscan (TOFU)."
+            ssh-keyscan -H -p "$DEPLOY_PORT" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          fi
+          # Must have at least one host key line.
+          test -s ~/.ssh/known_hosts
+
+          # Pin strict host key checking for every subsequent ssh/rsync call.
+          cat > ~/.ssh/config <<CFG
+          Host deploy-target
+            HostName $DEPLOY_HOST
+            Port $DEPLOY_PORT
+            User ${{ secrets.DEPLOY_USER }}
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            StrictHostKeyChecking yes
+            UserKnownHostsFile ~/.ssh/known_hosts
+            BatchMode yes
+          CFG
+          chmod 600 ~/.ssh/config
+
+      - name: Sanity-check deploy path
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+          # Guard against catastrophic rsync --delete targets:
+          #   - must be absolute
+          #   - not exactly "/", "/root", "/home", "/etc", "/usr", "/var", "/opt"
+          #   - no shell metacharacters
+          if [ -z "${DEPLOY_PATH:-}" ]; then
+            echo "DEPLOY_PATH secret is empty"; exit 1
+          fi
+          case "$DEPLOY_PATH" in
+            /) echo "Refusing to deploy to '/'"; exit 1 ;;
+            /root|/home|/etc|/usr|/var|/opt|/bin|/sbin|/boot|/dev|/proc|/sys)
+              echo "Refusing to deploy to a top-level system directory: $DEPLOY_PATH"; exit 1 ;;
+          esac
+          if ! printf '%s' "$DEPLOY_PATH" | grep -qE '^/[A-Za-z0-9_./-]+$'; then
+            echo "DEPLOY_PATH contains disallowed characters: $DEPLOY_PATH"; exit 1
+          fi
 
       - name: Sync to server
         run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.DEPLOY_PORT || 22 }}" \
+          set -euo pipefail
+          rsync -avz --delete -e "ssh" \
             deploy/ \
-            ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
+            "deploy-target:${{ secrets.DEPLOY_PATH }}/"
 
       - name: Restart on server
-        env:
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || 22 }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
-          ssh -T -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" \
-              "$DEPLOY_USER@$DEPLOY_HOST" \
-              "bash -s" <<EOF
-          set -e
+          set -euo pipefail
+          # Heredoc is *single-quoted* (<<'REMOTE') so NOTHING expands in the
+          # runner shell — this neutralises $(...) / backticks embedded in any
+          # secret. The absolute path is passed as a positional argument, and
+          # printf %q shell-escapes it safely.
+          REMOTE_ARG=$(printf '%q' "${{ secrets.DEPLOY_PATH }}")
+          ssh -T deploy-target "bash -s -- $REMOTE_ARG" <<'REMOTE'
+          set -euo pipefail
+          DEPLOY_PATH="$1"
+          case "$DEPLOY_PATH" in
+            /*) ;;
+            *) echo "remote: DEPLOY_PATH must be absolute"; exit 1 ;;
+          esac
           # Pick up node/pm2 from nvm or system install paths
-          export PATH="/usr/local/bin:/usr/bin:/bin:\$PATH"
-          [ -s "\$HOME/.nvm/nvm.sh" ] && . "\$HOME/.nvm/nvm.sh"
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+          [ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
           cd "$DEPLOY_PATH/apps/docs"
-          PORT=3000 pm2 restart timeui-docs 2>/dev/null \\
+          PORT=3000 pm2 restart timeui-docs 2>/dev/null \
             || PORT=3000 pm2 start server.js --name timeui-docs
           pm2 save
-          EOF
+          REMOTE
 
-      - name: Cleanup SSH key
+      - name: Cleanup SSH material
         if: always()
-        run: rm -f ~/.ssh/deploy_key
+        run: rm -f ~/.ssh/deploy_key ~/.ssh/config ~/.ssh/known_hosts

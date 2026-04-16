@@ -2,6 +2,7 @@ import type { ComponentPropsWithoutRef } from 'react';
 import { Callout, CodeBlock, Code, Button, Flex, Stack } from '@/components/timeui-client';
 import { PropsTable } from '@/components/mdx/PropsTable';
 import { LiveDemo } from '@/components/mdx/LiveDemo';
+import { SearchDialogDemo } from '@/components/mdx/SearchDialogDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -19,6 +20,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     PropsTable,
     CodeBlock,
     LiveDemo,
+    SearchDialogDemo,
 
     Button,
     Flex,

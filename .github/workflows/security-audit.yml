@@ -1,0 +1,55 @@
+name: Security Audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pnpm-lock.yaml'
+      - '**/package.json'
+      - '.github/workflows/security-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'pnpm-lock.yaml'
+      - '**/package.json'
+  schedule:
+    # Every Monday 01:00 UTC — catches newly-disclosed CVEs on already-pinned deps.
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: security-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Pin here so the action output matches what developers run locally (see
+  # docs/guides/testing.md). Bump intentionally.
+  OSV_SCANNER_VERSION: v2.3.5
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  # Primary scanner: Google's OSV-Scanner — natively understands pnpm-lock.yaml,
+  # reads vulnerabilities from the OSV.dev database (which aggregates GHSA, CVE,
+  # PyPA, RustSec, etc.). Replaces `pnpm audit`, whose legacy npm endpoint was
+  # retired by the registry (HTTP 410).
+  osv-scan:
+    name: OSV Scanner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install osv-scanner
+        run: |
+          set -euo pipefail
+          curl -sSL --fail -o /usr/local/bin/osv-scanner \
+            "https://github.com/google/osv-scanner/releases/download/${OSV_SCANNER_VERSION}/osv-scanner_linux_amd64"
+          chmod +x /usr/local/bin/osv-scanner
+          osv-scanner --version
+
+      - name: Scan pnpm-lock.yaml
+        run: |
+          set -euo pipefail
+          osv-scanner scan source --lockfile=pnpm-lock.yaml
