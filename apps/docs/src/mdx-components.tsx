@@ -31,6 +31,16 @@ import {
   SegmentedControl,
   Select,
   SelectOption,
+  ChatMessage,
+  ChatMessageList,
+  ChatAvatar,
+  ChatTypingIndicator,
+  ChatToolCall,
+  ChatKnowledgeRefs,
+  ChatComposer,
+  ChatActionButton,
+  ChatSendButton,
+  ChatVoiceWave,
 } from '@/components/timeui-client';
 import { PropsTable } from '@/components/mdx/PropsTable';
 import { LiveDemo } from '@/components/mdx/LiveDemo';
@@ -45,6 +55,11 @@ import { SliderRangeDemo } from '@/components/mdx/SliderRangeDemo';
 import { SegmentedControlInboxDemo } from '@/components/mdx/SegmentedControlInboxDemo';
 import { SegmentedControlRangeDemo } from '@/components/mdx/SegmentedControlRangeDemo';
 import { SegmentedControlIconOnlyDemo } from '@/components/mdx/SegmentedControlIconOnlyDemo';
+import { ChatOverviewDemo } from '@/components/mdx/ChatOverviewDemo';
+import { ChatComposerDemo } from '@/components/mdx/ChatComposerDemo';
+import { ChatStreamingDemo } from '@/components/mdx/ChatStreamingDemo';
+import { ChatToolStatesDemo } from '@/components/mdx/ChatToolStatesDemo';
+import { ChatWorkspaceDemo } from '@/components/mdx/ChatWorkspaceDemo';
 import { SelectDemo } from '@/components/mdx/SelectDemo';
 import { CodeBlockOnCopyDemo } from '@/components/mdx/CodeBlockOnCopyDemo';
 
@@ -90,6 +105,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     SegmentedControlInboxDemo,
     SegmentedControlRangeDemo,
     SegmentedControlIconOnlyDemo,
+    ChatOverviewDemo,
+    ChatComposerDemo,
+    ChatStreamingDemo,
+    ChatToolStatesDemo,
+    ChatWorkspaceDemo,
     SelectDemo,
     CodeBlockOnCopyDemo,
 
@@ -117,6 +137,16 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     SegmentedControl,
     Select,
     SelectOption,
+    ChatMessage,
+    ChatMessageList,
+    ChatAvatar,
+    ChatTypingIndicator,
+    ChatToolCall,
+    ChatKnowledgeRefs,
+    ChatComposer,
+    ChatActionButton,
+    ChatSendButton,
+    ChatVoiceWave,
 
     code: (p: ComponentPropsWithoutRef<'code'>) =>
       typeof p.children === 'string' ? <Code {...p}>{p.children}</Code> : <code {...p} />,

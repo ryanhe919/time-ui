@@ -1,0 +1,205 @@
+# AI Chat Overview
+
+TimeUI's `Chat` family is for building production-grade LLM chat surfaces: message stream, tool calls, knowledge citations, streaming caret, and an extensible composer — all unified through the design tokens. The components are protocol-agnostic — pipe an OpenAI / Anthropic / your-own SSE stream into an `AsyncIterable<string>` and feed it to `useChatStream`.
+
+## Component family
+
+| Component                             | Role                                                                                                                                                               |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ChatMessageList`                     | Vertical container, optional `maxHeight` scroll with auto-stick-to-bottom, `role="log" aria-live="polite"`.                                                        |
+| `ChatMessage`                         | Single message — 5 built-in roles (`user` / `assistant` / `system` / `tool` / `knowledge`), optional avatar, name, timestamp, streaming caret, attachments slot.   |
+| `ChatAvatar`                          | Round avatar — image / text initials / arbitrary node, role-tinted background.                                                                                     |
+| `ChatTypingIndicator`                 | Three-dot bouncing indicator (degrades to pulse under `prefers-reduced-motion`).                                                                                   |
+| `ChatToolCall`                        | Collapsible tool-call card, 4 statuses (pending / running / success / error), auto JSON-serialises args / result, custom `renderArguments` / `renderResult` slots. |
+| `ChatKnowledgeRefs`                   | Citation chips — clickable link / button / static span, source-typed initial badge.                                                                                |
+| `ChatComposer`                        | Auto-grow textarea, Enter submits / Shift+Enter newline, IME-composition safe, four extension slots (start / end / top / bottom).                                  |
+| `ChatActionButton` / `ChatSendButton` | Composer toolbar icon button + primary send button.                                                                                                                |
+| `useChatStream`                       | Streaming hook: consume an `AsyncIterable<string>`, accumulate text, expose `text` / `isStreaming` / `error` / `start` / `cancel` / `reset`.                       |
+
+## End-to-end conversation
+
+The demo shows all five roles in one shot: a centered `system` notice, a right-aligned `user` bubble, a `tool` row with a tool-call card, a `knowledge` row with citation chips, and a streaming `assistant` reply.
+
+<LiveDemo
+  code={`<ChatMessageList maxHeight={420}>
+  <ChatMessage role="system">
+    You are a helpful research assistant…
+  </ChatMessage>
+  <ChatMessage role="user" name="Ryan" timestamp={new Date()}>
+    What's the latest on React Server Components?
+  </ChatMessage>
+  <ChatMessage
+    role="tool"
+    name="search_web"
+    attachments={
+      <ChatToolCall
+        name="search_web"
+        status="success"
+        arguments={{ query: 'RSC perf 2026' }}
+        result={{ items: 5 }}
+      />
+    }
+  >
+    Searched the web.
+  </ChatMessage>
+  <ChatMessage
+    role="knowledge"
+    attachments={
+      <ChatKnowledgeRefs
+        references={[
+          { id: '1', title: 'React Docs', source: 'web', href: '…' },
+          { id: '2', title: 'Notes.pdf', source: 'pdf' },
+        ]}
+      />
+    }
+  >
+    Pulled relevant sources.
+  </ChatMessage>
+  <ChatMessage role="assistant" name="Claude" isStreaming>
+    React Server Components in 2026…
+  </ChatMessage>
+</ChatMessageList>`}
+>
+  <ChatOverviewDemo />
+</LiveDemo>
+
+## Workspace composition
+
+Single message primitives are only the foundation. In production, the more common surface is a full AI workspace: thread list on the left, message flow in the middle, and a composer docked at the bottom. This demo shows that assembled shape: thread sidebar, session header, tool steps, citations, typing state, and a composer with attached-file chips.
+
+<LiveDemo code={`<div style={{ display: 'grid', gridTemplateColumns: '220px 1fr' }}>
+  <aside>{/* thread list */}</aside>
+  <main>
+    <ChatMessageList maxHeight={420}>
+      <ChatMessage role="system">Summarize the top weekly themes…</ChatMessage>
+      <ChatMessage role="user" name="Ryan">Please consolidate the three feedback channels.</ChatMessage>
+      <ChatMessage
+        role="tool"
+        attachments={
+          <ChatToolCall
+            name="aggregate_feedback"
+            status="success"
+            arguments={{ sources: ['support', 'community', 'sales'] }}
+            result={{ rows: 183, clusters: 11 }}
+          />
+        }
+      >
+        Collected and clustered feedback streams.
+      </ChatMessage>
+      <ChatMessage
+        role="knowledge"
+        attachments={<ChatKnowledgeRefs references={[/* sources */]} />}
+      >
+        Selected references for the summary.
+      </ChatMessage>
+      <ChatMessage role="assistant" name="Claude">
+        This week's feedback clusters around first-load speed, search quality, and answer formatting consistency.
+      </ChatMessage>
+    </ChatMessageList>
+
+    <ChatComposer
+      topContent={<>{/* attached file chips */}</>}
+      startContent={<ChatActionButton aria-label="Add context">+</ChatActionButton>}
+      endContent={<ChatSendButton />}
+      bottomContent={<span>Auto-save enabled</span>}
+    />
+
+  </main>
+</div>`}>
+  <ChatWorkspaceDemo />
+</LiveDemo>
+
+## Tool and citation states
+
+AI surfaces are rarely just "prompt in, response out". Real interfaces often need to expose the agent's intermediate state: which tools are running, which ones succeeded, where a step failed, and which sources were cited. This demo focuses on the four `ChatToolCall` statuses plus a multi-source `ChatKnowledgeRefs` block.
+
+<LiveDemo
+  code={`<>
+  <ChatToolCall name="search_web" status="pending" arguments={{ query: 'AI observability stack' }} />
+  <ChatToolCall
+    name="fetch_docs"
+    status="running"
+    arguments={{ ids: ['react-rsc', 'suspense-streaming'] }}
+    result="Reading 2 documents..."
+  />
+  <ChatToolCall
+    name="summarize_findings"
+    status="success"
+    arguments={{ maxBullets: 5 }}
+    result={{ bullets: 5, citations: 3 }}
+  />
+  <ChatToolCall
+    name="query_warehouse"
+    status="error"
+    arguments={{ table: 'latency_daily' }}
+    error="Query timeout after 12s."
+  />
+  <ChatKnowledgeRefs
+    title="Evidence pack"
+    references={[
+      { id: '1', title: 'React Docs', source: 'web', href: 'https://react.dev' },
+      { id: '2', title: 'perf-benchmark-q1.pdf', source: 'pdf' },
+      { id: '3', title: 'Migration checklist', source: 'note' },
+    ]}
+  />
+</>`}
+>
+  <ChatToolStatesDemo />
+</LiveDemo>
+
+## Streaming
+
+The components carry no fetch logic and bind to no SSE protocol. `useChatStream` accumulates any `AsyncIterable<string>` into `text`; pair it with `<ChatMessage isStreaming>` to show the blinking caret. The demo below uses `setTimeout` slicing to simulate a stream:
+
+<LiveDemo code={`import { useChatStream, ChatMessage, ChatMessageList, Button } from '@timeui/react';
+
+async function\* fakeStream(text: string) {
+for (let i = 0; i < text.length; i += 6) {
+await new Promise((r) => setTimeout(r, 40));
+yield text.slice(i, i + 6);
+}
+}
+
+export function StreamDemo() {
+  const stream = useChatStream();
+  return (
+    <>
+      <Button onClick={() => stream.start(fakeStream('Hello world…'))}>Start</Button>
+      <Button onClick={stream.cancel}>Cancel</Button>
+      <ChatMessageList>
+        {stream.text || stream.isStreaming ? (
+          <ChatMessage role="assistant" isStreaming={stream.isStreaming}>
+            {stream.text}
+          </ChatMessage>
+        ) : null}
+      </ChatMessageList>
+    </>
+  );
+}`}>
+  <ChatStreamingDemo />
+</LiveDemo>
+
+## Visual rules per role
+
+- **`user`** — right aligned, `primary[100]` bubble, avatar on the right
+- **`assistant`** — left aligned, `bg.surface` bubble with hairline border, avatar on the left
+- **`system`** — centered, no bubble, `default[100]` pill, no avatar
+- **`tool`** — left aligned, no bubble (header only), pass `<ChatToolCall>` via `attachments`
+- **`knowledge`** — left aligned, no bubble, pass `<ChatKnowledgeRefs>` via `attachments`
+
+Bubble corners use `bubbleRadius` (18px) on three sides; the corner closest to the avatar shrinks to `bubbleRadiusSmall` (6px) for an iMessage-style "tail".
+
+<Callout variant="info" title="Accessibility">
+  `ChatMessageList` defaults to `role="log" aria-live="polite" aria-relevant="additions"` so screen
+  readers announce new messages. `ChatMessage` uses `role="article"` to make each message a discrete
+  unit. `ChatTypingIndicator` uses `role="status"` + `aria-live="polite"`. All animations downgrade
+  gracefully under `prefers-reduced-motion: reduce`.
+</Callout>
+
+## Recommended combinations
+
+- Main chat surface: `ChatMessageList` + `ChatMessage` + `ChatComposer`
+- Agent process visibility: `ChatMessage role="tool"` + `ChatToolCall`
+- RAG / retrieval UX: `ChatMessage role="knowledge"` + `ChatKnowledgeRefs`
+- Streaming output: `useChatStream` + `ChatMessage isStreaming`
+- Voice or multimodal input: `ChatComposer` + `ChatActionButton` + `ChatVoiceWave`

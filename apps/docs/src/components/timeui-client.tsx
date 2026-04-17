@@ -32,5 +32,15 @@ export {
   SegmentedControl,
   Select,
   SelectOption,
+  ChatMessage,
+  ChatMessageList,
+  ChatAvatar,
+  ChatTypingIndicator,
+  ChatToolCall,
+  ChatKnowledgeRefs,
+  ChatComposer,
+  ChatActionButton,
+  ChatSendButton,
+  ChatVoiceWave,
 } from '@timeui/react';
 export { CodeBlock } from '@timeui/react/code-block';

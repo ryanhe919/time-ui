@@ -1,0 +1,205 @@
+# AI 对话总览
+
+TimeUI 的 `Chat` 组件族用于构建生产级 LLM 对话界面：消息流、工具调用、知识库引用、流式光标、可扩展输入框，全部按 TimeUI 的设计 token 统一。组件本身不绑定任何后端协议——你把 OpenAI / Anthropic / 自家 SSE 流转成 `AsyncIterable<string>` 喂给 `useChatStream` 即可。
+
+## 组件家族
+
+| 组件                                  | 作用                                                                                                                                                 |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ChatMessageList`                     | 消息容器：垂直堆叠 + 可选 max-height 滚动 + 新消息自动 scroll-to-bottom，`role="log" aria-live="polite"`。                                           |
+| `ChatMessage`                         | 单条消息：5 种内置 role（`user` / `assistant` / `system` / `tool` / `knowledge`），含可选 avatar、name、timestamp、流式光标、attachments slot。      |
+| `ChatAvatar`                          | 圆形头像：图片 / 文字首字母 / 自定义节点三种 source，按 role 自动着色。                                                                              |
+| `ChatTypingIndicator`                 | "AI 正在输入" 三点跳动指示器（`prefers-reduced-motion` 下退化为脉冲）。                                                                              |
+| `ChatToolCall`                        | 工具调用卡片：可折叠，4 种状态（pending / running / success / error），自动 JSON 序列化 args / result，可自定义 `renderArguments` / `renderResult`。 |
+| `ChatKnowledgeRefs`                   | 知识库引用 chips：可点击跳转或回调，按 source 类型展示首字母 badge。                                                                                 |
+| `ChatComposer`                        | 输入框：auto-grow textarea，Enter 提交 / Shift+Enter 换行，IME composition 防误触，4 个扩展 slot（start / end / top / bottom）。                     |
+| `ChatActionButton` / `ChatSendButton` | Composer 工具栏图标按钮 + 主发送按钮。                                                                                                               |
+| `useChatStream`                       | 流式 hook：消费 `AsyncIterable<string>` 累加文本，提供 `text` / `isStreaming` / `error` / `start` / `cancel` / `reset`。                             |
+
+## 完整对话示例
+
+下面这个 demo 一次性演示了 5 种 role：`system` 居中提示、`user` 右侧主色气泡、`tool` + 工具调用卡片、`knowledge` + 引用 chips、`assistant` 带流式光标。
+
+<LiveDemo
+  code={`<ChatMessageList maxHeight={420}>
+  <ChatMessage role="system">
+    You are a helpful research assistant…
+  </ChatMessage>
+  <ChatMessage role="user" name="Ryan" timestamp={new Date()}>
+    What's the latest on React Server Components?
+  </ChatMessage>
+  <ChatMessage
+    role="tool"
+    name="search_web"
+    attachments={
+      <ChatToolCall
+        name="search_web"
+        status="success"
+        arguments={{ query: 'RSC perf 2026' }}
+        result={{ items: 5 }}
+      />
+    }
+  >
+    Searched the web.
+  </ChatMessage>
+  <ChatMessage
+    role="knowledge"
+    attachments={
+      <ChatKnowledgeRefs
+        references={[
+          { id: '1', title: 'React Docs', source: 'web', href: '…' },
+          { id: '2', title: 'Notes.pdf', source: 'pdf' },
+        ]}
+      />
+    }
+  >
+    Pulled relevant sources.
+  </ChatMessage>
+  <ChatMessage role="assistant" name="Claude" isStreaming>
+    React Server Components in 2026…
+  </ChatMessage>
+</ChatMessageList>`}
+>
+  <ChatOverviewDemo />
+</LiveDemo>
+
+## 工作台场景展示
+
+单个消息组件只是基础能力。更常见的生产形态，是左侧线程列表 + 中间消息流 + 底部 Composer 的完整 AI 工作台。下面这个 demo 演示了一个典型布局：线程侧栏、会话头部状态、工具调用、引用来源、typing indicator，以及带顶部文件 chip 的输入区。
+
+<LiveDemo code={`<div style={{ display: 'grid', gridTemplateColumns: '220px 1fr' }}>
+  <aside>{/* thread list */}</aside>
+  <main>
+    <ChatMessageList maxHeight={420}>
+      <ChatMessage role="system">Summarize the top weekly themes…</ChatMessage>
+      <ChatMessage role="user" name="Ryan">帮我把三路反馈汇总成简报。</ChatMessage>
+      <ChatMessage
+        role="tool"
+        attachments={
+          <ChatToolCall
+            name="aggregate_feedback"
+            status="success"
+            arguments={{ sources: ['support', 'community', 'sales'] }}
+            result={{ rows: 183, clusters: 11 }}
+          />
+        }
+      >
+        Collected and clustered feedback streams.
+      </ChatMessage>
+      <ChatMessage
+        role="knowledge"
+        attachments={<ChatKnowledgeRefs references={[/* sources */]} />}
+      >
+        Selected references for the summary.
+      </ChatMessage>
+      <ChatMessage role="assistant" name="Claude">
+        本周反馈主要集中在首屏速度、搜索结果质量，以及 AI 回复格式一致性。
+      </ChatMessage>
+    </ChatMessageList>
+
+    <ChatComposer
+      topContent={<>{/* attached file chips */}</>}
+      startContent={<ChatActionButton aria-label="Add context">+</ChatActionButton>}
+      endContent={<ChatSendButton />}
+      bottomContent={<span>Auto-save enabled</span>}
+    />
+
+  </main>
+</div>`}>
+  <ChatWorkspaceDemo />
+</LiveDemo>
+
+## 工具调用与引用状态
+
+AI UI 往往不只是“你一问我一答”。真实场景里还需要把 agent 的中间过程暴露出来：哪些工具正在跑、哪些结果成功返回、哪里失败了，以及最终引用了哪些资料。这个 demo 专门展示 `ChatToolCall` 的 4 种状态和 `ChatKnowledgeRefs` 的多来源样式。
+
+<LiveDemo
+  code={`<>
+  <ChatToolCall name="search_web" status="pending" arguments={{ query: 'AI observability stack' }} />
+  <ChatToolCall
+    name="fetch_docs"
+    status="running"
+    arguments={{ ids: ['react-rsc', 'suspense-streaming'] }}
+    result="Reading 2 documents..."
+  />
+  <ChatToolCall
+    name="summarize_findings"
+    status="success"
+    arguments={{ maxBullets: 5 }}
+    result={{ bullets: 5, citations: 3 }}
+  />
+  <ChatToolCall
+    name="query_warehouse"
+    status="error"
+    arguments={{ table: 'latency_daily' }}
+    error="Query timeout after 12s."
+  />
+  <ChatKnowledgeRefs
+    title="Evidence pack"
+    references={[
+      { id: '1', title: 'React Docs', source: 'web', href: 'https://react.dev' },
+      { id: '2', title: 'perf-benchmark-q1.pdf', source: 'pdf' },
+      { id: '3', title: 'Migration checklist', source: 'note' },
+    ]}
+  />
+</>`}
+>
+  <ChatToolStatesDemo />
+</LiveDemo>
+
+## 流式传输
+
+组件不内置 fetch 也不绑定特定 SSE 协议。`useChatStream` 把任何 `AsyncIterable<string>` 累加成 `text`，配合 `<ChatMessage isStreaming>` 显示闪烁光标即可。下面 demo 用 setTimeout 切片模拟一个流：
+
+<LiveDemo code={`import { useChatStream, ChatMessage, ChatMessageList, Button } from '@timeui/react';
+
+async function\* fakeStream(text: string) {
+for (let i = 0; i < text.length; i += 6) {
+await new Promise((r) => setTimeout(r, 40));
+yield text.slice(i, i + 6);
+}
+}
+
+export function StreamDemo() {
+  const stream = useChatStream();
+  return (
+    <>
+      <Button onClick={() => stream.start(fakeStream('Hello world…'))}>Start</Button>
+      <Button onClick={stream.cancel}>Cancel</Button>
+      <ChatMessageList>
+        {stream.text || stream.isStreaming ? (
+          <ChatMessage role="assistant" isStreaming={stream.isStreaming}>
+            {stream.text}
+          </ChatMessage>
+        ) : null}
+      </ChatMessageList>
+    </>
+  );
+}`}>
+  <ChatStreamingDemo />
+</LiveDemo>
+
+## 5 种 role 的视觉规则
+
+- **`user`**：右对齐、`primary[100]` 气泡、avatar 在右
+- **`assistant`**：左对齐、`bg.surface` 气泡 + hairline border、avatar 在左
+- **`system`**：居中无气泡、`default[100]` 小 pill、不显示 avatar
+- **`tool`**：左对齐、不渲染气泡（仅 header）、`attachments` slot 放 `<ChatToolCall>` 卡片
+- **`knowledge`**：左对齐、不渲染气泡、`attachments` 放 `<ChatKnowledgeRefs>` chips
+
+气泡四角用 `bubbleRadius` (18px)，靠近 avatar 的一角缩到 `bubbleRadiusSmall` (6px)，得到 iMessage 风格的"小尾巴"。
+
+<Callout variant="info" title="可访问性">
+  `ChatMessageList` 默认 `role="log" aria-live="polite"
+  aria-relevant="additions"`，新消息会被屏幕阅读器朗读。`ChatMessage` 用 `role="article"`
+  让每条消息成为独立阅读单元。`ChatTypingIndicator` 用 `role="status"` +
+  `aria-live="polite"`。所有动效在 `prefers-reduced-motion: reduce` 下自动降级。
+</Callout>
+
+## 推荐组合
+
+- 聊天主界面：`ChatMessageList` + `ChatMessage` + `ChatComposer`
+- Agent 过程可视化：`ChatMessage role="tool"` + `ChatToolCall`
+- RAG / 检索增强：`ChatMessage role="knowledge"` + `ChatKnowledgeRefs`
+- 流式回复：`useChatStream` + `ChatMessage isStreaming`
+- 语音或多模态输入：`ChatComposer` + `ChatActionButton` + `ChatVoiceWave`

@@ -1,0 +1,146 @@
+# 输入框 Composer
+
+`ChatComposer` 是聊天输入区，自带 auto-grow textarea + 4 个扩展 slot：`startContent` / `endContent` / `topContent` / `bottomContent`，方便接入附件 / 语音 / 模型选择 / 文件 chip 等扩展。配套 `ChatActionButton`（圆形图标按钮）和 `ChatSendButton`（主发送按钮，自带 streaming → 停止图标切换）。
+
+## 完整 demo
+
+下面这个 demo 现在把 4 个 slot 都真正用起来了：顶部文件 chip、左侧附件 / 图片按钮、右侧语音与发送、底部模型选择 + context 信息 + 字数统计。
+
+<LiveDemo
+  code={`<ChatComposer
+  value={value}
+  onChange={setValue}
+  onSubmit={handleSubmit}
+  placeholder="Ask Claude anything…"
+  topContent={
+    <>
+      <span>roadmap-q2.pdf</span>
+      <span>latency-bench.csv</span>
+    </>
+  }
+  startContent={
+    <>
+      <ChatActionButton aria-label="Attach file"><PaperclipIcon /></ChatActionButton>
+      <ChatActionButton aria-label="Add image"><ImageIcon /></ChatActionButton>
+    </>
+  }
+  endContent={
+    <>
+      <ChatActionButton
+        aria-label="Voice input"
+        isActive={recording}
+        onClick={() => setRecording(!recording)}
+      >
+        {recording ? <ChatVoiceWave /> : <MicIcon />}
+      </ChatActionButton>
+      <ChatSendButton
+        isStreaming={streaming}
+        isDisabled={!value.trim()}
+        onClick={() => handleSubmit(value)}
+        onStop={() => setStreaming(false)}
+      />
+    </>
+  }
+  bottomContent={
+    <>
+      <Select size="sm" value={model} onChange={setModel} aria-label="Model">
+        <SelectOption value="claude-opus-4-7">Claude Opus 4.7</SelectOption>
+        <SelectOption value="claude-sonnet-4-6">Claude Sonnet 4.6</SelectOption>
+      </Select>
+      <span>Context window: 128k</span>
+      <span>{value.length}/2000</span>
+    </>
+  }
+/>`}
+>
+  <ChatComposerDemo />
+</LiveDemo>
+
+## 适合展示成什么样
+
+如果你不是只做一个最小输入框，而是要做完整 AI 产品，Composer 通常会有这些信息层：
+
+- `topContent`：文件附件、已选上下文、提示 banner
+- `startContent`：上传、图片、工具入口
+- `endContent`：语音、发送、停止
+- `bottomContent`：模型、上下文窗口、token / 字数、快捷提示
+
+这几个层级分开之后，输入框不会很快堆成一团，后续加能力也更稳。
+
+## 槽位布局
+
+```
+┌──────────────────────────────────────┐
+│  [topContent]                         │  ← 文件 chip / 提示 banner
+│  <textarea auto-grow>                 │
+│  [startContent]    →    [endContent]  │  ← 工具栏行
+│  [bottomContent]                      │  ← 模型选择 / 字符计数
+└──────────────────────────────────────┘
+```
+
+- 整体外壳：`composerRadius` (20px) 圆角 + `border.default` 描边，focus-within 切换到 `border.focus`
+- Textarea：透明无边框，`minRows`/`maxRows` 控制高度区间（默认 1 / 8）
+- 工具栏行：`flex space-between`，`startContent` 和 `endContent` 之间是 textarea
+- 滚动：当输入超过 `maxRows` 时 textarea 内部 `overflow-y: auto`
+
+## 键盘行为
+
+- **Enter** → 触发 `onSubmit(value)`，非受控时自动清空
+- **Shift + Enter** → 换行，不提交
+- **IME composition 期间的 Enter** → 不提交（中日韩输入法选词时安全）
+- `submitOnEnter={false}` → 完全禁用 Enter 提交，必须显式调用 send
+- 空 / 全空白 value → submit no-op
+- `isDisabled` → textarea 与 toolbar 都不可交互（仍保留 ARIA 可读性）
+
+## ChatVoiceWave
+
+录音 / 语音输入激活时的动态声波指示器：N 根 bar 高度交错跳动。可以独立放在工具栏旁边，也可以塞进 `ChatActionButton` 里替代 icon——上面 demo 用的就是后者。
+
+- `isActive`：是否播放动画。inactive 时 bars 静止在最小高度。
+- `bars`：bar 数量，默认 4。
+- `color` / `size`：复用主题 6 色 + sm/md/lg。
+- `prefers-reduced-motion: reduce`：bars 全部静止。
+
+## ChatActionButton
+
+通用 32×32 圆形图标按钮，用于工具栏槽位。三种状态：
+
+- `isActive`：`primary[100]` 背景 + `primary` 图标色（如录音中、附件附着）
+- `isDisabled`：opacity 0.4，不可点击
+- 默认：透明背景，hover 时 `default[100]`
+
+通过 `aria-label`（必填）+ `tooltip` 提供可访问名与原生 hover 提示。
+
+## ChatSendButton
+
+主发送按钮，与 `ChatActionButton` 同尺寸，但默认 `primary` 主色。`isStreaming=true` 时自动切到方形停止图标，点击触发 `onStop` 而非 `onClick`，aria-label 也跟着切换。
+
+## 常见组合方式
+
+- 最小版：只有 `ChatComposer` + `ChatSendButton`
+- Copilot 风格：`startContent` 放附件 / 命令入口，`endContent` 放发送
+- 多模型工作台：`bottomContent` 放模型选择、上下文容量、模式切换
+- 多模态输入：`topContent` 放图片 / 文件 chip，`endContent` 放语音按钮
+
+## useChatStream
+
+把任意 `AsyncIterable<string>` 累加成 `text`，用于驱动 `<ChatMessage isStreaming>` 显示流式内容。详细 API 见 [API 参考](/zh/docs/chat/api)。
+
+```tsx
+const stream = useChatStream({
+  onComplete: (final) => saveMessage(final),
+  onError: (e) => toast.error(e.message),
+});
+
+// 启动
+await stream.start(myAsyncGenerator());
+
+// 用户点 stop 按钮时
+stream.cancel();
+```
+
+<Callout variant="info" title="可访问性">
+  Composer 外壳是普通 `div`，焦点环只在 textarea / 按钮元素上单独显示。`ChatActionButton` /
+  `ChatSendButton` 的 `aria-label` 必填，icon-only 按钮才能被屏幕阅读器朗读。`isActive` 通过
+  `aria-pressed` 暴露给 AT。
+</Callout>

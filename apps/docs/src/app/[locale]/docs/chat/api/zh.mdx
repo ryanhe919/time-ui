@@ -1,0 +1,136 @@
+# API 参考
+
+Chat 组件族的全部 props。共享类型见每个组件 props 表的 `type` 字段。
+
+## ChatMessageList
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode', description: '通常是若干 `<ChatMessage>`。' },
+  { name: 'autoScrollToBottom', type: 'boolean', default: 'true', description: 'children 变化时自动滚到底部（仅在 `maxHeight` 设定时生效）。' },
+  { name: 'maxHeight', type: 'string | number', description: '设置后启用 overflow-y 滚动；不设则交给父容器。' },
+  { name: 'role', type: "'log' | 'list' | 'region'", default: "'log'" },
+  { name: 'isLive', type: 'boolean', default: 'true', description: '`aria-live="polite"`，新消息会被屏幕阅读器朗读。' }
+]} />
+
+## ChatMessage
+
+<PropsTable props={[
+  { name: 'role', type: "'user' | 'assistant' | 'system' | 'tool' | 'knowledge' | string", description: '消息角色（必填）。自定义字符串走 assistant 视觉。' },
+  { name: 'children', type: 'ReactNode', description: '消息正文。' },
+  { name: 'name', type: 'ReactNode', description: '气泡上方的显示名（如 "Claude"、"Ryan"）。' },
+  { name: 'avatar', type: 'ChatAvatarSource', description: '覆盖 avatar；缺省时按 name 派生首字母。' },
+  { name: 'showAvatar', type: 'boolean', description: '默认 user/assistant=true，system=false。' },
+  { name: 'timestamp', type: 'Date | number | string', description: '时间戳（自动 toLocaleTimeString）。' },
+  { name: 'isStreaming', type: 'boolean', default: 'false', description: '内容末尾追加闪烁光标 + `data-streaming="true"`。' },
+  { name: 'attachments', type: 'ReactNode', description: '气泡下方插槽（典型用法：放 `<ChatToolCall>` 或 `<ChatKnowledgeRefs>`）。' }
+]} />
+
+## ChatAvatar
+
+<PropsTable props={[
+  { name: 'source', type: 'ChatAvatarSource', description: '`{ kind: "image", src, alt }` / `{ kind: "text", text }` / `{ kind: "node", node }`。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'sm 24 / md 32 / lg 40。' },
+  { name: 'role', type: 'ChatMessageRole', description: '驱动 text/node 模式的背景色调。' }
+]} />
+
+## ChatTypingIndicator
+
+<PropsTable props={[
+  { name: 'size', type: "'sm' | 'md'", default: "'md'" },
+  { name: 'label', type: 'string', default: '"AI is typing"', description: '同时作为 `aria-label`。' }
+]} />
+
+## ChatVoiceWave
+
+<PropsTable props={[
+  { name: 'isActive', type: 'boolean', default: 'true', description: 'false 时 bars 静止在最小高度。' },
+  { name: 'bars', type: 'number', default: '4' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: '"aria-label"', type: 'string', default: '"Recording"' }
+]} />
+
+## ChatToolCall
+
+<PropsTable props={[
+  { name: 'name', type: 'string', description: '工具名（必填）。' },
+  { name: 'status', type: "'pending' | 'running' | 'success' | 'error'", default: "'success'" },
+  { name: 'arguments', type: 'unknown', description: '调用参数（自动 JSON 序列化；string 透传）。' },
+  { name: 'result', type: 'unknown', description: '调用结果。' },
+  { name: 'error', type: 'string', description: 'status="error" 时显示。' },
+  { name: 'isExpanded', type: 'boolean', description: '受控折叠态。' },
+  { name: 'defaultExpanded', type: 'boolean', default: 'false' },
+  { name: 'onExpandedChange', type: '(expanded: boolean) => void' },
+  { name: 'renderArguments', type: '(args: unknown) => ReactNode', description: '覆盖默认 args 渲染。' },
+  { name: 'renderResult', type: '(result: unknown) => ReactNode' },
+  { name: 'isCollapsible', type: 'boolean', default: 'true', description: 'false 时隐藏展开 / 折叠按钮。' }
+]} />
+
+## ChatKnowledgeRefs
+
+<PropsTable props={[
+  { name: 'references', type: 'ReadonlyArray<ChatKnowledgeReference>', description: '引用列表。每项 `{ id, title, snippet?, href?, source? }`。' },
+  { name: 'title', type: 'ReactNode | false', default: '"Sources"', description: '顶部小标题，false 隐藏。' },
+  { name: 'onSelect', type: '(reference: ChatKnowledgeReference) => void', description: '点击 chip 时回调（带 href 也会触发）。' },
+  { name: 'isExternal', type: 'boolean', default: 'true', description: '带 href 的 chip 是否加 target="_blank" rel。' }
+]} />
+
+## ChatComposer
+
+<PropsTable props={[
+  { name: 'value', type: 'string', description: '受控值。' },
+  { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: string) => void' },
+  { name: 'onSubmit', type: '(value: string) => void', description: 'Enter 提交 / 显式 send 按钮触发。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'placeholder', type: 'string' },
+  { name: 'minRows', type: 'number', default: '1' },
+  { name: 'maxRows', type: 'number', default: '8' },
+  { name: 'submitOnEnter', type: 'boolean', default: 'true' },
+  { name: 'startContent', type: 'ReactNode', description: '工具栏左侧 slot。' },
+  { name: 'endContent', type: 'ReactNode', description: '工具栏右侧 slot。' },
+  { name: 'topContent', type: 'ReactNode', description: 'textarea 上方 slot。' },
+  { name: 'bottomContent', type: 'ReactNode', description: '工具栏下方 slot。' },
+  { name: 'name', type: 'string', description: '底层 textarea 的 name 属性（form 集成）。' }
+]} />
+
+## ChatActionButton
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode', description: '图标节点（推荐 16x16 SVG）。' },
+  { name: '"aria-label"', type: 'string', description: '必填，icon-only 按钮的可访问名。' },
+  { name: 'onClick', type: '() => void' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isActive', type: 'boolean', default: 'false', description: '激活态（如录音中）。映射到 `aria-pressed`。' },
+  { name: 'tooltip', type: 'string', description: '原生 `title` 提示。' },
+  { name: 'type', type: "'button' | 'submit'", default: "'button'" }
+]} />
+
+## ChatSendButton
+
+<PropsTable props={[
+  { name: 'onClick', type: '() => void', description: '默认状态下点击。' },
+  { name: 'onStop', type: '() => void', description: 'isStreaming=true 时点击触发的回调。' },
+  { name: 'isStreaming', type: 'boolean', default: 'false', description: '切到方形停止图标 + 切换 aria-label。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '仅在非 streaming 时生效。' }
+]} />
+
+## useChatStream
+
+```ts
+const { text, isStreaming, error, start, cancel, reset } = useChatStream({
+  onStart?: () => void;
+  onUpdate?: (text: string) => void;
+  onComplete?: (finalText: string) => void;
+  onError?: (error: unknown) => void;
+});
+```
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `text` | `string` | 自上次 reset 起累加的文本。 |
+| `isStreaming` | `boolean` | 介于 start 与 complete / error / cancel 之间为 true。 |
+| `error` | `unknown \| null` | 最近一次错误，下次 start 时清零。 |
+| `start(chunks)` | `(chunks: AsyncIterable<string>) => Promise<string>` | 开始消费迭代器，每次 yield 的字符串**追加**到 `text`，最终返回累加结果。 |
+| `cancel()` | `() => void` | 中止当前流（abort）；不触发 onError。 |
+| `reset()` | `() => void` | 仅清空 `text`，不影响进行中的流。 |

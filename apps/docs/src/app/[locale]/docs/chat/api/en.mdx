@@ -1,0 +1,136 @@
+# API Reference
+
+All props for the Chat family. Shared types are listed inline in each `type` column.
+
+## ChatMessageList
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode', description: 'Typically a list of `<ChatMessage>`.' },
+  { name: 'autoScrollToBottom', type: 'boolean', default: 'true', description: 'Scroll to bottom on children change (only when `maxHeight` is set).' },
+  { name: 'maxHeight', type: 'string | number', description: 'Sets up internal overflow-y scrolling; otherwise defers to parent.' },
+  { name: 'role', type: "'log' | 'list' | 'region'", default: "'log'" },
+  { name: 'isLive', type: 'boolean', default: 'true', description: '`aria-live="polite"` — screen readers announce new messages.' }
+]} />
+
+## ChatMessage
+
+<PropsTable props={[
+  { name: 'role', type: "'user' | 'assistant' | 'system' | 'tool' | 'knowledge' | string", description: 'Required. Custom strings inherit assistant visuals.' },
+  { name: 'children', type: 'ReactNode', description: 'Message body.' },
+  { name: 'name', type: 'ReactNode', description: 'Display name above the bubble (e.g. "Claude").' },
+  { name: 'avatar', type: 'ChatAvatarSource', description: 'Override avatar; otherwise derived from `name` initial.' },
+  { name: 'showAvatar', type: 'boolean', description: 'Default true for user/assistant, false for system.' },
+  { name: 'timestamp', type: 'Date | number | string', description: 'Auto-formatted via toLocaleTimeString.' },
+  { name: 'isStreaming', type: 'boolean', default: 'false', description: 'Append blinking caret + `data-streaming="true"`.' },
+  { name: 'attachments', type: 'ReactNode', description: 'Slot under the bubble — typically `<ChatToolCall>` or `<ChatKnowledgeRefs>`.' }
+]} />
+
+## ChatAvatar
+
+<PropsTable props={[
+  { name: 'source', type: 'ChatAvatarSource', description: '`{ kind: "image", src, alt }` / `{ kind: "text", text }` / `{ kind: "node", node }`.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'sm 24 / md 32 / lg 40.' },
+  { name: 'role', type: 'ChatMessageRole', description: 'Drives the tinted background for text/node sources.' }
+]} />
+
+## ChatTypingIndicator
+
+<PropsTable props={[
+  { name: 'size', type: "'sm' | 'md'", default: "'md'" },
+  { name: 'label', type: 'string', default: '"AI is typing"', description: 'Also serves as `aria-label`.' }
+]} />
+
+## ChatVoiceWave
+
+<PropsTable props={[
+  { name: 'isActive', type: 'boolean', default: 'true', description: 'When false, bars freeze at their minimum height.' },
+  { name: 'bars', type: 'number', default: '4' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: '"aria-label"', type: 'string', default: '"Recording"' }
+]} />
+
+## ChatToolCall
+
+<PropsTable props={[
+  { name: 'name', type: 'string', description: 'Tool name (required).' },
+  { name: 'status', type: "'pending' | 'running' | 'success' | 'error'", default: "'success'" },
+  { name: 'arguments', type: 'unknown', description: 'Call arguments (auto JSON-serialised; strings passed through).' },
+  { name: 'result', type: 'unknown', description: 'Call result.' },
+  { name: 'error', type: 'string', description: 'Shown when status="error".' },
+  { name: 'isExpanded', type: 'boolean', description: 'Controlled open state.' },
+  { name: 'defaultExpanded', type: 'boolean', default: 'false' },
+  { name: 'onExpandedChange', type: '(expanded: boolean) => void' },
+  { name: 'renderArguments', type: '(args: unknown) => ReactNode', description: 'Override default arg rendering.' },
+  { name: 'renderResult', type: '(result: unknown) => ReactNode' },
+  { name: 'isCollapsible', type: 'boolean', default: 'true', description: 'Hide the toggle when false.' }
+]} />
+
+## ChatKnowledgeRefs
+
+<PropsTable props={[
+  { name: 'references', type: 'ReadonlyArray<ChatKnowledgeReference>', description: 'Each `{ id, title, snippet?, href?, source? }`.' },
+  { name: 'title', type: 'ReactNode | false', default: '"Sources"', description: 'Top heading; pass `false` to hide.' },
+  { name: 'onSelect', type: '(reference: ChatKnowledgeReference) => void', description: 'Click callback (also fires when href is set).' },
+  { name: 'isExternal', type: 'boolean', default: 'true', description: 'Whether href chips get `target="_blank" rel="noopener noreferrer"`.' }
+]} />
+
+## ChatComposer
+
+<PropsTable props={[
+  { name: 'value', type: 'string', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: string) => void' },
+  { name: 'onSubmit', type: '(value: string) => void', description: 'Triggered on Enter / explicit send button.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'placeholder', type: 'string' },
+  { name: 'minRows', type: 'number', default: '1' },
+  { name: 'maxRows', type: 'number', default: '8' },
+  { name: 'submitOnEnter', type: 'boolean', default: 'true' },
+  { name: 'startContent', type: 'ReactNode', description: 'Toolbar left slot.' },
+  { name: 'endContent', type: 'ReactNode', description: 'Toolbar right slot.' },
+  { name: 'topContent', type: 'ReactNode', description: 'Above the textarea.' },
+  { name: 'bottomContent', type: 'ReactNode', description: 'Below the toolbar row.' },
+  { name: 'name', type: 'string', description: 'Underlying textarea name attr (form integration).' }
+]} />
+
+## ChatActionButton
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode', description: 'Icon node (16x16 SVG recommended).' },
+  { name: '"aria-label"', type: 'string', description: 'Required — accessible name for the icon-only button.' },
+  { name: 'onClick', type: '() => void' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isActive', type: 'boolean', default: 'false', description: 'Active state (e.g. recording). Maps to `aria-pressed`.' },
+  { name: 'tooltip', type: 'string', description: 'Native `title` hint.' },
+  { name: 'type', type: "'button' | 'submit'", default: "'button'" }
+]} />
+
+## ChatSendButton
+
+<PropsTable props={[
+  { name: 'onClick', type: '() => void', description: 'Click handler in default state.' },
+  { name: 'onStop', type: '() => void', description: 'Click handler when isStreaming=true.' },
+  { name: 'isStreaming', type: 'boolean', default: 'false', description: 'Swaps in the stop icon + updates aria-label.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Only takes effect when not streaming.' }
+]} />
+
+## useChatStream
+
+```ts
+const { text, isStreaming, error, start, cancel, reset } = useChatStream({
+  onStart?: () => void;
+  onUpdate?: (text: string) => void;
+  onComplete?: (finalText: string) => void;
+  onError?: (error: unknown) => void;
+});
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `text` | `string` | Accumulated text since last reset. |
+| `isStreaming` | `boolean` | True between start and complete / error / cancel. |
+| `error` | `unknown \| null` | Last error, cleared on next start. |
+| `start(chunks)` | `(chunks: AsyncIterable<string>) => Promise<string>` | Consume the iterable; each yielded string is **appended** to `text`. Resolves with the final accumulated text. |
+| `cancel()` | `() => void` | Abort the current stream; does not fire onError. |
+| `reset()` | `() => void` | Clear `text` only; does not affect a running stream. |

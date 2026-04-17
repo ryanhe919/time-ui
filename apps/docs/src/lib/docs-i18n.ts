@@ -28,6 +28,7 @@ const zh: DocsMessages = {
   brand: 'TimeUI',
   sections: {
     'getting-started': '开始使用',
+    chat: 'AI 对话',
     components: '组件',
   },
   groups: {
@@ -37,6 +38,9 @@ const zh: DocsMessages = {
   pages: {
     introduction: '介绍',
     installation: '安装',
+    overview: '总览',
+    composer: '输入框',
+    api: 'API 参考',
     button: '按钮',
     callout: '提示块',
     'code-block': '代码块',
@@ -69,6 +73,7 @@ const en: DocsMessages = {
   brand: 'TimeUI',
   sections: {
     'getting-started': 'Getting Started',
+    chat: 'AI Chat',
     components: 'Components',
   },
   groups: {
@@ -78,6 +83,9 @@ const en: DocsMessages = {
   pages: {
     introduction: 'Introduction',
     installation: 'Installation',
+    overview: 'Overview',
+    composer: 'Composer',
+    api: 'API Reference',
     button: 'Button',
     callout: 'Callout',
     'code-block': 'Code Block',

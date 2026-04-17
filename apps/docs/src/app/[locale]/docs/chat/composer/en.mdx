@@ -1,0 +1,146 @@
+# Composer
+
+`ChatComposer` is the chat input region — auto-grow textarea + four extension slots (`startContent` / `endContent` / `topContent` / `bottomContent`) so you can wire in attachments, voice, model selection, file chips, etc. It ships with `ChatActionButton` (circular icon button) and `ChatSendButton` (the primary send button — auto-swaps to a stop icon while streaming).
+
+## End-to-end demo
+
+This version uses all four slots for real: top file chips, left-side attach / image actions, right-side voice + send controls, and a bottom row for model selection, context info, and a character counter.
+
+<LiveDemo
+  code={`<ChatComposer
+  value={value}
+  onChange={setValue}
+  onSubmit={handleSubmit}
+  placeholder="Ask Claude anything…"
+  topContent={
+    <>
+      <span>roadmap-q2.pdf</span>
+      <span>latency-bench.csv</span>
+    </>
+  }
+  startContent={
+    <>
+      <ChatActionButton aria-label="Attach file"><PaperclipIcon /></ChatActionButton>
+      <ChatActionButton aria-label="Add image"><ImageIcon /></ChatActionButton>
+    </>
+  }
+  endContent={
+    <>
+      <ChatActionButton
+        aria-label="Voice input"
+        isActive={recording}
+        onClick={() => setRecording(!recording)}
+      >
+        {recording ? <ChatVoiceWave /> : <MicIcon />}
+      </ChatActionButton>
+      <ChatSendButton
+        isStreaming={streaming}
+        isDisabled={!value.trim()}
+        onClick={() => handleSubmit(value)}
+        onStop={() => setStreaming(false)}
+      />
+    </>
+  }
+  bottomContent={
+    <>
+      <Select size="sm" value={model} onChange={setModel} aria-label="Model">
+        <SelectOption value="claude-opus-4-7">Claude Opus 4.7</SelectOption>
+        <SelectOption value="claude-sonnet-4-6">Claude Sonnet 4.6</SelectOption>
+      </Select>
+      <span>Context window: 128k</span>
+      <span>{value.length}/2000</span>
+    </>
+  }
+/>`}
+>
+  <ChatComposerDemo />
+</LiveDemo>
+
+## How this usually scales
+
+If you're not building a minimal prompt box but a full AI product, the composer often needs multiple information layers:
+
+- `topContent`: attached files, selected context, hint banners
+- `startContent`: upload, image, or tool-entry actions
+- `endContent`: voice, send, stop
+- `bottomContent`: model picker, context-window info, token or char counts, quick hints
+
+Keeping those layers separate prevents the input from collapsing into a single crowded toolbar.
+
+## Slot layout
+
+```
+┌──────────────────────────────────────┐
+│  [topContent]                         │  ← file chips / hint banner
+│  <textarea auto-grow>                 │
+│  [startContent]    →    [endContent]  │  ← toolbar row
+│  [bottomContent]                      │  ← model picker / char count
+└──────────────────────────────────────┘
+```
+
+- Outer shell: `composerRadius` (20px) rounded + `border.default` outline; on focus-within it shifts to `border.focus`.
+- Textarea: borderless transparent, `minRows`/`maxRows` clamps height (defaults 1 / 8).
+- Toolbar row: `flex space-between` with the textarea between `startContent` and `endContent`.
+- Scroll: when content exceeds `maxRows`, the textarea scrolls internally (`overflow-y: auto`).
+
+## Keyboard behaviour
+
+- **Enter** → fires `onSubmit(value)`; if uncontrolled, the input clears
+- **Shift + Enter** → newline, no submit
+- **Enter during IME composition** → ignored (safe with CJK input methods)
+- `submitOnEnter={false}` → disable Enter submit entirely; consumers must trigger send themselves
+- Empty / whitespace-only value → submit no-op
+- `isDisabled` → textarea and toolbar non-interactive (ARIA still readable)
+
+## ChatVoiceWave
+
+A dynamic wave indicator for active voice input: N bars with staggered bouncing heights. Drop it next to the toolbar, or swap it in _as the icon_ of an active `ChatActionButton` — the demo above uses the latter pattern.
+
+- `isActive`: animate vs. freeze at the minimum height.
+- `bars`: bar count, default 4.
+- `color` / `size`: reuses the 6 theme colors + sm/md/lg.
+- Under `prefers-reduced-motion: reduce`, all bars stay static.
+
+## ChatActionButton
+
+Generic 32×32 circular icon button for toolbar slots. Three states:
+
+- `isActive`: `primary[100]` bg + `primary` icon color (e.g. recording, attached)
+- `isDisabled`: opacity 0.4, non-clickable
+- Default: transparent bg, hover → `default[100]`
+
+`aria-label` is required, `tooltip` adds the native hover hint.
+
+## ChatSendButton
+
+Primary send button — same dimensions as `ChatActionButton` but in `primary`. When `isStreaming=true`, it auto-swaps to a square stop icon, routes click to `onStop` instead of `onClick`, and updates the aria-label.
+
+## Common patterns
+
+- Minimal: `ChatComposer` + `ChatSendButton`
+- Copilot-style: attach / command actions in `startContent`, send in `endContent`
+- Multi-model workspace: model picker, context capacity, and mode toggles in `bottomContent`
+- Multimodal input: image / file chips in `topContent`, voice control in `endContent`
+
+## useChatStream
+
+Accumulates any `AsyncIterable<string>` into `text` for driving `<ChatMessage isStreaming>`. Full API in the [API Reference](/en/docs/chat/api).
+
+```tsx
+const stream = useChatStream({
+  onComplete: (final) => saveMessage(final),
+  onError: (e) => toast.error(e.message),
+});
+
+// Start
+await stream.start(myAsyncGenerator());
+
+// On user "Stop" click
+stream.cancel();
+```
+
+<Callout variant="info" title="Accessibility">
+  The composer shell is a plain `div`; focus rings live on the textarea / buttons individually.
+  `aria-label` is required on `ChatActionButton` / `ChatSendButton` so icon-only buttons remain
+  announced. `isActive` propagates as `aria-pressed` for assistive tech.
+</Callout>
