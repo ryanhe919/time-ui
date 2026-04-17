@@ -42,5 +42,17 @@ export {
   ChatActionButton,
   ChatSendButton,
   ChatVoiceWave,
+  SearchDialog,
+  Popover,
+  Tooltip,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Tabs,
+  Tab,
+  TabPanel,
+  Pagination,
+  Table,
 } from '@timeui/react';
 export { CodeBlock } from '@timeui/react/code-block';

@@ -1,0 +1,104 @@
+# Tooltip
+
+A lightweight inverted hint. Reuses Popover's twelve placements and positioning algorithm, but the colour treatment is hard-coded inverted (dark fill / white text in light mode, the inverse in dark mode), only `hover` + `focus` triggers are supported, the panel sets `pointer-events: none`, and it auto-hides on touch screens. Includes a warm-up behaviour: opening another tooltip shortly after one closes skips the enter delay.
+
+<Callout variant="info" title="Tooltip vs. Popover">
+  Tooltip = inverted + short text + non-interactive (`pointer-events: none`, so the cursor cannot "live" on the hint). It has no header / footer / close button, no click trigger, and `@media (hover: none)` removes it entirely on touch. Need buttons, inputs, or link lists inside a floating panel? Use [Popover](./popover) instead.
+</Callout>
+
+## Basic usage
+
+Pass any single `ReactElement` as `children`. The component clones it to inject `ref`, `mouseenter` / `mouseleave` / `focus` / `blur`, and `aria-describedby`.
+
+<LiveDemo code={`<Tooltip content="Save to disk">
+  <Button>Save</Button>
+</Tooltip>`}>
+  <Tooltip content="Save to disk">
+    <Button>Save</Button>
+  </Tooltip>
+</LiveDemo>
+
+## Placements
+
+All twelve placements are inherited from Popover: `top` / `bottom` / `left` / `right`, plus `-start` / `-end` alignment variants. Tooltip's default placement is `top`.
+
+<LiveDemo code={`<Flex gap={16}>
+  <Tooltip content="top" placement="top">
+    <Button>top</Button>
+  </Tooltip>
+  <Tooltip content="bottom" placement="bottom">
+    <Button>bottom</Button>
+  </Tooltip>
+  <Tooltip content="left" placement="left">
+    <Button>left</Button>
+  </Tooltip>
+  <Tooltip content="right" placement="right">
+    <Button>right</Button>
+  </Tooltip>
+  <Tooltip content="top-start" placement="top-start">
+    <Button>top-start</Button>
+  </Tooltip>
+  <Tooltip content="bottom-end" placement="bottom-end">
+    <Button>bottom-end</Button>
+  </Tooltip>
+</Flex>`}>
+  <Flex gap={16}>
+    <Tooltip content="top" placement="top"><Button>top</Button></Tooltip>
+    <Tooltip content="bottom" placement="bottom"><Button>bottom</Button></Tooltip>
+    <Tooltip content="left" placement="left"><Button>left</Button></Tooltip>
+    <Tooltip content="right" placement="right"><Button>right</Button></Tooltip>
+    <Tooltip content="top-start" placement="top-start"><Button>top-start</Button></Tooltip>
+    <Tooltip content="bottom-end" placement="bottom-end"><Button>bottom-end</Button></Tooltip>
+  </Flex>
+</LiveDemo>
+
+## Delays & warm-up
+
+`enterDelay` / `exitDelay` control the hover/focus latency before the tooltip appears or disappears (in ms). The component keeps a module-level "last closed at" timestamp — if a new tooltip opens within `warmThreshold` (default 500 ms) of the last close, the **enter delay is skipped**. This mirrors macOS's batched tooltip experience: glide across a row of buttons and the hint snaps from one to the next without latency.
+
+<LiveDemo code={`<Flex gap={16}>
+  <Tooltip content="120 ms (default)"><Button>Default</Button></Tooltip>
+  <Tooltip content="600 ms" enterDelay={600}><Button>Slow</Button></Tooltip>
+  <Tooltip content="Instant" enterDelay={0}><Button>Instant</Button></Tooltip>
+</Flex>`}>
+  <Flex gap={16}>
+    <Tooltip content="120 ms (default)"><Button>Default</Button></Tooltip>
+    <Tooltip content="600 ms" enterDelay={600}><Button>Slow</Button></Tooltip>
+    <Tooltip content="Instant" enterDelay={0}><Button>Instant</Button></Tooltip>
+  </Flex>
+</LiveDemo>
+
+## Manual control via `isOpen`
+
+Passing `isOpen` switches the component to **fully controlled** mode — every internal hover / focus path is bypassed and visibility is whatever you set. Useful for "step N of an onboarding tour is currently active" style flows.
+
+<LiveDemo code={`<Tooltip isOpen content="Always visible" placement="top">
+  <Button>Always on</Button>
+</Tooltip>`}>
+  <Tooltip isOpen content="Always visible" placement="top">
+    <Button>Always on</Button>
+  </Tooltip>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'content', type: 'ReactNode', description: 'Tooltip body — typically short text or a compact ReactNode.' },
+  { name: 'children', type: 'ReactElement', description: 'The wrapped anchor (must be a single ReactElement). Cloned to inject `ref` + events + `aria-describedby`.' },
+  { name: 'placement', type: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'", default: "'top'" },
+  { name: 'offset', type: 'number', description: 'Pixel gap between anchor and tooltip. Defaults to `theme.components.tooltip.offset` (6).' },
+  { name: 'withArrow', type: 'boolean', default: 'true' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable entirely — even hovering does not portal anything.' },
+  { name: 'enterDelay', type: 'number', description: 'Open delay in ms. Defaults to `theme.components.tooltip.enterDelay` (120). Skipped while warm.' },
+  { name: 'exitDelay', type: 'number', description: 'Close delay in ms. Defaults to `theme.components.tooltip.exitDelay` (80).' },
+  { name: 'isOpen', type: 'boolean', description: 'Controlled visibility. Once provided, all internal hover/focus logic is ignored.' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'className', type: 'string', description: 'Forwarded to the tooltip panel (not the anchor).' },
+  { name: 'style', type: 'CSSProperties', description: 'Forwarded to the tooltip panel; `top`/`left` are computed and injected.' },
+  { name: 'id', type: 'string', description: 'Custom panel id; this is also what gets injected into the anchor as `aria-describedby`.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The panel renders as `role="tooltip"` and is wired to the anchor through `aria-describedby` (the anchor's existing `aria-describedby` is preserved and merged). The `focus` trigger ensures keyboard users see the hint. On `@media (hover: none)` the entire panel is `display: none`, so touch users are never blocked. All animation respects `prefers-reduced-motion`.
+</Callout>

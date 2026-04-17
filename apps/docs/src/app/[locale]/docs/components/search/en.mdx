@@ -7,14 +7,11 @@ Clicking it opens a command palette / search dialog (your responsibility).
 The placeholder defaults to `useI18n().search.placeholder` and follows the
 active locale automatically.
 
-<Callout variant="warning" title="It is not a typable input">
-  `Search` does **not** accept text input. It's a trigger button: clicking it
-  opens a dialog which hosts the actual editable field and results. This "⌘K
-  command palette" pattern is the same approach used by Apple, Vercel, Tailwind,
-  and Linear — the header "search box" only opens the palette.
-  <br />
-  For a truly editable search field, use a native `<input type="search">` or
-  wait for the upcoming `SearchInput` component.
+<Callout variant="info" title="Pair it with SearchDialog">
+  `Search` does **not** accept text input — it's a trigger button. The actual
+  editable input, filtering, keyboard navigation, and result list live in its
+  partner component [`SearchDialog`](#searchdialog). This "⌘K command palette"
+  pattern is the same approach used by Apple, Vercel, Tailwind, and Linear.
 </Callout>
 
 ## Interactive demo ← try it
@@ -113,5 +110,86 @@ export function Demo() {
 ## Best practices
 
 - Never pass `value` to `Search` — it's a button, not an input.
-- For the command palette: auto-focus the inner `<input>` on open, close on <kbd>Esc</kbd>, and set `role="dialog"` + `aria-modal="true"`.
-- If you just need a conventional search field (not a command palette), use a native `<input type="search">`; a dedicated `SearchInput` component is on the roadmap.
+- For the command palette layer use `SearchDialog` directly — it ships with auto-focus on open, <kbd>Esc</kbd> to close, `role="dialog"` + `aria-modal="true"`, arrow-key navigation, Enter selection, and a polished scrollbar.
+- For a conventional search field (not a command palette), use a native `<input type="search">`.
+
+---
+
+## SearchDialog
+
+The ⌘K command palette dialog. Pairs with the `Search` trigger: `Search` opens it, `SearchDialog` handles input + filtering + selection.
+
+### End-to-end pairing
+
+`SearchDialog` accepts a built-in `shortcut="mod+k"` so the dialog binds the global ⌘K (Mac) / Ctrl K (other) keypress itself — no manual `useEffect` needed.
+
+<LiveDemo code={`import { useState } from 'react';
+import { Search, SearchDialog } from '@timeui/react';
+
+export function CommandPalette() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Search shortcut="⌘K" onClick={() => setOpen(true)} />
+      <SearchDialog
+        isOpen={open}
+        onOpenChange={setOpen}
+        shortcut="mod+k"
+        items={ITEMS}
+        placeholder="Search docs…"
+        onSelect={(item) => router.push(item.href)}
+      />
+    </>
+  );
+}`}>
+  <SearchDialogDemo />
+</LiveDemo>
+
+### Key behaviour
+
+- **Position**: centered both horizontally and vertically by default. Pass `topOffset` to switch to top-offset positioning.
+- **Sizing**: `width` defaults to `min(620px, 92vw)`; the result list `maxListHeight` defaults to `min(420px, 52vh)` and shows a polished scrollbar when overflowing.
+- **Keyboard**: arrow keys navigate (skipping disabled), Home/End jump to ends, Enter selects, Esc closes.
+- **Filter**: case-insensitive substring match on `label` + `hint` by default. Pass a custom `filter` to override (return `() => true` to disable local filtering for remote search).
+- **Sections**: `sections` win over `items` and may carry an optional `title`.
+- **Loading**: `isLoading` shows a spinner + `loadingMessage`.
+- **Shortcut**: `shortcut="mod+k"` binds the global key; the component toggles `isOpen` itself.
+
+### SearchDialog API
+
+<PropsTable props={[
+  { name: 'isOpen', type: 'boolean', description: 'Controlled open state.' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: 'Uncontrolled initial open state.' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'items', type: 'ReadonlyArray<SearchDialogItem>', description: 'Flat result list.' },
+  { name: 'sections', type: 'ReadonlyArray<SearchDialogSection>', description: 'Grouped results (wins over `items`).' },
+  { name: 'query', type: 'string', description: 'Controlled query string.' },
+  { name: 'defaultQuery', type: 'string', default: "''" },
+  { name: 'onQueryChange', type: '(query: string) => void' },
+  { name: 'filter', type: '(item, query) => boolean', description: 'Default: case-insensitive substring of `label`+`hint`. Return `() => true` for remote search.' },
+  { name: 'onSelect', type: '(item: SearchDialogItem) => void' },
+  { name: 'closeOnSelect', type: 'boolean', default: 'true' },
+  { name: 'shortcut', type: 'string', description: "Global keybinding (e.g. `'mod+k'`); the component binds it and toggles `isOpen`." },
+  { name: 'placeholder', type: 'string', default: "'Search…'" },
+  { name: 'emptyMessage', type: 'ReactNode', default: "'No results'" },
+  { name: 'isLoading', type: 'boolean', default: 'false' },
+  { name: 'loadingMessage', type: 'ReactNode', default: "'Searching…'" },
+  { name: 'showEscapeKey', type: 'boolean', default: 'true' },
+  { name: 'escapeKeyLabel', type: 'ReactNode', default: "'ESC'" },
+  { name: 'footer', type: 'ReactNode | false', description: 'Footer status bar; `false` hides; ReactNode replaces the default keyboard hints.' },
+  { name: 'renderItem', type: '(item, { isHighlighted, isDisabled }) => ReactNode', description: 'Override the default (icon + label + hint) layout.' },
+  { name: 'width', type: 'string | number', default: "'min(620px, 92vw)'" },
+  { name: 'maxListHeight', type: 'string | number', default: "'min(420px, 52vh)'" },
+  { name: 'topOffset', type: 'string | number', description: 'Distance from the top of the viewport; enables top-offset positioning when provided.' }
+]} />
+
+### SearchDialogItem
+
+<PropsTable props={[
+  { name: 'id', type: 'string', description: 'Required unique identifier.' },
+  { name: 'label', type: 'ReactNode', description: 'Primary label.' },
+  { name: 'hint', type: 'ReactNode', description: 'Right-aligned hint (URL / shortcut).' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon.' },
+  { name: 'href', type: 'string', description: 'Optional href; the consumer decides how to navigate inside `onSelect`.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' }
+]} />

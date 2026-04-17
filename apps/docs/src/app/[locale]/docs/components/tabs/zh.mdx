@@ -1,0 +1,332 @@
+# 标签页 Tabs
+
+把同一上下文下的多块内容折叠成一组可切换的 panel。提供 `underline` / `pills` / `bordered` 三种 variant，水平和垂直两种方向；同时支持声明式（`<Tab>` + `<TabPanel>`）和数据驱动（`items={[...]}`）两套 API。
+
+<Callout variant="info" title="什么时候不用 Tabs">
+  Tabs 是 **navigation** 语义（`role="tablist"` + `role="tabpanel"`），用于在已有内容的多个面板之间切换。如果你只是想在表单里二选一 / 多选一，请用 [`SegmentedControl`](/zh/docs/components/segmented-control) —— 它是 `radiogroup` 语义，会被表单提交。Tabs 切换的是 **panel**，SegmentedControl 切换的是 **value**。
+</Callout>
+
+## 基础用法
+
+声明式写法：每个 `<Tab itemKey>` 内嵌一个 `<TabPanel>` 描述这一页的内容。
+
+<LiveDemo code={`<Tabs aria-label="Repository" defaultSelectedKey="readme">
+  <Tab itemKey="readme" label="README">
+    <TabPanel itemKey="readme">仓库说明文档。</TabPanel>
+  </Tab>
+  <Tab itemKey="issues" label="Issues">
+    <TabPanel itemKey="issues">已上报的问题列表。</TabPanel>
+  </Tab>
+  <Tab itemKey="prs" label="Pull requests">
+    <TabPanel itemKey="prs">待审阅的合并请求。</TabPanel>
+  </Tab>
+</Tabs>`}>
+  <div style={{ width: '100%', maxWidth: 480 }}>
+    <Tabs aria-label="Repository" defaultSelectedKey="readme">
+      <Tab itemKey="readme" label="README">
+        <TabPanel itemKey="readme">仓库说明文档。</TabPanel>
+      </Tab>
+      <Tab itemKey="issues" label="Issues">
+        <TabPanel itemKey="issues">已上报的问题列表。</TabPanel>
+      </Tab>
+      <Tab itemKey="prs" label="Pull requests">
+        <TabPanel itemKey="prs">待审阅的合并请求。</TabPanel>
+      </Tab>
+    </Tabs>
+  </div>
+</LiveDemo>
+
+## 数据驱动 items
+
+当 panel 数量较多、或来自远端时，用 `items` 更简洁。`items` 优先级高于 `children`。
+
+<LiveDemo code={`<Tabs
+  aria-label="Account settings"
+  defaultSelectedKey="profile"
+  items={[
+    { key: 'profile',  label: 'Profile',  content: <p>个人资料 panel。</p> },
+    { key: 'security', label: 'Security', content: <p>安全设置 panel。</p> },
+    { key: 'billing',  label: 'Billing',  content: <p>账单与发票 panel。</p> },
+  ]}
+/>`}>
+  <TabsBasicDemo />
+</LiveDemo>
+
+## 视觉变体 Variants
+
+`underline`（默认）—— 简洁的下划线 indicator；`pills`—— 胶囊式背景，灵感来自 macOS 的分段控件；`bordered` —— 带 panel 容器边框，适合内容区独立展示。
+
+<LiveDemo code={`<Stack spacing={24}>
+  <Tabs aria-label="underline" variant="underline" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'Overview' }, { key: 'b', label: 'Activity' }, { key: 'c', label: 'Settings' }]} />
+  <Tabs aria-label="pills" variant="pills" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'Overview' }, { key: 'b', label: 'Activity' }, { key: 'c', label: 'Settings' }]} />
+  <Tabs aria-label="bordered" variant="bordered" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'Overview', content: 'Overview 内容' }, { key: 'b', label: 'Activity', content: 'Activity 内容' }, { key: 'c', label: 'Settings', content: 'Settings 内容' }]} />
+</Stack>`}>
+  <Stack spacing={24}>
+    <Tabs
+      aria-label="underline"
+      variant="underline"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'Overview' },
+        { key: 'b', label: 'Activity' },
+        { key: 'c', label: 'Settings' },
+      ]}
+    />
+    <Tabs
+      aria-label="pills"
+      variant="pills"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'Overview' },
+        { key: 'b', label: 'Activity' },
+        { key: 'c', label: 'Settings' },
+      ]}
+    />
+    <Tabs
+      aria-label="bordered"
+      variant="bordered"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'Overview', content: 'Overview 内容' },
+        { key: 'b', label: 'Activity', content: 'Activity 内容' },
+        { key: 'c', label: 'Settings', content: 'Settings 内容' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+`sm` / `md`（默认）/ `lg`，影响字号、tab 高度与图标大小。
+
+<LiveDemo code={`<Stack spacing={20}>
+  <Tabs size="sm" aria-label="sm" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+  <Tabs size="md" aria-label="md" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+  <Tabs size="lg" aria-label="lg" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+</Stack>`}>
+  <Stack spacing={20}>
+    <Tabs
+      size="sm"
+      aria-label="sm"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'One' },
+        { key: 'b', label: 'Two' },
+        { key: 'c', label: 'Three' },
+      ]}
+    />
+    <Tabs
+      size="md"
+      aria-label="md"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'One' },
+        { key: 'b', label: 'Two' },
+        { key: 'c', label: 'Three' },
+      ]}
+    />
+    <Tabs
+      size="lg"
+      aria-label="lg"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'One' },
+        { key: 'b', label: 'Two' },
+        { key: 'c', label: 'Three' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## 垂直方向 Vertical
+
+`orientation="vertical"` 适合"侧边导航 + 主区面板"的设置型布局。键盘导航自动切换为 `↑` / `↓`。
+
+<LiveDemo code={`<Tabs
+  aria-label="Settings nav"
+  orientation="vertical"
+  variant="bordered"
+  defaultSelectedKey="profile"
+  items={[
+    { key: 'profile',  label: 'Profile',       content: '个人资料 panel。' },
+    { key: 'team',     label: 'Team',          content: '团队成员管理 panel。' },
+    { key: 'security', label: 'Security',      content: '账户安全 panel。' },
+    { key: 'billing',  label: 'Billing',       content: '账单与发票 panel。' },
+  ]}
+/>`}>
+  <div style={{ width: '100%', maxWidth: 520 }}>
+    <Tabs
+      aria-label="Settings nav"
+      orientation="vertical"
+      variant="bordered"
+      defaultSelectedKey="profile"
+      items={[
+        { key: 'profile', label: 'Profile', content: '个人资料 panel。' },
+        { key: 'team', label: 'Team', content: '团队成员管理 panel。' },
+        { key: 'security', label: 'Security', content: '账户安全 panel。' },
+        { key: 'billing', label: 'Billing', content: '账单与发票 panel。' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## 图标 Icons
+
+为每个 tab 传入 `icon`，会渲染在 label 左侧。
+
+<LiveDemo code={`<Tabs aria-label="View" variant="pills" defaultSelectedKey="grid"
+  items={[
+    { key: 'list', label: 'List', icon: <ListIcon /> },
+    { key: 'grid', label: 'Grid', icon: <GridIcon /> },
+    { key: 'kanban', label: 'Kanban', icon: <KanbanIcon /> },
+  ]}
+/>`}>
+  <Tabs
+    aria-label="View"
+    variant="pills"
+    defaultSelectedKey="grid"
+    items={[
+      {
+        key: 'list',
+        label: 'List',
+        icon: (
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+            <path d="M3 4h10M3 8h10M3 12h10" />
+          </svg>
+        ),
+      },
+      {
+        key: 'grid',
+        label: 'Grid',
+        icon: (
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <rect x="2.5" y="2.5" width="4.5" height="4.5" rx="0.6" />
+            <rect x="9" y="2.5" width="4.5" height="4.5" rx="0.6" />
+            <rect x="2.5" y="9" width="4.5" height="4.5" rx="0.6" />
+            <rect x="9" y="9" width="4.5" height="4.5" rx="0.6" />
+          </svg>
+        ),
+      },
+      {
+        key: 'kanban',
+        label: 'Kanban',
+        icon: (
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <rect x="2.5" y="2.5" width="3" height="11" rx="0.6" />
+            <rect x="6.5" y="2.5" width="3" height="7" rx="0.6" />
+            <rect x="10.5" y="2.5" width="3" height="9" rx="0.6" />
+          </svg>
+        ),
+      },
+    ]}
+  />
+</LiveDemo>
+
+## 禁用 disabledKeys
+
+整体禁用用 `isDisabled`；单独禁用某些 tab 用 `disabledKeys`，键盘方向键会自动跳过。
+
+<LiveDemo code={`<Tabs
+  aria-label="Plan"
+  defaultSelectedKey="free"
+  disabledKeys={['team']}
+  items={[
+    { key: 'free',  label: 'Free' },
+    { key: 'pro',   label: 'Pro' },
+    { key: 'team',  label: 'Team (即将推出)' },
+  ]}
+/>`}>
+  <Tabs
+    aria-label="Plan"
+    defaultSelectedKey="free"
+    disabledKeys={['team']}
+    items={[
+      { key: 'free', label: 'Free' },
+      { key: 'pro', label: 'Pro' },
+      { key: 'team', label: 'Team (即将推出)' },
+    ]}
+  />
+</LiveDemo>
+
+## 懒加载 isLazy
+
+`isLazy` 时，只挂载当前激活 panel —— 切换才挂载下一个。适用于大型 dashboard 或需要按需请求数据的场景。
+
+<LiveDemo code={`<Tabs
+  aria-label="Dashboard"
+  isLazy
+  defaultSelectedKey="overview"
+  items={[
+    { key: 'overview',  label: 'Overview',  content: <Overview /> },
+    { key: 'analytics', label: 'Analytics', content: <Analytics /> },  // 切到这一项才会挂载
+    { key: 'reports',   label: 'Reports',   content: <Reports /> },
+  ]}
+/>`}>
+  <Tabs
+    aria-label="Lazy demo"
+    isLazy
+    defaultSelectedKey="overview"
+    items={[
+      { key: 'overview', label: 'Overview', content: 'Overview 已挂载。' },
+      { key: 'analytics', label: 'Analytics', content: '切到这一项才挂载。' },
+      { key: 'reports', label: 'Reports', content: '同上 —— 按需挂载。' },
+    ]}
+  />
+</LiveDemo>
+
+## API
+
+### TabsProps
+
+<PropsTable props={[
+  { name: 'items', type: 'ReadonlyArray<TabItem>', description: '数据驱动的 tab 列表（优先级高于 children）。' },
+  { name: 'children', type: 'ReactNode', description: '声明式：`<Tab itemKey>` + `<TabPanel itemKey>`。' },
+  { name: 'selectedKey', type: 'string', description: '受控选中 key。' },
+  { name: 'defaultSelectedKey', type: 'string', description: '非受控初始 key。未提供时取第一个非 disabled。' },
+  { name: 'onSelectionChange', type: '(key: string) => void' },
+  { name: 'variant', type: "'underline' | 'pills' | 'bordered'", default: "'underline'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
+  { name: 'isLazy', type: 'boolean', default: 'false', description: '只挂载激活的 panel。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '整体禁用。' },
+  { name: 'disabledKeys', type: 'ReadonlyArray<string>', description: '按 key 单独禁用。' },
+  { name: 'aria-label', type: 'string', description: '当 tablist 缺乏可见标签时必填。' },
+  { name: 'aria-labelledby', type: 'string', description: '指向页面上的可见标题元素。' }
+]} />
+
+### TabItem（数据驱动）
+
+<PropsTable props={[
+  { name: 'key', type: 'string', description: '唯一 key，用于受控选中。' },
+  { name: 'label', type: 'ReactNode', description: '标签内容。' },
+  { name: 'icon', type: 'ReactNode', description: '前置图标。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'content', type: 'ReactNode', description: '该 tab 对应的 panel 内容。' }
+]} />
+
+### TabProps（声明式）
+
+<PropsTable props={[
+  { name: 'itemKey', type: 'string', description: '真正参与选择的 key（避开 React `key` 冲突）。' },
+  { name: 'label', type: 'ReactNode' },
+  { name: 'icon', type: 'ReactNode' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'children', type: 'ReactNode', description: '内嵌 `<TabPanel>` 或直接的 panel 内容（约定式简写）。' }
+]} />
+
+### TabPanelProps
+
+<PropsTable props={[
+  { name: 'itemKey', type: 'string', description: '与 `<Tab itemKey>` 一致。' },
+  { name: 'children', type: 'ReactNode' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  Tabs 渲染原生 `role="tablist"` + `role="tab"` + `role="tabpanel"`，并实现 roving tabindex：方向键切换（横向 `←` `→`，纵向 `↑` `↓`）、`Home` / `End` 跳首尾、自动跳过 disabled。indicator 滑动遵循 `prefers-reduced-motion`。当容器没有可见标题时，请通过 `aria-label` 或 `aria-labelledby` 给 tablist 命名。
+</Callout>

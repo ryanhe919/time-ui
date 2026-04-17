@@ -1,0 +1,143 @@
+# Pagination
+
+Page navigation that derives its layout from `total` + `pageSize` and renders the collapsed page list. Three forms — `default`, `simple`, `mini` — plus optional jumper and page-size selector.
+
+<Callout variant="info" title="Controlled vs uncontrolled">
+  Pass `page` + `onChange` for the controlled form, or `defaultPage` for uncontrolled. **Pagination doesn't slice your data** — it tells you the current page and `pageSize`; fetching or slicing the corresponding rows is on you (see "Pairing with Table" below for the canonical pattern).
+</Callout>
+
+## Interactive demo ← try it
+
+Click any page number, prev, or next.
+
+<LiveDemo code={`import { useState } from 'react';
+import { Pagination } from '@timeui/react';
+
+export function Demo() {
+  const [page, setPage] = useState(1);
+  return <Pagination total={87} pageSize={10} page={page} onChange={setPage} />;
+}`}>
+  <PaginationBasicDemo />
+</LiveDemo>
+
+## Variants
+
+`default` shows full page numbers + chevrons. `simple` shows a compact `current / total` summary with chevrons. `mini` is `simple` locked to `sm` size — perfect for card footers and sidebars.
+
+<LiveDemo code={`<Stack spacing={20}>
+  <Pagination variant="default" total={120} defaultPage={3} />
+  <Pagination variant="simple"  total={120} defaultPage={3} />
+  <Pagination variant="mini"    total={120} defaultPage={3} />
+</Stack>`}>
+  <Stack spacing={20}>
+    <Pagination variant="default" total={120} defaultPage={3} />
+    <Pagination variant="simple" total={120} defaultPage={3} />
+    <Pagination variant="mini" total={120} defaultPage={3} />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+`sm` / `md` (default) / `lg` adjust button height and font size. The `mini` variant always uses `sm`.
+
+<LiveDemo code={`<Stack spacing={16}>
+  <Pagination size="sm" total={120} defaultPage={2} />
+  <Pagination size="md" total={120} defaultPage={2} />
+  <Pagination size="lg" total={120} defaultPage={2} />
+</Stack>`}>
+  <Stack spacing={16}>
+    <Pagination size="sm" total={120} defaultPage={2} />
+    <Pagination size="md" total={120} defaultPage={2} />
+    <Pagination size="lg" total={120} defaultPage={2} />
+  </Stack>
+</LiveDemo>
+
+## siblingCount
+
+Number of page buttons rendered on **either side** of the current page, default `1`. A higher value reduces ellipses and reveals more direct jumps.
+
+<LiveDemo code={`<Stack spacing={16}>
+  <Pagination total={500} defaultPage={12} siblingCount={0} />
+  <Pagination total={500} defaultPage={12} siblingCount={1} />
+  <Pagination total={500} defaultPage={12} siblingCount={2} />
+</Stack>`}>
+  <Stack spacing={16}>
+    <Pagination total={500} defaultPage={12} siblingCount={0} />
+    <Pagination total={500} defaultPage={12} siblingCount={1} />
+    <Pagination total={500} defaultPage={12} siblingCount={2} />
+  </Stack>
+</LiveDemo>
+
+## Quick jumper
+
+`showQuickJumper` adds a numeric input — press <kbd>Enter</kbd> to jump (the value is clamped to `[1, totalPages]`).
+
+<LiveDemo code={`<Pagination total={500} defaultPage={1} showQuickJumper />`}>
+  <Pagination total={500} defaultPage={1} showQuickJumper />
+</LiveDemo>
+
+## Page-size changer
+
+Switching `pageSize` resets `page` to `1` to avoid landing on an out-of-range page. Customize the choices via `pageSizeOptions` (defaults to `[10, 20, 50, 100]`).
+
+<LiveDemo code={`import { useState } from 'react';
+import { Pagination } from '@timeui/react';
+
+export function Demo() {
+  const [page, setPage] = useState(3);
+  const [pageSize, setPageSize] = useState(20);
+  return (
+    <Pagination
+      total={248}
+      page={page}
+      pageSize={pageSize}
+      onChange={setPage}
+      onPageSizeChange={(n) => { setPageSize(n); setPage(1); }}
+      showSizeChanger
+      showQuickJumper
+      pageSizeOptions={[10, 20, 50, 100]}
+    />
+  );
+}`}>
+  <PaginationFullDemo />
+</LiveDemo>
+
+## Hiding chevrons
+
+`hideControls` drops the prev/next arrows when horizontal space is tight (card footers, narrow sidebars).
+
+<LiveDemo code={`<Pagination total={120} defaultPage={2} hideControls />`}>
+  <Pagination total={120} defaultPage={2} hideControls />
+</LiveDemo>
+
+## Disabled
+
+<LiveDemo code={`<Pagination total={120} defaultPage={3} isDisabled />`}>
+  <Pagination total={120} defaultPage={3} isDisabled />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'total', type: 'number', required: true, description: 'Total item count (required). totalPages = `ceil(total / pageSize)`.' },
+  { name: 'page', type: 'number', description: 'Controlled current page (1-based).' },
+  { name: 'defaultPage', type: 'number', default: '1', description: 'Uncontrolled initial page.' },
+  { name: 'onChange', type: '(page: number) => void' },
+  { name: 'pageSize', type: 'number', description: 'Controlled page size.' },
+  { name: 'defaultPageSize', type: 'number', default: '10' },
+  { name: 'onPageSizeChange', type: '(pageSize: number) => void' },
+  { name: 'pageSizeOptions', type: 'ReadonlyArray<number>', default: '[10, 20, 50, 100]' },
+  { name: 'variant', type: "'default' | 'simple' | 'mini'", default: "'default'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'mini variant forces sm.' },
+  { name: 'siblingCount', type: 'number', default: '1', description: 'Pages rendered on each side of the current page.' },
+  { name: 'showQuickJumper', type: 'boolean', default: 'false' },
+  { name: 'showSizeChanger', type: 'boolean', default: 'false' },
+  { name: 'hideControls', type: 'boolean', default: 'false', description: 'Hide the prev/next arrows.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'labels', type: 'PaginationLabels', description: 'i18n strings (prev / next / jumperLabel / sizeChangerLabel / summary).' },
+  { name: 'aria-label', type: 'string', description: 'Renders `<nav aria-label>`. Set explicitly when multiple paginators share a page.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The root is a `<nav>`. The active page button carries `aria-current="page"`; each page button is labeled `aria-label="Page {n}"`. Prev/next become `disabled` at the boundaries. Hover transitions honor `prefers-reduced-motion`.
+</Callout>

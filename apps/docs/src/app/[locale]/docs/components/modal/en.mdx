@@ -1,0 +1,160 @@
+# Modal
+
+A centered modal dialog: focus trap + body scroll lock + Esc dismissal + overlay click-out + return focus on close. Portaled into `<body>`, with a saturate(180%) blurred-glass overlay. Five width steps (`sm` / `md` / `lg` / `xl` / `full`) and two scroll behaviours (`inside` / `outside`).
+
+<Callout variant="info" title="Modal vs. Drawer vs. Popover">
+  - **Modal** — interrupts the current task to demand confirmation or critical input. Locks body scroll and traps focus.
+  - **Drawer** — a parallel side panel (settings, details) you observe alongside the main flow.
+  - **Popover** — a lightweight, anchor-positioned overlay (menu, hint card).
+</Callout>
+
+## Interactive demo ← try it
+
+Click the button below to open a Modal with a title and a footer. Press <kbd>Esc</kbd>, click the close icon in the corner, or click the overlay to dismiss. Focus returns to the trigger button on close.
+
+<LiveDemo code={`import { useState } from 'react';
+import { Modal, Button } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open modal</Button>
+      <Modal
+        isOpen={open}
+        onOpenChange={setOpen}
+        title="Update available"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setOpen(false)}>Later</Button>
+            <Button onClick={() => setOpen(false)}>Install</Button>
+          </>
+        }
+      >
+        TimeUI 1.4 is ready to install. Do you want to install it now?
+      </Modal>
+    </>
+  );
+}`}>
+  <ModalBasicDemo />
+</LiveDemo>
+
+## Sizes
+
+`sm` 420 px / `md` 560 px (default) / `lg` 720 px / `xl` 960 px / `full` viewport-spanning (with a 16 px gutter). Every size is bounded by `max-width: calc(100vw - 32px)` and `max-height: calc(100vh - 64px)`, so nothing overflows on small viewports.
+
+<LiveDemo code={`<Flex gap={8}>
+  <Button onClick={openSm}>size = sm</Button>
+  <Button onClick={openMd}>size = md</Button>
+  <Button onClick={openLg}>size = lg</Button>
+  <Button onClick={openXl}>size = xl</Button>
+  <Button onClick={openFull}>size = full</Button>
+</Flex>`}>
+  <ModalSizesDemo />
+</LiveDemo>
+
+## Compound usage
+
+Beyond the convenience `title` / `footer` props, you can split the body into the semantic `<ModalHeader>` / `<ModalBody>` / `<ModalFooter>` subcomponents — same default tokens, but you're free to drop in icons, subtitles, or rich form controls. **Note**: don't combine `<ModalHeader>` with the top-level `title` prop; both will render.
+
+```tsx
+<Modal isOpen={open} onOpenChange={setOpen}>
+  <ModalHeader>Compose message</ModalHeader>
+  <ModalBody>
+    <Input placeholder="Subject" />
+    <Textarea placeholder="Body" rows={5} />
+  </ModalBody>
+  <ModalFooter>
+    <Button variant="ghost">Cancel</Button>
+    <Button>Send</Button>
+  </ModalFooter>
+</Modal>
+```
+
+## Dismissal behaviour
+
+- `closeOnEsc` (default `true`) — Esc closes the dialog.
+- `closeOnOverlayClick` (default `true`) — clicking the translucent overlay closes the dialog.
+- `showCloseButton` (default `true`) — a 32×32 close icon in the top-right with a hover background and a `focus-visible` outline.
+
+Disable all three to get a **forced-flow** dialog that can only be dismissed via the buttons you provide ("I agree" etc.) — useful for one-off compliance acknowledgement.
+
+```tsx
+<Modal
+  isOpen={open}
+  onOpenChange={setOpen}
+  closeOnEsc={false}
+  closeOnOverlayClick={false}
+  showCloseButton={false}
+  title="Terms updated"
+  footer={<Button onClick={() => setOpen(false)}>I agree</Button>}
+>
+  We have updated our Terms of Service. You must agree to continue.
+</Modal>
+```
+
+## Scroll behaviour
+
+- **`inside`** (default) — total panel height is bounded by `max-height`; header and footer stay pinned, **only the body scrolls**. Best for long forms or long copy.
+- **`outside`** — the entire panel scrolls with the page (panel height is content-driven). Best for shorter, page-like content.
+
+```tsx
+<Modal scrollBehavior="inside" title="Release notes">
+  {/* header / footer pinned, body scrolls with a custom scrollbar */}
+  <p>{longText}</p>
+</Modal>
+
+<Modal scrollBehavior="outside" title="Release notes">
+  {/* whole panel scrolls */}
+  <p>{longText}</p>
+</Modal>
+```
+
+## API
+
+### Modal
+
+<PropsTable props={[
+  { name: 'isOpen', type: 'boolean', description: 'Controlled open state.' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width preset — 420 / 560 / 720 / 960 / `calc(100vw - 32px)`.' },
+  { name: 'scrollBehavior', type: "'inside' | 'outside'", default: "'inside'", description: '`inside` scrolls the body; `outside` scrolls the whole panel.' },
+  { name: 'title', type: 'ReactNode', description: 'Convenience header title; also wires `aria-labelledby` to its id.' },
+  { name: 'footer', type: 'ReactNode | false', description: 'Footer area. Pass `false` to explicitly hide the footer.' },
+  { name: 'showCloseButton', type: 'boolean', default: 'true' },
+  { name: 'closeOnEsc', type: 'boolean', default: 'true' },
+  { name: 'closeOnOverlayClick', type: 'boolean', default: 'true' },
+  { name: 'blockScrollOnMount', type: 'boolean', default: 'true', description: 'Lock `body` scroll while the dialog is open.' },
+  { name: 'autoFocus', type: 'boolean', default: 'true', description: 'Focus the first focusable element inside the panel on open. When `false`, the panel itself receives focus.' },
+  { name: 'returnFocusOnClose', type: 'boolean', default: 'true', description: 'Return focus to the previously focused element on close.' },
+  { name: 'children', type: 'ReactNode', description: 'Modal body content.' },
+  { name: 'className', type: 'string' },
+  { name: 'style', type: 'CSSProperties' },
+  { name: 'id', type: 'string' },
+  { name: 'aria-label', type: 'string', description: 'Provide an accessible name when neither `title` nor `aria-labelledby` is supplied.' },
+  { name: 'aria-labelledby', type: 'string' },
+  { name: 'aria-describedby', type: 'string' }
+]} />
+
+### ModalHeader / ModalBody / ModalFooter
+
+All three share the same signature and accept `children` / `className` / `id`. `ModalHeader` renders as an `<h2>`; `ModalFooter` lays out children with `flex` + `justify-content: flex-end` + a default gap.
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode' },
+  { name: 'className', type: 'string' },
+  { name: 'id', type: 'string' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The panel is `role="dialog"` + `aria-modal="true"`; supplying `title` automatically sets `aria-labelledby` to its element. While open, Tab / Shift+Tab cycles within the panel (focus trap), body scroll is locked, and focus returns to the previously focused element on close. Under `prefers-reduced-motion` the panel transition collapses to a simple fade.
+</Callout>
+
+## Best practices
+
+- **Use a Modal** for irreversible actions, confirmations, or focused side-flows (creating an item, confirming a delete, signing in). Modals interrupt — make sure the user notices the change of context.
+- **Use a Drawer** when the user wants to edit details while still seeing the surrounding context (e.g. the right-hand inspector in a three-column layout).
+- **Use a Popover** for trigger-attached lightweight overlays (menus, share sheets, notifications).
+- Two simultaneous Modals is an anti-pattern — fold the second into the first or move to a multi-step form.
+- Keep one clear focus target inside complex Modals. By default `autoFocus` lands on the first focusable element, so avoid surprise inputs in the body.

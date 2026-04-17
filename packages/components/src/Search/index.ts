@@ -6,3 +6,6 @@
 
 export { Search } from './Search';
 export type { SearchProps, SearchSize, SearchVariant } from './Search';
+
+export { SearchDialog } from './SearchDialog';
+export type { SearchDialogProps, SearchDialogItem, SearchDialogSection } from './Search.types';

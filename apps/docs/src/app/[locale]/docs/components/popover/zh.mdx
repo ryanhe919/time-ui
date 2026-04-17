@@ -1,0 +1,138 @@
+# 浮层 Popover
+
+基于 anchor 的浮层容器：12 种 placement、四种触发方式（click / hover / focus / manual）、Portal 渲染、自带 header / footer / 箭头与 ESC + 外部点击关闭。受控 / 非受控双轨，定位在 fixed 层并随滚动 / 调整窗口同步。
+
+<Callout variant="info" title="Popover 还是 Tooltip？">
+  Popover 承载**富内容**（表单、按钮、链接列表）；面板可以被聚焦、可以点击、有 header / footer。Tooltip 只是**反色质感的纯文本提示**，`pointer-events: none`，触摸屏不显示。需要"鼠标悬停 → 一句话说明"用 Tooltip；需要"点击展开一个小卡片"用 Popover。
+</Callout>
+
+## 交互示例 ← 点击试试
+
+点击下方按钮打开一个带 header + footer 的 Popover。按 `Esc` 或点击 popover 之外的区域可以关闭。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Popover, Button } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover
+      isOpen={open}
+      onOpenChange={setOpen}
+      placement="bottom"
+      header="Share this page"
+      footer={<Button onClick={() => setOpen(false)}>Copy link</Button>}
+      anchor={<Button>Open popover</Button>}
+    >
+      Anyone with the link can view this page.
+    </Popover>
+  );
+}`}>
+  <PopoverDemo />
+</LiveDemo>
+
+## 基础用法
+
+`anchor` 接收一个 `ReactElement` 或 render-prop。组件会通过 `cloneElement` 注入 `ref` 与对应触发模式的事件，原有的 `onClick` / `onMouseEnter` 等会被保留并合并调用。
+
+<LiveDemo code={`<Popover anchor={<Button>Open</Button>}>
+  Hello, popover.
+</Popover>`}>
+  <Popover anchor={<Button>Open</Button>}>Hello, popover.</Popover>
+</LiveDemo>
+
+## 触发方式 trigger
+
+`click`（默认）/ `hover` / `focus` / `manual` 四种。`manual` 模式下完全靠 `isOpen` 受控，组件不再监听 anchor 上的任何事件。
+
+<LiveDemo code={`<Flex gap={12}>
+  <Popover trigger="click" anchor={<Button>Click</Button>}>By click</Popover>
+  <Popover trigger="hover" anchor={<Button>Hover</Button>}>By hover</Popover>
+  <Popover trigger="focus" anchor={<Button>Focus</Button>}>By focus</Popover>
+</Flex>`}>
+  <Flex gap={12}>
+    <Popover trigger="click" anchor={<Button>Click</Button>}>By click</Popover>
+    <Popover trigger="hover" anchor={<Button>Hover</Button>}>By hover</Popover>
+    <Popover trigger="focus" anchor={<Button>Focus</Button>}>By focus</Popover>
+  </Flex>
+</LiveDemo>
+
+## 方位 placement
+
+12 种 placement：`top` / `bottom` / `left` / `right` 四个主方向，每个方向再带 `-start` / `-end` 对齐变体。点击下面网格中任意一个按钮，可以看到弹层落到对应方向。
+
+<LiveDemo code={`<Popover placement="top-start" anchor={<Button>top-start</Button>}>...</Popover>
+<Popover placement="top" anchor={<Button>top</Button>}>...</Popover>
+<Popover placement="top-end" anchor={<Button>top-end</Button>}>...</Popover>
+{/* 共 12 种，省略 */}`}>
+  <PopoverPlacementDemo />
+</LiveDemo>
+
+## 带 header / footer
+
+`header` 在面板顶部渲染加粗标题；`footer` 在底部渲染次级文字 / 按钮区。两者都可选。`header` 自动写入 `aria-labelledby`，让屏幕阅读器朗读弹层标题。
+
+<LiveDemo code={`<Popover
+  header="Notifications"
+  footer={<a>查看全部 →</a>}
+  anchor={<Button>Inbox</Button>}
+>
+  你有 3 条新通知。
+</Popover>`}>
+  <Popover
+    header="Notifications"
+    footer={<a>查看全部 →</a>}
+    anchor={<Button>Inbox</Button>}
+  >
+    你有 3 条新通知。
+  </Popover>
+</LiveDemo>
+
+## 箭头开关 withArrow
+
+默认 `withArrow={true}`，会在面板贴近 anchor 的一边渲染一个 8px 旋转方块作为视觉引导。设为 `false` 移除箭头，常用于"卡片式" popover。
+
+<LiveDemo code={`<Flex gap={16}>
+  <Popover withArrow anchor={<Button>With arrow</Button>}>带箭头</Popover>
+  <Popover withArrow={false} anchor={<Button>No arrow</Button>}>无箭头</Popover>
+</Flex>`}>
+  <Flex gap={16}>
+    <Popover withArrow anchor={<Button>With arrow</Button>}>带箭头</Popover>
+    <Popover withArrow={false} anchor={<Button>No arrow</Button>}>无箭头</Popover>
+  </Flex>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'anchor', type: 'ReactElement | ((opts: { isOpen, ref }) => ReactNode)', description: '触发器（必填）。ReactElement 会被 cloneElement 注入 ref + 事件；render-prop 形式则由你自行 spread `ref`。' },
+  { name: 'children', type: 'ReactNode', description: 'Popover body 内容。' },
+  { name: 'isOpen', type: 'boolean', description: '受控开关。' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: '非受控初始开关。' },
+  { name: 'onOpenChange', type: '(open: boolean) => void', description: '开关变化回调。' },
+  { name: 'trigger', type: "'click' | 'hover' | 'focus' | 'manual'", default: "'click'" },
+  { name: 'placement', type: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'", default: "'bottom'" },
+  { name: 'offset', type: 'number', description: 'anchor 与面板之间的像素间距。默认读 `theme.components.popover.offset`（8）。' },
+  { name: 'withArrow', type: 'boolean', default: 'true', description: '是否渲染箭头。' },
+  { name: 'closeOnBlur', type: 'boolean', default: 'true', description: '点击 anchor / panel 之外是否关闭。' },
+  { name: 'closeOnEsc', type: 'boolean', default: 'true', description: '按 Esc 是否关闭。' },
+  { name: 'header', type: 'ReactNode', description: '顶部 header slot；提供时会自动 `aria-labelledby` 关联。' },
+  { name: 'footer', type: 'ReactNode', description: '底部 footer slot。' },
+  { name: 'openDelay', type: 'number', default: '0', description: 'hover 触发的进入延迟（ms）。' },
+  { name: 'closeDelay', type: 'number', default: '100', description: 'hover 触发的离开延迟（ms）；鼠标进入 panel 会取消该计时器。' },
+  { name: 'className', type: 'string', description: '透传到 panel。' },
+  { name: 'style', type: 'CSSProperties', description: '透传到 panel；定位 top/left 由组件计算后注入，请勿覆盖。' },
+  { name: 'id', type: 'string', description: '自定义 panel id。' },
+  { name: 'aria-label', type: 'string', description: '在没有 header 的纯 body 场景下提供可访问名。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  click 触发时 anchor 自动获得 `aria-haspopup="dialog"` + `aria-expanded` + `aria-controls`；hover 触发时面板 `role="tooltip"`，其它情况 `role="dialog"`。`closeOnEsc` 同时挂在 `window` keydown 与 panel 内部 keydown 上，焦点无论在 anchor 还是 panel 都能响应。`prefers-reduced-motion` 下取消入场动画。
+</Callout>
+
+## 最佳实践
+
+- 浮层内放**复杂交互**（含输入框 / 多个按钮）时使用 `trigger="click"`，避免 hover 抖动。
+- 给纯展示性的 anchor 用 `trigger="hover"` 时记得给 anchor 一个聚焦态（如 `<button>`）以保证键盘可达。
+- 不要在 popover 里嵌套另一个 popover；如果需要多层级，请用 Modal 承载。
+- 需要"组件外部命令式打开"时使用 `trigger="manual"` + `isOpen` 受控；`closeOnEsc` 与 `closeOnBlur` 在 manual 模式下被禁用，关闭逻辑完全交给消费者。

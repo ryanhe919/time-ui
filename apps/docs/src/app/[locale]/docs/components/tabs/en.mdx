@@ -1,0 +1,332 @@
+# Tabs
+
+Group related panels behind a row of selectable headers. Ships with three visual variants — `underline`, `pills`, `bordered` — in horizontal or vertical orientation. Supports both a declarative API (`<Tab>` + `<TabPanel>`) and a data-driven API (`items={[...]}`).
+
+<Callout variant="info" title="Tabs vs SegmentedControl">
+  Tabs are **navigation** semantics (`role="tablist"` + `role="tabpanel"`) — switching between panels of pre-existing content. For a one-of-many choice inside a form, reach for [`SegmentedControl`](/docs/components/segmented-control) instead — it has `radiogroup` semantics and participates in form submission. Tabs switch a **panel**; SegmentedControl switches a **value**.
+</Callout>
+
+## Basic usage
+
+The declarative form: each `<Tab itemKey>` wraps a `<TabPanel>` describing what that tab shows.
+
+<LiveDemo code={`<Tabs aria-label="Repository" defaultSelectedKey="readme">
+  <Tab itemKey="readme" label="README">
+    <TabPanel itemKey="readme">Project documentation.</TabPanel>
+  </Tab>
+  <Tab itemKey="issues" label="Issues">
+    <TabPanel itemKey="issues">Filed bugs and requests.</TabPanel>
+  </Tab>
+  <Tab itemKey="prs" label="Pull requests">
+    <TabPanel itemKey="prs">Open code reviews.</TabPanel>
+  </Tab>
+</Tabs>`}>
+  <div style={{ width: '100%', maxWidth: 480 }}>
+    <Tabs aria-label="Repository" defaultSelectedKey="readme">
+      <Tab itemKey="readme" label="README">
+        <TabPanel itemKey="readme">Project documentation.</TabPanel>
+      </Tab>
+      <Tab itemKey="issues" label="Issues">
+        <TabPanel itemKey="issues">Filed bugs and requests.</TabPanel>
+      </Tab>
+      <Tab itemKey="prs" label="Pull requests">
+        <TabPanel itemKey="prs">Open code reviews.</TabPanel>
+      </Tab>
+    </Tabs>
+  </div>
+</LiveDemo>
+
+## Data-driven items
+
+Pass an `items` array when the tabs come from data — it wins over `children`.
+
+<LiveDemo code={`<Tabs
+  aria-label="Account settings"
+  defaultSelectedKey="profile"
+  items={[
+    { key: 'profile',  label: 'Profile',  content: <p>Profile panel.</p> },
+    { key: 'security', label: 'Security', content: <p>Security panel.</p> },
+    { key: 'billing',  label: 'Billing',  content: <p>Billing panel.</p> },
+  ]}
+/>`}>
+  <TabsBasicDemo />
+</LiveDemo>
+
+## Variants
+
+`underline` (default) — a sliding hairline indicator. `pills` — pill-shaped selection inspired by macOS segmented controls. `bordered` — surrounds the panel with a hairline frame, useful when the panel stands on its own.
+
+<LiveDemo code={`<Stack spacing={24}>
+  <Tabs aria-label="underline" variant="underline" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'Overview' }, { key: 'b', label: 'Activity' }, { key: 'c', label: 'Settings' }]} />
+  <Tabs aria-label="pills" variant="pills" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'Overview' }, { key: 'b', label: 'Activity' }, { key: 'c', label: 'Settings' }]} />
+  <Tabs aria-label="bordered" variant="bordered" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'Overview', content: 'Overview content' }, { key: 'b', label: 'Activity', content: 'Activity content' }, { key: 'c', label: 'Settings', content: 'Settings content' }]} />
+</Stack>`}>
+  <Stack spacing={24}>
+    <Tabs
+      aria-label="underline"
+      variant="underline"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'Overview' },
+        { key: 'b', label: 'Activity' },
+        { key: 'c', label: 'Settings' },
+      ]}
+    />
+    <Tabs
+      aria-label="pills"
+      variant="pills"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'Overview' },
+        { key: 'b', label: 'Activity' },
+        { key: 'c', label: 'Settings' },
+      ]}
+    />
+    <Tabs
+      aria-label="bordered"
+      variant="bordered"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'Overview', content: 'Overview content' },
+        { key: 'b', label: 'Activity', content: 'Activity content' },
+        { key: 'c', label: 'Settings', content: 'Settings content' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+`sm` / `md` (default) / `lg` adjust font size, tab height, and icon size.
+
+<LiveDemo code={`<Stack spacing={20}>
+  <Tabs size="sm" aria-label="sm" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+  <Tabs size="md" aria-label="md" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+  <Tabs size="lg" aria-label="lg" defaultSelectedKey="a"
+    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+</Stack>`}>
+  <Stack spacing={20}>
+    <Tabs
+      size="sm"
+      aria-label="sm"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'One' },
+        { key: 'b', label: 'Two' },
+        { key: 'c', label: 'Three' },
+      ]}
+    />
+    <Tabs
+      size="md"
+      aria-label="md"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'One' },
+        { key: 'b', label: 'Two' },
+        { key: 'c', label: 'Three' },
+      ]}
+    />
+    <Tabs
+      size="lg"
+      aria-label="lg"
+      defaultSelectedKey="a"
+      items={[
+        { key: 'a', label: 'One' },
+        { key: 'b', label: 'Two' },
+        { key: 'c', label: 'Three' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## Vertical orientation
+
+`orientation="vertical"` is the canonical "settings sidebar + main panel" layout. Keyboard navigation switches to `↑` / `↓`.
+
+<LiveDemo code={`<Tabs
+  aria-label="Settings nav"
+  orientation="vertical"
+  variant="bordered"
+  defaultSelectedKey="profile"
+  items={[
+    { key: 'profile',  label: 'Profile',  content: 'Profile panel.' },
+    { key: 'team',     label: 'Team',     content: 'Team management panel.' },
+    { key: 'security', label: 'Security', content: 'Security panel.' },
+    { key: 'billing',  label: 'Billing',  content: 'Billing panel.' },
+  ]}
+/>`}>
+  <div style={{ width: '100%', maxWidth: 520 }}>
+    <Tabs
+      aria-label="Settings nav"
+      orientation="vertical"
+      variant="bordered"
+      defaultSelectedKey="profile"
+      items={[
+        { key: 'profile', label: 'Profile', content: 'Profile panel.' },
+        { key: 'team', label: 'Team', content: 'Team management panel.' },
+        { key: 'security', label: 'Security', content: 'Security panel.' },
+        { key: 'billing', label: 'Billing', content: 'Billing panel.' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## Icons
+
+Pass `icon` per tab to render a leading glyph next to the label.
+
+<LiveDemo code={`<Tabs aria-label="View" variant="pills" defaultSelectedKey="grid"
+  items={[
+    { key: 'list', label: 'List', icon: <ListIcon /> },
+    { key: 'grid', label: 'Grid', icon: <GridIcon /> },
+    { key: 'kanban', label: 'Kanban', icon: <KanbanIcon /> },
+  ]}
+/>`}>
+  <Tabs
+    aria-label="View"
+    variant="pills"
+    defaultSelectedKey="grid"
+    items={[
+      {
+        key: 'list',
+        label: 'List',
+        icon: (
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+            <path d="M3 4h10M3 8h10M3 12h10" />
+          </svg>
+        ),
+      },
+      {
+        key: 'grid',
+        label: 'Grid',
+        icon: (
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <rect x="2.5" y="2.5" width="4.5" height="4.5" rx="0.6" />
+            <rect x="9" y="2.5" width="4.5" height="4.5" rx="0.6" />
+            <rect x="2.5" y="9" width="4.5" height="4.5" rx="0.6" />
+            <rect x="9" y="9" width="4.5" height="4.5" rx="0.6" />
+          </svg>
+        ),
+      },
+      {
+        key: 'kanban',
+        label: 'Kanban',
+        icon: (
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <rect x="2.5" y="2.5" width="3" height="11" rx="0.6" />
+            <rect x="6.5" y="2.5" width="3" height="7" rx="0.6" />
+            <rect x="10.5" y="2.5" width="3" height="9" rx="0.6" />
+          </svg>
+        ),
+      },
+    ]}
+  />
+</LiveDemo>
+
+## Disabling tabs
+
+`isDisabled` disables the whole control; `disabledKeys` disables specific tabs and arrow-key navigation skips them automatically.
+
+<LiveDemo code={`<Tabs
+  aria-label="Plan"
+  defaultSelectedKey="free"
+  disabledKeys={['team']}
+  items={[
+    { key: 'free',  label: 'Free' },
+    { key: 'pro',   label: 'Pro' },
+    { key: 'team',  label: 'Team (coming soon)' },
+  ]}
+/>`}>
+  <Tabs
+    aria-label="Plan"
+    defaultSelectedKey="free"
+    disabledKeys={['team']}
+    items={[
+      { key: 'free', label: 'Free' },
+      { key: 'pro', label: 'Pro' },
+      { key: 'team', label: 'Team (coming soon)' },
+    ]}
+  />
+</LiveDemo>
+
+## Lazy panels
+
+With `isLazy`, only the active panel is mounted — others mount on first activation. Useful for heavy dashboards or panels that fetch on demand.
+
+<LiveDemo code={`<Tabs
+  aria-label="Dashboard"
+  isLazy
+  defaultSelectedKey="overview"
+  items={[
+    { key: 'overview',  label: 'Overview',  content: <Overview /> },
+    { key: 'analytics', label: 'Analytics', content: <Analytics /> },  // mounts only when first selected
+    { key: 'reports',   label: 'Reports',   content: <Reports /> },
+  ]}
+/>`}>
+  <Tabs
+    aria-label="Lazy demo"
+    isLazy
+    defaultSelectedKey="overview"
+    items={[
+      { key: 'overview', label: 'Overview', content: 'Overview is mounted.' },
+      { key: 'analytics', label: 'Analytics', content: 'This panel mounts when first selected.' },
+      { key: 'reports', label: 'Reports', content: 'Same — mounted on demand.' },
+    ]}
+  />
+</LiveDemo>
+
+## API
+
+### TabsProps
+
+<PropsTable props={[
+  { name: 'items', type: 'ReadonlyArray<TabItem>', description: 'Data-driven tab list (wins over children).' },
+  { name: 'children', type: 'ReactNode', description: 'Declarative: `<Tab itemKey>` + `<TabPanel itemKey>`.' },
+  { name: 'selectedKey', type: 'string', description: 'Controlled key.' },
+  { name: 'defaultSelectedKey', type: 'string', description: 'Uncontrolled initial key. Falls back to the first non-disabled tab.' },
+  { name: 'onSelectionChange', type: '(key: string) => void' },
+  { name: 'variant', type: "'underline' | 'pills' | 'bordered'", default: "'underline'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
+  { name: 'isLazy', type: 'boolean', default: 'false', description: 'Only mount the active panel.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the entire control.' },
+  { name: 'disabledKeys', type: 'ReadonlyArray<string>', description: 'Disable specific tabs by key.' },
+  { name: 'aria-label', type: 'string', description: 'Required when no visible label labels the tablist.' },
+  { name: 'aria-labelledby', type: 'string', description: 'IDREF of a visible heading.' }
+]} />
+
+### TabItem (data-driven)
+
+<PropsTable props={[
+  { name: 'key', type: 'string', description: 'Unique key for selection.' },
+  { name: 'label', type: 'ReactNode', description: 'Tab label.' },
+  { name: 'icon', type: 'ReactNode', description: 'Leading icon.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'content', type: 'ReactNode', description: 'Panel content for this tab.' }
+]} />
+
+### TabProps (declarative)
+
+<PropsTable props={[
+  { name: 'itemKey', type: 'string', description: 'The actual selection key (avoid colliding with React `key`).' },
+  { name: 'label', type: 'ReactNode' },
+  { name: 'icon', type: 'ReactNode' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'children', type: 'ReactNode', description: 'Either a nested `<TabPanel>` or panel content directly (shorthand).' }
+]} />
+
+### TabPanelProps
+
+<PropsTable props={[
+  { name: 'itemKey', type: 'string', description: 'Must match its parent `<Tab itemKey>`.' },
+  { name: 'children', type: 'ReactNode' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Renders native `role="tablist"` + `role="tab"` + `role="tabpanel"` with roving tabindex: arrow keys (`←` `→` horizontal, `↑` `↓` vertical) move selection, `Home` / `End` jump to ends, and disabled tabs are skipped. The sliding indicator honors `prefers-reduced-motion`. Always label the tablist via `aria-label` or `aria-labelledby` when there's no visible heading.
+</Callout>

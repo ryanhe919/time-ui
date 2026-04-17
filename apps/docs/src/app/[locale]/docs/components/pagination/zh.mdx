@@ -1,0 +1,143 @@
+# 分页 Pagination
+
+页码导航：根据 `total` + `pageSize` 自动计算总页数，并渲染折叠后的页码列表。提供 `default` / `simple` / `mini` 三种形态，以及可选的页码跳转输入和每页条数切换。
+
+<Callout variant="info" title="受控/非受控">
+  传 `page` + `onChange` 即受控；传 `defaultPage` 即非受控。**Pagination 不会自动从数据源切片**，它只负责告诉你当前页号和 pageSize —— 真实的"取这一页的数据"由消费方完成（典型做法见下方"与 Table 配合"）。
+</Callout>
+
+## 交互示例 ← 试试
+
+点击页码 / 上下页按钮即时切换。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Pagination } from '@timeui/react';
+
+export function Demo() {
+  const [page, setPage] = useState(1);
+  return <Pagination total={87} pageSize={10} page={page} onChange={setPage} />;
+}`}>
+  <PaginationBasicDemo />
+</LiveDemo>
+
+## 三种 variant
+
+`default`—— 完整页码 + 上下页；`simple`—— 仅显示 `当前 / 总数` 摘要 + 上下页；`mini`—— 同 simple 但强制 `sm` 尺寸，常用于卡片底部或边栏。
+
+<LiveDemo code={`<Stack spacing={20}>
+  <Pagination variant="default" total={120} defaultPage={3} />
+  <Pagination variant="simple"  total={120} defaultPage={3} />
+  <Pagination variant="mini"    total={120} defaultPage={3} />
+</Stack>`}>
+  <Stack spacing={20}>
+    <Pagination variant="default" total={120} defaultPage={3} />
+    <Pagination variant="simple" total={120} defaultPage={3} />
+    <Pagination variant="mini" total={120} defaultPage={3} />
+  </Stack>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+`sm` / `md`（默认）/ `lg`，影响按钮高度与字号。`mini` variant 强制 `sm`。
+
+<LiveDemo code={`<Stack spacing={16}>
+  <Pagination size="sm" total={120} defaultPage={2} />
+  <Pagination size="md" total={120} defaultPage={2} />
+  <Pagination size="lg" total={120} defaultPage={2} />
+</Stack>`}>
+  <Stack spacing={16}>
+    <Pagination size="sm" total={120} defaultPage={2} />
+    <Pagination size="md" total={120} defaultPage={2} />
+    <Pagination size="lg" total={120} defaultPage={2} />
+  </Stack>
+</LiveDemo>
+
+## 邻接页 siblingCount
+
+控制当前页两侧固定显示的页码数量，默认 `1`。增大可减少省略号、增加直接可点页码。
+
+<LiveDemo code={`<Stack spacing={16}>
+  <Pagination total={500} defaultPage={12} siblingCount={0} />
+  <Pagination total={500} defaultPage={12} siblingCount={1} />
+  <Pagination total={500} defaultPage={12} siblingCount={2} />
+</Stack>`}>
+  <Stack spacing={16}>
+    <Pagination total={500} defaultPage={12} siblingCount={0} />
+    <Pagination total={500} defaultPage={12} siblingCount={1} />
+    <Pagination total={500} defaultPage={12} siblingCount={2} />
+  </Stack>
+</LiveDemo>
+
+## 快速跳转 showQuickJumper
+
+在右侧渲染一个数字输入框，回车即跳到目标页（自动 clamp 到 `[1, totalPages]`）。
+
+<LiveDemo code={`<Pagination total={500} defaultPage={1} showQuickJumper />`}>
+  <Pagination total={500} defaultPage={1} showQuickJumper />
+</LiveDemo>
+
+## 每页条数 showSizeChanger
+
+切换 pageSize 会重置 `page` 为 1（避免越界）。`pageSizeOptions` 自定义可选值，默认 `[10, 20, 50, 100]`。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Pagination } from '@timeui/react';
+
+export function Demo() {
+  const [page, setPage] = useState(3);
+  const [pageSize, setPageSize] = useState(20);
+  return (
+    <Pagination
+      total={248}
+      page={page}
+      pageSize={pageSize}
+      onChange={setPage}
+      onPageSizeChange={(n) => { setPageSize(n); setPage(1); }}
+      showSizeChanger
+      showQuickJumper
+      pageSizeOptions={[10, 20, 50, 100]}
+    />
+  );
+}`}>
+  <PaginationFullDemo />
+</LiveDemo>
+
+## 隐藏前/后控件 hideControls
+
+`hideControls=true` 隐藏左右箭头按钮，只保留页码。适合横向空间紧张的卡片底部。
+
+<LiveDemo code={`<Pagination total={120} defaultPage={2} hideControls />`}>
+  <Pagination total={120} defaultPage={2} hideControls />
+</LiveDemo>
+
+## 禁用
+
+<LiveDemo code={`<Pagination total={120} defaultPage={3} isDisabled />`}>
+  <Pagination total={120} defaultPage={3} isDisabled />
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'total', type: 'number', required: true, description: '数据总条数（必填）。总页数 = `ceil(total / pageSize)`。' },
+  { name: 'page', type: 'number', description: '受控当前页（1-based）。' },
+  { name: 'defaultPage', type: 'number', default: '1', description: '非受控初始页。' },
+  { name: 'onChange', type: '(page: number) => void' },
+  { name: 'pageSize', type: 'number', description: '受控每页条数。' },
+  { name: 'defaultPageSize', type: 'number', default: '10' },
+  { name: 'onPageSizeChange', type: '(pageSize: number) => void' },
+  { name: 'pageSizeOptions', type: 'ReadonlyArray<number>', default: '[10, 20, 50, 100]' },
+  { name: 'variant', type: "'default' | 'simple' | 'mini'", default: "'default'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'mini variant 强制 sm。' },
+  { name: 'siblingCount', type: 'number', default: '1', description: '当前页两侧显示的页码数。' },
+  { name: 'showQuickJumper', type: 'boolean', default: 'false' },
+  { name: 'showSizeChanger', type: 'boolean', default: 'false' },
+  { name: 'hideControls', type: 'boolean', default: 'false', description: '隐藏前/后箭头。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'labels', type: 'PaginationLabels', description: '文案 i18n（prev / next / jumperLabel / sizeChangerLabel / summary）。' },
+  { name: 'aria-label', type: 'string', description: '默认渲染 `<nav aria-label>`，建议显式提供以区分页面上多个分页器。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  根节点是 `<nav>`，当前激活页码带 `aria-current="page"`，每个页码按钮都有 `aria-label="Page {n}"`，前/后翻页按钮在到达边界时设置 `disabled`。`prefers-reduced-motion` 下取消 hover 过渡。
+</Callout>

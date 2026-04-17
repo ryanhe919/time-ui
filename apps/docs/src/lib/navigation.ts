@@ -56,6 +56,18 @@ const SECTIONS: readonly SectionConfig[] = [
           'segmented-control',
         ],
       },
+      {
+        slug: 'overlays',
+        pages: ['popover', 'tooltip', 'modal'],
+      },
+      {
+        slug: 'navigation',
+        pages: ['tabs', 'pagination'],
+      },
+      {
+        slug: 'data-display',
+        pages: ['table'],
+      },
     ],
   },
 ];

@@ -8,13 +8,16 @@
 
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { css } from '@emotion/react';
-import { useEffect, useState } from 'react';
-import { Search, type Locale } from '@timeui/react';
+import { useEffect, useMemo, useState } from 'react';
+import { Search, SearchDialog, type Locale } from '@timeui/react';
 import type { Navigation } from '@/lib/navigation';
 import type { DocsMessages } from '@/lib/docs-i18n';
+import { buildDocsSearchIndex, type DocsSearchItem } from '@/lib/docs-search-index';
+import logo from '@/assets/logo.png';
 import { ThemeToggle } from './ThemeToggle';
 import { LocaleToggle } from './LocaleToggle';
 
@@ -24,7 +27,7 @@ interface Props {
   locale: Locale;
 }
 
-const GITHUB_URL = 'https://github.com/timeui/timeui';
+const GITHUB_URL = 'https://github.com/ryanhe919/time-ui';
 
 const GithubIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -34,8 +37,10 @@ const GithubIcon = () => (
 
 export function TopNav({ navigation, messages, locale }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
   const activeSection = pathname.match(/\/docs\/([^/]+)/)?.[1];
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
@@ -43,6 +48,8 @@ export function TopNav({ navigation, messages, locale }: Props) {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const searchItems = useMemo(() => buildDocsSearchIndex(navigation, locale), [navigation, locale]);
 
   return (
     <header
@@ -72,19 +79,32 @@ export function TopNav({ navigation, messages, locale }: Props) {
       >
         <Link
           href={`/${locale}/docs/getting-started/introduction`}
+          aria-label="TimeUI"
           css={css`
-            font-size: 20px;
-            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
             line-height: 1;
-            color: var(--c-text);
-            letter-spacing: -0.012em;
             transition: opacity 200ms;
             &:hover {
               opacity: 0.7;
             }
           `}
         >
-          TimeUI
+          <Image
+            src={logo}
+            alt="TimeUI"
+            priority
+            sizes="160px"
+            css={css`
+              display: block;
+              /* logo 自身有较多透明 padding，渲染高度 80 → 实际可见内容 ~24px。 */
+              height: 80px;
+              width: auto;
+              object-fit: contain;
+              /* 负边距让 link 在布局上仍占 48px 头部高，img 只是"突破"头部上下沿。 */
+              margin-block: -16px;
+            `}
+          />
         </Link>
 
         <nav
@@ -130,7 +150,27 @@ export function TopNav({ navigation, messages, locale }: Props) {
           `}
         />
 
-        <Search size="sm" placeholder={messages.nav.searchPlaceholder} shortcut="⌘K" disabled />
+        <Search
+          size="sm"
+          placeholder={messages.nav.searchPlaceholder}
+          shortcut="⌘K"
+          onClick={() => setSearchOpen(true)}
+          aria-label={messages.nav.searchPlaceholder}
+        />
+        <SearchDialog
+          isOpen={searchOpen}
+          onOpenChange={setSearchOpen}
+          shortcut="mod+k"
+          items={searchItems}
+          placeholder={messages.nav.searchPlaceholder}
+          emptyMessage={locale === 'en' ? 'No matching pages' : '没有匹配的页面'}
+          aria-label={messages.nav.searchPlaceholder}
+          topOffset="clamp(56px, 12vh, 140px)"
+          onSelect={(item) => {
+            const href = (item as DocsSearchItem).href;
+            if (href) router.push(href);
+          }}
+        />
 
         <div
           css={css`

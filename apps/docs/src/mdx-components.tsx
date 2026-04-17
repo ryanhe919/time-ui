@@ -41,6 +41,17 @@ import {
   ChatActionButton,
   ChatSendButton,
   ChatVoiceWave,
+  Popover,
+  Tooltip,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Tabs,
+  Tab,
+  TabPanel,
+  Pagination,
+  Table,
 } from '@/components/timeui-client';
 import { PropsTable } from '@/components/mdx/PropsTable';
 import { LiveDemo } from '@/components/mdx/LiveDemo';
@@ -62,6 +73,18 @@ import { ChatToolStatesDemo } from '@/components/mdx/ChatToolStatesDemo';
 import { ChatWorkspaceDemo } from '@/components/mdx/ChatWorkspaceDemo';
 import { SelectDemo } from '@/components/mdx/SelectDemo';
 import { CodeBlockOnCopyDemo } from '@/components/mdx/CodeBlockOnCopyDemo';
+import { PopoverDemo } from '@/components/mdx/PopoverDemo';
+import { PopoverPlacementDemo } from '@/components/mdx/PopoverPlacementDemo';
+import { ModalBasicDemo } from '@/components/mdx/ModalBasicDemo';
+import { ModalSizesDemo } from '@/components/mdx/ModalSizesDemo';
+import { TabsBasicDemo } from '@/components/mdx/TabsBasicDemo';
+import { PaginationBasicDemo } from '@/components/mdx/PaginationBasicDemo';
+import { PaginationFullDemo } from '@/components/mdx/PaginationFullDemo';
+import { TableSortableDemo } from '@/components/mdx/TableSortableDemo';
+import { TableSelectionDemo } from '@/components/mdx/TableSelectionDemo';
+import { TableWithPaginationDemo } from '@/components/mdx/TableWithPaginationDemo';
+import { TableFixedColumnsDemo } from '@/components/mdx/TableFixedColumnsDemo';
+import { TableCustomRenderDemo } from '@/components/mdx/TableCustomRenderDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -112,6 +135,18 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ChatWorkspaceDemo,
     SelectDemo,
     CodeBlockOnCopyDemo,
+    PopoverDemo,
+    PopoverPlacementDemo,
+    ModalBasicDemo,
+    ModalSizesDemo,
+    TabsBasicDemo,
+    PaginationBasicDemo,
+    PaginationFullDemo,
+    TableSortableDemo,
+    TableSelectionDemo,
+    TableWithPaginationDemo,
+    TableFixedColumnsDemo,
+    TableCustomRenderDemo,
 
     Button,
     Box,
@@ -147,6 +182,17 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ChatActionButton,
     ChatSendButton,
     ChatVoiceWave,
+    Popover,
+    Tooltip,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Tabs,
+    Tab,
+    TabPanel,
+    Pagination,
+    Table,
 
     code: (p: ComponentPropsWithoutRef<'code'>) =>
       typeof p.children === 'string' ? <Code {...p}>{p.children}</Code> : <code {...p} />,

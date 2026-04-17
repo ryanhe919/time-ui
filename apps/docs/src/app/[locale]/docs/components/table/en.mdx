@@ -1,0 +1,391 @@
+# Table
+
+A data-driven table: describe the columns via `columns`, pass rows via `data`. Built-in support for sorting, row selection, fixed columns, sticky headers, density, and loading / empty states.
+
+<Callout variant="info" title="Controlled-sort contract">
+  Table **does not mutate your `data`**. When the user clicks a sortable header, the component emits `onSortChange(sortDescriptor)` and the consumer is responsible for sorting and feeding `data` back. This matches React Aria / Material Table conventions and avoids holding a duplicate copy of large datasets.
+</Callout>
+
+## Basic usage
+
+A minimal example: 3 columns × 5 rows. By default, `column.key` resolves to `row[key]`.
+
+<LiveDemo code={`<Table
+  aria-label="Members"
+  columns={[
+    { key: 'name', title: 'Name' },
+    { key: 'role', title: 'Role' },
+    { key: 'email', title: 'Email' },
+  ]}
+  data={[
+    { id: 1, name: 'Ada Lovelace', role: 'Engineer', email: 'ada@timeui.dev' },
+    { id: 2, name: 'Grace Hopper', role: 'Architect', email: 'grace@timeui.dev' },
+    { id: 3, name: 'Linus Torvalds', role: 'Engineer', email: 'linus@timeui.dev' },
+    { id: 4, name: 'Margaret Hamilton', role: 'Director', email: 'margaret@timeui.dev' },
+    { id: 5, name: 'Tim Berners-Lee', role: 'Architect', email: 'tim@timeui.dev' },
+  ]}
+/>`}>
+  <div style={{ width: '100%', maxWidth: 640 }}>
+    <Table
+      aria-label="Members"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+        { key: 'email', title: 'Email' },
+      ]}
+      data={[
+        { id: 1, name: 'Ada Lovelace', role: 'Engineer', email: 'ada@timeui.dev' },
+        { id: 2, name: 'Grace Hopper', role: 'Architect', email: 'grace@timeui.dev' },
+        { id: 3, name: 'Linus Torvalds', role: 'Engineer', email: 'linus@timeui.dev' },
+        { id: 4, name: 'Margaret Hamilton', role: 'Director', email: 'margaret@timeui.dev' },
+        { id: 5, name: 'Tim Berners-Lee', role: 'Architect', email: 'tim@timeui.dev' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## Sorting
+
+Mark a column with `isSortable: true` to render a sortable header. Click cycles `asc → desc → none`. **The consumer performs the actual sort.**
+
+<LiveDemo code={`import { useMemo, useState } from 'react';
+import { Table } from '@timeui/react';
+import type { SortDescriptor } from '@timeui/react';
+
+export function Demo() {
+  const [sort, setSort] = useState<SortDescriptor | undefined>({ columnKey: 'signups', direction: 'desc' });
+  const sorted = useMemo(() => {
+    if (!sort) return ROWS;
+    return [...ROWS].sort((a, b) => {
+      const av = a[sort.columnKey], bv = b[sort.columnKey];
+      const cmp = av > bv ? 1 : av < bv ? -1 : 0;
+      return sort.direction === 'asc' ? cmp : -cmp;
+    });
+  }, [sort]);
+
+  return (
+    <Table
+      columns={[
+        { key: 'name', title: 'Name', isSortable: true },
+        { key: 'role', title: 'Role', isSortable: true },
+        { key: 'signups', title: 'Sign-ups', align: 'right', isSortable: true },
+      ]}
+      data={sorted}
+      sortDescriptor={sort}
+      onSortChange={setSort}
+    />
+  );
+}`}>
+  <TableSortableDemo />
+</LiveDemo>
+
+## Row selection
+
+`multiple` adds a checkbox per row plus a header "select all"; `single` becomes mutually exclusive — a common pattern for "pick one row, then drill in".
+
+### Multiple
+
+<LiveDemo code={`<Table
+  selectionMode="multiple"
+  rowKey="id"
+  selectedKeys={keys}
+  onSelectionChange={setKeys}
+  columns={[
+    { key: 'file', title: 'File' },
+    { key: 'size', title: 'Size', align: 'right' },
+  ]}
+  data={ROWS}
+/>`}>
+  <TableSelectionDemo />
+</LiveDemo>
+
+### Single
+
+<LiveDemo code={`<Table
+  selectionMode="single"
+  rowKey="id"
+  defaultSelectedKeys={['2']}
+  columns={[{ key: 'name', title: 'Name' }, { key: 'role', title: 'Role' }]}
+  data={[
+    { id: '1', name: 'Ada', role: 'Engineer' },
+    { id: '2', name: 'Grace', role: 'Architect' },
+    { id: '3', name: 'Linus', role: 'Engineer' },
+  ]}
+/>`}>
+  <div style={{ width: '100%', maxWidth: 480 }}>
+    <Table
+      aria-label="Pick a member"
+      selectionMode="single"
+      rowKey="id"
+      defaultSelectedKeys={['2']}
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[
+        { id: '1', name: 'Ada', role: 'Engineer' },
+        { id: '2', name: 'Grace', role: 'Architect' },
+        { id: '3', name: 'Linus', role: 'Engineer' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## Density
+
+`compact` / `default` / `comfortable` adjust row height for differing information density.
+
+<LiveDemo code={`<Stack spacing={20}>
+  <Table density="compact"     columns={COLS} data={ROWS} />
+  <Table density="default"     columns={COLS} data={ROWS} />
+  <Table density="comfortable" columns={COLS} data={ROWS} />
+</Stack>`}>
+  <Stack spacing={20}>
+    <Table
+      aria-label="compact"
+      density="compact"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[
+        { id: 1, name: 'Ada', role: 'Engineer' },
+        { id: 2, name: 'Grace', role: 'Architect' },
+      ]}
+    />
+    <Table
+      aria-label="default"
+      density="default"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[
+        { id: 1, name: 'Ada', role: 'Engineer' },
+        { id: 2, name: 'Grace', role: 'Architect' },
+      ]}
+    />
+    <Table
+      aria-label="comfortable"
+      density="comfortable"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[
+        { id: 1, name: 'Ada', role: 'Engineer' },
+        { id: 2, name: 'Grace', role: 'Architect' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## Striped rows
+
+Alternate row tints make long lists easier to scan.
+
+<LiveDemo code={`<Table isStriped columns={COLS} data={ROWS} />`}>
+  <div style={{ width: '100%', maxWidth: 560 }}>
+    <Table
+      aria-label="Striped"
+      isStriped
+      columns={[
+        { key: 'item', title: 'Item' },
+        { key: 'qty', title: 'Qty', align: 'right', width: 80 },
+        { key: 'price', title: 'Price', align: 'right', width: 100 },
+      ]}
+      data={[
+        { id: 1, item: 'Pencil', qty: 12, price: '$1.20' },
+        { id: 2, item: 'Notebook', qty: 4, price: '$6.80' },
+        { id: 3, item: 'Sticker pack', qty: 30, price: '$0.50' },
+        { id: 4, item: 'Lanyard', qty: 8, price: '$2.40' },
+        { id: 5, item: 'Tote bag', qty: 2, price: '$14.00' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## Fixed columns
+
+`column.fixed: 'left' | 'right'` pins a column during horizontal scroll. The component watches container overflow and casts a soft shadow on the pinned edge.
+
+<LiveDemo code={`<Table
+  columns={[
+    { key: 'name',   title: 'Account', width: 160, fixed: 'left' },
+    { key: 'region', title: 'Region',  width: 120 },
+    { key: 'q1',     title: 'Q1',      align: 'right', width: 100 },
+    { key: 'q2',     title: 'Q2',      align: 'right', width: 100 },
+    { key: 'q3',     title: 'Q3',      align: 'right', width: 100 },
+    { key: 'q4',     title: 'Q4',      align: 'right', width: 100 },
+    { key: 'ytd',    title: 'YTD',     align: 'right', width: 110, fixed: 'right' },
+  ]}
+  data={ROWS}
+/>`}>
+  <TableFixedColumnsDemo />
+</LiveDemo>
+
+## Sticky header
+
+Set `maxHeight` to enable vertical scrolling, then `stickyHeader` to pin the header to the top.
+
+<LiveDemo code={`<Table
+  stickyHeader
+  maxHeight={240}
+  columns={[{ key: 'index', title: '#', width: 60 }, { key: 'value', title: 'Value' }]}
+  data={Array.from({ length: 30 }, (_, i) => ({ id: i, index: i + 1, value: \`Row \${i + 1}\` }))}
+/>`}>
+  <div style={{ width: '100%', maxWidth: 480 }}>
+    <Table
+      aria-label="Sticky header"
+      stickyHeader
+      maxHeight={240}
+      columns={[
+        { key: 'index', title: '#', width: 60 },
+        { key: 'value', title: 'Value' },
+      ]}
+      data={Array.from({ length: 30 }, (_, i) => ({
+        id: i,
+        index: i + 1,
+        value: `Row ${i + 1}`,
+      }))}
+    />
+  </div>
+</LiveDemo>
+
+## Loading and empty states
+
+`isLoading` shows a spinner (header is preserved); `emptyMessage` renders when `data` is empty.
+
+<LiveDemo code={`<Stack spacing={20}>
+  <Table isLoading loadingMessage="Loading…" columns={COLS} data={[]} />
+  <Table emptyMessage="No records yet"  columns={COLS} data={[]} />
+</Stack>`}>
+  <Stack spacing={20}>
+    <Table
+      aria-label="Loading"
+      isLoading
+      loadingMessage="Loading…"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[]}
+    />
+    <Table
+      aria-label="Empty"
+      emptyMessage="No records yet"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[]}
+    />
+  </Stack>
+</LiveDemo>
+
+## Custom cells via column.render
+
+`render(row, index)` takes over a cell entirely — drop in tags, avatars, buttons, links, rich text. Marking a column `isInteractive` prevents its clicks from bubbling to `onRowClick`.
+
+<LiveDemo code={`const COLUMNS = [
+  { key: 'name', title: 'Name' },
+  {
+    key: 'status',
+    title: 'Status',
+    render: (row) => <Tag color={row.status === 'active' ? 'success' : 'muted'}>{row.status}</Tag>,
+  },
+  {
+    key: 'actions',
+    title: '',
+    isInteractive: true,
+    render: (row) => <Button size="sm" onClick={() => alert(row.name)}>Edit</Button>,
+  },
+];
+
+<Table columns={COLUMNS} data={ROWS} />`}>
+  <TableCustomRenderDemo />
+</LiveDemo>
+
+## Pairing with Pagination
+
+The canonical client-side pagination pattern: keep `page` + `pageSize` in state, slice the rows for the current page, hand them to `<Table data>`.
+
+<LiveDemo code={`import { useMemo, useState } from 'react';
+import { Pagination, Table } from '@timeui/react';
+
+export function Demo() {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const pageRows = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return ALL_ORDERS.slice(start, start + pageSize);
+  }, [page, pageSize]);
+
+  return (
+    <>
+      <Table columns={COLS} data={pageRows} rowKey="id" />
+      <Pagination
+        total={ALL_ORDERS.length}
+        page={page}
+        pageSize={pageSize}
+        onChange={setPage}
+        onPageSizeChange={(n) => { setPageSize(n); setPage(1); }}
+        showSizeChanger
+      />
+    </>
+  );
+}`}>
+  <TableWithPaginationDemo />
+</LiveDemo>
+
+## API
+
+### TableProps
+
+<PropsTable props={[
+  { name: 'columns', type: 'ReadonlyArray<TableColumn<T>>', required: true, description: 'Column definitions.' },
+  { name: 'data', type: 'ReadonlyArray<T>', required: true, description: 'Row data.' },
+  { name: 'rowKey', type: 'keyof T | (row, index) => string', description: 'Per-row key: field name / function / fallback to `row.id`, `row.key`, then index.' },
+  { name: 'density', type: "'compact' | 'default' | 'comfortable'", default: "'default'" },
+  { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Pin the header when used with maxHeight.' },
+  { name: 'isStriped', type: 'boolean', default: 'false' },
+  { name: 'hasBorder', type: 'boolean', default: 'true', description: 'Outer container border.' },
+  { name: 'isLoading', type: 'boolean', default: 'false' },
+  { name: 'loadingMessage', type: 'ReactNode', default: "'Loading…'" },
+  { name: 'emptyMessage', type: 'ReactNode', default: "'No data'" },
+  { name: 'sortDescriptor', type: 'SortDescriptor', description: 'Controlled sort state.' },
+  { name: 'defaultSortDescriptor', type: 'SortDescriptor', description: 'Uncontrolled initial sort.' },
+  { name: 'onSortChange', type: '(sort: SortDescriptor | undefined) => void' },
+  { name: 'selectionMode', type: "'none' | 'single' | 'multiple'", default: "'none'" },
+  { name: 'selectedKeys', type: 'ReadonlyArray<string>', description: 'Controlled selection.' },
+  { name: 'defaultSelectedKeys', type: 'ReadonlyArray<string>', default: '[]' },
+  { name: 'onSelectionChange', type: '(keys: ReadonlyArray<string>) => void' },
+  { name: 'disabledKeys', type: 'ReadonlyArray<string>', description: 'Row keys that cannot be selected.' },
+  { name: 'onRowClick', type: '(row, index, e) => void', description: 'Row click handler; isInteractive cells do not bubble.' },
+  { name: 'maxHeight', type: 'number | string', description: 'Max container height — enables vertical scrolling.' },
+  { name: 'aria-label', type: 'string', description: 'Recommended; surfaces as `<table aria-label>`.' }
+]} />
+
+### TableColumn
+
+<PropsTable props={[
+  { name: 'key', type: 'string', required: true, description: 'Unique column key. Defaults to `row[key]`.' },
+  { name: 'title', type: 'ReactNode', required: true, description: 'Header content.' },
+  { name: 'width', type: 'number | string', description: 'Column width. Numbers are interpreted as px.' },
+  { name: 'align', type: "'left' | 'center' | 'right'", default: "'left'" },
+  { name: 'isSortable', type: 'boolean', default: 'false', description: 'Renders a sort button + `aria-sort`.' },
+  { name: 'render', type: '(row, rowIndex) => ReactNode', description: 'Custom cell renderer.' },
+  { name: 'fixed', type: "'left' | 'right'", description: 'Pin the column during horizontal scroll.' },
+  { name: 'isInteractive', type: 'boolean', default: 'false', description: 'Stop click bubbling from this cell to `onRowClick` / row selection.' }
+]} />
+
+### SortDescriptor
+
+<PropsTable props={[
+  { name: 'columnKey', type: 'string', description: 'Currently sorted column key.' },
+  { name: 'direction', type: "'asc' | 'desc'" }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Renders a native `<table>` with `<thead>` / `<tbody>`. Sortable headers expose `aria-sort`; selectable rows expose `aria-selected`. Always provide an `aria-label` so the table has an accessible name. Hover and sort-icon transitions honor `prefers-reduced-motion`.
+</Callout>

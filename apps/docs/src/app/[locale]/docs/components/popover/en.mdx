@@ -1,0 +1,138 @@
+# Popover
+
+An anchor-positioned floating container: 12 placements, four trigger modes (`click` / `hover` / `focus` / `manual`), portal rendered, with built-in header / footer / arrow and Esc + outside-click dismissal. Controlled and uncontrolled both ship; positioning lives in `position: fixed` and tracks scroll / resize.
+
+<Callout variant="info" title="Popover or Tooltip?">
+  A Popover hosts **rich content** — forms, buttons, link lists. Its panel is focusable and clickable, and may carry a header / footer. A Tooltip is just a **monochrome inverted hint**, `pointer-events: none`, hidden on touch. Use Tooltip for hover-triggered one-liners; use Popover for click-to-expand cards.
+</Callout>
+
+## Interactive demo ← try it
+
+Click the button below to open a Popover with a header and a footer. Press <kbd>Esc</kbd> or click outside to dismiss.
+
+<LiveDemo code={`import { useState } from 'react';
+import { Popover, Button } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover
+      isOpen={open}
+      onOpenChange={setOpen}
+      placement="bottom"
+      header="Share this page"
+      footer={<Button onClick={() => setOpen(false)}>Copy link</Button>}
+      anchor={<Button>Open popover</Button>}
+    >
+      Anyone with the link can view this page.
+    </Popover>
+  );
+}`}>
+  <PopoverDemo />
+</LiveDemo>
+
+## Basic usage
+
+`anchor` accepts a `ReactElement` or a render prop. The component clones the element to inject a `ref` plus the events for the active trigger; existing `onClick` / `onMouseEnter` etc. are preserved and chained.
+
+<LiveDemo code={`<Popover anchor={<Button>Open</Button>}>
+  Hello, popover.
+</Popover>`}>
+  <Popover anchor={<Button>Open</Button>}>Hello, popover.</Popover>
+</LiveDemo>
+
+## Trigger modes
+
+`click` (default) / `hover` / `focus` / `manual`. In `manual` the component stops listening to anchor events entirely — open state is whatever you pass to `isOpen`.
+
+<LiveDemo code={`<Flex gap={12}>
+  <Popover trigger="click" anchor={<Button>Click</Button>}>By click</Popover>
+  <Popover trigger="hover" anchor={<Button>Hover</Button>}>By hover</Popover>
+  <Popover trigger="focus" anchor={<Button>Focus</Button>}>By focus</Popover>
+</Flex>`}>
+  <Flex gap={12}>
+    <Popover trigger="click" anchor={<Button>Click</Button>}>By click</Popover>
+    <Popover trigger="hover" anchor={<Button>Hover</Button>}>By hover</Popover>
+    <Popover trigger="focus" anchor={<Button>Focus</Button>}>By focus</Popover>
+  </Flex>
+</LiveDemo>
+
+## Placements
+
+Twelve placements: `top` / `bottom` / `left` / `right` plus their `-start` / `-end` alignment variants. Click any cell in the grid below to see the panel land on the matching side.
+
+<LiveDemo code={`<Popover placement="top-start" anchor={<Button>top-start</Button>}>...</Popover>
+<Popover placement="top" anchor={<Button>top</Button>}>...</Popover>
+<Popover placement="top-end" anchor={<Button>top-end</Button>}>...</Popover>
+{/* 12 in total, omitted */}`}>
+  <PopoverPlacementDemo />
+</LiveDemo>
+
+## Header & footer
+
+`header` renders a bold title at the top of the panel; `footer` renders a secondary text or button row at the bottom. Both are optional. Providing `header` automatically sets `aria-labelledby`, so screen readers announce the popover title.
+
+<LiveDemo code={`<Popover
+  header="Notifications"
+  footer={<a>View all →</a>}
+  anchor={<Button>Inbox</Button>}
+>
+  You have 3 new notifications.
+</Popover>`}>
+  <Popover
+    header="Notifications"
+    footer={<a>View all →</a>}
+    anchor={<Button>Inbox</Button>}
+  >
+    You have 3 new notifications.
+  </Popover>
+</LiveDemo>
+
+## Arrow toggle (`withArrow`)
+
+Defaults to `true` — an 8 px rotated square is rendered on the side facing the anchor. Set to `false` for card-style popovers without a beak.
+
+<LiveDemo code={`<Flex gap={16}>
+  <Popover withArrow anchor={<Button>With arrow</Button>}>With arrow</Popover>
+  <Popover withArrow={false} anchor={<Button>No arrow</Button>}>No arrow</Popover>
+</Flex>`}>
+  <Flex gap={16}>
+    <Popover withArrow anchor={<Button>With arrow</Button>}>With arrow</Popover>
+    <Popover withArrow={false} anchor={<Button>No arrow</Button>}>No arrow</Popover>
+  </Flex>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'anchor', type: 'ReactElement | ((opts: { isOpen, ref }) => ReactNode)', description: 'Required. A `ReactElement` is cloned with `ref` + events; the render-prop form lets you spread `ref` yourself.' },
+  { name: 'children', type: 'ReactNode', description: 'Popover body content.' },
+  { name: 'isOpen', type: 'boolean', description: 'Controlled open state.' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: 'Uncontrolled initial open state.' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'trigger', type: "'click' | 'hover' | 'focus' | 'manual'", default: "'click'" },
+  { name: 'placement', type: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'", default: "'bottom'" },
+  { name: 'offset', type: 'number', description: 'Pixel gap between anchor and panel. Defaults to `theme.components.popover.offset` (8).' },
+  { name: 'withArrow', type: 'boolean', default: 'true' },
+  { name: 'closeOnBlur', type: 'boolean', default: 'true', description: 'Dismiss on outside mousedown.' },
+  { name: 'closeOnEsc', type: 'boolean', default: 'true' },
+  { name: 'header', type: 'ReactNode', description: 'Top header slot; wires up `aria-labelledby` automatically when provided.' },
+  { name: 'footer', type: 'ReactNode' },
+  { name: 'openDelay', type: 'number', default: '0', description: 'Hover-trigger open delay in ms.' },
+  { name: 'closeDelay', type: 'number', default: '100', description: 'Hover-trigger close delay in ms; entering the panel cancels the timer.' },
+  { name: 'className', type: 'string', description: 'Forwarded to the panel.' },
+  { name: 'style', type: 'CSSProperties', description: 'Forwarded to the panel; do not override the computed `top`/`left`.' },
+  { name: 'id', type: 'string', description: 'Custom panel id.' },
+  { name: 'aria-label', type: 'string', description: 'Accessible name when no `header` is provided.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  In `click` mode the anchor automatically receives `aria-haspopup="dialog"` + `aria-expanded` + `aria-controls`. The panel is `role="tooltip"` for `hover` triggers, otherwise `role="dialog"`. `closeOnEsc` listens both at the window level and on the panel, so focus can be anywhere. All animation respects `prefers-reduced-motion`.
+</Callout>
+
+## Best practices
+
+- Use `trigger="click"` whenever the panel contains real interactions (inputs, multiple buttons) — hover is too fragile.
+- For hover triggers, keep the anchor focusable (e.g. a `<button>`) so keyboard users can reach the panel.
+- Don't nest a Popover inside another Popover. For multi-level UI use a Modal.
+- Need imperative open from elsewhere? Use `trigger="manual"` plus a controlled `isOpen` — both `closeOnEsc` and `closeOnBlur` become no-ops in manual mode, so dismissal is fully yours.

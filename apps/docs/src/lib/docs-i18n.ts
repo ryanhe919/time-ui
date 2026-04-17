@@ -34,6 +34,9 @@ const zh: DocsMessages = {
   groups: {
     general: '通用',
     forms: '表单',
+    overlays: '浮层',
+    navigation: '导航',
+    'data-display': '数据展示',
   },
   pages: {
     introduction: '介绍',
@@ -56,6 +59,12 @@ const zh: DocsMessages = {
     switch: '开关',
     slider: '滑块',
     'segmented-control': '分段控制',
+    popover: '气泡卡片',
+    tooltip: '文字提示',
+    modal: '对话框',
+    tabs: '标签页',
+    pagination: '分页',
+    table: '表格',
   },
   nav: {
     onThisPage: '本页目录',
@@ -79,6 +88,9 @@ const en: DocsMessages = {
   groups: {
     general: 'General',
     forms: 'Forms',
+    overlays: 'Overlays',
+    navigation: 'Navigation',
+    'data-display': 'Data Display',
   },
   pages: {
     introduction: 'Introduction',
@@ -101,6 +113,12 @@ const en: DocsMessages = {
     switch: 'Switch',
     slider: 'Slider',
     'segmented-control': 'Segmented Control',
+    popover: 'Popover',
+    tooltip: 'Tooltip',
+    modal: 'Modal',
+    tabs: 'Tabs',
+    pagination: 'Pagination',
+    table: 'Table',
   },
   nav: {
     onThisPage: 'On this page',

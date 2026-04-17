@@ -4,10 +4,8 @@ import { Search } from '@/components/timeui-client';
 
 Pill 形状的"搜索触发器"——视觉上像输入框，**语义上是 `<button>`**。点击后由调用方自行打开 ⌘K 命令面板 / 搜索弹层。占位文案默认走 `useI18n()`，跟随当前 locale 自动切换。
 
-<Callout variant="warning" title="它不是一个可输入的输入框">
-  `Search` 本身**不接受文字输入**。它是一个触发器按钮，点击之后打开真正承载输入与结果展示的对话框。这种"⌘K 命令面板"模式被 Apple、Vercel、Tailwind、Linear 等现代文档站广泛采用——顶栏的"搜索框"只负责开面板。
-  <br />
-  如果你需要真正的可编辑搜索字段，请使用原生 `<input type="search">`，或等待即将推出的 `SearchInput` 组件。
+<Callout variant="info" title="搭配 SearchDialog 使用">
+  `Search` 本身**不接受文字输入**——它是一个触发器按钮。真正承载输入框、过滤、键盘导航、结果列表的是搭档组件 [`SearchDialog`](#searchdialog)。这种"⌘K 命令面板"模式被 Apple、Vercel、Tailwind、Linear 等文档站广泛采用。
 </Callout>
 
 ## 交互示例 ← 点击试试
@@ -105,5 +103,86 @@ export function Demo() {
 ## 最佳实践
 
 - 顶栏的 `Search` 永远**不要**携带 `value`——它不是输入框，语义上应该只有 `placeholder` + `onClick`。
-- 打开的命令面板建议：首次打开自动 focus 原生 `<input>`、支持 Esc 关闭、`role="dialog"` + `aria-modal="true"`。
-- 如果你的场景只需要一个常规搜索输入，而不是命令面板，请直接用原生 `<input type="search">`——下一版 TimeUI 会补充一个专用的 `SearchInput` 组件。
+- 命令面板部分直接用 `SearchDialog` 即可，已经内置首次自动 focus、Esc 关闭、`role="dialog"` + `aria-modal="true"`、键盘上下导航、Enter 选中、滚动条美化等行为。
+- 如果你的场景只需要一个常规搜索输入，而不是命令面板，请直接用原生 `<input type="search">`。
+
+---
+
+## SearchDialog
+
+⌘K 命令面板对话框。和 `Search` 触发按钮搭配：`Search` 负责"打开"，`SearchDialog` 负责"输入 + 过滤 + 选中"。
+
+### 完整搭配示例
+
+`SearchDialog` 自带 `shortcut="mod+k"`，组件内部就会监听 ⌘K（Mac）/ Ctrl K（其它），不再需要手动写 `useEffect`。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Search, SearchDialog } from '@timeui/react';
+
+export function CommandPalette() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Search shortcut="⌘K" onClick={() => setOpen(true)} />
+      <SearchDialog
+        isOpen={open}
+        onOpenChange={setOpen}
+        shortcut="mod+k"
+        items={ITEMS}
+        placeholder="搜索文档…"
+        onSelect={(item) => router.push(item.href)}
+      />
+    </>
+  );
+}`}>
+  <SearchDialogDemo />
+</LiveDemo>
+
+### 关键行为
+
+- **位置**：对话框默认横向 + 纵向居中；传入 `topOffset` 后改为按顶部偏移定位
+- **尺寸**：`width` 默认 `min(620px, 92vw)`；结果列表 `maxListHeight` 默认 `min(420px, 52vh)`，超过出现美化滚动条
+- **键盘**：上下方向键导航（自动跳过 disabled 项）、Home/End 跳首尾、Enter 选中、Esc 关闭
+- **过滤**：默认对 `label` + `hint` 做大小写无关子串匹配；传 `filter` 完全覆盖（远端搜索时返回 `() => true` 禁用本地过滤）
+- **分组**：`sections` 优先于 `items`，每个 section 可有 `title`
+- **加载态**：`isLoading` 显示 spinner + `loadingMessage`
+- **快捷键**：`shortcut="mod+k"` 内置全局监听，自动 toggle `isOpen`
+
+### SearchDialog API
+
+<PropsTable props={[
+  { name: 'isOpen', type: 'boolean', description: '受控打开状态。' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: '非受控初始打开状态。' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'items', type: 'ReadonlyArray<SearchDialogItem>', description: '扁平结果列表。' },
+  { name: 'sections', type: 'ReadonlyArray<SearchDialogSection>', description: '分组结果（优先于 `items`）。' },
+  { name: 'query', type: 'string', description: '受控查询字符串。' },
+  { name: 'defaultQuery', type: 'string', default: "''" },
+  { name: 'onQueryChange', type: '(query: string) => void' },
+  { name: 'filter', type: '(item, query) => boolean', description: '默认对 `label`+`hint` 子串匹配；远端搜索可返回 `() => true`。' },
+  { name: 'onSelect', type: '(item: SearchDialogItem) => void' },
+  { name: 'closeOnSelect', type: 'boolean', default: 'true' },
+  { name: 'shortcut', type: 'string', description: "全局快捷键（如 `'mod+k'`）。组件内置监听切换 `isOpen`。" },
+  { name: 'placeholder', type: 'string', default: "'Search…'" },
+  { name: 'emptyMessage', type: 'ReactNode', default: "'No results'" },
+  { name: 'isLoading', type: 'boolean', default: 'false' },
+  { name: 'loadingMessage', type: 'ReactNode', default: "'Searching…'" },
+  { name: 'showEscapeKey', type: 'boolean', default: 'true' },
+  { name: 'escapeKeyLabel', type: 'ReactNode', default: "'ESC'" },
+  { name: 'footer', type: 'ReactNode | false', description: '底部状态条；false 隐藏；自定义 ReactNode 替换默认快捷键提示。' },
+  { name: 'renderItem', type: '(item, { isHighlighted, isDisabled }) => ReactNode', description: '覆盖默认 (icon + label + hint) 布局。' },
+  { name: 'width', type: 'string | number', default: "'min(620px, 92vw)'" },
+  { name: 'maxListHeight', type: 'string | number', default: "'min(420px, 52vh)'" },
+  { name: 'topOffset', type: 'string | number', description: '距视口顶部距离；传入后会改为顶部偏移定位。' }
+]} />
+
+### SearchDialogItem
+
+<PropsTable props={[
+  { name: 'id', type: 'string', description: '唯一标识（必填）。' },
+  { name: 'label', type: 'ReactNode', description: '主标签。' },
+  { name: 'hint', type: 'ReactNode', description: '右侧辅助文字（如 URL / 快捷键）。' },
+  { name: 'icon', type: 'ReactNode', description: '左侧图标。' },
+  { name: 'href', type: 'string', description: '可选的链接地址（消费方在 onSelect 中决定如何导航）。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' }
+]} />

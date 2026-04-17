@@ -228,11 +228,10 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       setSearch('');
       return;
     }
+    // 打开时把高亮锚定到当前选中项；找不到则回退到第一个可用项。
+    // 搜索框的初始聚焦由 input 自身的 autoFocus 处理。
     const idx = filteredItems.findIndex((it) => it.value === current && !it.isDisabled);
     setHighlight(idx >= 0 ? idx : filteredItems.findIndex((it) => !it.isDisabled));
-    if (isSearchable) {
-      requestAnimationFrame(() => searchInputRef.current?.focus());
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -276,14 +275,20 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
 
   const closeAndRefocus = useCallback(() => {
     setOpen(false);
-    requestAnimationFrame(() => triggerRef.current?.focus());
+    triggerRef.current?.focus();
+  }, []);
+
+  const focusSearchInput = useCallback(() => {
+    // 仅在 popover 已挂载（即 open && isSearchable）时调用，input 此刻已就绪。
+    searchInputRef.current?.focus();
   }, []);
 
   const commit = useCallback(
     (nextValue: string) => {
+      setSearch('');
       setValue(nextValue);
       setOpen(false);
-      requestAnimationFrame(() => triggerRef.current?.focus());
+      triggerRef.current?.focus();
     },
     [setValue],
   );
@@ -366,8 +371,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   };
 
   const onSearchKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
-    const navKeys = ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', 'Escape', 'Tab'];
-    if (!navKeys.includes(e.key)) return;
+    // handleNavKey 只对方向/Home/End/Enter/Esc/Tab 返回 true，其它字符按键直通给 input。
     if (handleNavKey(e.key)) {
       e.preventDefault();
     }
@@ -397,15 +401,15 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
 
   const iconSizePx = parseInt(sizeTokens.iconSize, 10) || 16;
 
+  // wrapper 仅承担尺寸/边框等"字段框架"职责；button 自身吸收所有点击区域，
+  // 因此 startContent/chevron 都放在 button 内部（见下方 JSX），不再需要把
+  // wrapper 上的 mousedown 转发到 trigger。
   const wrapperCss = css`
     position: relative;
     display: inline-flex;
-    align-items: center;
-    gap: ${sizeTokens.gap};
     box-sizing: border-box;
     width: ${fullWidth ? '100%' : 'auto'};
     height: ${sizeTokens.height};
-    padding: 0 ${sizeTokens.paddingX};
     border-radius: ${borderRadius};
     color: ${theme.colors.text.primary};
     font-size: ${sizeTokens.fontSize};
@@ -424,7 +428,8 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     width: 100%;
     height: 100%;
     margin: 0;
-    padding: 0;
+    padding: 0 ${sizeTokens.paddingX};
+    gap: ${sizeTokens.gap};
     font: inherit;
     color: inherit;
     line-height: inherit;
@@ -432,6 +437,16 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     display: inline-flex;
     align-items: center;
     ${isDisabled ? 'cursor: not-allowed;' : 'cursor: pointer;'}
+  `;
+
+  const adornmentCss = css`
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: ${theme.colors.text.muted};
+    pointer-events: none;
+    font-size: ${sizeTokens.iconSize};
+    line-height: 1;
   `;
 
   const selectedBg =
@@ -551,7 +566,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const renderOption = (it: SelectItem, idx: number) => {
     const isSelected = it.value === current;
     const isHighlighted = idx === highlight;
-    const isHighlightedSelected = isSelected && isHighlighted;
+    // 高亮态：在已选项上叠加更深一档（color/200 或 sunken）；普通项用 muted。
     const highlightedBg = isSelected
       ? resolvedColor === 'default'
         ? theme.colors.bg.sunken
@@ -585,13 +600,11 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
               : theme.colors.text.primary};
           background: ${it.isDisabled
             ? 'transparent'
-            : isHighlightedSelected
+            : isHighlighted
               ? highlightedBg
               : isSelected
                 ? selectedBg
-                : isHighlighted
-                  ? highlightedBg
-                  : 'transparent'};
+                : 'transparent'};
           font-weight: ${isSelected ? 500 : 400};
           transition:
             background-color 100ms ease,
@@ -675,18 +688,31 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       ? `${listboxId}-opt-${highlight}`
       : undefined;
 
-  // Trigger 是 button，仅占文本部分；chevron / startContent / 文本与图标之间的
-  // 间隙在 button 之外。把 wrapper 上"非 trigger 区域"的 mousedown 转发到 button
-  // 自身的 click，整条 select 都能响应点击（HeroUI / Radix 同样行为）。
-  const onWrapperMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
+  const onTriggerClick = useCallback(() => {
     if (isDisabled) return;
-    const trigger = triggerRef.current;
-    if (!trigger) return;
-    if (trigger.contains(e.target as Node)) return;
-    e.preventDefault();
-    trigger.click();
-    trigger.focus();
-  };
+    // 已展开 + 可搜索时：点击 trigger 不应折叠面板，而是把焦点送回搜索框。
+    if (open) {
+      if (isSearchable) {
+        focusSearchInput();
+        return;
+      }
+      setOpen(false);
+      return;
+    }
+    setOpen(true);
+  }, [focusSearchInput, isDisabled, isSearchable, open]);
+
+  const onSearchAreaMouseDown = useCallback(
+    (e: ReactMouseEvent<HTMLDivElement>) => {
+      // 点击搜索图标 / padding 等"非 input"区域时也聚焦到输入框，
+      // 同时阻止默认 mousedown 把焦点转移到外层 div。
+      const target = e.target as Node;
+      if (searchInputRef.current?.contains(target)) return;
+      e.preventDefault();
+      focusSearchInput();
+    },
+    [focusSearchInput],
+  );
 
   return (
     <div
@@ -699,26 +725,8 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       data-open={open || undefined}
       className={className}
       style={style}
-      onMouseDown={onWrapperMouseDown}
       css={[wrapperCss, variantStyles]}
     >
-      {startContent ? (
-        <span
-          aria-hidden
-          css={css`
-            display: inline-flex;
-            align-items: center;
-            flex-shrink: 0;
-            color: ${theme.colors.text.muted};
-            pointer-events: none;
-            font-size: ${sizeTokens.iconSize};
-            line-height: 1;
-          `}
-        >
-          {startContent}
-        </span>
-      ) : null}
-
       <button
         {...rest}
         ref={mergeRefs(ref, triggerRef)}
@@ -735,10 +743,15 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
         aria-labelledby={ariaLabelledByProp}
         aria-disabled={isDisabled || undefined}
         disabled={isDisabled}
-        onClick={() => !isDisabled && setOpen((o) => !o)}
+        onClick={onTriggerClick}
         onKeyDown={onTriggerKeyDown}
         css={triggerCss}
       >
+        {startContent ? (
+          <span aria-hidden css={adornmentCss}>
+            {startContent}
+          </span>
+        ) : null}
         <span
           data-empty={isEmptyValue || undefined}
           css={css`
@@ -752,22 +765,10 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
         >
           {triggerLabel}
         </span>
+        <span aria-hidden css={adornmentCss}>
+          {endContent ?? <ChevronIcon sizePx={iconSizePx} open={open} />}
+        </span>
       </button>
-
-      <span
-        aria-hidden
-        css={css`
-          display: inline-flex;
-          align-items: center;
-          flex-shrink: 0;
-          color: ${theme.colors.text.muted};
-          pointer-events: none;
-          font-size: ${sizeTokens.iconSize};
-          line-height: 1;
-        `}
-      >
-        {endContent ?? <ChevronIcon sizePx={iconSizePx} open={open} />}
-      </span>
 
       {name ? <input type="hidden" name={name} value={current} /> : null}
 
@@ -786,7 +787,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
               data-color={resolvedColor}
             >
               {isSearchable ? (
-                <div css={searchCss}>
+                <div css={searchCss} onMouseDown={onSearchAreaMouseDown}>
                   <svg
                     aria-hidden
                     focusable="false"
@@ -813,6 +814,9 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
                     onKeyDown={onSearchKeyDown}
                     aria-controls={listboxId}
                     aria-autocomplete="list"
+                    // 每次 popover 打开都会重新挂载 input，autoFocus 因此在每次
+                    // 打开时同步聚焦——比 useEffect+RAF 更可靠，且测试可用。
+                    autoFocus
                   />
                 </div>
               ) : null}

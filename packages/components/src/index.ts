@@ -30,3 +30,11 @@ export * from './Switch';
 export * from './Slider';
 export * from './SegmentedControl';
 export * from './Select';
+export * from './Chat';
+
+export * from './Popover';
+export * from './Tooltip';
+export * from './Modal';
+export * from './Tabs';
+export * from './Pagination';
+export * from './Table';

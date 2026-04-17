@@ -1,0 +1,391 @@
+# 表格 Table
+
+数据驱动的表格：通过 `columns` 描述列、`data` 提供行数据。原生支持排序、行选择、固定列、sticky 表头、密度切换、loading / empty 状态。
+
+<Callout variant="info" title="受控排序契约">
+  Table **不会修改你的 `data`**。当用户点击排序表头时，组件只触发 `onSortChange(sortDescriptor)`，由消费方根据新的 `sortDescriptor` 自行排序数据再传回 `data`。这与 React Aria / Material Table 的契约一致，避免组件持有大量数据副本。
+</Callout>
+
+## 基础用法
+
+最小可运行示例：3 列 + 5 行。`column.key` 默认对应 `row[key]`。
+
+<LiveDemo code={`<Table
+  aria-label="Members"
+  columns={[
+    { key: 'name', title: 'Name' },
+    { key: 'role', title: 'Role' },
+    { key: 'email', title: 'Email' },
+  ]}
+  data={[
+    { id: 1, name: 'Ada Lovelace', role: 'Engineer', email: 'ada@timeui.dev' },
+    { id: 2, name: 'Grace Hopper', role: 'Architect', email: 'grace@timeui.dev' },
+    { id: 3, name: 'Linus Torvalds', role: 'Engineer', email: 'linus@timeui.dev' },
+    { id: 4, name: 'Margaret Hamilton', role: 'Director', email: 'margaret@timeui.dev' },
+    { id: 5, name: 'Tim Berners-Lee', role: 'Architect', email: 'tim@timeui.dev' },
+  ]}
+/>`}>
+  <div style={{ width: '100%', maxWidth: 640 }}>
+    <Table
+      aria-label="Members"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+        { key: 'email', title: 'Email' },
+      ]}
+      data={[
+        { id: 1, name: 'Ada Lovelace', role: 'Engineer', email: 'ada@timeui.dev' },
+        { id: 2, name: 'Grace Hopper', role: 'Architect', email: 'grace@timeui.dev' },
+        { id: 3, name: 'Linus Torvalds', role: 'Engineer', email: 'linus@timeui.dev' },
+        { id: 4, name: 'Margaret Hamilton', role: 'Director', email: 'margaret@timeui.dev' },
+        { id: 5, name: 'Tim Berners-Lee', role: 'Architect', email: 'tim@timeui.dev' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## 排序 isSortable
+
+把列标为 `isSortable: true` 即在表头显示排序按钮。点击循环：`asc → desc → 无`。**消费方负责实际 sort**。
+
+<LiveDemo code={`import { useMemo, useState } from 'react';
+import { Table } from '@timeui/react';
+import type { SortDescriptor } from '@timeui/react';
+
+export function Demo() {
+  const [sort, setSort] = useState<SortDescriptor | undefined>({ columnKey: 'signups', direction: 'desc' });
+  const sorted = useMemo(() => {
+    if (!sort) return ROWS;
+    return [...ROWS].sort((a, b) => {
+      const av = a[sort.columnKey], bv = b[sort.columnKey];
+      const cmp = av > bv ? 1 : av < bv ? -1 : 0;
+      return sort.direction === 'asc' ? cmp : -cmp;
+    });
+  }, [sort]);
+
+  return (
+    <Table
+      columns={[
+        { key: 'name', title: 'Name', isSortable: true },
+        { key: 'role', title: 'Role', isSortable: true },
+        { key: 'signups', title: 'Sign-ups', align: 'right', isSortable: true },
+      ]}
+      data={sorted}
+      sortDescriptor={sort}
+      onSortChange={setSort}
+    />
+  );
+}`}>
+  <TableSortableDemo />
+</LiveDemo>
+
+## 行选择 selectionMode
+
+`multiple` 给每行加复选框 + 表头全选；`single` 改成"互斥单选"，常见于"挑一行进入详情"。
+
+### 多选
+
+<LiveDemo code={`<Table
+  selectionMode="multiple"
+  rowKey="id"
+  selectedKeys={keys}
+  onSelectionChange={setKeys}
+  columns={[
+    { key: 'file', title: 'File' },
+    { key: 'size', title: 'Size', align: 'right' },
+  ]}
+  data={ROWS}
+/>`}>
+  <TableSelectionDemo />
+</LiveDemo>
+
+### 单选
+
+<LiveDemo code={`<Table
+  selectionMode="single"
+  rowKey="id"
+  defaultSelectedKeys={['2']}
+  columns={[{ key: 'name', title: 'Name' }, { key: 'role', title: 'Role' }]}
+  data={[
+    { id: '1', name: 'Ada', role: 'Engineer' },
+    { id: '2', name: 'Grace', role: 'Architect' },
+    { id: '3', name: 'Linus', role: 'Engineer' },
+  ]}
+/>`}>
+  <div style={{ width: '100%', maxWidth: 480 }}>
+    <Table
+      aria-label="Pick a member"
+      selectionMode="single"
+      rowKey="id"
+      defaultSelectedKeys={['2']}
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[
+        { id: '1', name: 'Ada', role: 'Engineer' },
+        { id: '2', name: 'Grace', role: 'Architect' },
+        { id: '3', name: 'Linus', role: 'Engineer' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## 密度 Density
+
+`compact` / `default`（默认）/ `comfortable` 三档行高，适配信息密度。
+
+<LiveDemo code={`<Stack spacing={20}>
+  <Table density="compact"     columns={COLS} data={ROWS} />
+  <Table density="default"     columns={COLS} data={ROWS} />
+  <Table density="comfortable" columns={COLS} data={ROWS} />
+</Stack>`}>
+  <Stack spacing={20}>
+    <Table
+      aria-label="compact"
+      density="compact"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[
+        { id: 1, name: 'Ada', role: 'Engineer' },
+        { id: 2, name: 'Grace', role: 'Architect' },
+      ]}
+    />
+    <Table
+      aria-label="default"
+      density="default"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[
+        { id: 1, name: 'Ada', role: 'Engineer' },
+        { id: 2, name: 'Grace', role: 'Architect' },
+      ]}
+    />
+    <Table
+      aria-label="comfortable"
+      density="comfortable"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[
+        { id: 1, name: 'Ada', role: 'Engineer' },
+        { id: 2, name: 'Grace', role: 'Architect' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## 斑马纹 isStriped
+
+为奇偶行交替着色，提升长列表的扫读速度。
+
+<LiveDemo code={`<Table isStriped columns={COLS} data={ROWS} />`}>
+  <div style={{ width: '100%', maxWidth: 560 }}>
+    <Table
+      aria-label="Striped"
+      isStriped
+      columns={[
+        { key: 'item', title: 'Item' },
+        { key: 'qty', title: 'Qty', align: 'right', width: 80 },
+        { key: 'price', title: 'Price', align: 'right', width: 100 },
+      ]}
+      data={[
+        { id: 1, item: 'Pencil', qty: 12, price: '$1.20' },
+        { id: 2, item: 'Notebook', qty: 4, price: '$6.80' },
+        { id: 3, item: 'Sticker pack', qty: 30, price: '$0.50' },
+        { id: 4, item: 'Lanyard', qty: 8, price: '$2.40' },
+        { id: 5, item: 'Tote bag', qty: 2, price: '$14.00' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## 固定列 fixed
+
+`column.fixed: 'left' | 'right'` 锁定列在水平滚动时不动。组件会监听容器溢出并在固定列上添加阴影分隔。
+
+<LiveDemo code={`<Table
+  columns={[
+    { key: 'name',   title: 'Account', width: 160, fixed: 'left' },
+    { key: 'region', title: 'Region',  width: 120 },
+    { key: 'q1',     title: 'Q1',      align: 'right', width: 100 },
+    { key: 'q2',     title: 'Q2',      align: 'right', width: 100 },
+    { key: 'q3',     title: 'Q3',      align: 'right', width: 100 },
+    { key: 'q4',     title: 'Q4',      align: 'right', width: 100 },
+    { key: 'ytd',    title: 'YTD',     align: 'right', width: 110, fixed: 'right' },
+  ]}
+  data={ROWS}
+/>`}>
+  <TableFixedColumnsDemo />
+</LiveDemo>
+
+## sticky 表头
+
+设置 `maxHeight` 启用纵向滚动，再加 `stickyHeader` 让表头钉住容器顶部。
+
+<LiveDemo code={`<Table
+  stickyHeader
+  maxHeight={240}
+  columns={[{ key: 'index', title: '#', width: 60 }, { key: 'value', title: 'Value' }]}
+  data={Array.from({ length: 30 }, (_, i) => ({ id: i, index: i + 1, value: \`Row \${i + 1}\` }))}
+/>`}>
+  <div style={{ width: '100%', maxWidth: 480 }}>
+    <Table
+      aria-label="Sticky header"
+      stickyHeader
+      maxHeight={240}
+      columns={[
+        { key: 'index', title: '#', width: 60 },
+        { key: 'value', title: 'Value' },
+      ]}
+      data={Array.from({ length: 30 }, (_, i) => ({
+        id: i,
+        index: i + 1,
+        value: `Row ${i + 1}`,
+      }))}
+    />
+  </div>
+</LiveDemo>
+
+## 加载态 / 空态
+
+`isLoading` 显示 spinner（保留表头）；`emptyMessage` 在 `data` 为空时显示。
+
+<LiveDemo code={`<Stack spacing={20}>
+  <Table isLoading loadingMessage="正在加载…" columns={COLS} data={[]} />
+  <Table emptyMessage="还没有任何记录" columns={COLS} data={[]} />
+</Stack>`}>
+  <Stack spacing={20}>
+    <Table
+      aria-label="Loading"
+      isLoading
+      loadingMessage="正在加载…"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[]}
+    />
+    <Table
+      aria-label="Empty"
+      emptyMessage="还没有任何记录"
+      columns={[
+        { key: 'name', title: 'Name' },
+        { key: 'role', title: 'Role' },
+      ]}
+      data={[]}
+    />
+  </Stack>
+</LiveDemo>
+
+## 自定义渲染 column.render
+
+`render(row, index)` 完全接管该单元格的渲染——可以塞 Tag、Avatar、Button、链接、富文本。带 `isInteractive` 的列其点击不会冒泡到行 `onRowClick`。
+
+<LiveDemo code={`const COLUMNS = [
+  { key: 'name', title: 'Name' },
+  {
+    key: 'status',
+    title: 'Status',
+    render: (row) => <Tag color={row.status === 'active' ? 'success' : 'muted'}>{row.status}</Tag>,
+  },
+  {
+    key: 'actions',
+    title: '',
+    isInteractive: true,
+    render: (row) => <Button size="sm" onClick={() => alert(row.name)}>Edit</Button>,
+  },
+];
+
+<Table columns={COLUMNS} data={ROWS} />`}>
+  <TableCustomRenderDemo />
+</LiveDemo>
+
+## 与 Pagination 配合
+
+典型的"客户端分页"模式：消费方用 `useState` 保存 `page` 与 `pageSize`，每次切换从全量数据切片，再传给 `<Table data>`。
+
+<LiveDemo code={`import { useMemo, useState } from 'react';
+import { Pagination, Table } from '@timeui/react';
+
+export function Demo() {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const pageRows = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return ALL_ORDERS.slice(start, start + pageSize);
+  }, [page, pageSize]);
+
+  return (
+    <>
+      <Table columns={COLS} data={pageRows} rowKey="id" />
+      <Pagination
+        total={ALL_ORDERS.length}
+        page={page}
+        pageSize={pageSize}
+        onChange={setPage}
+        onPageSizeChange={(n) => { setPageSize(n); setPage(1); }}
+        showSizeChanger
+      />
+    </>
+  );
+}`}>
+  <TableWithPaginationDemo />
+</LiveDemo>
+
+## API
+
+### TableProps
+
+<PropsTable props={[
+  { name: 'columns', type: 'ReadonlyArray<TableColumn<T>>', required: true, description: '列定义。' },
+  { name: 'data', type: 'ReadonlyArray<T>', required: true, description: '行数据。' },
+  { name: 'rowKey', type: 'keyof T | (row, index) => string', description: '行 key：字段名 / 函数 / 兜底 `row.id` / `row.key` / 索引。' },
+  { name: 'density', type: "'compact' | 'default' | 'comfortable'", default: "'default'" },
+  { name: 'stickyHeader', type: 'boolean', default: 'false', description: '配合 maxHeight 让表头钉住顶部。' },
+  { name: 'isStriped', type: 'boolean', default: 'false', description: '斑马纹。' },
+  { name: 'hasBorder', type: 'boolean', default: 'true', description: '容器外边框。' },
+  { name: 'isLoading', type: 'boolean', default: 'false' },
+  { name: 'loadingMessage', type: 'ReactNode', default: "'Loading…'" },
+  { name: 'emptyMessage', type: 'ReactNode', default: "'No data'" },
+  { name: 'sortDescriptor', type: 'SortDescriptor', description: '受控排序状态。' },
+  { name: 'defaultSortDescriptor', type: 'SortDescriptor', description: '非受控初始排序。' },
+  { name: 'onSortChange', type: '(sort: SortDescriptor | undefined) => void' },
+  { name: 'selectionMode', type: "'none' | 'single' | 'multiple'", default: "'none'" },
+  { name: 'selectedKeys', type: 'ReadonlyArray<string>', description: '受控选中 key 数组。' },
+  { name: 'defaultSelectedKeys', type: 'ReadonlyArray<string>', default: '[]' },
+  { name: 'onSelectionChange', type: '(keys: ReadonlyArray<string>) => void' },
+  { name: 'disabledKeys', type: 'ReadonlyArray<string>', description: '不可选的行 key。' },
+  { name: 'onRowClick', type: '(row, index, e) => void', description: '行点击；isInteractive 列不会冒泡。' },
+  { name: 'maxHeight', type: 'number | string', description: '容器最大高度，超过启用纵向滚动。' },
+  { name: 'aria-label', type: 'string', description: '建议显式提供，用作 `<table aria-label>`。' }
+]} />
+
+### TableColumn
+
+<PropsTable props={[
+  { name: 'key', type: 'string', required: true, description: '唯一列 key；默认对应 `row[key]`。' },
+  { name: 'title', type: 'ReactNode', required: true, description: '表头内容。' },
+  { name: 'width', type: 'number | string', description: '列宽。数字按 px 处理。' },
+  { name: 'align', type: "'left' | 'center' | 'right'", default: "'left'" },
+  { name: 'isSortable', type: 'boolean', default: 'false', description: '表头渲染排序按钮 + `aria-sort`。' },
+  { name: 'render', type: '(row, rowIndex) => ReactNode', description: '自定义单元格内容。' },
+  { name: 'fixed', type: "'left' | 'right'", description: '固定列；横向滚动时锁定。' },
+  { name: 'isInteractive', type: 'boolean', default: 'false', description: '该列点击阻止冒泡到 onRowClick / 行选择。' }
+]} />
+
+### SortDescriptor
+
+<PropsTable props={[
+  { name: 'columnKey', type: 'string', description: '当前排序的列 key。' },
+  { name: 'direction', type: "'asc' | 'desc'" }
+]} />
+
+<Callout variant="info" title="可访问性">
+  渲染原生 `<table>` + `<thead>` / `<tbody>`；可排序表头使用 `aria-sort`；可选行带 `aria-selected`。`<aria-label>` 应用于 table，建议显式提供。`prefers-reduced-motion` 下取消 hover 与排序图标的过渡。
+</Callout>

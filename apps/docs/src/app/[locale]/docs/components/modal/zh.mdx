@@ -1,0 +1,160 @@
+# 模态框 Modal
+
+居中模态对话框：focus trap + body scroll lock + Esc 关闭 + overlay 点击关闭 + 关闭后焦点归还。Portal 渲染到 `<body>`，背景使用 saturate(180%) blur 的毛玻璃 overlay。提供 5 档宽度（`sm` / `md` / `lg` / `xl` / `full`）与 `inside` / `outside` 两种滚动行为。
+
+<Callout variant="info" title="Modal、Drawer 还是 Popover？">
+  - **Modal**：需要打断当前流程、要求用户做出确认 / 输入关键信息时使用。会 lock body scroll 并 trap 焦点。
+  - **Drawer**：与主流程平行的次级面板（如设置、详情），可与背景同时观察。
+  - **Popover**：轻量、anchor 相关的浮层（菜单、提示卡片）。
+</Callout>
+
+## 交互示例 ← 点击试试
+
+点击下方按钮打开一个带 title + footer 的 Modal。按 `Esc`、点击右上角关闭按钮、或点击外部 overlay 都可以关闭。关闭后焦点会回到触发按钮。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Modal, Button } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open modal</Button>
+      <Modal
+        isOpen={open}
+        onOpenChange={setOpen}
+        title="Update available"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setOpen(false)}>Later</Button>
+            <Button onClick={() => setOpen(false)}>Install</Button>
+          </>
+        }
+      >
+        TimeUI 1.4 is ready to install. Do you want to install it now?
+      </Modal>
+    </>
+  );
+}`}>
+  <ModalBasicDemo />
+</LiveDemo>
+
+## 尺寸 size
+
+`sm` 420px / `md` 560px（默认）/ `lg` 720px / `xl` 960px / `full` 撑满视口（留 16px 边距）。所有尺寸都受 `max-width: calc(100vw - 32px)` 与 `max-height: calc(100vh - 64px)` 限制，确保在任何视口下不会撑爆。
+
+<LiveDemo code={`<Flex gap={8}>
+  <Button onClick={openSm}>size = sm</Button>
+  <Button onClick={openMd}>size = md</Button>
+  <Button onClick={openLg}>size = lg</Button>
+  <Button onClick={openXl}>size = xl</Button>
+  <Button onClick={openFull}>size = full</Button>
+</Flex>`}>
+  <ModalSizesDemo />
+</LiveDemo>
+
+## 复合用法
+
+除了用便捷的 `title` / `footer` props，你也可以把 body 区分成 `<ModalHeader>` / `<ModalBody>` / `<ModalFooter>` 三个语义子组件——样式与默认 token 一致，但你可以自由插入图标、副标题、复杂表单。**注意**：使用 `<ModalHeader>` 时不要再传顶层 `title` prop，二者会同时渲染。
+
+```tsx
+<Modal isOpen={open} onOpenChange={setOpen}>
+  <ModalHeader>Compose message</ModalHeader>
+  <ModalBody>
+    <Input placeholder="Subject" />
+    <Textarea placeholder="Body" rows={5} />
+  </ModalBody>
+  <ModalFooter>
+    <Button variant="ghost">Cancel</Button>
+    <Button>Send</Button>
+  </ModalFooter>
+</Modal>
+```
+
+## 关闭行为
+
+- `closeOnEsc`（默认 `true`）：按 Esc 关闭。
+- `closeOnOverlayClick`（默认 `true`）：点击半透明 overlay 关闭。
+- `showCloseButton`（默认 `true`）：右上角 32×32 的关闭按钮，hover 有底色反馈，`focus-visible` 时显示 outline。
+
+把这三者全部关掉就得到一个**强制流程**对话框——只能通过你提供的按钮（如"我已知晓"）关闭，常用于一次性合规确认。
+
+```tsx
+<Modal
+  isOpen={open}
+  onOpenChange={setOpen}
+  closeOnEsc={false}
+  closeOnOverlayClick={false}
+  showCloseButton={false}
+  title="Terms updated"
+  footer={<Button onClick={() => setOpen(false)}>I agree</Button>}
+>
+  We have updated our Terms of Service. You must agree to continue.
+</Modal>
+```
+
+## 滚动行为 scrollBehavior
+
+- **`inside`（默认）**：panel 总高度受 `max-height` 限制，header 和 footer 固定，**只有 body 区滚动**。适合长表单 / 长说明文本。
+- **`outside`**：整个 panel 一起随页面滚动（panel 高度由内容决定）。适合内容长度可控、想要更"页面化"观感的场景。
+
+```tsx
+<Modal scrollBehavior="inside" title="Release notes">
+  {/* header / footer 固定，body 内部出现自定义滚动条 */}
+  <p>{longText}</p>
+</Modal>
+
+<Modal scrollBehavior="outside" title="Release notes">
+  {/* panel 整体滚动 */}
+  <p>{longText}</p>
+</Modal>
+```
+
+## API
+
+### Modal
+
+<PropsTable props={[
+  { name: 'isOpen', type: 'boolean', description: '受控打开状态。' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: '非受控初始打开状态。' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: '宽度档位。对应 420 / 560 / 720 / 960 / `calc(100vw - 32px)`。' },
+  { name: 'scrollBehavior', type: "'inside' | 'outside'", default: "'inside'", description: '`inside` body 滚动；`outside` panel 整体滚动。' },
+  { name: 'title', type: 'ReactNode', description: '便捷 header 标题（同时把 `aria-labelledby` 指向其 id）。' },
+  { name: 'footer', type: 'ReactNode | false', description: '底部按钮区。`false` 显式隐藏 footer。' },
+  { name: 'showCloseButton', type: 'boolean', default: 'true' },
+  { name: 'closeOnEsc', type: 'boolean', default: 'true' },
+  { name: 'closeOnOverlayClick', type: 'boolean', default: 'true' },
+  { name: 'blockScrollOnMount', type: 'boolean', default: 'true', description: '打开时锁定 `body` 滚动。' },
+  { name: 'autoFocus', type: 'boolean', default: 'true', description: '打开后把焦点放到 panel 内第一个可聚焦元素；否则只 focus panel 自身。' },
+  { name: 'returnFocusOnClose', type: 'boolean', default: 'true', description: '关闭时把焦点归还到打开前聚焦的元素。' },
+  { name: 'children', type: 'ReactNode', description: 'Modal 主体内容。' },
+  { name: 'className', type: 'string', description: '透传到 panel。' },
+  { name: 'style', type: 'CSSProperties', description: '透传到 panel。' },
+  { name: 'id', type: 'string' },
+  { name: 'aria-label', type: 'string', description: '当不提供 `title` 也没有 `aria-labelledby` 时，请用 `aria-label` 命名对话框。' },
+  { name: 'aria-labelledby', type: 'string' },
+  { name: 'aria-describedby', type: 'string' }
+]} />
+
+### ModalHeader / ModalBody / ModalFooter
+
+三者签名一致，均接受 `children` / `className` / `id`。`ModalHeader` 渲染为 `<h2>`，`ModalFooter` 默认 `flex` + `justify-content: flex-end` + `gap`。
+
+<PropsTable props={[
+  { name: 'children', type: 'ReactNode' },
+  { name: 'className', type: 'string' },
+  { name: 'id', type: 'string' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  panel 渲染为 `role="dialog"` + `aria-modal="true"`；提供 `title` 时自动 `aria-labelledby` 指向标题元素。打开时 Tab / Shift+Tab 在 panel 内循环（focus trap）；body scroll 被锁定，关闭后焦点归还到打开前的元素。`prefers-reduced-motion` 下面板入场动画退化为单纯淡入。
+</Callout>
+
+## 最佳实践
+
+- **何时用 Modal**：操作不可逆 / 需要确认 / 需要离线表单（如新建条目、删除确认、登录）。Modal 打断流程，请确保用户能感知到他们打开了一个对话框。
+- **何时用 Drawer**：用户希望在编辑详情的同时看见上下文（如三栏布局右侧的属性面板）。
+- **何时用 Popover**：触发 + 简短交互的轻量浮层（菜单、分享、通知列表）。
+- 一个页面同时出现两个 Modal 是反模式：把第二个并入第一个，或改为多步表单。
+- 复杂 Modal 内尽量保持单一焦点目标——首屏 `autoFocus` 默认会落到第一个可聚焦元素，避免内容里出现意料外的输入框。

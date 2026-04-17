@@ -1,0 +1,104 @@
+# 提示 Tooltip
+
+反色质感的轻量浮层提示。复用 Popover 的 12 种 placement 与定位算法，但配色硬编码为反色（light 模式深底白字 / dark 模式浅底深字），仅支持 `hover` + `focus`，`pointer-events: none`，触摸屏自动隐藏。自带 warm-up 行为：刚关闭一个 tooltip 后短时间内打开下一个会跳过进入延迟。
+
+<Callout variant="info" title="与 Popover 的核心区别">
+  Tooltip = 反色 + 简短文本 + 不可交互（`pointer-events: none`，鼠标移到 tooltip 上不会让它继续展开）。它没有 header / footer / 关闭按钮、不支持 click 触发，触摸屏（`@media (hover: none)`）下完全不显示。需要在浮层里放按钮 / 输入框 / 链接列表？请用 [Popover](./popover)。
+</Callout>
+
+## 基础用法
+
+把任意一个 `ReactElement`（必须是单个）作为 `children` 传入，组件会通过 `cloneElement` 注入 `ref`、`mouseenter` / `mouseleave` / `focus` / `blur` 事件以及 `aria-describedby`。
+
+<LiveDemo code={`<Tooltip content="保存到本地">
+  <Button>Save</Button>
+</Tooltip>`}>
+  <Tooltip content="保存到本地">
+    <Button>Save</Button>
+  </Tooltip>
+</LiveDemo>
+
+## 方位 placement
+
+12 种 placement 全部继承自 Popover：`top` / `bottom` / `left` / `right` 四主向 + `-start` / `-end` 对齐变体。Tooltip 的默认 placement 是 `top`。
+
+<LiveDemo code={`<Flex gap={16}>
+  <Tooltip content="top" placement="top">
+    <Button>top</Button>
+  </Tooltip>
+  <Tooltip content="bottom" placement="bottom">
+    <Button>bottom</Button>
+  </Tooltip>
+  <Tooltip content="left" placement="left">
+    <Button>left</Button>
+  </Tooltip>
+  <Tooltip content="right" placement="right">
+    <Button>right</Button>
+  </Tooltip>
+  <Tooltip content="top-start" placement="top-start">
+    <Button>top-start</Button>
+  </Tooltip>
+  <Tooltip content="bottom-end" placement="bottom-end">
+    <Button>bottom-end</Button>
+  </Tooltip>
+</Flex>`}>
+  <Flex gap={16}>
+    <Tooltip content="top" placement="top"><Button>top</Button></Tooltip>
+    <Tooltip content="bottom" placement="bottom"><Button>bottom</Button></Tooltip>
+    <Tooltip content="left" placement="left"><Button>left</Button></Tooltip>
+    <Tooltip content="right" placement="right"><Button>right</Button></Tooltip>
+    <Tooltip content="top-start" placement="top-start"><Button>top-start</Button></Tooltip>
+    <Tooltip content="bottom-end" placement="bottom-end"><Button>bottom-end</Button></Tooltip>
+  </Flex>
+</LiveDemo>
+
+## 延迟与 warm-up
+
+`enterDelay` / `exitDelay` 控制 hover/focus 进入与离开到 tooltip 显隐之间的等待时间（ms）。组件内部维护一个模块级"上次关闭时间戳"——若距上次关闭不到 `warmThreshold`（默认 500ms），下一次打开会**跳过 enterDelay** 立即显示。这模拟了 macOS 系统级 tooltip 的"批处理"体验：在一组按钮间快速划过时，提示无延迟连续切换。
+
+<LiveDemo code={`<Flex gap={16}>
+  <Tooltip content="120ms 延迟（默认）"><Button>Default</Button></Tooltip>
+  <Tooltip content="600ms 延迟" enterDelay={600}><Button>Slow</Button></Tooltip>
+  <Tooltip content="瞬时显示" enterDelay={0}><Button>Instant</Button></Tooltip>
+</Flex>`}>
+  <Flex gap={16}>
+    <Tooltip content="120ms 延迟（默认）"><Button>Default</Button></Tooltip>
+    <Tooltip content="600ms 延迟" enterDelay={600}><Button>Slow</Button></Tooltip>
+    <Tooltip content="瞬时显示" enterDelay={0}><Button>Instant</Button></Tooltip>
+  </Flex>
+</LiveDemo>
+
+## 手动控制 isOpen
+
+传入 `isOpen` 后组件进入"完全受控"模式，**所有内部 hover / focus 触发逻辑都被跳过**，显隐完全由你决定。常用于"教程引导第几步现在 active"等程序驱动场景。
+
+<LiveDemo code={`<Tooltip isOpen content="始终显示" placement="top">
+  <Button>Always on</Button>
+</Tooltip>`}>
+  <Tooltip isOpen content="始终显示" placement="top">
+    <Button>Always on</Button>
+  </Tooltip>
+</LiveDemo>
+
+## API
+
+<PropsTable props={[
+  { name: 'content', type: 'ReactNode', description: 'Tooltip 显示的内容；通常是短文本或紧凑的 ReactNode。' },
+  { name: 'children', type: 'ReactElement', description: '被包裹的 anchor，必须是单个 ReactElement；会被 cloneElement 注入 ref + 事件 + `aria-describedby`。' },
+  { name: 'placement', type: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'", default: "'top'" },
+  { name: 'offset', type: 'number', description: 'anchor 与 tooltip 的像素间距。默认读 `theme.components.tooltip.offset`（6）。' },
+  { name: 'withArrow', type: 'boolean', default: 'true' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用整个 tooltip：即使 hover 也不会渲染 portal。' },
+  { name: 'enterDelay', type: 'number', description: '进入延迟（ms）。默认读 `theme.components.tooltip.enterDelay`（120）。warm 状态下被跳过。' },
+  { name: 'exitDelay', type: 'number', description: '离开延迟（ms）。默认读 `theme.components.tooltip.exitDelay`（80）。' },
+  { name: 'isOpen', type: 'boolean', description: '受控显隐。一旦提供，所有内部 hover/focus 逻辑被忽略。' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'className', type: 'string', description: '透传到 tooltip panel（不是 anchor）。' },
+  { name: 'style', type: 'CSSProperties', description: '透传到 tooltip panel；定位 top/left 由组件计算后注入。' },
+  { name: 'id', type: 'string', description: '自定义 panel id；同时也是注入到 anchor `aria-describedby` 的值。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  Tooltip panel 渲染为 `role="tooltip"`，并通过 `aria-describedby` 与 anchor 关联（与 anchor 已有的 `aria-describedby` 自动合并）。focus 触发保证键盘用户能看到提示；触摸屏（`@media (hover: none)`）下整个 panel `display: none`，避免影响触摸用户。`prefers-reduced-motion` 下取消入场动画。
+</Callout>

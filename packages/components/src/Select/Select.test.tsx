@@ -172,6 +172,46 @@ describe('Select', () => {
     expect(await screen.findByText('Nothing found')).toBeInTheDocument();
   });
 
+  it('keeps the listbox open and focuses search when clicking the trigger in searchable mode', async () => {
+    renderWithProviders(<Select isSearchable items={ITEMS} aria-label="fruit" />);
+    const trigger = screen.getByRole('combobox');
+    await userEvent.click(trigger);
+    const search = screen.getByRole('searchbox');
+    expect(search).toHaveFocus();
+    await userEvent.click(trigger);
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('searchbox')).toHaveFocus();
+    });
+  });
+
+  it('focuses the search input when clicking the search area container', async () => {
+    renderWithProviders(<Select isSearchable items={ITEMS} aria-label="fruit" />);
+    await openListbox();
+    const search = screen.getByRole('searchbox');
+    const searchArea = search.parentElement as HTMLElement;
+
+    search.blur();
+    fireEvent.mouseDown(searchArea);
+
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(search).toHaveFocus();
+    });
+  });
+
+  it('clears search and closes the popover after selecting an option in searchable mode', async () => {
+    renderWithProviders(<Select isSearchable items={ITEMS} aria-label="fruit" />);
+    await openListbox();
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'ap' } });
+    await userEvent.click(screen.getByRole('option', { name: /Apple/i }));
+    expect(screen.queryByRole('listbox')).toBeNull();
+
+    await openListbox();
+    expect(screen.getByRole('searchbox')).toHaveValue('');
+    expect(within(screen.getByRole('listbox')).getAllByRole('option')).toHaveLength(3);
+  });
+
   it('renders startContent and option descriptions', async () => {
     renderWithProviders(
       <Select

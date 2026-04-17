@@ -188,6 +188,229 @@ export const segmentedControlSizes = {
   },
 } as const;
 
+export const chatTokens = {
+  avatarSize: '32px',
+  avatarRadius: '9999px',
+  bubbleRadius: '18px',
+  bubbleRadiusSmall: '6px',
+  bubbleMaxWidth: '75%',
+  bubblePaddingX: '14px',
+  bubblePaddingY: '10px',
+  messageGap: '20px',
+  messageInnerGap: '10px',
+  metaGap: '4px',
+  metaFontSize: '12px',
+  contentFontSize: '14px',
+  contentLineHeight: '1.55',
+  composerRadius: '20px',
+  composerMinHeight: '44px',
+  composerMaxHeight: '200px',
+  composerPaddingX: '8px',
+  composerPaddingY: '6px',
+  composerToolbarGap: '4px',
+  composerActionSize: '32px',
+  composerActionRadius: '16px',
+  composerActionIconSize: '16px',
+  toolCardRadius: '12px',
+  toolCardPaddingX: '14px',
+  toolCardPaddingY: '10px',
+  toolCardGap: '8px',
+  citationChipHeight: '24px',
+  citationChipPaddingX: '8px',
+  citationChipRadius: '12px',
+  typingDotSize: '6px',
+  typingDotGap: '4px',
+} as const;
+
+export const popoverTokens = {
+  minWidth: '160px',
+  maxWidth: '320px',
+  paddingX: '14px',
+  paddingY: '12px',
+  radius: '12px',
+  offset: '8px',
+  arrowSize: '10px',
+  arrowInset: '12px',
+  headerPaddingY: '10px',
+  headerFontSize: '14px',
+  headerFontWeight: 600,
+  footerPaddingY: '10px',
+  bodyFontSize: '13px',
+  bodyLineHeight: 1.5,
+  enterDuration: '200ms',
+  exitDuration: '150ms',
+  enterTranslate: '6px',
+} as const;
+
+export const tooltipTokens = {
+  paddingX: '8px',
+  paddingY: '5px',
+  radius: '6px',
+  fontSize: '12px',
+  lineHeight: 1.4,
+  fontWeight: 500,
+  maxWidth: '240px',
+  offset: '6px',
+  arrowSize: '6px',
+  bgLight: 'rgba(28, 28, 30, 0.92)',
+  bgDark: 'rgba(242, 242, 247, 0.95)',
+  fgLight: '#ffffff',
+  fgDark: '#0a0a0a',
+  shadow: '0 2px 8px rgba(0, 0, 0, 0.18)',
+  enterDelay: '120ms',
+  exitDelay: '80ms',
+  warmThreshold: '500ms',
+  enterDuration: '120ms',
+  enterTranslate: '4px',
+} as const;
+
+export const modalTokens = {
+  widthSm: '420px',
+  widthMd: '560px',
+  widthLg: '720px',
+  widthXl: '960px',
+  widthFull: 'calc(100vw - 32px)',
+  maxHeight: 'calc(100vh - 64px)',
+  radius: '16px',
+  headerPaddingX: '24px',
+  headerPaddingY: '20px',
+  headerFontSize: '17px',
+  headerFontWeight: 600,
+  bodyPaddingX: '24px',
+  bodyPaddingY: '20px',
+  bodyFontSize: '14px',
+  bodyLineHeight: 1.55,
+  footerPaddingX: '24px',
+  footerPaddingY: '16px',
+  footerGap: '8px',
+  closeButtonSize: '32px',
+  closeButtonRadius: '10px',
+  closeButtonOffset: '12px',
+  overlayBlur: '8px',
+  shadow: '0 24px 64px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.06)',
+  shadowDark: '0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06)',
+  overlayDuration: '180ms',
+  panelDuration: '250ms',
+  panelEnterTranslateY: '8px',
+  panelEnterScale: 0.985,
+} as const;
+
+export const tabsSizes = {
+  sm: {
+    height: '32px',
+    fontSize: '13px',
+    paddingX: '12px',
+    gap: '6px',
+    iconSize: '14px',
+  },
+  md: {
+    height: '40px',
+    fontSize: '14px',
+    paddingX: '16px',
+    gap: '8px',
+    iconSize: '16px',
+  },
+  lg: {
+    height: '48px',
+    fontSize: '15px',
+    paddingX: '20px',
+    gap: '10px',
+    iconSize: '18px',
+  },
+} as const;
+
+export const tabsTokens = {
+  listGap: '4px',
+  underlineThickness: '2px',
+  underlineRadius: '2px',
+  underlineBottomOffset: '0px',
+  underlineTrackBorder: '1px',
+  pillsRadius: '10px',
+  pillsTrackPadding: '4px',
+  pillsTrackRadius: '12px',
+  borderedRadius: '12px',
+  itemFontWeightDefault: 500,
+  itemFontWeightActive: 600,
+  panelPaddingY: '20px',
+  indicatorDuration: '250ms',
+  colorDuration: '120ms',
+} as const;
+
+export const paginationSizes = {
+  sm: {
+    itemSize: '28px',
+    fontSize: '12px',
+    gap: '4px',
+    radius: '8px',
+  },
+  md: {
+    itemSize: '36px',
+    fontSize: '14px',
+    gap: '6px',
+    radius: '10px',
+  },
+  lg: {
+    itemSize: '44px',
+    fontSize: '15px',
+    gap: '8px',
+    radius: '12px',
+  },
+} as const;
+
+export const paginationTokens = {
+  jumperWidth: '56px',
+  jumperHeight: '36px',
+  jumperRadius: '10px',
+  sizeSelectorMinWidth: '88px',
+  itemBorder: '1px',
+  hoverDuration: '120ms',
+} as const;
+
+export const tableDensities = {
+  compact: {
+    rowHeight: '36px',
+    cellPaddingY: '6px',
+    cellPaddingX: '12px',
+    fontSize: '13px',
+  },
+  default: {
+    rowHeight: '44px',
+    cellPaddingY: '10px',
+    cellPaddingX: '16px',
+    fontSize: '14px',
+  },
+  comfortable: {
+    rowHeight: '56px',
+    cellPaddingY: '14px',
+    cellPaddingX: '20px',
+    fontSize: '14px',
+  },
+} as const;
+
+export const tableTokens = {
+  headerFontSize: '12px',
+  headerFontWeight: 600,
+  headerLetterSpacing: '0.02em',
+  headerHeight: '40px',
+  headerBorderBottom: '1px',
+  rowBorderBottom: '1px',
+  cellLineHeight: 1.5,
+  sortIconSize: '14px',
+  sortIconGap: '6px',
+  selectionColumnWidth: '44px',
+  expandColumnWidth: '36px',
+  stickyHeaderShadow: '0 1px 0 0 rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.06)',
+  stickyColumnShadowLeft: '4px 0 6px -4px rgba(0, 0, 0, 0.12)',
+  stickyColumnShadowRight: '-4px 0 6px -4px rgba(0, 0, 0, 0.12)',
+  containerRadius: '12px',
+  containerBorder: '1px',
+  emptyMinHeight: '180px',
+  emptyFontSize: '14px',
+  resizeHandleWidth: '4px',
+  rowHoverDuration: '120ms',
+  expandDuration: '200ms',
+} as const;
+
 export const components = {
   button: buttonSizes,
   input: inputSizes,
@@ -195,6 +418,16 @@ export const components = {
   switch: switchSizes,
   slider: sliderSizes,
   segmentedControl: segmentedControlSizes,
+  chat: chatTokens,
+  popover: popoverTokens,
+  tooltip: tooltipTokens,
+  modal: modalTokens,
+  tabsSize: tabsSizes,
+  tabs: tabsTokens,
+  paginationSize: paginationSizes,
+  pagination: paginationTokens,
+  tableDensity: tableDensities,
+  table: tableTokens,
 } as const;
 
 export type ButtonSizes = typeof buttonSizes;
@@ -203,4 +436,14 @@ export type CheckboxSizes = typeof checkboxSizes;
 export type SwitchSizes = typeof switchSizes;
 export type SliderSizes = typeof sliderSizes;
 export type SegmentedControlSizes = typeof segmentedControlSizes;
+export type ChatTokens = typeof chatTokens;
+export type PopoverTokens = typeof popoverTokens;
+export type TooltipTokens = typeof tooltipTokens;
+export type ModalTokens = typeof modalTokens;
+export type TabsSizes = typeof tabsSizes;
+export type TabsTokens = typeof tabsTokens;
+export type PaginationSizes = typeof paginationSizes;
+export type PaginationTokens = typeof paginationTokens;
+export type TableDensities = typeof tableDensities;
+export type TableTokens = typeof tableTokens;
 export type Components = typeof components;
