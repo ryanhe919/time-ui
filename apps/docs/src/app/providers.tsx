@@ -10,9 +10,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { ConfigProvider, ThemeProvider, lightTheme, darkTheme, type Locale } from '@timeui/react';
 
 type Mode = 'light' | 'dark';
-const ThemeModeCtx = createContext<{ mode: Mode; toggle: () => void }>({
+const ThemeModeCtx = createContext<{
+  mode: Mode;
+  setMode: (next: Mode) => void;
+}>({
   mode: 'light',
-  toggle: () => {},
+  setMode: () => {},
 });
 
 export function useThemeMode() {
@@ -34,17 +37,14 @@ export function Providers({
     document.documentElement.dataset.theme = stored;
   }, []);
 
-  const toggle = useCallback(() => {
-    setMode((m) => {
-      const next = m === 'light' ? 'dark' : 'light';
-      localStorage.setItem('docs-theme', next);
-      document.documentElement.dataset.theme = next;
-      return next;
-    });
+  const setModeAndPersist = useCallback((next: Mode) => {
+    setMode(next);
+    localStorage.setItem('docs-theme', next);
+    document.documentElement.dataset.theme = next;
   }, []);
 
   const theme = mode === 'dark' ? darkTheme : lightTheme;
-  const value = useMemo(() => ({ mode, toggle }), [mode, toggle]);
+  const value = useMemo(() => ({ mode, setMode: setModeAndPersist }), [mode, setModeAndPersist]);
 
   return (
     <ThemeModeCtx.Provider value={value}>

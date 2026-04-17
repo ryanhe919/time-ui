@@ -1,0 +1,396 @@
+# SegmentedControl
+
+An iOS-style segmented selector: pick one value from a small mutually exclusive set. Internally each segment is a real `<input type="radio">`, so arrow-key navigation, screen readers, and native form submission work for free; the selected state is carried by a single highlight "thumb" that slides between segments.
+
+## Basic usage
+
+The canonical "time range / category filter" — pass an `options` array.
+
+<LiveDemo
+  code={`<SegmentedControl
+  aria-label="Date range"
+  defaultValue="1d"
+  options={[
+    { value: '1d', label: '1D' },
+    { value: '7d', label: '7D' },
+    { value: '1m', label: '1M' },
+    { value: '1y', label: '1Y' },
+    { value: 'all', label: 'All' },
+  ]}
+/>`}
+>
+  <SegmentedControl
+    aria-label="Date range"
+    defaultValue="1d"
+    options={[
+      { value: '1d', label: '1D' },
+      { value: '7d', label: '7D' },
+      { value: '1m', label: '1M' },
+      { value: '1y', label: '1Y' },
+      { value: 'all', label: 'All' },
+    ]}
+  />
+</LiveDemo>
+
+## With icons
+
+Each `option` accepts an `icon`; in horizontal mode it sits to the left of the label. If `label` is icon-only, supply `aria-label` so the segment still has an accessible name.
+
+<LiveDemo
+  code={`<SegmentedControl
+  aria-label="Inbox"
+  value={tab}
+  onChange={setTab}
+  options={[
+    { value: 'chats', label: 'Chats', icon: <ChatIcon /> },
+    { value: 'emails', label: 'Emails', icon: <MailIcon /> },
+  ]}
+/>`}
+>
+  <SegmentedControlInboxDemo />
+</LiveDemo>
+
+## Icon-only
+
+When every `option` has only an `icon` and no visible `label`, the control auto-switches to a "square segment + circular indicator" shape — perfect for compact tool buttons like theme or view switchers. Each icon must supply `option["aria-label"]` to keep an accessible name.
+
+<LiveDemo code={`<SegmentedControl
+  size="sm"
+  aria-label="Theme"
+  defaultValue="light"
+  options={[
+    { value: 'light', label: <SunIcon />,  'aria-label': 'Light' },
+    { value: 'dark',  label: <MoonIcon />, 'aria-label': 'Dark'  },
+  ]}
+/>
+
+<SegmentedControl
+  aria-label="View"
+  defaultValue="list"
+  options={[
+    { value: 'list',    label: <ListIcon />,    'aria-label': 'List'    },
+    { value: 'grid',    label: <GridIcon />,    'aria-label': 'Grid'    },
+    { value: 'columns', label: <ColumnsIcon />, 'aria-label': 'Columns' },
+  ]}
+/>`}>
+  <SegmentedControlIconOnlyDemo />
+</LiveDemo>
+
+## Controlled
+
+`value` + `onChange` puts you in full control; `onChange` fires once per selection with the next `value`.
+
+<LiveDemo code={`import { useState } from 'react';
+import { SegmentedControl } from '@timeui/react';
+
+type Range = '1d' | '7d' | '1m' | '1y' | 'all';
+
+export function DateRange() {
+  const [range, setRange] = useState<Range>('1d');
+  return (
+    <SegmentedControl<Range>
+      aria-label="Date range"
+      value={range}
+      onChange={setRange}
+      options={[
+        { value: '1d', label: '1D' },
+        { value: '7d', label: '7D' },
+        { value: '1m', label: '1M' },
+        { value: '1y', label: '1Y' },
+        { value: 'all', label: 'All' },
+      ]}
+    />
+  );
+}`}>
+  <SegmentedControlRangeDemo />
+</LiveDemo>
+
+## Colors
+
+`color` drives the selected text and focus ring. `isInvalid` overrides it to `danger`.
+
+<LiveDemo
+  code={`<Stack spacing={16}>
+  <SegmentedControl color="primary"   aria-label="primary"   defaultValue="a" options={SAMPLE} />
+  <SegmentedControl color="secondary" aria-label="secondary" defaultValue="a" options={SAMPLE} />
+  <SegmentedControl color="success"   aria-label="success"   defaultValue="a" options={SAMPLE} />
+  <SegmentedControl color="warning"   aria-label="warning"   defaultValue="a" options={SAMPLE} />
+  <SegmentedControl color="danger"    aria-label="danger"    defaultValue="a" options={SAMPLE} />
+</Stack>`}
+>
+  <Stack spacing={16}>
+    <SegmentedControl
+      color="primary"
+      aria-label="primary"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      color="secondary"
+      aria-label="secondary"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      color="success"
+      aria-label="success"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      color="warning"
+      aria-label="warning"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      color="danger"
+      aria-label="danger"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+<LiveDemo
+  code={`<Stack spacing={16}>
+  <SegmentedControl size="sm" aria-label="sm" defaultValue="a" options={SAMPLE} />
+  <SegmentedControl size="md" aria-label="md" defaultValue="a" options={SAMPLE} />
+  <SegmentedControl size="lg" aria-label="lg" defaultValue="a" options={SAMPLE} />
+</Stack>`}
+>
+  <Stack spacing={16}>
+    <SegmentedControl
+      size="sm"
+      aria-label="sm"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Day' },
+        { value: 'b', label: 'Week' },
+        { value: 'c', label: 'Month' },
+      ]}
+    />
+    <SegmentedControl
+      size="md"
+      aria-label="md"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Day' },
+        { value: 'b', label: 'Week' },
+        { value: 'c', label: 'Month' },
+      ]}
+    />
+    <SegmentedControl
+      size="lg"
+      aria-label="lg"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Day' },
+        { value: 'b', label: 'Week' },
+        { value: 'c', label: 'Month' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## Vertical
+
+`orientation="vertical"` is well-suited to sidebar-style view switchers — segments stack into rows.
+
+<LiveDemo
+  code={`<SegmentedControl
+  orientation="vertical"
+  aria-label="View"
+  defaultValue="overview"
+  options={[
+    { value: 'overview', label: 'Overview' },
+    { value: 'analytics', label: 'Analytics' },
+    { value: 'reports', label: 'Reports' },
+    { value: 'settings', label: 'Settings' },
+  ]}
+/>`}
+>
+  <SegmentedControl
+    orientation="vertical"
+    aria-label="View"
+    defaultValue="overview"
+    options={[
+      { value: 'overview', label: 'Overview' },
+      { value: 'analytics', label: 'Analytics' },
+      { value: 'reports', label: 'Reports' },
+      { value: 'settings', label: 'Settings' },
+    ]}
+  />
+</LiveDemo>
+
+## States
+
+`isDisabled` disables the whole group, `isReadOnly` locks the current selection, `isInvalid` swaps in the `danger` palette + `aria-invalid`. Per-option `isDisabled` is also supported.
+
+<LiveDemo
+  code={`<Stack spacing={16}>
+  <SegmentedControl label="Disabled" isDisabled defaultValue="a" options={SAMPLE} />
+  <SegmentedControl label="Read only" isReadOnly defaultValue="b" options={SAMPLE} />
+  <SegmentedControl label="Invalid" isInvalid defaultValue="a" options={SAMPLE} />
+  <SegmentedControl
+    label="Per-option disabled"
+    defaultValue="a"
+    options={[
+      { value: 'a', label: 'Free' },
+      { value: 'b', label: 'Pro', isDisabled: true },
+      { value: 'c', label: 'Team' },
+    ]}
+  />
+</Stack>`}
+>
+  <Stack spacing={16}>
+    <SegmentedControl
+      label="Disabled"
+      isDisabled
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      label="Read only"
+      isReadOnly
+      defaultValue="b"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      label="Invalid"
+      isInvalid
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      label="Per-option disabled"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Free' },
+        { value: 'b', label: 'Pro', isDisabled: true },
+        { value: 'c', label: 'Team' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## Full width
+
+By default the control sizes to its content. `isFullWidth` stretches it across the parent container with equally-sized segments.
+
+<LiveDemo
+  code={`<SegmentedControl
+  isFullWidth
+  aria-label="Plan"
+  defaultValue="monthly"
+  options={[
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly · save 20%' },
+  ]}
+/>`}
+>
+  <div style={{ width: 'min(420px, 100%)' }}>
+    <SegmentedControl
+      isFullWidth
+      aria-label="Plan"
+      defaultValue="monthly"
+      options={[
+        { value: 'monthly', label: 'Monthly' },
+        { value: 'yearly', label: 'Yearly · save 20%' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## API
+
+<PropsTable
+  props={[
+    {
+      name: 'options',
+      type: 'ReadonlyArray<SegmentedControlOption<V>>',
+      description: 'Required. Each entry: value / label / icon? / isDisabled? / aria-label?.',
+    },
+    { name: 'value', type: 'V', description: 'Controlled value.' },
+    {
+      name: 'defaultValue',
+      type: 'V',
+      description: 'Uncontrolled initial value. Falls back to the first non-disabled option.',
+    },
+    {
+      name: 'onChange',
+      type: '(value: V) => void',
+      description: 'Fires on each selection change.',
+    },
+    {
+      name: 'color',
+      type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'",
+      default: "'primary'",
+    },
+    { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+    { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
+    {
+      name: 'label',
+      type: 'ReactNode',
+      description: 'Associated label rendered above the control.',
+    },
+    {
+      name: 'name',
+      type: 'string',
+      description: 'Form field name (segments share this name as radios).',
+    },
+    { name: 'isDisabled', type: 'boolean', default: 'false' },
+    { name: 'isReadOnly', type: 'boolean', default: 'false' },
+    {
+      name: 'isInvalid',
+      type: 'boolean',
+      default: 'false',
+      description: 'Forces the `danger` palette + `aria-invalid`.',
+    },
+    { name: 'isRequired', type: 'boolean', default: 'false' },
+    {
+      name: 'isFullWidth',
+      type: 'boolean',
+      default: 'false',
+      description: 'Stretch the control to the parent width.',
+    },
+  ]}
+/>
+
+<Callout variant="info" title="Accessibility">
+  The control wraps native `<input type="radio">` in a `role="radiogroup"`, so the browser handles arrow / Home / End navigation, form submission, and screen-reader announcements ("X of Y") natively. When an `option.label` is icon-only, supply `option["aria-label"]` so each segment still has an accessible name. `prefers-reduced-motion` disables the indicator's slide transition.
+</Callout>

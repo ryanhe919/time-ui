@@ -28,6 +28,7 @@ import {
   RadioGroup,
   Switch,
   Slider,
+  SegmentedControl,
   Select,
   SelectOption,
 } from '@/components/timeui-client';
@@ -41,6 +42,9 @@ import { RadioGroupDemo } from '@/components/mdx/RadioGroupDemo';
 import { SwitchSettingsDemo } from '@/components/mdx/SwitchSettingsDemo';
 import { SliderVolumeDemo } from '@/components/mdx/SliderVolumeDemo';
 import { SliderRangeDemo } from '@/components/mdx/SliderRangeDemo';
+import { SegmentedControlInboxDemo } from '@/components/mdx/SegmentedControlInboxDemo';
+import { SegmentedControlRangeDemo } from '@/components/mdx/SegmentedControlRangeDemo';
+import { SegmentedControlIconOnlyDemo } from '@/components/mdx/SegmentedControlIconOnlyDemo';
 import { SelectDemo } from '@/components/mdx/SelectDemo';
 import { CodeBlockOnCopyDemo } from '@/components/mdx/CodeBlockOnCopyDemo';
 
@@ -83,6 +87,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     SwitchSettingsDemo,
     SliderVolumeDemo,
     SliderRangeDemo,
+    SegmentedControlInboxDemo,
+    SegmentedControlRangeDemo,
+    SegmentedControlIconOnlyDemo,
     SelectDemo,
     CodeBlockOnCopyDemo,
 
@@ -107,6 +114,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     RadioGroup,
     Switch,
     Slider,
+    SegmentedControl,
     Select,
     SelectOption,
 

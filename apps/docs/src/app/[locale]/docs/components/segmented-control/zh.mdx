@@ -1,0 +1,384 @@
+# 分段控制 SegmentedControl
+
+iOS 风格的分段选择器：在一组互斥的选项中选取一个值。底层是原生 `<input type="radio">`，所以方向键导航、屏幕阅读器、表单提交都开箱即用；选中态由一颗会平滑滑动的"高亮 thumb"承载。
+
+## 基础用法
+
+最常见的"时间范围 / 类目筛选"场景，传一组 `options` 即可。
+
+<LiveDemo
+  code={`<SegmentedControl
+  aria-label="Date range"
+  defaultValue="1d"
+  options={[
+    { value: '1d', label: '1D' },
+    { value: '7d', label: '7D' },
+    { value: '1m', label: '1M' },
+    { value: '1y', label: '1Y' },
+    { value: 'all', label: 'All' },
+  ]}
+/>`}
+>
+  <SegmentedControl
+    aria-label="Date range"
+    defaultValue="1d"
+    options={[
+      { value: '1d', label: '1D' },
+      { value: '7d', label: '7D' },
+      { value: '1m', label: '1M' },
+      { value: '1y', label: '1Y' },
+      { value: 'all', label: 'All' },
+    ]}
+  />
+</LiveDemo>
+
+## 带图标
+
+每个 `option` 可以传 `icon`，横向时图标位于文本左侧。当 `label` 是图标节点（无文本）时，请通过 `aria-label` 提供可访问名。
+
+<LiveDemo
+  code={`<SegmentedControl
+  aria-label="Inbox"
+  value={tab}
+  onChange={setTab}
+  options={[
+    { value: 'chats', label: 'Chats', icon: <ChatIcon /> },
+    { value: 'emails', label: 'Emails', icon: <MailIcon /> },
+  ]}
+/>`}
+>
+  <SegmentedControlInboxDemo />
+</LiveDemo>
+
+## 纯图标模式
+
+当所有 `option` 都只有 `icon` 而没有可见 `label` 时，组件会自动切换为"正方形 segment + 正圆 indicator"形态——常见于主题切换、视图切换等紧凑工具按钮。每个图标必须通过 `option["aria-label"]` 提供可访问名。
+
+<LiveDemo code={`<SegmentedControl
+  size="sm"
+  aria-label="Theme"
+  defaultValue="light"
+  options={[
+    { value: 'light', label: <SunIcon />,  'aria-label': 'Light' },
+    { value: 'dark',  label: <MoonIcon />, 'aria-label': 'Dark'  },
+  ]}
+/>
+
+<SegmentedControl
+  aria-label="View"
+  defaultValue="list"
+  options={[
+    { value: 'list',    label: <ListIcon />,    'aria-label': 'List'    },
+    { value: 'grid',    label: <GridIcon />,    'aria-label': 'Grid'    },
+    { value: 'columns', label: <ColumnsIcon />, 'aria-label': 'Columns' },
+  ]}
+/>`}>
+  <SegmentedControlIconOnlyDemo />
+</LiveDemo>
+
+## 受控用法
+
+`value` + `onChange` 即可受控；`onChange` 在每次选择变化时触发，传入新的 `value`。
+
+<LiveDemo code={`import { useState } from 'react';
+import { SegmentedControl } from '@timeui/react';
+
+type Range = '1d' | '7d' | '1m' | '1y' | 'all';
+
+export function DateRange() {
+  const [range, setRange] = useState<Range>('1d');
+  return (
+    <SegmentedControl<Range>
+      aria-label="Date range"
+      value={range}
+      onChange={setRange}
+      options={[
+        { value: '1d', label: '1D' },
+        { value: '7d', label: '7D' },
+        { value: '1m', label: '1M' },
+        { value: '1y', label: '1Y' },
+        { value: 'all', label: 'All' },
+      ]}
+    />
+  );
+}`}>
+  <SegmentedControlRangeDemo />
+</LiveDemo>
+
+## 颜色
+
+`color` 控制选中态文字与焦点环颜色。`isInvalid` 会强制走 `danger`。
+
+<LiveDemo
+  code={`<Stack spacing={16}>
+  <SegmentedControl color="primary"   aria-label="primary"   defaultValue="a" options={SAMPLE} />
+  <SegmentedControl color="secondary" aria-label="secondary" defaultValue="a" options={SAMPLE} />
+  <SegmentedControl color="success"   aria-label="success"   defaultValue="a" options={SAMPLE} />
+  <SegmentedControl color="warning"   aria-label="warning"   defaultValue="a" options={SAMPLE} />
+  <SegmentedControl color="danger"    aria-label="danger"    defaultValue="a" options={SAMPLE} />
+</Stack>`}
+>
+  <Stack spacing={16}>
+    <SegmentedControl
+      color="primary"
+      aria-label="primary"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      color="secondary"
+      aria-label="secondary"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      color="success"
+      aria-label="success"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      color="warning"
+      aria-label="warning"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      color="danger"
+      aria-label="danger"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## 尺寸
+
+<LiveDemo
+  code={`<Stack spacing={16}>
+  <SegmentedControl size="sm" aria-label="sm" defaultValue="a" options={SAMPLE} />
+  <SegmentedControl size="md" aria-label="md" defaultValue="a" options={SAMPLE} />
+  <SegmentedControl size="lg" aria-label="lg" defaultValue="a" options={SAMPLE} />
+</Stack>`}
+>
+  <Stack spacing={16}>
+    <SegmentedControl
+      size="sm"
+      aria-label="sm"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Day' },
+        { value: 'b', label: 'Week' },
+        { value: 'c', label: 'Month' },
+      ]}
+    />
+    <SegmentedControl
+      size="md"
+      aria-label="md"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Day' },
+        { value: 'b', label: 'Week' },
+        { value: 'c', label: 'Month' },
+      ]}
+    />
+    <SegmentedControl
+      size="lg"
+      aria-label="lg"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Day' },
+        { value: 'b', label: 'Week' },
+        { value: 'c', label: 'Month' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## 纵向 Vertical
+
+`orientation="vertical"` 适合侧边栏式的视图切换，每个分段平铺为一行。
+
+<LiveDemo
+  code={`<SegmentedControl
+  orientation="vertical"
+  aria-label="View"
+  defaultValue="overview"
+  options={[
+    { value: 'overview', label: 'Overview' },
+    { value: 'analytics', label: 'Analytics' },
+    { value: 'reports', label: 'Reports' },
+    { value: 'settings', label: 'Settings' },
+  ]}
+/>`}
+>
+  <SegmentedControl
+    orientation="vertical"
+    aria-label="View"
+    defaultValue="overview"
+    options={[
+      { value: 'overview', label: 'Overview' },
+      { value: 'analytics', label: 'Analytics' },
+      { value: 'reports', label: 'Reports' },
+      { value: 'settings', label: 'Settings' },
+    ]}
+  />
+</LiveDemo>
+
+## 状态
+
+`isDisabled` 整体禁用，`isReadOnly` 锁定当前选中值，`isInvalid` 强制 `danger` 配色 + `aria-invalid`。也支持单项 `option.isDisabled`。
+
+<LiveDemo
+  code={`<Stack spacing={16}>
+  <SegmentedControl label="Disabled" isDisabled defaultValue="a" options={SAMPLE} />
+  <SegmentedControl label="Read only" isReadOnly defaultValue="b" options={SAMPLE} />
+  <SegmentedControl label="Invalid" isInvalid defaultValue="a" options={SAMPLE} />
+  <SegmentedControl
+    label="Per-option disabled"
+    defaultValue="a"
+    options={[
+      { value: 'a', label: 'Free' },
+      { value: 'b', label: 'Pro', isDisabled: true },
+      { value: 'c', label: 'Team' },
+    ]}
+  />
+</Stack>`}
+>
+  <Stack spacing={16}>
+    <SegmentedControl
+      label="Disabled"
+      isDisabled
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      label="Read only"
+      isReadOnly
+      defaultValue="b"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      label="Invalid"
+      isInvalid
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'One' },
+        { value: 'b', label: 'Two' },
+        { value: 'c', label: 'Three' },
+      ]}
+    />
+    <SegmentedControl
+      label="Per-option disabled"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Free' },
+        { value: 'b', label: 'Pro', isDisabled: true },
+        { value: 'c', label: 'Team' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+## 撑满父容器
+
+默认按内容自适应宽度。`isFullWidth` 让控件铺满父容器，每个分段等宽。
+
+<LiveDemo
+  code={`<SegmentedControl
+  isFullWidth
+  aria-label="Plan"
+  defaultValue="monthly"
+  options={[
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly · save 20%' },
+  ]}
+/>`}
+>
+  <div style={{ width: 'min(420px, 100%)' }}>
+    <SegmentedControl
+      isFullWidth
+      aria-label="Plan"
+      defaultValue="monthly"
+      options={[
+        { value: 'monthly', label: 'Monthly' },
+        { value: 'yearly', label: 'Yearly · save 20%' },
+      ]}
+    />
+  </div>
+</LiveDemo>
+
+## API
+
+<PropsTable
+  props={[
+    {
+      name: 'options',
+      type: 'ReadonlyArray<SegmentedControlOption<V>>',
+      description:
+        '分段选项数组（必填）。每项含 value / label / icon? / isDisabled? / aria-label?。',
+    },
+    { name: 'value', type: 'V', description: '受控值。' },
+    {
+      name: 'defaultValue',
+      type: 'V',
+      description: '非受控初始值。未提供时取第一个非 disabled 选项。',
+    },
+    { name: 'onChange', type: '(value: V) => void', description: '选中变化时触发。' },
+    {
+      name: 'color',
+      type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'",
+      default: "'primary'",
+    },
+    { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+    { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
+    { name: 'label', type: 'ReactNode', description: '关联文本标签，渲染在控件上方。' },
+    {
+      name: 'name',
+      type: 'string',
+      description: '表单字段名（每个 segment 是同 name 的 radio）。',
+    },
+    { name: 'isDisabled', type: 'boolean', default: 'false' },
+    { name: 'isReadOnly', type: 'boolean', default: 'false' },
+    {
+      name: 'isInvalid',
+      type: 'boolean',
+      default: 'false',
+      description: '强制 `danger` 配色 + `aria-invalid`。',
+    },
+    { name: 'isRequired', type: 'boolean', default: 'false' },
+    { name: 'isFullWidth', type: 'boolean', default: 'false', description: '撑满父容器。' },
+  ]}
+/>
+
+<Callout variant="info" title="可访问性">
+  控件用 `role="radiogroup"` 包裹原生 `<input type="radio">`，浏览器原生提供方向键 / Home / End 切换、表单提交、屏幕阅读器播报"X 选 Y"等行为。当 `option.label` 为图标时，请通过 `option["aria-label"]` 提供可访问名。`prefers-reduced-motion` 下取消滑动 indicator 的过渡。
+</Callout>

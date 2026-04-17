@@ -29,6 +29,7 @@ export {
   RadioGroup,
   Switch,
   Slider,
+  SegmentedControl,
   Select,
   SelectOption,
 } from '@timeui/react';

@@ -51,6 +51,7 @@ const zh: DocsMessages = {
     radio: '单选按钮',
     switch: '开关',
     slider: '滑块',
+    'segmented-control': '分段控制',
   },
   nav: {
     onThisPage: '本页目录',
@@ -91,6 +92,7 @@ const en: DocsMessages = {
     radio: 'Radio',
     switch: 'Switch',
     slider: 'Slider',
+    'segmented-control': 'Segmented Control',
   },
   nav: {
     onThisPage: 'On this page',

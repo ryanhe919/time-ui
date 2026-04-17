@@ -49,6 +49,7 @@ const SECTIONS: readonly SectionConfig[] = [
           'radio',
           'switch',
           'slider',
+          'segmented-control',
         ],
       },
     ],

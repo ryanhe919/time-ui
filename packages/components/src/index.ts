@@ -28,4 +28,5 @@ export * from './Checkbox';
 export * from './Radio';
 export * from './Switch';
 export * from './Slider';
+export * from './SegmentedControl';
 export * from './Select';

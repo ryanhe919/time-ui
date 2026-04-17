@@ -158,12 +158,43 @@ export const sliderSizes = {
   },
 } as const;
 
+export const segmentedControlSizes = {
+  sm: {
+    height: '28px',
+    fontSize: '12px',
+    paddingX: '10px',
+    iconSize: '14px',
+    gap: '6px',
+    innerPadding: '3px',
+    verticalWidth: '120px',
+  },
+  md: {
+    height: '36px',
+    fontSize: '14px',
+    paddingX: '16px',
+    iconSize: '16px',
+    gap: '8px',
+    innerPadding: '4px',
+    verticalWidth: '160px',
+  },
+  lg: {
+    height: '44px',
+    fontSize: '15px',
+    paddingX: '20px',
+    iconSize: '18px',
+    gap: '10px',
+    innerPadding: '5px',
+    verticalWidth: '180px',
+  },
+} as const;
+
 export const components = {
   button: buttonSizes,
   input: inputSizes,
   checkbox: checkboxSizes,
   switch: switchSizes,
   slider: sliderSizes,
+  segmentedControl: segmentedControlSizes,
 } as const;
 
 export type ButtonSizes = typeof buttonSizes;
@@ -171,4 +202,5 @@ export type InputSizes = typeof inputSizes;
 export type CheckboxSizes = typeof checkboxSizes;
 export type SwitchSizes = typeof switchSizes;
 export type SliderSizes = typeof sliderSizes;
+export type SegmentedControlSizes = typeof segmentedControlSizes;
 export type Components = typeof components;
