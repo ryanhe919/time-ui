@@ -56,7 +56,9 @@ export function TopNav({ navigation, messages, locale }: Props) {
       css={css`
         position: sticky;
         top: 0;
-        z-index: 9999;
+        /* sticky header 层级；低于 popover (1500) / toast (1700) / tooltip (1800)
+           让浮层和 toast 能正常盖在 header 之上。 */
+        z-index: 1100;
         height: 48px;
         background: var(--c-nav-bg);
         backdrop-filter: saturate(180%) blur(20px);
