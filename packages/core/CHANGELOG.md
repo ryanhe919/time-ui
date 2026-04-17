@@ -1,5 +1,13 @@
 # @timeui/core
 
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [0a3337c]
+  - @timeui/tokens@1.3.0
+  - @timeui/themes@1.1.2
+
 ## 1.1.1
 
 ### Patch Changes

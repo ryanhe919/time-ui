@@ -33,7 +33,6 @@ import {
   compareDays,
   endOfMonth,
   isInRange,
-  isInRangeExclusive,
   isSameDay,
   isWithinBounds,
   monthLabel,
@@ -86,6 +85,11 @@ export interface CalendarPanelProps {
   /** 是否隐藏 prev/next（DateRangePicker 双月时左/右面板分别用得上）。 */
   hidePrevButton?: boolean;
   hideNextButton?: boolean;
+  /**
+   * 是否隐藏相邻月份的 outside-month cell（保留 grid 占位但不渲染数字 / 不可交互）。
+   * DateRangePicker 双月视图用它避免两个 panel 重复显示同一天，视觉更克制。
+   */
+  hideOutsideMonth?: boolean;
   /** 自定义 footer 区域内容（覆盖默认按钮）。 */
   footer?: ReactNode;
   /** 整体 a11y label。 */
@@ -97,6 +101,10 @@ export interface CalendarPanelProps {
 
 const TODAY_LABEL = 'Today';
 const CLEAR_LABEL = 'Clear';
+
+function isChineseLocale(locale?: string): boolean {
+  return locale?.toLowerCase().startsWith('zh') ?? false;
+}
 
 export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
   function CalendarPanel(props, forwardedRef) {
@@ -124,6 +132,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       showClearButton = true,
       hidePrevButton = false,
       hideNextButton = false,
+      hideOutsideMonth = false,
       footer,
       'aria-label': ariaLabel,
       className,
@@ -133,6 +142,12 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
 
     const theme = useTheme();
     const tokens = theme.components.datePicker;
+    const isZh = isChineseLocale(locale);
+    const todayLabel = isZh ? '今天' : TODAY_LABEL;
+    const clearLabel = isZh ? '清除' : CLEAR_LABEL;
+    const calendarLabel = isZh ? '日历' : 'Calendar';
+    const previousMonthLabel = isZh ? '上个月' : 'Previous month';
+    const nextMonthLabel = isZh ? '下个月' : 'Next month';
 
     const autoId = useId();
     const safeAutoId = autoId.replace(/:/g, '');
@@ -484,10 +499,51 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       cursor: pointer;
       border-radius: ${tokens.cellRadius};
       position: relative;
+      isolation: isolate;
       user-select: none;
       transition:
         background-color 120ms ease,
         color 120ms ease;
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        opacity: 0;
+        pointer-events: none;
+        background: transparent;
+        border-radius: ${tokens.rangeBgRadius};
+        z-index: 0;
+      }
+      &[data-in-range='true']::before,
+      &[data-range-bridge-left='true']::before,
+      &[data-range-bridge-right='true']::before {
+        background: ${primarySoft};
+        opacity: 1;
+      }
+      &[data-preview='true']::before,
+      &[data-preview-bridge-left='true']::before,
+      &[data-preview-bridge-right='true']::before {
+        background: ${primarySoft};
+        opacity: ${tokens.rangePreviewOpacity};
+      }
+      &[data-in-range='true']::before,
+      &[data-preview='true']::before,
+      &[data-range-bridge-left='true'][data-range-bridge-right='true']::before,
+      &[data-preview-bridge-left='true'][data-preview-bridge-right='true']::before {
+        left: calc(-1 * (${tokens.cellGap} / 2));
+        right: calc(-1 * (${tokens.cellGap} / 2));
+      }
+      &[data-range-bridge-left='true']::before,
+      &[data-preview-bridge-left='true']::before {
+        left: calc(-1 * (${tokens.cellGap} / 2));
+      }
+      &[data-range-bridge-right='true']::before,
+      &[data-preview-bridge-right='true']::before {
+        right: calc(-1 * (${tokens.cellGap} / 2));
+      }
       &:hover:not([data-disabled='true']):not([data-selected='true']) {
         background: ${hoverBg};
       }
@@ -554,6 +610,14 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
 
     // 计算每个 cell 的状态。
     const cells = useMemo(() => {
+      // 预先归一化 range 端点到 startOfDay timestamp，避免 42 cells × 重复 startOfDay 分配。
+      const rStart = mode === 'range' ? (range?.start ?? null) : null;
+      const rEnd = mode === 'range' ? (range?.end ?? null) : null;
+      const rStartTs = rStart ? startOfDay(rStart).getTime() : null;
+      const rEndTs = rEnd ? startOfDay(rEnd).getTime() : null;
+      const rLoTs = rStartTs !== null && rEndTs !== null ? Math.min(rStartTs, rEndTs) : null;
+      const rHiTs = rStartTs !== null && rEndTs !== null ? Math.max(rStartTs, rEndTs) : null;
+
       return matrix.map((cell) => {
         const isCurrentMonth = cell.isCurrentMonth;
         const isToday = isSameDay(cell.date, today);
@@ -563,26 +627,57 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
         const isDisabled = isUnavailable || isOutOfBounds;
         const isFocused = isSameDay(cell.date, focusedDate);
 
-        // range 高亮
+        // range 高亮（用预先 hoist 的 timestamp，避免在 map 循环里重复 startOfDay）
         let isRangeStart = false;
         let isRangeEnd = false;
         let isInRangeMid = false;
         let isPreview = false;
+        let rangeBridgeLeft = false;
+        let rangeBridgeRight = false;
+        let previewBridgeLeft = false;
+        let previewBridgeRight = false;
         if (mode === 'range') {
-          const rStart = range?.start ?? null;
-          const rEnd = range?.end ?? null;
-          if (rStart && rEnd) {
-            isRangeStart = isSameDay(cell.date, rStart) || isSameDay(cell.date, rEnd);
-            isRangeEnd = isRangeStart;
-            isInRangeMid = isInRangeExclusive(cell.date, rStart, rEnd);
-          } else if (rStart && !rEnd) {
-            isRangeStart = isSameDay(cell.date, rStart);
-            // hover preview
-            if (hoverEnd && !isSameDay(cell.date, rStart)) {
+          const cellTs = startOfDay(cell.date).getTime();
+          if (rStartTs !== null && rEndTs !== null) {
+            isRangeStart = cellTs === rStartTs;
+            isRangeEnd = cellTs === rEndTs;
+            isInRangeMid = rLoTs !== null && rHiTs !== null && cellTs > rLoTs && cellTs < rHiTs;
+            if (rStartTs !== rEndTs) {
+              const isForward = rEndTs > rStartTs;
+              if (isRangeStart) {
+                rangeBridgeRight = isForward;
+                rangeBridgeLeft = !isForward;
+              } else if (isRangeEnd) {
+                rangeBridgeLeft = isForward;
+                rangeBridgeRight = !isForward;
+              } else if (isInRangeMid) {
+                rangeBridgeLeft = true;
+                rangeBridgeRight = true;
+              }
+            }
+          } else if (rStartTs !== null && rEndTs === null && rStart) {
+            isRangeStart = cellTs === rStartTs;
+            // hover preview：hover 路径相对低频，保持原有 Date API 调用
+            if (hoverEnd && cellTs !== rStartTs) {
               isPreview = isInRange(cell.date, rStart, hoverEnd);
-              // 端点不算 preview-mid
               if (isSameDay(cell.date, hoverEnd)) {
                 isPreview = true;
+              }
+            }
+            if (hoverEnd) {
+              const hoverTs = startOfDay(hoverEnd).getTime();
+              if (hoverTs !== rStartTs) {
+                const isForward = hoverTs > rStartTs;
+                if (isRangeStart) {
+                  previewBridgeRight = isForward;
+                  previewBridgeLeft = !isForward;
+                } else if (cellTs === hoverTs) {
+                  previewBridgeLeft = isForward;
+                  previewBridgeRight = !isForward;
+                } else if (isPreview) {
+                  previewBridgeLeft = true;
+                  previewBridgeRight = true;
+                }
               }
             }
           }
@@ -599,6 +694,10 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
           isRangeEnd,
           isInRangeMid,
           isPreview,
+          rangeBridgeLeft,
+          rangeBridgeRight,
+          previewBridgeLeft,
+          previewBridgeRight,
         };
       });
     }, [
@@ -635,7 +734,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
         id={baseId}
         className={className}
         style={style}
-        aria-label={ariaLabel ?? 'Calendar'}
+        aria-label={ariaLabel ?? calendarLabel}
         data-timeui-calendar=""
       >
         <div css={headerCss}>
@@ -649,7 +748,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
           ) : (
             <button
               type="button"
-              aria-label="Previous month"
+              aria-label={previousMonthLabel}
               disabled={prevDisabled}
               onClick={() => {
                 setSlide(-1);
@@ -691,7 +790,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
           ) : (
             <button
               type="button"
-              aria-label="Next month"
+              aria-label={nextMonthLabel}
               disabled={nextDisabled}
               onClick={() => {
                 setSlide(1);
@@ -739,27 +838,73 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
           >
             {cells.map((c) => {
               const dateAttr = c.date.toISOString().slice(0, 10);
+              // DateRangePicker 双月视图下，相邻月份 outside cell 渲染为不可交互的 grid 占位，
+              // 避免两个 panel 重复显示同一天的视觉冗余。
+              if (hideOutsideMonth && !c.isCurrentMonth) {
+                return (
+                  <span
+                    key={dateAttr}
+                    aria-hidden
+                    data-date={dateAttr}
+                    data-outside-placeholder=""
+                    css={css`
+                      width: ${tokens.cellSize};
+                      height: ${tokens.cellSize};
+                      display: inline-block;
+                    `}
+                  />
+                );
+              }
+              // isAnySelected 聚合 single 选中与 range 两端，后续 5 处判断共用。
+              const isAnySelected = c.isSelected || c.isRangeStart || c.isRangeEnd;
               // 计算 cell 的视觉样式（行内 style 优先于 css 块以避免大量 styled 实例）。
               const cellInline: CSSProperties = {};
-              if (c.isSelected || c.isRangeStart || c.isRangeEnd) {
-                cellInline.background = primaryBg;
-                cellInline.color = primaryFg;
-                cellInline.borderRadius = tokens.rangeEndRadius;
-              } else if (c.isInRangeMid) {
-                cellInline.background = primarySoft;
-                cellInline.borderRadius = tokens.rangeBgRadius;
-              } else if (c.isPreview) {
-                cellInline.background = primarySoft;
-                cellInline.opacity = tokens.rangePreviewOpacity;
-                cellInline.borderRadius = tokens.rangeBgRadius;
+              // 圆角策略：start/end 的内侧（朝向区间中段的一侧）保持直角，
+              // 与 mid 段浅蓝条无缝拼接；外侧走 rangeEndRadius 圆角。
+              // 单日（isSelected 或 start === end）四角全圆。
+              if (isAnySelected) {
+                const r = tokens.rangeEndRadius;
+                const isStartOnly = c.isRangeStart && !c.isRangeEnd;
+                const isEndOnly = c.isRangeEnd && !c.isRangeStart;
+                if (isStartOnly) {
+                  cellInline.borderTopLeftRadius = r;
+                  cellInline.borderBottomLeftRadius = r;
+                  cellInline.borderTopRightRadius = 0;
+                  cellInline.borderBottomRightRadius = 0;
+                } else if (isEndOnly) {
+                  cellInline.borderTopRightRadius = r;
+                  cellInline.borderBottomRightRadius = r;
+                  cellInline.borderTopLeftRadius = 0;
+                  cellInline.borderBottomLeftRadius = 0;
+                } else {
+                  cellInline.borderRadius = r;
+                }
               }
-              if (!c.isCurrentMonth && !c.isSelected && !c.isRangeStart && !c.isRangeEnd) {
+              if (!c.isCurrentMonth && !isAnySelected) {
                 cellInline.color = textDisabled;
               }
               if (c.isDisabled) {
                 cellInline.opacity = 0.4;
                 cellInline.cursor = 'not-allowed';
               }
+              const uniformRadius =
+                cellInline.borderRadius === undefined ? undefined : String(cellInline.borderRadius);
+              const borderTopLeftRadius =
+                cellInline.borderTopLeftRadius === undefined
+                  ? uniformRadius
+                  : String(cellInline.borderTopLeftRadius);
+              const borderTopRightRadius =
+                cellInline.borderTopRightRadius === undefined
+                  ? uniformRadius
+                  : String(cellInline.borderTopRightRadius);
+              const borderBottomLeftRadius =
+                cellInline.borderBottomLeftRadius === undefined
+                  ? uniformRadius
+                  : String(cellInline.borderBottomLeftRadius);
+              const borderBottomRightRadius =
+                cellInline.borderBottomRightRadius === undefined
+                  ? uniformRadius
+                  : String(cellInline.borderBottomRightRadius);
               const ariaLabelDay = c.date.toLocaleDateString(locale, {
                 weekday: 'long',
                 year: 'numeric',
@@ -774,11 +919,17 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
                   data-date={dateAttr}
                   data-current-month={c.isCurrentMonth || undefined}
                   data-today={c.isToday || undefined}
-                  data-selected={c.isSelected || c.isRangeStart || c.isRangeEnd || undefined}
+                  data-selected={isAnySelected || undefined}
                   data-in-range={c.isInRangeMid || undefined}
                   data-preview={c.isPreview || undefined}
+                  data-range-start={c.isRangeStart || undefined}
+                  data-range-end={c.isRangeEnd || undefined}
+                  data-range-bridge-left={c.rangeBridgeLeft || undefined}
+                  data-range-bridge-right={c.rangeBridgeRight || undefined}
+                  data-preview-bridge-left={c.previewBridgeLeft || undefined}
+                  data-preview-bridge-right={c.previewBridgeRight || undefined}
                   data-disabled={c.isDisabled || undefined}
-                  aria-selected={c.isSelected || c.isRangeStart || c.isRangeEnd}
+                  aria-selected={isAnySelected}
                   aria-disabled={c.isDisabled || undefined}
                   aria-label={ariaLabelDay}
                   tabIndex={c.isFocused ? 0 : -1}
@@ -791,12 +942,32 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
                   css={cellBaseCss}
                   style={cellInline}
                 >
-                  {c.date.getDate()}
-                  {c.isToday && !c.isSelected && !c.isRangeStart && !c.isRangeEnd ? (
+                  <span
+                    data-slot="day-label"
+                    style={{
+                      position: 'relative',
+                      zIndex: 1,
+                      width: '100%',
+                      height: '100%',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderTopLeftRadius,
+                      borderTopRightRadius,
+                      borderBottomLeftRadius,
+                      borderBottomRightRadius,
+                      background: isAnySelected ? primaryBg : 'transparent',
+                      color: isAnySelected ? primaryFg : 'inherit',
+                    }}
+                  >
+                    {c.date.getDate()}
+                  </span>
+                  {c.isToday && !isAnySelected ? (
                     <span
                       aria-hidden
                       style={{
                         position: 'absolute',
+                        zIndex: 1,
                         width: tokens.cellTodayDotSize,
                         height: tokens.cellTodayDotSize,
                         borderRadius: '50%',
@@ -819,14 +990,14 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
               <>
                 {showTodayButton ? (
                   <button type="button" css={footerBtnCss} onClick={onToday} data-slot="today">
-                    {TODAY_LABEL}
+                    {todayLabel}
                   </button>
                 ) : (
                   <span />
                 )}
                 {showClearButton ? (
                   <button type="button" css={clearBtnCss} onClick={onClear} data-slot="clear">
-                    {CLEAR_LABEL}
+                    {clearLabel}
                   </button>
                 ) : (
                   <span />

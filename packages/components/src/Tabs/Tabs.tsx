@@ -54,23 +54,46 @@ const TabPanel = (_props: TabPanelProps): null => {
 };
 (TabPanel as unknown as { displayName: string }).displayName = 'TimeUI.TabPanel';
 
+// 用 props 形状而非引用相等 / displayName 比较来识别 Tab / TabPanel：
+//
+// Next.js 15 + RSC 把每个 client component 包成 React.lazy proxy（
+// `{ $$typeof: Symbol(react.lazy), _payload, _init }`）。在 Tabs 的 parseChildren 跑的时候，
+// Tab 子元素的 element.type 还是这个未 resolve 的 lazy 对象 ——
+//   - typeof type === 'object' 而非 'function'，引用相等失败
+//   - 没有 displayName / name，displayName 比较也失败
+//
+// 唯一可靠的运行时判别是看 props 形状：Tab 必有 itemKey + label（tab 按钮要显示标签），
+// TabPanel 只有 itemKey 不带 label。这与组件类型签名一致，约束消费者不要在
+// children 里塞其它带这两个 prop 的元素。
+function isTabElement(el: unknown): el is React.ReactElement<TabProps> {
+  if (!isValidElement(el)) return false;
+  const props = el.props as Record<string, unknown>;
+  return 'itemKey' in props && 'label' in props;
+}
+
+function isTabPanelElement(el: unknown): el is React.ReactElement<TabPanelProps> {
+  if (!isValidElement(el)) return false;
+  const props = el.props as Record<string, unknown>;
+  return 'itemKey' in props && !('label' in props);
+}
+
 /**
  * 解析 children：
- * - 遍历顶层 children，过滤 type === Tab 的节点
- * - 每个 Tab 子节点的 props.children 中查找 type === TabPanel 的节点；找到则取其 children 作为 panel
+ * - 遍历顶层 children，过滤 displayName === 'TimeUI.Tab' 的节点
+ * - 每个 Tab 子节点的 props.children 中查找 'TimeUI.TabPanel' 节点；找到则取其 children 作为 panel
  * - 若 Tab 没有 TabPanel 子节点，则 props.children 整体作为 panel 内容（约定式简写）
  */
 function parseChildren(children: ReactNode): ResolvedTab[] {
   const out: ResolvedTab[] = [];
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
-    if (child.type !== Tab) return;
+    if (!isTabElement(child)) return;
     const tabProps = child.props as TabProps;
     let panelContent: ReactNode = null;
     let foundPanel = false;
     Children.forEach(tabProps.children, (inner) => {
       if (!isValidElement(inner)) return;
-      if (inner.type === TabPanel) {
+      if (isTabPanelElement(inner)) {
         const panelProps = inner.props as TabPanelProps;
         panelContent = panelProps.children;
         foundPanel = true;

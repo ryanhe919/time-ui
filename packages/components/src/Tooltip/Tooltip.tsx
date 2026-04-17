@@ -322,7 +322,13 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
           scheduleClose();
         },
         'aria-describedby': composedDescribedBy,
-        ref: mergeRefs<HTMLElement>(anchorRef, element.ref as Ref<HTMLElement> | undefined),
+        // React 19 把 ref 放进 props；React 18 仍挂在 element.ref 上。
+        // 优先读 props.ref 以消除 R19 的 deprecation 警告，fallback 保持 R18 兼容。
+        ref: mergeRefs<HTMLElement>(
+          anchorRef,
+          ((element.props as { ref?: Ref<HTMLElement> }).ref ??
+            (element as unknown as { ref?: Ref<HTMLElement> }).ref) as Ref<HTMLElement> | undefined,
+        ),
       };
       return cloneElement(element, composed as unknown as Record<string, unknown>);
     };

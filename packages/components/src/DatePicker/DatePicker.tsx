@@ -59,6 +59,10 @@ const CalendarIcon = ({ size }: { size: number }) => (
   </svg>
 );
 
+function isChineseLocale(locale?: string): boolean {
+  return locale?.toLowerCase().startsWith('zh') ?? false;
+}
+
 export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
   function DatePicker(props, forwardedRef) {
     const {
@@ -77,7 +81,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       locale,
       format,
       parse,
-      placeholder = 'Select a date',
+      placeholder,
       isReadOnly = false,
       isDisabled = false,
       isInvalid = false,
@@ -94,6 +98,11 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
 
     const theme = useTheme();
     const tokens = theme.components.datePicker;
+    const isZh = isChineseLocale(locale);
+    const resolvedPlaceholder = placeholder ?? (isZh ? '选择日期' : 'Select a date');
+    const openCalendarLabel = isZh ? '打开日历' : 'Open calendar';
+    const inputAriaLabel = ariaLabel ?? (isZh ? '日期' : 'Date');
+    const pickerAriaLabel = ariaLabel ?? (isZh ? '日期选择器' : 'Date picker');
 
     const autoId = useId();
     const safeAutoId = autoId.replace(/:/g, '');
@@ -266,7 +275,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
           css={calendarBtnCss}
           onClick={handleCalendarIconClick}
           disabled={isDisabled || isReadOnly}
-          aria-label="Open calendar"
+          aria-label={openCalendarLabel}
           aria-haspopup="dialog"
           aria-expanded={open}
           aria-controls={open ? `${baseId}-panel` : undefined}
@@ -314,7 +323,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
           }}
           onBlur={handleInputBlur}
           onFocus={handleInputFocus}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           isDisabled={isDisabled}
           isReadOnly={isReadOnly}
           isInvalid={isInvalid}
@@ -322,7 +331,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
           onClear={handleClear}
           startContent={startContent}
           endContent={inputEndContent}
-          aria-label={ariaLabel ?? 'Date'}
+          aria-label={inputAriaLabel}
           id={baseId}
         />
       </div>
@@ -340,6 +349,14 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       margin: -${theme.components.popover.paddingY} -${theme.components.popover.paddingX};
     `;
 
+    // Popover 默认 panel CSS 带 `max-width: 320px`（来自 popoverTokens.maxWidth），
+    // 单 panel ~284px 通常够用，但仍显式撑开以防本地化（如 "September 2026"）导致
+    // 内容超 320px。inline style 优先级高于 css class，可安全覆盖。
+    const popoverStyle: React.CSSProperties = {
+      width: 'max-content',
+      maxWidth: 'calc(100vw - 32px)',
+    };
+
     return (
       <Popover
         anchor={anchorElement}
@@ -349,7 +366,8 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         trigger="manual"
         offset={parseInt(tokens.panelOffset, 10) || 8}
         id={`${baseId}-panel`}
-        aria-label={ariaLabel ?? 'Date picker'}
+        aria-label={pickerAriaLabel}
+        style={popoverStyle}
       >
         <div ref={panelRef} css={panelCss} data-slot="datepicker-panel">
           <CalendarPanel
@@ -367,7 +385,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
             showFooter
             showTodayButton={showTodayButton}
             showClearButton={isClearable}
-            aria-label={ariaLabel ?? 'Date picker'}
+            aria-label={pickerAriaLabel}
           />
         </div>
       </Popover>

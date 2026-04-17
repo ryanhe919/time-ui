@@ -92,6 +92,27 @@ describe('DateRangePicker — base rendering', () => {
     expect(screen.getAllByRole('grid')).toHaveLength(2);
   });
 
+  it('allows the popover panel to grow beyond the generic 320px cap', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderWithProviders(<DateRangePicker aria-label="r" />);
+    await user.click(screen.getByLabelText('Open calendar'));
+    expect(screen.getByRole('dialog')).toHaveStyle({
+      width: 'max-content',
+      maxWidth: 'calc(100vw - 32px)',
+    });
+  });
+
+  it('keeps the calendars row sized by content instead of shrinking in the popover', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderWithProviders(<DateRangePicker aria-label="r" />);
+    await user.click(screen.getByLabelText('Open calendar'));
+    const panel = document.querySelector('[data-slot="daterangepicker-panel"]') as HTMLElement;
+    const calendarsRow = panel.lastElementChild as HTMLElement;
+    expect(calendarsRow).toHaveStyle({ flex: 'none', width: 'max-content' });
+  });
+
   it('shows one grid when visibleMonths=1', async () => {
     installRectMocks();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });

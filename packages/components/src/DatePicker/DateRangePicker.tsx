@@ -58,6 +58,10 @@ const CalendarIcon = ({ size }: { size: number }) => (
   </svg>
 );
 
+function isChineseLocale(locale?: string): boolean {
+  return locale?.toLowerCase().startsWith('zh') ?? false;
+}
+
 export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
   function DateRangePicker(props, forwardedRef) {
     const {
@@ -75,7 +79,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       weekStartsOn = 0,
       locale,
       format,
-      placeholder = 'Select a date range',
+      placeholder,
       isReadOnly = false,
       isDisabled = false,
       isInvalid = false,
@@ -94,6 +98,15 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
     const theme = useTheme();
     const tokens = theme.components.datePicker;
+    const isZh = isChineseLocale(locale);
+    const resolvedPlaceholder = placeholder ?? (isZh ? '选择日期范围' : 'Select a date range');
+    const openCalendarLabel = isZh ? '打开日历' : 'Open calendar';
+    const clearLabel = isZh ? '清除' : 'Clear';
+    const presetsLabel = isZh ? '快捷选择' : 'Presets';
+    const inputAriaLabel = ariaLabel ?? (isZh ? '日期范围' : 'Date range');
+    const pickerAriaLabel = ariaLabel ?? (isZh ? '日期范围选择器' : 'Date range picker');
+    const startMonthLabel = isZh ? '开始月份' : 'Start month';
+    const endMonthLabel = isZh ? '结束月份' : 'End month';
 
     const autoId = useId();
     const safeAutoId = autoId.replace(/:/g, '');
@@ -306,7 +319,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               e.stopPropagation();
               handleClear();
             }}
-            aria-label="Clear"
+            aria-label={clearLabel}
             data-slot="clear"
             tabIndex={-1}
           >
@@ -332,7 +345,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
           css={calendarBtnCss}
           onClick={handleCalendarIconClick}
           disabled={isDisabled || isReadOnly}
-          aria-label="Open calendar"
+          aria-label={openCalendarLabel}
           aria-haspopup="dialog"
           aria-expanded={open}
           aria-controls={open ? `${baseId}-panel` : undefined}
@@ -368,12 +381,12 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               if (!isDisabled && !isReadOnly) setOpen(true);
             }
           }}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           isDisabled={isDisabled}
           isInvalid={isInvalid}
           startContent={startContent}
           endContent={inputEndContent}
-          aria-label={ariaLabel ?? 'Date range'}
+          aria-label={inputAriaLabel}
           id={baseId}
         />
       </div>
@@ -397,6 +410,8 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     const panelCss = css`
       box-sizing: border-box;
       min-width: ${panelMin};
+      width: max-content;
+      max-width: calc(100vw - 32px);
       padding: ${tokens.panelPaddingY} ${tokens.panelPaddingX};
       background: ${theme.colors.bg.surface ?? theme.colors.bg.canvas};
       color: ${theme.colors.text.primary};
@@ -420,10 +435,21 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     `;
 
     const calendarsRowCss = css`
-      flex: 1;
+      flex: none;
+      width: max-content;
       display: flex;
       gap: ${tokens.panelGap};
     `;
+
+    // 关键：Popover 默认 panel CSS 带 `max-width: 320px`（popoverTokens.maxWidth），
+    // 而双月 + presets 的实际宽度 ~720-750px，会让外层 Popover 白色背景容器被截断
+    // 到 320px、内容溢出。Popover.tsx 把 `style` 透传到 panel 的 inline style，
+    // inline 优先级高于 css class，因此 `maxWidth` 可安全解除限制；
+    // 配合 `width: max-content` 让 panel 跟随子内容自然撑开。
+    const popoverStyle: React.CSSProperties = {
+      width: 'max-content',
+      maxWidth: 'calc(100vw - 32px)',
+    };
 
     return (
       <Popover
@@ -434,11 +460,12 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         trigger="manual"
         offset={parseInt(tokens.panelOffset, 10) || 8}
         id={`${baseId}-panel`}
-        aria-label={ariaLabel ?? 'Date range picker'}
+        aria-label={pickerAriaLabel}
+        style={popoverStyle}
       >
         <div ref={panelRef} css={panelCss} data-slot="daterangepicker-panel">
           {presets && presets.length > 0 ? (
-            <div css={presetsListCss} role="listbox" aria-label="Presets" data-slot="presets">
+            <div css={presetsListCss} role="listbox" aria-label={presetsLabel} data-slot="presets">
               {presets.map((p, i) => (
                 <MenuRow
                   key={i}
@@ -476,7 +503,8 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               showTodayButton={showTodayButton}
               showClearButton={isClearable}
               hideNextButton={isRange}
-              aria-label="Start month"
+              hideOutsideMonth={isRange}
+              aria-label={startMonthLabel}
             />
             {isRange ? (
               <CalendarPanel
@@ -498,7 +526,8 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
                 showTodayButton={showTodayButton}
                 showClearButton={isClearable}
                 hidePrevButton
-                aria-label="End month"
+                hideOutsideMonth
+                aria-label={endMonthLabel}
               />
             ) : null}
           </div>

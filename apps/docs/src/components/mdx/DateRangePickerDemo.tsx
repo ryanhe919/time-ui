@@ -7,6 +7,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useParams } from 'next/navigation';
 import { DateRangePicker } from '@/components/timeui-client';
 import type { DateRangeValue, DateRangePresetEntry } from '@timeui/react';
 
@@ -21,23 +22,30 @@ function addDays(d: Date, n: number): Date {
   return x;
 }
 
-const today = startOfDay(new Date());
-const PRESETS: DateRangePresetEntry[] = [
-  { label: 'Today', value: { start: today, end: today } },
-  { label: 'Last 7 days', value: { start: addDays(today, -6), end: today } },
-  { label: 'Last 30 days', value: { start: addDays(today, -29), end: today } },
-  {
-    label: 'This month',
-    value: { start: new Date(today.getFullYear(), today.getMonth(), 1), end: today },
-  },
-];
-
 function fmt(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
 export function DateRangePickerDemo() {
   const [value, setValue] = useState<DateRangeValue | null>(null);
+  const params = useParams<{ locale?: string }>();
+  const isZh = params?.locale === 'zh';
+  const today = startOfDay(new Date());
+  const presets: DateRangePresetEntry[] = [
+    { label: isZh ? '今天' : 'Today', value: { start: today, end: today } },
+    {
+      label: isZh ? '近 7 天' : 'Last 7 days',
+      value: { start: addDays(today, -6), end: today },
+    },
+    {
+      label: isZh ? '近 30 天' : 'Last 30 days',
+      value: { start: addDays(today, -29), end: today },
+    },
+    {
+      label: isZh ? '本月' : 'This month',
+      value: { start: new Date(today.getFullYear(), today.getMonth(), 1), end: today },
+    },
+  ];
 
   return (
     <div
@@ -52,8 +60,9 @@ export function DateRangePickerDemo() {
       <DateRangePicker
         value={value}
         onChange={setValue}
-        presets={PRESETS}
-        placeholder="Select a range"
+        locale={isZh ? 'zh-CN' : 'en-US'}
+        presets={presets}
+        placeholder={isZh ? '选择日期范围' : 'Select a range'}
         isClearable
       />
       <div

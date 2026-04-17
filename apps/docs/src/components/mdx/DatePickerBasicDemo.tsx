@@ -7,10 +7,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useParams } from 'next/navigation';
 import { DatePicker } from '@/components/timeui-client';
 
 export function DatePickerBasicDemo() {
   const [value, setValue] = useState<Date | null>(null);
+  const params = useParams<{ locale?: string }>();
+  const isZh = params?.locale === 'zh';
 
   return (
     <div
@@ -25,7 +28,8 @@ export function DatePickerBasicDemo() {
       <DatePicker
         value={value}
         onChange={setValue}
-        placeholder="Pick a date"
+        locale={isZh ? 'zh-CN' : 'en-US'}
+        placeholder={isZh ? '选择日期' : 'Pick a date'}
         isClearable
         showTodayButton
       />

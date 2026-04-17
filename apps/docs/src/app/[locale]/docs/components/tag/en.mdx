@@ -73,10 +73,7 @@ A compact label control for categories, statuses, or attributes. Three variants 
 
 <LiveDemo code={`<Tag isClosable onClose={() => console.log('closed')}>React</Tag>
 <Tag isClosable color="primary" onClose={() => {}}>TypeScript</Tag>`}>
-  <Flex gap={8} align="center">
-    <Tag isClosable onClose={() => {}}>React</Tag>
-    <Tag isClosable color="primary" onClose={() => {}}>TypeScript</Tag>
-  </Flex>
+  <TagClosableDemo />
 </LiveDemo>
 
 ## Interactive
@@ -84,7 +81,7 @@ A compact label control for categories, statuses, or attributes. Three variants 
 With `isInteractive`, the entire tag becomes a focusable `<button>`. Enter / Space invoke `onPress` — useful for chip-style filters.
 
 <LiveDemo code={`<Tag isInteractive onPress={() => console.log('pressed')}>Filter: React</Tag>`}>
-  <Tag isInteractive onPress={() => {}}>Filter: React</Tag>
+  <TagInteractiveDemo />
 </LiveDemo>
 
 ## Start / end content

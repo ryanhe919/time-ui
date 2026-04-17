@@ -112,6 +112,7 @@ import { MenuBasicDemo } from '@/components/mdx/MenuBasicDemo';
 import { MenuSelectionDemo } from '@/components/mdx/MenuSelectionDemo';
 import { DatePickerBasicDemo } from '@/components/mdx/DatePickerBasicDemo';
 import { DateRangePickerDemo } from '@/components/mdx/DateRangePickerDemo';
+import { TagClosableDemo, TagInteractiveDemo } from '@/components/mdx/TagInteractiveDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -182,6 +183,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     MenuSelectionDemo,
     DatePickerBasicDemo,
     DateRangePickerDemo,
+    TagClosableDemo,
+    TagInteractiveDemo,
 
     Button,
     Box,
