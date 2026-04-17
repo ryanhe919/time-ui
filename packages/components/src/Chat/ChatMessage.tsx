@@ -45,12 +45,17 @@ function defaultShowAvatar(role: ChatMessageRole): boolean {
   return true;
 }
 
+// hour12: false 强制 24 小时制 —— 不带 AM/PM —— 让 server (常默认 en-US 12h)
+// 与 client (浏览器 locale 可能 24h) 输出一致，避免 SSR hydration mismatch。
+const TIME_FMT_OPTS: Intl.DateTimeFormatOptions = {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+};
+
 function formatTimestamp(ts: Date | number | string): string {
-  if (ts instanceof Date) return ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  if (typeof ts === 'number') {
-    const d = new Date(ts);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+  if (ts instanceof Date) return ts.toLocaleTimeString([], TIME_FMT_OPTS);
+  if (typeof ts === 'number') return new Date(ts).toLocaleTimeString([], TIME_FMT_OPTS);
   return String(ts);
 }
 
