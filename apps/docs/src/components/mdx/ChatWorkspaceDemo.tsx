@@ -40,8 +40,11 @@ const PlusIcon = () => (
 export function ChatWorkspaceDemo() {
   const [value, setValue] = useState('给我总结一下这周用户反馈的前三个主题');
   const [streaming, setStreaming] = useState(false);
-  const [messages, setMessages] = useState<string[]>([
-    '本周反馈主要集中在首屏速度、搜索结果质量，以及 AI 回复格式一致性。',
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([
+    {
+      role: 'assistant',
+      text: '本周反馈主要集中在首屏速度、搜索结果质量,以及 AI 回复格式一致性。',
+    },
   ]);
 
   const sessions = useMemo(
@@ -54,13 +57,18 @@ export function ChatWorkspaceDemo() {
   );
 
   const handleSubmit = (text: string) => {
-    if (!text.trim()) return;
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setMessages((prev) => [...prev, { role: 'user', text: trimmed }]);
     setStreaming(true);
     setValue('');
     window.setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        '优先级最高的是搜索召回偏差，其次是深色模式对比度，再是移动端输入框遮挡问题。',
+        {
+          role: 'assistant',
+          text: '优先级最高的是搜索召回偏差,其次是深色模式对比度,再是移动端输入框遮挡问题。',
+        },
       ]);
       setStreaming(false);
     }, 1200);
@@ -273,12 +281,12 @@ export function ChatWorkspaceDemo() {
 
             {messages.map((message, index) => (
               <ChatMessage
-                key={`${index}-${message.slice(0, 16)}`}
-                role="assistant"
-                name="Claude"
+                key={`${index}-${message.text.slice(0, 16)}`}
+                role={message.role}
+                name={message.role === 'user' ? 'Ryan' : 'Claude'}
                 timestamp="09:19"
               >
-                {message}
+                {message.text}
               </ChatMessage>
             ))}
 
