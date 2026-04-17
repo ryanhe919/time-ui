@@ -950,3 +950,87 @@ describe('Table — default cell rendering', () => {
     expect(window.getComputedStyle(age).textAlign).toBe('right');
   });
 });
+
+describe('Table — variants', () => {
+  it('defaults to enclosed and exposes data-variant', () => {
+    const { container } = renderWithProviders(
+      <Table columns={BASIC_COLUMNS} data={PEOPLE} rowKey="id" aria-label="t" />,
+    );
+    const region = container.querySelector('[role="region"]')!;
+    expect(region.getAttribute('data-variant')).toBe('enclosed');
+  });
+
+  it.each([['enclosed'], ['divided'], ['grid'], ['quiet']] as const)(
+    'renders %s variant without warnings',
+    (variant) => {
+      const { container } = renderWithProviders(
+        <Table
+          variant={variant}
+          columns={BASIC_COLUMNS}
+          data={PEOPLE}
+          rowKey="id"
+          aria-label={variant}
+        />,
+      );
+      const region = container.querySelector('[role="region"]')!;
+      expect(region.getAttribute('data-variant')).toBe(variant);
+      // tbody has rendered row data
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+    },
+  );
+
+  it('quiet variant strips container background to transparent', () => {
+    const { container } = renderWithProviders(
+      <Table variant="quiet" columns={BASIC_COLUMNS} data={PEOPLE} rowKey="id" aria-label="q" />,
+    );
+    const region = container.querySelector('[role="region"]') as HTMLElement;
+    // emotion class is applied; assert via injected stylesheet that 'background: transparent' exists
+    const styles = Array.from(document.querySelectorAll('style'))
+      .map((s) => s.textContent ?? '')
+      .join('\n');
+    expect(styles).toMatch(/background:\s*transparent/);
+    expect(region.getAttribute('data-variant')).toBe('quiet');
+  });
+
+  it('hasBorder is ignored on non-enclosed variants (no border applied)', () => {
+    renderWithProviders(
+      <Table
+        variant="divided"
+        hasBorder
+        columns={BASIC_COLUMNS}
+        data={PEOPLE}
+        rowKey="id"
+        aria-label="d"
+      />,
+    );
+    // divided + hasBorder should still produce 'border: none' for the container.
+    const styles = Array.from(document.querySelectorAll('style'))
+      .map((s) => s.textContent ?? '')
+      .join('\n');
+    expect(styles).toMatch(/border:\s*none/);
+  });
+
+  it('grid variant injects column dividers via td + td selector', () => {
+    renderWithProviders(
+      <Table variant="grid" columns={BASIC_COLUMNS} data={PEOPLE} rowKey="id" aria-label="g" />,
+    );
+    const styles = Array.from(document.querySelectorAll('style'))
+      .map((s) => s.textContent ?? '')
+      .join('\n');
+    expect(styles).toMatch(/td\s*\+\s*td/);
+    expect(styles).toMatch(/th\s*\+\s*th/);
+  });
+
+  it('quiet variant has zero axe violations', async () => {
+    const { container } = renderWithProviders(
+      <Table
+        variant="quiet"
+        columns={BASIC_COLUMNS}
+        data={PEOPLE}
+        rowKey="id"
+        aria-label="quiet"
+      />,
+    );
+    await expectA11y(container);
+  });
+});

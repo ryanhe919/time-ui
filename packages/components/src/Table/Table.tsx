@@ -187,6 +187,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     data,
     rowKey,
     density = 'default',
+    variant = 'enclosed',
     stickyHeader = false,
     isStriped = false,
     hasBorder = true,
@@ -391,13 +392,63 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
 
   const hoverDuration = tableTokens.rowHoverDuration;
 
+  // ────────────────────────────────────────────────────────────
+  // Variant 视觉策略：每个 variant 在 hairline / bg / radius / spacing 上做差异，
+  // 但全部消费现有 token，不引入新风格元素。
+  //
+  //  - enclosed: 默认，外圆角 + 容器 hairline + header muted bg
+  //  - divided:  无外框，header 仅底部 hairline strong + letter-spacing 强化
+  //  - grid:     enclosed + 单元格 column 间也有 hairline subtle
+  //  - quiet:    无边无线无 bg，仅靠 row hover 揭示分隔
+  // ────────────────────────────────────────────────────────────
+
+  const variantStyle = {
+    container: {
+      bg: variant === 'quiet' ? 'transparent' : surfaceBg,
+      radius: variant === 'enclosed' || variant === 'grid' ? tableTokens.containerRadius : '0',
+      border:
+        variant === 'enclosed'
+          ? hasBorder
+            ? `${tableTokens.containerBorder} solid ${hairline}`
+            : 'none'
+          : variant === 'grid'
+            ? `${tableTokens.containerBorder} solid ${hairline}`
+            : 'none',
+    },
+    header: {
+      bg: variant === 'enclosed' || variant === 'grid' ? headerBg : 'transparent',
+      // divided 用更重的 borderBottom 让 header 视觉上"独立成段"
+      borderBottomColor:
+        variant === 'divided' ? borderStrong : variant === 'quiet' ? 'transparent' : borderStrong,
+      borderBottomWidth: variant === 'divided' ? '1.5px' : tableTokens.headerBorderBottom,
+      // quiet 用 muted text 让 header 退到背景
+      color: variant === 'quiet' ? textMuted : textSecondary,
+      // divided / quiet 强化 letter-spacing 让 header 文字有"distant label"质感
+      letterSpacing:
+        variant === 'divided'
+          ? '0.04em'
+          : variant === 'quiet'
+            ? '0.06em'
+            : tableTokens.headerLetterSpacing,
+      fontWeight: variant === 'quiet' ? 500 : tableTokens.headerFontWeight,
+    },
+    row: {
+      // quiet 完全不画行间分隔线
+      borderBottomColor: variant === 'quiet' ? 'transparent' : hairline,
+    },
+    // grid 在 td/th 之间画竖向 hairline（用 td + td / th + th 兄弟选择器）
+    column: {
+      divider: variant === 'grid' ? `${tableTokens.containerBorder} solid ${hairline}` : null,
+    },
+  } as const;
+
   const containerCss = css`
     position: relative;
     width: 100%;
-    background: ${surfaceBg};
+    background: ${variantStyle.container.bg};
     color: ${textPrimary};
-    border-radius: ${tableTokens.containerRadius};
-    border: ${hasBorder ? `${tableTokens.containerBorder} solid ${hairline}` : 'none'};
+    border-radius: ${variantStyle.container.radius};
+    border: ${variantStyle.container.border};
     overflow: ${maxHeight !== undefined ? 'auto' : 'auto'};
     ${maxHeight !== undefined ? `max-height: ${asLength(maxHeight)};` : ''}
     /* 让横向滚动可键盘聚焦 */
@@ -416,10 +467,16 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     font-size: ${densityTokens.fontSize};
     line-height: ${tableTokens.cellLineHeight};
     color: ${textPrimary};
+    ${variantStyle.column.divider
+      ? `
+        & thead > tr > th + th { border-left: ${variantStyle.column.divider}; }
+        & tbody > tr > td + td { border-left: ${variantStyle.column.divider}; }
+      `
+      : ''}
   `;
 
   const theadRowCss = css`
-    background: ${headerBg};
+    background: ${variantStyle.header.bg};
   `;
 
   const thBaseCss = (
@@ -435,11 +492,12 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     height: ${tableTokens.headerHeight};
     padding: 0 ${densityTokens.cellPaddingX};
     font-size: ${tableTokens.headerFontSize};
-    font-weight: ${tableTokens.headerFontWeight};
-    letter-spacing: ${tableTokens.headerLetterSpacing};
-    color: ${textSecondary};
-    background: ${headerBg};
-    border-bottom: ${tableTokens.headerBorderBottom} solid ${borderStrong};
+    font-weight: ${variantStyle.header.fontWeight};
+    letter-spacing: ${variantStyle.header.letterSpacing};
+    color: ${variantStyle.header.color};
+    background: ${variantStyle.header.bg};
+    border-bottom: ${variantStyle.header.borderBottomWidth} solid
+      ${variantStyle.header.borderBottomColor};
     user-select: none;
     white-space: nowrap;
     ${width ? `width: ${width}; min-width: ${width};` : ''}
@@ -466,7 +524,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     text-align: ${align};
     padding: ${densityTokens.cellPaddingY} ${densityTokens.cellPaddingX};
     height: ${densityTokens.rowHeight};
-    border-bottom: ${tableTokens.rowBorderBottom} solid ${hairline};
+    border-bottom: ${tableTokens.rowBorderBottom} solid ${variantStyle.row.borderBottomColor};
     color: ${textPrimary};
     vertical-align: middle;
     ${width ? `width: ${width}; min-width: ${width};` : ''}
@@ -776,6 +834,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
       aria-busy={isLoading || undefined}
       tabIndex={0}
       data-density={density}
+      data-variant={variant}
       data-sticky-header={stickyHeader || undefined}
       data-striped={isStriped || undefined}
       data-loading={isLoading || undefined}

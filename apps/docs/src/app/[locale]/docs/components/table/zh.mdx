@@ -180,6 +180,87 @@ export function Demo() {
   </Stack>
 </LiveDemo>
 
+## 视觉风格 variant
+
+四种视觉策略，**全部基于现有 token，互相之间风格自洽**：
+
+- `enclosed`（默认）— 外圆角 + 容器 hairline + header muted bg。Apple Settings 卡片质感，适合作为页面里的"独立数据块"。
+- `divided` — 无外框，header 仅保留底部 hairline strong + 强化 letter-spacing。Apple Mail 列表质感，嵌入正文不抢注意力。
+- `grid` — 在 `enclosed` 基础上为单元格之间也画 hairline。Numbers / 报表质感，适合密集字段。
+- `quiet` — 无边无线无 bg，仅靠 row hover 揭示行。最克制的形态，适合文档 / 阅读场景。
+
+<LiveDemo code={`<Stack spacing={24}>
+  <Table variant="enclosed" columns={COLS} data={ROWS} />
+  <Table variant="divided"  columns={COLS} data={ROWS} />
+  <Table variant="grid"     columns={COLS} data={ROWS} />
+  <Table variant="quiet"    columns={COLS} data={ROWS} />
+</Stack>`}>
+  <Stack spacing={24}>
+    <Table
+      aria-label="enclosed"
+      variant="enclosed"
+      columns={[
+        { key: 'project', title: 'Project' },
+        { key: 'owner', title: 'Owner' },
+        { key: 'updated', title: 'Updated', align: 'right' },
+      ]}
+      data={[
+        { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
+        { id: 2, project: 'Blue Wave', owner: 'Grace', updated: '14 min ago' },
+        { id: 3, project: 'Crescent', owner: 'Linus', updated: '1 hr ago' },
+      ]}
+    />
+    <Table
+      aria-label="divided"
+      variant="divided"
+      columns={[
+        { key: 'project', title: 'Project' },
+        { key: 'owner', title: 'Owner' },
+        { key: 'updated', title: 'Updated', align: 'right' },
+      ]}
+      data={[
+        { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
+        { id: 2, project: 'Blue Wave', owner: 'Grace', updated: '14 min ago' },
+        { id: 3, project: 'Crescent', owner: 'Linus', updated: '1 hr ago' },
+      ]}
+    />
+    <Table
+      aria-label="grid"
+      variant="grid"
+      columns={[
+        { key: 'project', title: 'Project' },
+        { key: 'owner', title: 'Owner' },
+        { key: 'updated', title: 'Updated', align: 'right' },
+      ]}
+      data={[
+        { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
+        { id: 2, project: 'Blue Wave', owner: 'Grace', updated: '14 min ago' },
+        { id: 3, project: 'Crescent', owner: 'Linus', updated: '1 hr ago' },
+      ]}
+    />
+    <Table
+      aria-label="quiet"
+      variant="quiet"
+      columns={[
+        { key: 'project', title: 'Project' },
+        { key: 'owner', title: 'Owner' },
+        { key: 'updated', title: 'Updated', align: 'right' },
+      ]}
+      data={[
+        { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
+        { id: 2, project: 'Blue Wave', owner: 'Grace', updated: '14 min ago' },
+        { id: 3, project: 'Crescent', owner: 'Linus', updated: '1 hr ago' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+<Callout variant="info" title="variant 与其他视觉开关的关系">
+  - `hasBorder` 仅对 `variant="enclosed"` 生效；其它 variant 强制忽略容器边框。
+  - `isStriped` / `stickyHeader` / `fixed` 列在四种 variant 下都按预期工作。
+  - 数据行较多时，`quiet` 建议搭配更大的 `density="comfortable"` 让行间留白替代分隔线。
+</Callout>
+
 ## 斑马纹 isStriped
 
 为奇偶行交替着色，提升长列表的扫读速度。
@@ -348,8 +429,9 @@ export function Demo() {
   { name: 'rowKey', type: 'keyof T | (row, index) => string', description: '行 key：字段名 / 函数 / 兜底 `row.id` / `row.key` / 索引。' },
   { name: 'density', type: "'compact' | 'default' | 'comfortable'", default: "'default'" },
   { name: 'stickyHeader', type: 'boolean', default: 'false', description: '配合 maxHeight 让表头钉住顶部。' },
+  { name: 'variant', type: "'enclosed' | 'divided' | 'grid' | 'quiet'", default: "'enclosed'", description: '视觉风格：enclosed 卡片、divided 列表、grid 网格、quiet 极简。' },
   { name: 'isStriped', type: 'boolean', default: 'false', description: '斑马纹。' },
-  { name: 'hasBorder', type: 'boolean', default: 'true', description: '容器外边框。' },
+  { name: 'hasBorder', type: 'boolean', default: 'true', description: '容器外边框。**仅对 variant="enclosed" 生效**。' },
   { name: 'isLoading', type: 'boolean', default: 'false' },
   { name: 'loadingMessage', type: 'ReactNode', default: "'Loading…'" },
   { name: 'emptyMessage', type: 'ReactNode', default: "'No data'" },

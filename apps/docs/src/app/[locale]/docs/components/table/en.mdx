@@ -180,6 +180,87 @@ export function Demo() {
   </Stack>
 </LiveDemo>
 
+## Visual variant
+
+Four visual strategies, **all built from the existing tokens — they coexist without clashing**:
+
+- `enclosed` (default) — outer radius + container hairline + muted header bg. Apple Settings card vibe; ideal as a self-contained data block on the page.
+- `divided` — no outer frame, header keeps only a strong bottom hairline + tightened letter-spacing. Apple Mail list vibe; recedes inside body copy.
+- `grid` — `enclosed` plus hairlines between columns. Numbers / report vibe; great for dense fields.
+- `quiet` — no border, no divider, no background; only row hover reveals separation. The most restrained form, best for documentation / reading contexts.
+
+<LiveDemo code={`<Stack spacing={24}>
+  <Table variant="enclosed" columns={COLS} data={ROWS} />
+  <Table variant="divided"  columns={COLS} data={ROWS} />
+  <Table variant="grid"     columns={COLS} data={ROWS} />
+  <Table variant="quiet"    columns={COLS} data={ROWS} />
+</Stack>`}>
+  <Stack spacing={24}>
+    <Table
+      aria-label="enclosed"
+      variant="enclosed"
+      columns={[
+        { key: 'project', title: 'Project' },
+        { key: 'owner', title: 'Owner' },
+        { key: 'updated', title: 'Updated', align: 'right' },
+      ]}
+      data={[
+        { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
+        { id: 2, project: 'Blue Wave', owner: 'Grace', updated: '14 min ago' },
+        { id: 3, project: 'Crescent', owner: 'Linus', updated: '1 hr ago' },
+      ]}
+    />
+    <Table
+      aria-label="divided"
+      variant="divided"
+      columns={[
+        { key: 'project', title: 'Project' },
+        { key: 'owner', title: 'Owner' },
+        { key: 'updated', title: 'Updated', align: 'right' },
+      ]}
+      data={[
+        { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
+        { id: 2, project: 'Blue Wave', owner: 'Grace', updated: '14 min ago' },
+        { id: 3, project: 'Crescent', owner: 'Linus', updated: '1 hr ago' },
+      ]}
+    />
+    <Table
+      aria-label="grid"
+      variant="grid"
+      columns={[
+        { key: 'project', title: 'Project' },
+        { key: 'owner', title: 'Owner' },
+        { key: 'updated', title: 'Updated', align: 'right' },
+      ]}
+      data={[
+        { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
+        { id: 2, project: 'Blue Wave', owner: 'Grace', updated: '14 min ago' },
+        { id: 3, project: 'Crescent', owner: 'Linus', updated: '1 hr ago' },
+      ]}
+    />
+    <Table
+      aria-label="quiet"
+      variant="quiet"
+      columns={[
+        { key: 'project', title: 'Project' },
+        { key: 'owner', title: 'Owner' },
+        { key: 'updated', title: 'Updated', align: 'right' },
+      ]}
+      data={[
+        { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
+        { id: 2, project: 'Blue Wave', owner: 'Grace', updated: '14 min ago' },
+        { id: 3, project: 'Crescent', owner: 'Linus', updated: '1 hr ago' },
+      ]}
+    />
+  </Stack>
+</LiveDemo>
+
+<Callout variant="info" title="How variant interacts with other visual switches">
+  - `hasBorder` is honored only when `variant="enclosed"`; it is forced off for the others.
+  - `isStriped`, `stickyHeader`, and fixed columns all behave as expected across every variant.
+  - For dense data with `quiet`, prefer `density="comfortable"` so the extra row padding replaces the missing dividers.
+</Callout>
+
 ## Striped rows
 
 Alternate row tints make long lists easier to scan.
@@ -348,8 +429,9 @@ export function Demo() {
   { name: 'rowKey', type: 'keyof T | (row, index) => string', description: 'Per-row key: field name / function / fallback to `row.id`, `row.key`, then index.' },
   { name: 'density', type: "'compact' | 'default' | 'comfortable'", default: "'default'" },
   { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Pin the header when used with maxHeight.' },
+  { name: 'variant', type: "'enclosed' | 'divided' | 'grid' | 'quiet'", default: "'enclosed'", description: 'Visual style: enclosed (card), divided (list), grid (table), quiet (minimal).' },
   { name: 'isStriped', type: 'boolean', default: 'false' },
-  { name: 'hasBorder', type: 'boolean', default: 'true', description: 'Outer container border.' },
+  { name: 'hasBorder', type: 'boolean', default: 'true', description: 'Outer container border. **Honored only when variant="enclosed".**' },
   { name: 'isLoading', type: 'boolean', default: 'false' },
   { name: 'loadingMessage', type: 'ReactNode', default: "'Loading…'" },
   { name: 'emptyMessage', type: 'ReactNode', default: "'No data'" },
