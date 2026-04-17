@@ -271,8 +271,13 @@ export function ChatWorkspaceDemo() {
               Selected references for the summary.
             </ChatMessage>
 
-            {messages.map((message) => (
-              <ChatMessage key={message} role="assistant" name="Claude" timestamp="09:19">
+            {messages.map((message, index) => (
+              <ChatMessage
+                key={`${index}-${message.slice(0, 16)}`}
+                role="assistant"
+                name="Claude"
+                timestamp="09:19"
+              >
                 {message}
               </ChatMessage>
             ))}
