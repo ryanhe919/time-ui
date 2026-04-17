@@ -1,0 +1,79 @@
+# Empty
+
+A placeholder for empty data sets, no-result states, and request errors: illustration + copy + optional action button. Four built-in image presets (`default` / `search` / `error` / `no-data`), three sizes, and `variant="inline"` for compact card-embedded use.
+
+## Basic usage
+
+The minimal form: pass `title` + `description`, optionally a primary CTA in `actions`.
+
+<LiveDemo code={`<Empty
+  title="Nothing here yet"
+  description="Create your first project to get started."
+  actions={<Button color="primary">New project</Button>}
+/>`}>
+  <Empty
+    title="Nothing here yet"
+    description="Create your first project to get started."
+    actions={<Button color="primary">New project</Button>}
+  />
+</LiveDemo>
+
+## Image preset
+
+Without `image`, you get `default`. The other three presets ship as built-in SVGs for the most common scenarios. For brand artwork, pass `image={<MyArt />}`.
+
+<LiveDemo code={`<Empty image="search"  title="No matches" description="Try a different keyword." />
+<Empty image="error"   title="Couldn't load" description="Refresh and try again." />
+<Empty image="no-data" title="No records"   description="Once you save data, it shows here." />`}>
+  <Stack spacing={32}>
+    <Empty image="search" title="No matches" description="Try a different keyword." />
+    <Empty image="error" title="Couldn't load" description="Refresh and try again." />
+    <Empty image="no-data" title="No records" description="Once you save data, it shows here." />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+`sm` / `md` (default) / `lg`. `sm` fits cards and drawers; `lg` fills a blank page.
+
+## variant="inline"
+
+A single-row empty state: image + one line of text + optional actions, laid out horizontally. Common in "no rows" rows of a table.
+
+```tsx
+<Empty
+  variant="inline"
+  image="no-data"
+  title="No results in this view"
+  actions={<Button size="sm" variant="ghost">Reset filters</Button>}
+/>
+```
+
+## Custom children
+
+If the default layout is too rigid, pass `children` to take over the body slot.
+
+```tsx
+<Empty image={<MyArt />}>
+  <Heading level={3}>Welcome aboard</Heading>
+  <Text muted>Three quick steps to set things up.</Text>
+  <Steps items={[...]} />
+</Empty>
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'image', type: "ReactNode | 'default' | 'search' | 'error' | 'no-data'", default: "'default'", description: 'Illustration. Pass a string for a preset or a ReactNode for custom artwork.' },
+  { name: 'title', type: 'ReactNode', description: 'Primary heading.' },
+  { name: 'description', type: 'ReactNode', description: 'Secondary description copy.' },
+  { name: 'actions', type: 'ReactNode', description: 'Primary action area; usually one or two Buttons.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'variant', type: "'default' | 'inline'", default: "'default'", description: '`inline` lays out horizontally on a single row.' },
+  { name: 'children', type: 'ReactNode', description: 'When passed, replaces the default `title` / `description` / `actions` body.' },
+  { name: 'className', type: 'string' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The illustration is `aria-hidden="true"` (it's decorative); the title renders as `<h3>` and the description as `<p>`. Buttons inside `actions` are keyboard-reachable by default.
+</Callout>

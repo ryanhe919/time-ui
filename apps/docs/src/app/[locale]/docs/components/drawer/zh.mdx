@@ -1,0 +1,118 @@
+# 抽屉 Drawer
+
+贴边滑入的次级面板：4 种 placement、5 档尺寸、focus trap + body scroll lock + ESC / overlay 关闭、关闭后焦点归还。Portal 渲染到 `<body>`，支持 `inside` / `outside` 两种滚动模式。
+
+<Callout variant="info" title="Drawer、Modal 还是 Popover？">
+  - **Drawer**：和主流程平行的次级面板（设置、详情、文件树），可与背景同时观察。
+  - **Modal**：需要打断流程、强制确认时使用。
+  - **Popover**：anchor 相关的轻量浮层（菜单、提示卡片）。
+</Callout>
+
+## 基础用法
+
+点击下方按钮从对应方向打开 Drawer。按 `Esc`、点击右上角关闭按钮、或点击外部 overlay 都可以关闭；焦点会回到触发按钮。
+
+<LiveDemo code={`import { useState } from 'react';
+import { Drawer, DrawerHeader, DrawerBody, DrawerFooter, Button } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open drawer</Button>
+      <Drawer
+        isOpen={open}
+        onOpenChange={setOpen}
+        placement="right"
+        header={<DrawerHeader>Notifications</DrawerHeader>}
+        footer={
+          <DrawerFooter>
+            <Button variant="ghost" onClick={() => setOpen(false)}>Close</Button>
+            <Button onClick={() => setOpen(false)}>Mark all as read</Button>
+          </DrawerFooter>
+        }
+      >
+        <DrawerBody>You have 3 new notifications.</DrawerBody>
+      </Drawer>
+    </>
+  );
+}`}>
+  <DrawerBasicDemo />
+</LiveDemo>
+
+## 尺寸 size
+
+横向 placement（`left` / `right`）按 width 取值；纵向（`top` / `bottom`）按 height 取值。`full` 留 16px 边距以保持视觉呼吸。
+
+<LiveDemo code={`<Flex gap={8}>
+  <Button onClick={openSm}>size = sm</Button>
+  <Button onClick={openMd}>size = md</Button>
+  <Button onClick={openLg}>size = lg</Button>
+  <Button onClick={openXl}>size = xl</Button>
+  <Button onClick={openFull}>size = full</Button>
+</Flex>`}>
+  <DrawerSizesDemo />
+</LiveDemo>
+
+## 复合用法
+
+`<DrawerHeader>` / `<DrawerBody>` / `<DrawerFooter>` 三个语义子组件提供与默认 token 一致的内边距与排版，但你可以自由插入图标、副标题、表单。也可以直接把 ReactNode 传给 `header` / `footer` props 走便捷写法。
+
+```tsx
+<Drawer isOpen={open} onOpenChange={setOpen}>
+  <DrawerHeader>Edit profile</DrawerHeader>
+  <DrawerBody>
+    <Input label="Name" defaultValue="Ada Lovelace" />
+    <Input label="Email" defaultValue="ada@example.com" />
+  </DrawerBody>
+  <DrawerFooter>
+    <Button variant="ghost">Cancel</Button>
+    <Button>Save</Button>
+  </DrawerFooter>
+</Drawer>
+```
+
+## 关闭行为
+
+- `isDismissable`（默认 `true`）：点击 overlay 关闭。
+- `isKeyboardDismissDisabled`（默认 `false`）：禁用 Esc 关闭。
+- `hideCloseButton`（默认 `false`）：隐藏右上角的关闭按钮。
+
+## 滚动行为 scrollBehavior
+
+- **`inside`（默认）**：panel 总高度有限，header / footer 固定，**只有 body 区滚动**。
+- **`outside`**：整个 panel 一起随父容器滚动。
+
+## API
+
+### Drawer
+
+<PropsTable props={[
+  { name: 'isOpen', type: 'boolean', description: '受控打开状态。' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: '非受控初始打开状态。' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'placement', type: "'left' | 'right' | 'top' | 'bottom'", default: "'right'", description: '贴边方向。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: '尺寸档位。' },
+  { name: 'isDismissable', type: 'boolean', default: 'true', description: '点击 overlay 是否关闭。' },
+  { name: 'isKeyboardDismissDisabled', type: 'boolean', default: 'false', description: '禁用 ESC 关闭。' },
+  { name: 'hideCloseButton', type: 'boolean', default: 'false' },
+  { name: 'scrollBehavior', type: "'inside' | 'outside'", default: "'inside'" },
+  { name: 'portalContainer', type: 'HTMLElement', description: '自定义 Portal 容器，默认 `document.body`。' },
+  { name: 'header', type: 'ReactNode', description: 'panel 顶部内容；推荐用 `<DrawerHeader>`。' },
+  { name: 'footer', type: 'ReactNode', description: 'panel 底部内容；推荐用 `<DrawerFooter>`。' },
+  { name: 'children', type: 'ReactNode', description: 'panel 主体内容。' },
+  { name: 'className', type: 'string', description: '透传到 panel。' },
+  { name: 'style', type: 'CSSProperties', description: '透传到 panel。' },
+  { name: 'id', type: 'string' },
+  { name: 'aria-label', type: 'string' },
+  { name: 'aria-labelledby', type: 'string' },
+  { name: 'aria-describedby', type: 'string' }
+]} />
+
+### DrawerHeader / DrawerBody / DrawerFooter
+
+签名一致，均接受 `children` / `className`。`DrawerHeader` 渲染为带 `<h2>` 语义的标题区，`DrawerFooter` 默认 `flex` + `justify-content: flex-end` + `gap`。
+
+<Callout variant="info" title="可访问性">
+  panel 渲染为 `role="dialog"` + `aria-modal="true"`；打开时 Tab / Shift+Tab 在 panel 内循环（focus trap），body scroll 被锁定，关闭后焦点归还到打开前的元素。`prefers-reduced-motion` 下入场动画退化为单纯淡入。
+</Callout>

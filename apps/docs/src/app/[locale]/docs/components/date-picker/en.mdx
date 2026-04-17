@@ -1,0 +1,118 @@
+# Date Picker
+
+`DatePicker` selects a single date; `DateRangePicker` selects a contiguous range. Both share one calendar panel: full keyboard navigation (arrows + PageUp/Down + Home/End), min / max bounds, per-day disabling, configurable week start and locale, all anchored via Popover.
+
+<Callout variant="info" title="Two components, one page">
+  `DatePicker` and `DateRangePicker` share almost every prop (both extend `DatePickerCommonProps`). The only differences are the `value` shape and the extra `visibleMonths` / `presets` on `DateRangePicker`.
+</Callout>
+
+## DatePicker — single date
+
+The everyday "pick a date" control. `isClearable` exposes a clear button when a value is set; `showTodayButton` adds a "Today" shortcut at the bottom of the panel.
+
+<LiveDemo code={`import { useState } from 'react';
+import { DatePicker } from '@timeui/react';
+
+export function Demo() {
+  const [value, setValue] = useState<Date | null>(null);
+  return (
+    <DatePicker
+      value={value}
+      onChange={setValue}
+      placeholder="Pick a date"
+      isClearable
+      showTodayButton
+    />
+  );
+}`}>
+  <DatePickerBasicDemo />
+</LiveDemo>
+
+## DateRangePicker — range
+
+A range picker with presets and a two-month view. The first click sets `start`; if the second click is earlier than `start` the values swap automatically. While hovering, the panel previews the upcoming range.
+
+<LiveDemo code={`<DateRangePicker
+  value={value}
+  onChange={setValue}
+  presets={[
+    { label: 'Today', value: { start: today, end: today } },
+    { label: 'Last 7 days', value: { start: addDays(today, -6), end: today } },
+    { label: 'Last 30 days', value: { start: addDays(today, -29), end: today } },
+  ]}
+  isClearable
+/>`}>
+  <DateRangePickerDemo />
+</LiveDemo>
+
+## Constraints and disabling
+
+- `minValue` / `maxValue` clamp the selectable window; out-of-range days are disabled.
+- `isDateUnavailable(date)` lets you disable arbitrary days, e.g. weekends:
+
+```tsx
+<DatePicker
+  isDateUnavailable={(d) => {
+    const day = d.getDay();
+    return day === 0 || day === 6; // Sunday / Saturday
+  }}
+/>
+```
+
+## Localisation and formatting
+
+- `weekStartsOn` — `0` (default, Sun) / `1` (Mon) / …
+- `locale` — BCP-47 tag forwarded to the internal `Intl.DateTimeFormat` (e.g. `'zh-CN'`).
+- `format(d)` / `parse(s)` — fully override input rendering and parsing.
+
+## API (shared `DatePickerCommonProps`)
+
+<PropsTable props={[
+  { name: 'isOpen', type: 'boolean', description: 'Controlled overlay state.' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger size.' },
+  { name: 'minValue', type: 'Date', description: 'Earliest selectable date (inclusive).' },
+  { name: 'maxValue', type: 'Date', description: 'Latest selectable date (inclusive).' },
+  { name: 'isDateUnavailable', type: '(date: Date) => boolean', description: 'Per-day disable callback.' },
+  { name: 'weekStartsOn', type: '0 | 1 | 2 | 3 | 4 | 5 | 6', default: '0', description: 'First day of the week; 0 = Sun.' },
+  { name: 'locale', type: 'string', description: 'BCP-47 tag forwarded to Intl.' },
+  { name: 'format', type: '(d: Date) => string', description: 'Input display format.' },
+  { name: 'parse', type: '(s: string) => Date | null', description: 'Parser for typed input.' },
+  { name: 'placeholder', type: 'string' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isInvalid', type: 'boolean', default: 'false' },
+  { name: 'isClearable', type: 'boolean', default: 'false', description: 'Show a clear button when a value is set.' },
+  { name: 'showTodayButton', type: 'boolean', default: 'false', description: 'Add a "Today" shortcut to the panel footer.' },
+  { name: 'startContent', type: 'ReactNode', description: 'Slot inside the trigger, leading side (e.g. an icon).' },
+  { name: 'endContent', type: 'ReactNode' },
+  { name: 'portalContainer', type: 'HTMLElement' },
+  { name: 'className', type: 'string' },
+  { name: 'style', type: 'CSSProperties' },
+  { name: 'id', type: 'string' },
+  { name: 'aria-label', type: 'string' }
+]} />
+
+### DatePicker only
+
+<PropsTable props={[
+  { name: 'value', type: 'Date | null', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'Date | null', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: Date | null) => void' }
+]} />
+
+### DateRangePicker only
+
+<PropsTable props={[
+  { name: 'value', type: '{ start: Date; end: Date } | null', description: 'Controlled range value.' },
+  { name: 'defaultValue', type: '{ start: Date; end: Date } | null' },
+  { name: 'onChange', type: '(value: { start: Date; end: Date } | null) => void' },
+  { name: 'visibleMonths', type: '1 | 2', default: '2', description: 'Number of months visible at once.' },
+  { name: 'presets', type: 'Array<{ label: ReactNode; value: { start: Date; end: Date } }>', description: 'Preset shortcuts shown in a side rail (e.g. Last 7 days).' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The trigger is a combobox-pattern `<input>`; the overlay is a `dialog`. The calendar is `role="grid"` + `gridcell`: arrows move, PageUp/Down change month, Shift+PageUp/Down change year, Home / End jump to the start / end of the row, Enter selects. Under `prefers-reduced-motion` all transitions are removed.
+</Callout>

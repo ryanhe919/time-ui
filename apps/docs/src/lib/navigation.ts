@@ -58,15 +58,15 @@ const SECTIONS: readonly SectionConfig[] = [
       },
       {
         slug: 'overlays',
-        pages: ['popover', 'tooltip', 'modal'],
+        pages: ['popover', 'tooltip', 'modal', 'drawer', 'menu', 'toast', 'date-picker'],
       },
       {
         slug: 'navigation',
-        pages: ['tabs', 'pagination'],
+        pages: ['tabs', 'pagination', 'steps'],
       },
       {
         slug: 'data-display',
-        pages: ['table'],
+        pages: ['table', 'avatar', 'tag', 'badge', 'empty', 'skeleton'],
       },
     ],
   },

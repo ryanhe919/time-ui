@@ -1,0 +1,138 @@
+# 菜单 Menu
+
+可键盘导航的下拉菜单：基于 Popover anchor，支持声明式（`<Menu.Item>` / `<Menu.Section>` / `<Menu.Divider>`）与数据驱动（`items`）两种写法、单选 / 多选 / 无选择三种 selectionMode、roving focus + 输入字符跳转、shortcut / icon / description / danger / href 等修饰符。
+
+<Callout variant="info" title="Menu 还是 Popover？">
+  - **Menu**：一组互斥的命令（操作、跳转、勾选）。键盘 `↑↓` 漫游，回车触发，符合 ARIA `menu` 模式。
+  - **Popover**：富内容的小卡片（表单、链接组、说明文字），无 menu 行为。
+</Callout>
+
+## 基础用法
+
+`onAction(key)` 在任意 item 触发时回调，配合 `<Menu.Section>` 做语义分组、`<Menu.Divider>` 插入分隔线、`isDanger` 标记危险操作。
+
+<LiveDemo code={`<Menu
+  trigger={<Button variant="bordered">Open menu</Button>}
+  onAction={(key) => console.log(key)}
+>
+  <MenuSection label="Account">
+    <MenuItem itemKey="profile" shortcut="⌘P">Profile</MenuItem>
+    <MenuItem itemKey="settings" shortcut="⌘,">Settings</MenuItem>
+  </MenuSection>
+  <MenuDivider />
+  <MenuItem itemKey="signout" isDanger>Sign out</MenuItem>
+</Menu>`}>
+  <MenuBasicDemo />
+</LiveDemo>
+
+## 多选 selectionMode
+
+`selectionMode="multiple"` 时点击 item 切换勾选，菜单不会自动关闭；右侧渲染勾选 indicator。`selectedKeys` / `defaultSelectedKeys` 双轨控制。
+
+<LiveDemo code={`const [selected, setSelected] = useState<Set<string>>(new Set(['inbox']));
+
+<Menu
+  trigger={<Button>Show columns</Button>}
+  selectionMode="multiple"
+  selectedKeys={selected}
+  onSelectionChange={setSelected}
+>
+  <MenuItem itemKey="inbox">Inbox</MenuItem>
+  <MenuItem itemKey="starred">Starred</MenuItem>
+  <MenuItem itemKey="snoozed">Snoozed</MenuItem>
+  <MenuItem itemKey="sent">Sent</MenuItem>
+  <MenuItem itemKey="drafts">Drafts</MenuItem>
+</Menu>`}>
+  <MenuSelectionDemo />
+</LiveDemo>
+
+## 数据驱动
+
+把 items / sections 作为扁平数组传给 `items` prop，避免在大型菜单里手写 JSX。两种写法可以互换，但同一菜单不要混用。
+
+```tsx
+<Menu
+  trigger={<Button>Sort</Button>}
+  selectionMode="single"
+  defaultSelectedKeys={['name-asc']}
+  items={[
+    {
+      type: 'section',
+      key: 'name',
+      label: 'Name',
+      items: [
+        { key: 'name-asc', label: 'A → Z' },
+        { key: 'name-desc', label: 'Z → A' },
+      ],
+    },
+    {
+      type: 'section',
+      key: 'date',
+      label: 'Date',
+      items: [
+        { key: 'date-newest', label: 'Newest first' },
+        { key: 'date-oldest', label: 'Oldest first' },
+      ],
+    },
+  ]}
+/>
+```
+
+## 修饰符
+
+每个 `MenuItem` 都可以加：
+
+- `icon` — 左侧 16×16 图标。
+- `shortcut` — 右侧次级文字（通常是 `⌘K` 这类快捷键提示）。
+- `description` — label 下方一行次级描述。
+- `isDanger` — 文字与 hover bg 走 danger 色板。
+- `href` — 渲染为 `<a>` 而非 `<button>`，回车与点击都会导航。
+- `isDisabled` — 键盘跳过、点击不触发。
+
+## API
+
+### Menu
+
+<PropsTable props={[
+  { name: 'trigger', type: 'ReactElement | (opts) => ReactNode', required: true, description: '触发器节点或 render-prop。render-prop 接收 `{ isOpen, ref }`。' },
+  { name: 'items', type: 'ReadonlyArray<MenuItemDescriptor | MenuSectionDescriptor>', description: '数据驱动写法；优先级高于 children。' },
+  { name: 'children', type: 'ReactNode', description: '声明式：<MenuItem> / <MenuSection> / <MenuDivider>。' },
+  { name: 'isOpen', type: 'boolean', description: '受控开关。' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'", description: '12 种 placement，复用 Popover。' },
+  { name: 'selectionMode', type: "'none' | 'single' | 'multiple'", default: "'none'" },
+  { name: 'selectedKeys', type: 'Iterable<string>', description: '受控选中集合。' },
+  { name: 'defaultSelectedKeys', type: 'Iterable<string>', description: '非受控初始选中集合。' },
+  { name: 'onSelectionChange', type: '(keys: Set<string>) => void' },
+  { name: 'onAction', type: '(key: string) => void', description: '点击任意 item 触发。' },
+  { name: 'closeOnSelect', type: 'boolean', default: 'single → true / multiple → false', description: '选中后是否关闭菜单。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '整体禁用：trigger 仍可见但不打开。' },
+  { name: 'portalContainer', type: 'HTMLElement' },
+  { name: 'className', type: 'string' },
+  { name: 'style', type: 'CSSProperties' },
+  { name: 'id', type: 'string' },
+  { name: 'aria-label', type: 'string' }
+]} />
+
+### MenuItem
+
+<PropsTable props={[
+  { name: 'itemKey', type: 'string', required: true, description: 'selection / onAction 都基于它。' },
+  { name: 'icon', type: 'ReactNode' },
+  { name: 'shortcut', type: 'ReactNode', description: '右侧快捷键提示（如 ⌘K）。' },
+  { name: 'description', type: 'ReactNode', description: 'label 下方次级描述。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isDanger', type: 'boolean', default: 'false', description: '文字与 hover bg 走 danger 色板。' },
+  { name: 'href', type: 'string', description: '渲染为 `<a>` 而非 `<button>`。' },
+  { name: 'onAction', type: '() => void', description: '专属 onAction 回调；与 Menu 顶层 onAction 都会被调用。' },
+  { name: 'children', type: 'ReactNode', description: '主标签。' }
+]} />
+
+### MenuSection / MenuDivider
+
+`MenuSection` 接受可选 `label` 渲染分组标题；`MenuDivider` 渲染 1px 水平线，仅作视觉分隔，不参与 keyboard navigation。
+
+<Callout variant="info" title="可访问性">
+  trigger 与 menu 通过 `aria-haspopup="menu"` + `aria-expanded` + `aria-controls` 关联。打开后菜单 `role="menu"`（multiple 走 `menu` + `menuitemcheckbox`），方向键漫游、Home / End 跳首尾、字符键键入做前缀匹配，Esc 关闭并把焦点归还到 trigger。
+</Callout>

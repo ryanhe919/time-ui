@@ -411,6 +411,315 @@ export const tableTokens = {
   expandDuration: '200ms',
 } as const;
 
+export const drawerTokens = {
+  widthSm: '320px',
+  widthMd: '420px',
+  widthLg: '560px',
+  widthXl: '720px',
+  widthFull: 'calc(100vw - 48px)',
+  heightSm: '240px',
+  heightMd: '360px',
+  heightLg: '50vh',
+  heightFull: 'calc(100vh - 48px)',
+  radius: '16px',
+  headerPaddingX: '24px',
+  headerPaddingY: '20px',
+  headerFontSize: '17px',
+  headerFontWeight: 600,
+  bodyPaddingX: '24px',
+  bodyPaddingY: '20px',
+  bodyFontSize: '14px',
+  bodyLineHeight: 1.55,
+  footerPaddingX: '24px',
+  footerPaddingY: '16px',
+  footerGap: '8px',
+  closeButtonSize: '32px',
+  closeButtonRadius: '10px',
+  closeButtonOffset: '12px',
+  overlayBlur: '8px',
+  shadow: '0 24px 64px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.06)',
+  shadowDark: '0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06)',
+  overlayDuration: '180ms',
+  panelDuration: '280ms',
+  panelEnterTranslate: '100%',
+  resizableHandleSize: '6px',
+} as const;
+
+export const toastTokens = {
+  width: '360px',
+  maxWidth: 'calc(100vw - 32px)',
+  minHeight: '52px',
+  paddingX: '14px',
+  paddingY: '12px',
+  radius: '12px',
+  gap: '12px',
+  iconSize: '20px',
+  iconGap: '12px',
+  titleFontSize: '14px',
+  titleFontWeight: 600,
+  descFontSize: '13px',
+  descLineHeight: 1.5,
+  descGap: '4px',
+  actionGap: '8px',
+  closeButtonSize: '24px',
+  closeButtonRadius: '6px',
+  closeButtonOffset: '6px',
+  viewportPadding: '16px',
+  viewportMaxStack: 5,
+  shadow: '0 8px 24px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.06)',
+  shadowDark: '0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06)',
+  enterDuration: '220ms',
+  exitDuration: '180ms',
+  enterTranslate: '16px',
+  swipeThreshold: '60px',
+  defaultTimeout: 5000,
+  progressBarHeight: '2px',
+} as const;
+
+export const menuTokens = {
+  minWidth: '180px',
+  maxWidth: '320px',
+  maxHeight: '320px',
+  paddingY: '6px',
+  radius: '12px',
+  offset: '6px',
+  itemHeight: '36px',
+  itemPaddingX: '12px',
+  itemPaddingY: '6px',
+  itemRadius: '8px',
+  itemGap: '10px',
+  itemFontSize: '13px',
+  itemIconSize: '16px',
+  shortcutFontSize: '12px',
+  shortcutLetterSpacing: '0.02em',
+  sectionLabelHeight: '28px',
+  sectionLabelPaddingX: '12px',
+  sectionLabelFontSize: '11px',
+  sectionLabelFontWeight: 600,
+  sectionLabelLetterSpacing: '0.04em',
+  dividerHeight: '1px',
+  dividerMarginY: '4px',
+  submenuOffset: '4px',
+  submenuTriggerIconSize: '14px',
+  shadow: '0 8px 24px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.06)',
+  shadowDark: '0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06)',
+  enterDuration: '160ms',
+  exitDuration: '120ms',
+  enterTranslate: '4px',
+} as const;
+
+export const datePickerTokens = {
+  panelMinWidth: '280px',
+  panelRangeMinWidth: '560px',
+  panelPaddingX: '16px',
+  panelPaddingY: '14px',
+  panelRadius: '12px',
+  panelOffset: '8px',
+  panelGap: '16px',
+  shadow: '0 12px 32px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.06)',
+  shadowDark: '0 12px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06)',
+  headerHeight: '36px',
+  headerFontSize: '14px',
+  headerFontWeight: 600,
+  headerNavButtonSize: '28px',
+  headerNavButtonRadius: '8px',
+  headerNavIconSize: '16px',
+  headerGap: '8px',
+  weekdayHeight: '28px',
+  weekdayFontSize: '11px',
+  weekdayFontWeight: 500,
+  weekdayLetterSpacing: '0.04em',
+  cellSize: '36px',
+  cellRadius: '8px',
+  cellFontSize: '13px',
+  cellFontWeight: 500,
+  cellGap: '0px',
+  cellTodayDotSize: '4px',
+  cellTodayDotOffset: '4px',
+  rangeBgRadius: '0px',
+  rangeEndRadius: '8px',
+  rangePreviewOpacity: 0.5,
+  monthSlideDuration: '220ms',
+  monthSlideTranslate: '12px',
+  footerHeight: '44px',
+  footerPaddingX: '12px',
+  footerGap: '8px',
+  footerBorderTop: '1px',
+  inputIconSize: '16px',
+  inputCalendarOffset: '4px',
+  timeColumnWidth: '56px',
+  timeItemHeight: '32px',
+  timeItemRadius: '6px',
+  timeItemFontSize: '13px',
+} as const;
+
+export const avatarSizes = {
+  xs: { size: '24px', fontSize: '11px', borderWidth: '1px', statusDotSize: '6px' },
+  sm: { size: '32px', fontSize: '13px', borderWidth: '2px', statusDotSize: '8px' },
+  md: { size: '40px', fontSize: '15px', borderWidth: '2px', statusDotSize: '10px' },
+  lg: { size: '56px', fontSize: '20px', borderWidth: '2px', statusDotSize: '12px' },
+  xl: { size: '80px', fontSize: '28px', borderWidth: '3px', statusDotSize: '16px' },
+} as const;
+
+export const avatarTokens = {
+  circleRadius: '9999px',
+  squareRadius: '8px',
+  fallbackFontWeight: 600,
+  groupOverlap: '-8px',
+  groupBorderWidth: '2px',
+  statusDotBorderWidth: '2px',
+  statusDotOffset: '2px',
+  loadingPlaceholderDuration: '1.4s',
+} as const;
+
+export const tagSizes = {
+  sm: {
+    height: '20px',
+    paddingX: '6px',
+    gap: '4px',
+    fontSize: '11px',
+    radius: '6px',
+    iconSize: '12px',
+    closeSize: '12px',
+  },
+  md: {
+    height: '24px',
+    paddingX: '8px',
+    gap: '6px',
+    fontSize: '12px',
+    radius: '6px',
+    iconSize: '14px',
+    closeSize: '14px',
+  },
+  lg: {
+    height: '28px',
+    paddingX: '10px',
+    gap: '6px',
+    fontSize: '13px',
+    radius: '8px',
+    iconSize: '16px',
+    closeSize: '16px',
+  },
+} as const;
+
+export const tagTokens = {
+  fontWeight: 500,
+  outlineBorderWidth: '1px',
+  closeButtonRadius: '4px',
+  closeIconStrokeWidth: '1.5px',
+  pillRadius: '9999px',
+  dotSize: '6px',
+  hoverOpacity: 0.85,
+  activeOpacity: 0.7,
+  transitionDuration: '120ms',
+} as const;
+
+export const badgeTokens = {
+  standardHeight: '18px',
+  standardMinWidth: '18px',
+  standardPaddingX: '5px',
+  standardFontSize: '11px',
+  standardFontWeight: 600,
+  standardRadius: '9999px',
+  standardBorderWidth: '2px',
+  dotSize: '8px',
+  dotBorderWidth: '2px',
+  offsetTopRight: 'translate(35%, -35%)',
+  offsetBottomRight: 'translate(35%, 35%)',
+  offsetTopLeft: 'translate(-35%, -35%)',
+  offsetBottomLeft: 'translate(-35%, 35%)',
+  standaloneRadius: '9999px',
+  pulseDuration: '1.6s',
+  enterDuration: '160ms',
+  enterScale: 0.6,
+  maxOverflowSuffix: '+',
+} as const;
+
+export const skeletonTokens = {
+  textHeightSm: '12px',
+  textHeightMd: '14px',
+  textHeightLg: '18px',
+  textRadius: '4px',
+  textGap: '8px',
+  textLastLineWidth: '60%',
+  rectRadius: '8px',
+  circleRadius: '9999px',
+  shimmerDuration: '1.4s',
+  shimmerAngle: '90deg',
+  shimmerWidth: '200%',
+  pulseDuration: '1.6s',
+  pulseMinOpacity: 0.5,
+  pulseMaxOpacity: 1,
+  groupGap: '12px',
+} as const;
+
+export const emptyTokens = {
+  paddingX: '24px',
+  paddingY: '40px',
+  gap: '16px',
+  imageSizeSm: '80px',
+  imageSizeMd: '120px',
+  imageSizeLg: '160px',
+  titleFontSize: '15px',
+  titleFontWeight: 600,
+  titleLineHeight: 1.4,
+  descFontSize: '13px',
+  descLineHeight: 1.55,
+  descMaxWidth: '360px',
+  descGap: '4px',
+  actionsGap: '8px',
+  actionsMarginTop: '8px',
+  inlinePaddingY: '24px',
+  inlineImageSize: '64px',
+  inlineTitleFontSize: '13px',
+  inlineDescFontSize: '12px',
+} as const;
+
+export const stepsSizes = {
+  sm: {
+    iconSize: '20px',
+    fontSize: '12px',
+    titleFontSize: '13px',
+    descFontSize: '11px',
+    connectorThickness: '1px',
+    itemGap: '8px',
+  },
+  md: {
+    iconSize: '28px',
+    fontSize: '14px',
+    titleFontSize: '14px',
+    descFontSize: '12px',
+    connectorThickness: '2px',
+    itemGap: '12px',
+  },
+  lg: {
+    iconSize: '36px',
+    fontSize: '16px',
+    titleFontSize: '15px',
+    descFontSize: '13px',
+    connectorThickness: '2px',
+    itemGap: '16px',
+  },
+} as const;
+
+export const stepsTokens = {
+  iconRadius: '9999px',
+  iconFontWeight: 600,
+  iconBorderWidth: '2px',
+  connectorMinLength: '40px',
+  connectorRadius: '1px',
+  connectorOffset: '8px',
+  itemPaddingY: '4px',
+  verticalConnectorWidth: '2px',
+  verticalIndent: '12px',
+  verticalItemMinHeight: '64px',
+  verticalDescGap: '4px',
+  dotSize: '10px',
+  dotActiveSize: '14px',
+  iconTransitionDuration: '200ms',
+  connectorFillDuration: '320ms',
+} as const;
+
 export const components = {
   button: buttonSizes,
   input: inputSizes,
@@ -428,6 +737,19 @@ export const components = {
   pagination: paginationTokens,
   tableDensity: tableDensities,
   table: tableTokens,
+  drawer: drawerTokens,
+  toast: toastTokens,
+  menu: menuTokens,
+  datePicker: datePickerTokens,
+  avatarSize: avatarSizes,
+  avatar: avatarTokens,
+  tagSize: tagSizes,
+  tag: tagTokens,
+  badge: badgeTokens,
+  skeleton: skeletonTokens,
+  empty: emptyTokens,
+  stepsSize: stepsSizes,
+  steps: stepsTokens,
 } as const;
 
 export type ButtonSizes = typeof buttonSizes;
@@ -446,4 +768,17 @@ export type PaginationSizes = typeof paginationSizes;
 export type PaginationTokens = typeof paginationTokens;
 export type TableDensities = typeof tableDensities;
 export type TableTokens = typeof tableTokens;
+export type DrawerTokens = typeof drawerTokens;
+export type ToastTokens = typeof toastTokens;
+export type MenuTokens = typeof menuTokens;
+export type DatePickerTokens = typeof datePickerTokens;
+export type AvatarSizes = typeof avatarSizes;
+export type AvatarTokens = typeof avatarTokens;
+export type TagSizes = typeof tagSizes;
+export type TagTokens = typeof tagTokens;
+export type BadgeTokens = typeof badgeTokens;
+export type SkeletonTokens = typeof skeletonTokens;
+export type EmptyTokens = typeof emptyTokens;
+export type StepsSizes = typeof stepsSizes;
+export type StepsTokens = typeof stepsTokens;
 export type Components = typeof components;

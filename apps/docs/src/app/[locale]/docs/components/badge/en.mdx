@@ -1,0 +1,102 @@
+# Badge
+
+A small label that decorates the corner of another element: unread counts, status dots, "has updates" markers. Two variants (`standard` numeric / `dot`), four placements, five colours, optional pulse animation, and a hide flag.
+
+<Callout variant="info" title="Badge vs. Tag">
+  - **Badge** — attaches to another element (icon corner, button, avatar) and conveys a count or status.
+  - **Tag** — a stand-alone label, usually with text content, often closable / pressable.
+</Callout>
+
+## Basic usage
+
+Pass the decorated element as `children`; the Badge positions absolutely into the corner. Numeric `content` is clamped by `max` (default 99) and rendered as `99+`.
+
+<LiveDemo code={`<Badge content={5} color="danger">
+  <Avatar name="Ada" />
+</Badge>
+<Badge content={120} max={99} color="primary">
+  <Avatar name="Bob" />
+</Badge>`}>
+  <Flex gap={24} align="center">
+    <Badge content={5} color="danger">
+      <Avatar name="Ada" />
+    </Badge>
+    <Badge content={120} max={99} color="primary">
+      <Avatar name="Bob" />
+    </Badge>
+  </Flex>
+</LiveDemo>
+
+## Dot variant
+
+`variant="dot"` renders a small textless dot — perfect for "unread / online / has updates" markers.
+
+<LiveDemo code={`<Badge variant="dot" color="success">
+  <Avatar name="Ada" />
+</Badge>
+<Badge variant="dot" color="danger" isPulse>
+  <Avatar name="Bob" />
+</Badge>`}>
+  <Flex gap={24} align="center">
+    <Badge variant="dot" color="success">
+      <Avatar name="Ada" />
+    </Badge>
+    <Badge variant="dot" color="danger" isPulse>
+      <Avatar name="Bob" />
+    </Badge>
+  </Flex>
+</LiveDemo>
+
+## Placement
+
+Four corners — `top-right` (default) / `top-left` / `bottom-right` / `bottom-left`.
+
+<LiveDemo code={`<Badge content="N" placement="top-right">    <Avatar /></Badge>
+<Badge content="N" placement="top-left">     <Avatar /></Badge>
+<Badge content="N" placement="bottom-right"> <Avatar /></Badge>
+<Badge content="N" placement="bottom-left">  <Avatar /></Badge>`}>
+  <Flex gap={24} align="center">
+    <Badge content="N" color="primary" placement="top-right"><Avatar /></Badge>
+    <Badge content="N" color="primary" placement="top-left"><Avatar /></Badge>
+    <Badge content="N" color="primary" placement="bottom-right"><Avatar /></Badge>
+    <Badge content="N" color="primary" placement="bottom-left"><Avatar /></Badge>
+  </Flex>
+</LiveDemo>
+
+## Hiding and zero
+
+- `isInvisible` — keeps the layout but hides the badge (handy for "fade out after read" animations).
+- `showZero` (default `false`) — render even when the value is `0`.
+
+```tsx
+<Badge content={count} isInvisible={count === 0}>
+  <BellIcon />
+</Badge>
+```
+
+## Single character + outline
+
+- `isOneCharacter` — pin the badge to a perfect circle, ideal for one-character / one-digit content.
+- `showOutline` (default `true`) — adds a ring matching the background colour so the badge lifts off complex surfaces.
+
+## API
+
+<PropsTable props={[
+  { name: 'content', type: 'ReactNode | number', description: 'Body of the standard variant; numbers are clamped by `max`.' },
+  { name: 'variant', type: "'standard' | 'dot'", default: "'standard'" },
+  { name: 'color', type: "'neutral' | 'primary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
+  { name: 'placement', type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'", default: "'top-right'" },
+  { name: 'max', type: 'number', default: '99', description: 'Numbers above the threshold render as `Xx+`.' },
+  { name: 'showZero', type: 'boolean', default: 'false', description: 'Render when the value is 0.' },
+  { name: 'isInvisible', type: 'boolean', default: 'false', description: 'Hide the badge while keeping layout.' },
+  { name: 'isOneCharacter', type: 'boolean', default: 'false', description: 'Force the badge to a circle.' },
+  { name: 'isPulse', type: 'boolean', default: 'false', description: 'Pulse animation; common for dot variant.' },
+  { name: 'showOutline', type: 'boolean', default: 'true', description: 'Ring matching the background colour.' },
+  { name: 'children', type: 'ReactNode', description: 'The decorated element.' },
+  { name: 'className', type: 'string' },
+  { name: 'aria-label', type: 'string', description: 'Accessible name when `content` is not text (required for dot).' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Badge is decorative: the standard variant uses `aria-label` to announce the value; the dot variant requires an explicit `aria-label` describing its meaning (e.g. "unread"). When `isInvisible`, the DOM node is kept with `aria-hidden="true"`.
+</Callout>

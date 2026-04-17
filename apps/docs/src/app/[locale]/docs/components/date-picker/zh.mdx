@@ -1,0 +1,118 @@
+# 日期选择 Date Picker
+
+`DatePicker` 选取单个日期，`DateRangePicker` 选取一段连续区间。两者共用同一个日历面板：键盘可达（方向键 + PageUp/Down + Home/End）、可设最小 / 最大值、可禁用任意天、可自定义周首日与本地化格式，弹层基于 Popover 渲染。
+
+<Callout variant="info" title="一篇文档两个组件">
+  `DatePicker` 与 `DateRangePicker` 共享几乎所有 props（继承 `DatePickerCommonProps`），区别只在 `value` 类型与 `DateRangePicker` 额外的 `visibleMonths` / `presets`。
+</Callout>
+
+## DatePicker — 单日期
+
+最常见的"选个日期"。`isClearable` 在已有值时显示清除按钮，`showTodayButton` 在面板底部加一个"今天"快捷按钮。
+
+<LiveDemo code={`import { useState } from 'react';
+import { DatePicker } from '@timeui/react';
+
+export function Demo() {
+  const [value, setValue] = useState<Date | null>(null);
+  return (
+    <DatePicker
+      value={value}
+      onChange={setValue}
+      placeholder="Pick a date"
+      isClearable
+      showTodayButton
+    />
+  );
+}`}>
+  <DatePickerBasicDemo />
+</LiveDemo>
+
+## DateRangePicker — 区间
+
+带 presets 与双月视图的区间选择。第一次点击设定 `start`，第二次点击若早于 `start` 则自动交换；hover 时面板内会高亮预览区间。
+
+<LiveDemo code={`<DateRangePicker
+  value={value}
+  onChange={setValue}
+  presets={[
+    { label: 'Today', value: { start: today, end: today } },
+    { label: 'Last 7 days', value: { start: addDays(today, -6), end: today } },
+    { label: 'Last 30 days', value: { start: addDays(today, -29), end: today } },
+  ]}
+  isClearable
+/>`}>
+  <DateRangePickerDemo />
+</LiveDemo>
+
+## 约束与禁用
+
+- `minValue` / `maxValue` 限定可选区间；超出范围的天会被禁用。
+- `isDateUnavailable(date)` 自定义任意天禁用，如禁选周末：
+
+```tsx
+<DatePicker
+  isDateUnavailable={(d) => {
+    const day = d.getDay();
+    return day === 0 || day === 6; // 周日 / 周六
+  }}
+/>
+```
+
+## 本地化与格式
+
+- `weekStartsOn`：`0`（默认，Sun）/ `1`（Mon）...
+- `locale`：传给内部 `Intl.DateTimeFormat` 的 BCP-47 语言标记（如 `'zh-CN'`）。
+- `format(d)` / `parse(s)`：完全自定义输入框的展示格式与解析逻辑。
+
+## API（共用 DatePickerCommonProps）
+
+<PropsTable props={[
+  { name: 'isOpen', type: 'boolean', description: '受控弹层开关。' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '触发器尺寸。' },
+  { name: 'minValue', type: 'Date', description: '最早可选日期（含）。' },
+  { name: 'maxValue', type: 'Date', description: '最晚可选日期（含）。' },
+  { name: 'isDateUnavailable', type: '(date: Date) => boolean', description: '自定义禁用任意天。' },
+  { name: 'weekStartsOn', type: '0 | 1 | 2 | 3 | 4 | 5 | 6', default: '0', description: '周首日；0 = Sun。' },
+  { name: 'locale', type: 'string', description: '传给 Intl 的 BCP-47 标记。' },
+  { name: 'format', type: '(d: Date) => string', description: '输入框显示格式。' },
+  { name: 'parse', type: '(s: string) => Date | null', description: '字符串解析回 Date。' },
+  { name: 'placeholder', type: 'string' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isInvalid', type: 'boolean', default: 'false' },
+  { name: 'isClearable', type: 'boolean', default: 'false', description: '已有值时显示清除按钮。' },
+  { name: 'showTodayButton', type: 'boolean', default: 'false', description: '面板底部「今天」快捷按钮。' },
+  { name: 'startContent', type: 'ReactNode', description: '触发器内左侧自定义内容（如图标）。' },
+  { name: 'endContent', type: 'ReactNode' },
+  { name: 'portalContainer', type: 'HTMLElement' },
+  { name: 'className', type: 'string' },
+  { name: 'style', type: 'CSSProperties' },
+  { name: 'id', type: 'string' },
+  { name: 'aria-label', type: 'string' }
+]} />
+
+### DatePicker 专属
+
+<PropsTable props={[
+  { name: 'value', type: 'Date | null', description: '受控值。' },
+  { name: 'defaultValue', type: 'Date | null', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: Date | null) => void' }
+]} />
+
+### DateRangePicker 专属
+
+<PropsTable props={[
+  { name: 'value', type: '{ start: Date; end: Date } | null', description: '受控区间值。' },
+  { name: 'defaultValue', type: '{ start: Date; end: Date } | null' },
+  { name: 'onChange', type: '(value: { start: Date; end: Date } | null) => void' },
+  { name: 'visibleMonths', type: '1 | 2', default: '2', description: '同时显示几个月。' },
+  { name: 'presets', type: 'Array<{ label: ReactNode; value: { start: Date; end: Date } }>', description: '左侧预设按钮列表（如 Last 7 days）。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  触发器为带 combobox 模式的 `<input>`，弹层以 `dialog` 渲染。日历网格用 `role="grid"` + `gridcell`：方向键移动、PageUp/Down 切月、Shift+PageUp/Down 切年、Home / End 跳到本周首尾、回车选定。`prefers-reduced-motion` 下取消所有过渡。
+</Callout>

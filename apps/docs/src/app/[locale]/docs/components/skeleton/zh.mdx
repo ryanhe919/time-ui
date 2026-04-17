@@ -1,0 +1,103 @@
+# 骨架屏 Skeleton
+
+加载占位：在数据返回前撑出最终布局，避免页面"塌陷"。三种 shape（`rect` / `circle` / `text`）、三种 animation（`shimmer` / `pulse` / `none`）、`isLoaded` 切换为真实内容、`SkeletonGroup` 统一控制一组子骨架。
+
+## 基础用法
+
+直接传 `width` / `height` 撑出尺寸。
+
+<LiveDemo code={`<Skeleton width={120} height={16} />
+<Skeleton width={200} height={16} />
+<Skeleton width={160} height={16} />`}>
+  <Stack spacing={8}>
+    <Skeleton width={120} height={16} />
+    <Skeleton width={200} height={16} />
+    <Skeleton width={160} height={16} />
+  </Stack>
+</LiveDemo>
+
+## Shape
+
+- `rect`（默认）：方形 / 圆角，受 `radius` 控制。
+- `circle`：宽高相等的正圆，给头像占位。
+- `text`：连续多行文本占位，最后一行自动短一些；`lines` 控制行数。
+
+<LiveDemo code={`<Skeleton shape="circle" width={48} height={48} />
+<Skeleton shape="text" lines={3} width={240} />`}>
+  <Flex gap={16} align="center">
+    <Skeleton shape="circle" width={48} height={48} />
+    <Skeleton shape="text" lines={3} width={240} />
+  </Flex>
+</LiveDemo>
+
+## 动画 animation
+
+- `shimmer`（默认）：高光从左到右扫过，最贴近 macOS / iOS 习惯。
+- `pulse`：整体明暗呼吸。
+- `none`：静态灰块，最克制。
+
+`prefers-reduced-motion` 会强制退化到 `none`。
+
+## 切换为真实内容 isLoaded
+
+`isLoaded` 为 true 时，Skeleton 不再渲染骨架，而是把 children 直接渲染出来——一行 props 就能切换"占位 / 数据"，避免在调用处用三元。
+
+```tsx
+<Skeleton isLoaded={!loading}>
+  <h2>{post.title}</h2>
+</Skeleton>
+```
+
+## SkeletonGroup
+
+把多个 Skeleton 包起来一次性切换，所有子骨架共享同一个 `animation`。
+
+<LiveDemo code={`<SkeletonGroup isLoaded={false}>
+  <Flex gap={12} align="center">
+    <Skeleton shape="circle" width={40} height={40} />
+    <Stack spacing={6}>
+      <Skeleton width={120} height={14} />
+      <Skeleton width={80} height={12} />
+    </Stack>
+  </Flex>
+</SkeletonGroup>`}>
+  <SkeletonGroup isLoaded={false}>
+    <Flex gap={12} align="center">
+      <Skeleton shape="circle" width={40} height={40} />
+      <Stack spacing={6}>
+        <Skeleton width={120} height={14} />
+        <Skeleton width={80} height={12} />
+      </Stack>
+    </Flex>
+  </SkeletonGroup>
+</LiveDemo>
+
+## API
+
+### Skeleton
+
+<PropsTable props={[
+  { name: 'shape', type: "'rect' | 'circle' | 'text'", default: "'rect'" },
+  { name: 'width', type: 'number | string', description: '像素或任意 CSS 长度。' },
+  { name: 'height', type: 'number | string' },
+  { name: 'lines', type: 'number', default: '1', description: '`shape="text"` 时的行数。' },
+  { name: 'radius', type: 'number | string', description: '`rect` shape 的圆角；缺省走 token。' },
+  { name: 'animation', type: "'shimmer' | 'pulse' | 'none'", default: "'shimmer'" },
+  { name: 'isLoaded', type: 'boolean', default: 'false', description: '为 true 时改为渲染 children。' },
+  { name: 'children', type: 'ReactNode', description: '`isLoaded` 后渲染的真实内容。' },
+  { name: 'className', type: 'string' },
+  { name: 'aria-label', type: 'string', description: '默认 "Loading"，可覆盖。' }
+]} />
+
+### SkeletonGroup
+
+<PropsTable props={[
+  { name: 'isLoaded', type: 'boolean', default: 'false', description: '统一控制一组子 Skeleton。' },
+  { name: 'animation', type: "'shimmer' | 'pulse' | 'none'", description: '统一覆盖所有子骨架的动画。' },
+  { name: 'children', type: 'ReactNode' },
+  { name: 'className', type: 'string' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  骨架渲染为 `role="status"` + `aria-busy="true"` + `aria-label="Loading"`；`isLoaded` 后 aria 属性同步移除，children 接管。`prefers-reduced-motion` 自动强制 `animation="none"`。
+</Callout>

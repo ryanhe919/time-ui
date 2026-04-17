@@ -52,6 +52,25 @@ import {
   TabPanel,
   Pagination,
   Table,
+  Drawer,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+  ToastProvider,
+  Menu,
+  MenuItem,
+  MenuSection,
+  MenuDivider,
+  DatePicker,
+  DateRangePicker,
+  Avatar,
+  AvatarGroup,
+  Tag,
+  Badge,
+  Skeleton,
+  SkeletonGroup,
+  Empty,
+  Steps,
 } from '@/components/timeui-client';
 import { PropsTable } from '@/components/mdx/PropsTable';
 import { LiveDemo } from '@/components/mdx/LiveDemo';
@@ -85,6 +104,14 @@ import { TableSelectionDemo } from '@/components/mdx/TableSelectionDemo';
 import { TableWithPaginationDemo } from '@/components/mdx/TableWithPaginationDemo';
 import { TableFixedColumnsDemo } from '@/components/mdx/TableFixedColumnsDemo';
 import { TableCustomRenderDemo } from '@/components/mdx/TableCustomRenderDemo';
+import { DrawerBasicDemo } from '@/components/mdx/DrawerBasicDemo';
+import { DrawerSizesDemo } from '@/components/mdx/DrawerSizesDemo';
+import { ToastBasicDemo } from '@/components/mdx/ToastBasicDemo';
+import { ToastPromiseDemo } from '@/components/mdx/ToastPromiseDemo';
+import { MenuBasicDemo } from '@/components/mdx/MenuBasicDemo';
+import { MenuSelectionDemo } from '@/components/mdx/MenuSelectionDemo';
+import { DatePickerBasicDemo } from '@/components/mdx/DatePickerBasicDemo';
+import { DateRangePickerDemo } from '@/components/mdx/DateRangePickerDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -147,6 +174,14 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     TableWithPaginationDemo,
     TableFixedColumnsDemo,
     TableCustomRenderDemo,
+    DrawerBasicDemo,
+    DrawerSizesDemo,
+    ToastBasicDemo,
+    ToastPromiseDemo,
+    MenuBasicDemo,
+    MenuSelectionDemo,
+    DatePickerBasicDemo,
+    DateRangePickerDemo,
 
     Button,
     Box,
@@ -193,6 +228,25 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     TabPanel,
     Pagination,
     Table,
+    Drawer,
+    DrawerHeader,
+    DrawerBody,
+    DrawerFooter,
+    ToastProvider,
+    Menu,
+    MenuItem,
+    MenuSection,
+    MenuDivider,
+    DatePicker,
+    DateRangePicker,
+    Avatar,
+    AvatarGroup,
+    Tag,
+    Badge,
+    Skeleton,
+    SkeletonGroup,
+    Empty,
+    Steps,
 
     code: (p: ComponentPropsWithoutRef<'code'>) =>
       typeof p.children === 'string' ? <Code {...p}>{p.children}</Code> : <code {...p} />,

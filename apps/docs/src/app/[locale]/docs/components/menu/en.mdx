@@ -1,0 +1,138 @@
+# Menu
+
+A keyboard-navigable dropdown menu: anchored via Popover, supports both declarative (`<Menu.Item>` / `<Menu.Section>` / `<Menu.Divider>`) and data-driven (`items`) authoring, three selection modes (none / single / multiple), roving focus + type-to-jump, and per-item modifiers (shortcut, icon, description, danger, href).
+
+<Callout variant="info" title="Menu vs. Popover">
+  - **Menu** — a list of mutually exclusive commands (actions, navigations, toggles). Arrow-key roving, Enter to invoke, ARIA `menu` semantics.
+  - **Popover** — a small card with arbitrary rich content (form, link list, hint text). No menu behaviour.
+</Callout>
+
+## Basic usage
+
+`onAction(key)` fires whenever an item is invoked. Combine with `<Menu.Section>` for semantic grouping, `<Menu.Divider>` for visual separators, and `isDanger` for destructive actions.
+
+<LiveDemo code={`<Menu
+  trigger={<Button variant="bordered">Open menu</Button>}
+  onAction={(key) => console.log(key)}
+>
+  <MenuSection label="Account">
+    <MenuItem itemKey="profile" shortcut="⌘P">Profile</MenuItem>
+    <MenuItem itemKey="settings" shortcut="⌘,">Settings</MenuItem>
+  </MenuSection>
+  <MenuDivider />
+  <MenuItem itemKey="signout" isDanger>Sign out</MenuItem>
+</Menu>`}>
+  <MenuBasicDemo />
+</LiveDemo>
+
+## Multiple selection
+
+With `selectionMode="multiple"`, clicking an item toggles its checked state and the menu stays open; a checkmark indicator renders on the right. `selectedKeys` / `defaultSelectedKeys` cover both controlled and uncontrolled use.
+
+<LiveDemo code={`const [selected, setSelected] = useState<Set<string>>(new Set(['inbox']));
+
+<Menu
+  trigger={<Button>Show columns</Button>}
+  selectionMode="multiple"
+  selectedKeys={selected}
+  onSelectionChange={setSelected}
+>
+  <MenuItem itemKey="inbox">Inbox</MenuItem>
+  <MenuItem itemKey="starred">Starred</MenuItem>
+  <MenuItem itemKey="snoozed">Snoozed</MenuItem>
+  <MenuItem itemKey="sent">Sent</MenuItem>
+  <MenuItem itemKey="drafts">Drafts</MenuItem>
+</Menu>`}>
+  <MenuSelectionDemo />
+</LiveDemo>
+
+## Data-driven
+
+Pass a flat `items` array to skip JSX in large menus. The two forms are interchangeable, but don't mix them within the same menu.
+
+```tsx
+<Menu
+  trigger={<Button>Sort</Button>}
+  selectionMode="single"
+  defaultSelectedKeys={['name-asc']}
+  items={[
+    {
+      type: 'section',
+      key: 'name',
+      label: 'Name',
+      items: [
+        { key: 'name-asc', label: 'A → Z' },
+        { key: 'name-desc', label: 'Z → A' },
+      ],
+    },
+    {
+      type: 'section',
+      key: 'date',
+      label: 'Date',
+      items: [
+        { key: 'date-newest', label: 'Newest first' },
+        { key: 'date-oldest', label: 'Oldest first' },
+      ],
+    },
+  ]}
+/>
+```
+
+## Item modifiers
+
+Each `MenuItem` accepts:
+
+- `icon` — a 16×16 leading icon.
+- `shortcut` — trailing secondary text (typically a keybinding like `⌘K`).
+- `description` — secondary line below the label.
+- `isDanger` — text + hover background swap to the danger palette.
+- `href` — render as `<a>` instead of `<button>`; both Enter and click navigate.
+- `isDisabled` — skipped by keyboard; click is a no-op.
+
+## API
+
+### Menu
+
+<PropsTable props={[
+  { name: 'trigger', type: 'ReactElement | (opts) => ReactNode', required: true, description: 'Trigger element or render-prop receiving `{ isOpen, ref }`.' },
+  { name: 'items', type: 'ReadonlyArray<MenuItemDescriptor | MenuSectionDescriptor>', description: 'Data-driven mode; takes precedence over children.' },
+  { name: 'children', type: 'ReactNode', description: 'Declarative mode: `<MenuItem>` / `<MenuSection>` / `<MenuDivider>`.' },
+  { name: 'isOpen', type: 'boolean' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'", description: 'One of 12 placements; reuses Popover semantics.' },
+  { name: 'selectionMode', type: "'none' | 'single' | 'multiple'", default: "'none'" },
+  { name: 'selectedKeys', type: 'Iterable<string>', description: 'Controlled selection.' },
+  { name: 'defaultSelectedKeys', type: 'Iterable<string>', description: 'Uncontrolled initial selection.' },
+  { name: 'onSelectionChange', type: '(keys: Set<string>) => void' },
+  { name: 'onAction', type: '(key: string) => void', description: 'Fires for every item invocation.' },
+  { name: 'closeOnSelect', type: 'boolean', default: 'single → true / multiple → false', description: 'Whether to close the menu after a selection.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the menu entirely; trigger stays visible but does not open.' },
+  { name: 'portalContainer', type: 'HTMLElement' },
+  { name: 'className', type: 'string' },
+  { name: 'style', type: 'CSSProperties' },
+  { name: 'id', type: 'string' },
+  { name: 'aria-label', type: 'string' }
+]} />
+
+### MenuItem
+
+<PropsTable props={[
+  { name: 'itemKey', type: 'string', required: true, description: 'Used by selection / onAction.' },
+  { name: 'icon', type: 'ReactNode' },
+  { name: 'shortcut', type: 'ReactNode', description: 'Trailing keybinding hint (e.g. ⌘K).' },
+  { name: 'description', type: 'ReactNode', description: 'Secondary line below the label.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isDanger', type: 'boolean', default: 'false', description: 'Swap text + hover background to the danger palette.' },
+  { name: 'href', type: 'string', description: 'Render as `<a>` instead of `<button>`.' },
+  { name: 'onAction', type: '() => void', description: 'Per-item callback; both this and Menu-level onAction fire.' },
+  { name: 'children', type: 'ReactNode', description: 'Primary label content.' }
+]} />
+
+### MenuSection / MenuDivider
+
+`MenuSection` accepts an optional `label` for a group title; `MenuDivider` renders a 1 px horizontal line as visual separator only — it isn't part of keyboard navigation.
+
+<Callout variant="info" title="Accessibility">
+  The trigger is wired to the menu via `aria-haspopup="menu"` + `aria-expanded` + `aria-controls`. Once open the menu is `role="menu"` (or `menu` + `menuitemcheckbox` for multiple). Arrow keys roam, Home / End jump to the ends, character keys do prefix matching, and Esc closes the menu and returns focus to the trigger.
+</Callout>

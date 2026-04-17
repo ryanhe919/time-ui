@@ -1,0 +1,118 @@
+# Tag
+
+A compact label control for categories, statuses, or attributes. Three variants (solid / soft / outline), six colours, three sizes, optional close button, optional press behaviour, and start / end slots.
+
+<Callout variant="info" title="Tag vs. Badge">
+  - **Tag** — a primary, user-visible label describing **content** ("React", "Bug", "Done"). Can be closed or pressed.
+  - **Badge** — typically **decorates another element** (icon, button, avatar) to convey count or status.
+</Callout>
+
+## Variants
+
+`solid` (high emphasis) / `soft` (the default subtle background) / `outline` (most restrained).
+
+<LiveDemo code={`<Tag variant="solid">Solid</Tag>
+<Tag variant="soft">Soft</Tag>
+<Tag variant="outline">Outline</Tag>`}>
+  <Flex gap={8} align="center">
+    <Tag variant="solid">Solid</Tag>
+    <Tag variant="soft">Soft</Tag>
+    <Tag variant="outline">Outline</Tag>
+  </Flex>
+</LiveDemo>
+
+## Colours
+
+`neutral` / `primary` / `secondary` / `success` / `warning` / `danger`. Every colour composes with every variant.
+
+<LiveDemo code={`<Tag color="neutral">Neutral</Tag>
+<Tag color="primary">Primary</Tag>
+<Tag color="secondary">Secondary</Tag>
+<Tag color="success">Success</Tag>
+<Tag color="warning">Warning</Tag>
+<Tag color="danger">Danger</Tag>`}>
+  <Flex gap={8} wrap="wrap" align="center">
+    <Tag color="neutral">Neutral</Tag>
+    <Tag color="primary">Primary</Tag>
+    <Tag color="secondary">Secondary</Tag>
+    <Tag color="success">Success</Tag>
+    <Tag color="warning">Warning</Tag>
+    <Tag color="danger">Danger</Tag>
+  </Flex>
+</LiveDemo>
+
+## Sizes
+
+`sm` / `md` (default) / `lg` — 20 / 24 / 28 px tall.
+
+<LiveDemo code={`<Tag size="sm">Small</Tag>
+<Tag size="md">Medium</Tag>
+<Tag size="lg">Large</Tag>`}>
+  <Flex gap={8} align="center">
+    <Tag size="sm" color="primary">Small</Tag>
+    <Tag size="md" color="primary">Medium</Tag>
+    <Tag size="lg" color="primary">Large</Tag>
+  </Flex>
+</LiveDemo>
+
+## Shape
+
+`rounded` (default) / `pill`.
+
+<LiveDemo code={`<Tag shape="rounded">Rounded</Tag>
+<Tag shape="pill">Pill</Tag>`}>
+  <Flex gap={8} align="center">
+    <Tag shape="rounded" color="success">Rounded</Tag>
+    <Tag shape="pill" color="success">Pill</Tag>
+  </Flex>
+</LiveDemo>
+
+## Closable
+
+`isClosable` renders a trailing `×` button; click fires `onClose(e)`. Put removal logic on `onClose`, not `onPress`.
+
+<LiveDemo code={`<Tag isClosable onClose={() => console.log('closed')}>React</Tag>
+<Tag isClosable color="primary" onClose={() => {}}>TypeScript</Tag>`}>
+  <Flex gap={8} align="center">
+    <Tag isClosable onClose={() => {}}>React</Tag>
+    <Tag isClosable color="primary" onClose={() => {}}>TypeScript</Tag>
+  </Flex>
+</LiveDemo>
+
+## Interactive
+
+With `isInteractive`, the entire tag becomes a focusable `<button>`. Enter / Space invoke `onPress` — useful for chip-style filters.
+
+<LiveDemo code={`<Tag isInteractive onPress={() => console.log('pressed')}>Filter: React</Tag>`}>
+  <Tag isInteractive onPress={() => {}}>Filter: React</Tag>
+</LiveDemo>
+
+## Start / end content
+
+```tsx
+<Tag startContent={<DotIcon />} color="success">Online</Tag>
+<Tag endContent={<ExternalIcon />}>Visit site</Tag>
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'color', type: "'neutral' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'neutral'" },
+  { name: 'variant', type: "'solid' | 'soft' | 'outline'", default: "'soft'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'shape', type: "'rounded' | 'pill'", default: "'rounded'" },
+  { name: 'isClosable', type: 'boolean', default: 'false', description: 'Render a trailing close button.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isInteractive', type: 'boolean', default: 'false', description: 'Render as a focusable `<button>` and fire `onPress`.' },
+  { name: 'startContent', type: 'ReactNode' },
+  { name: 'endContent', type: 'ReactNode' },
+  { name: 'onClose', type: '(e: MouseEvent) => void', description: 'Fires when the close button is clicked.' },
+  { name: 'onPress', type: '() => void', description: 'Fires on click / Enter when `isInteractive`.' },
+  { name: 'children', type: 'ReactNode' },
+  { name: 'className', type: 'string' },
+  { name: 'aria-label', type: 'string', description: 'Accessible name when `children` is not text.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The default form is a `<span>`; `isInteractive` switches to a `<button>` with native keyboard behaviour. The close button is its own focusable element with `aria-label="Remove"`. Setting `isDisabled` adds `aria-disabled="true"` and suppresses events.
+</Callout>

@@ -13,14 +13,14 @@ module.exports = [
     name: '@timeui/react — full import (no CodeBlock)',
     path: 'packages/components/dist/index.js',
     import: '*',
-    limit: '45 KB',
+    limit: '70 KB',
     ignore: ['react', 'react-dom', '@emotion/react', '@emotion/styled'],
   },
   {
     name: '@timeui/react — Button only',
     path: 'packages/components/dist/index.js',
     import: '{ Button }',
-    limit: '40 KB',
+    limit: '60 KB',
     ignore: ['react', 'react-dom', '@emotion/react', '@emotion/styled'],
   },
   {
@@ -34,6 +34,6 @@ module.exports = [
     name: '@timeui/tokens — full import',
     path: 'packages/tokens/dist/index.js',
     import: '*',
-    limit: '4 KB',
+    limit: '6 KB',
   },
 ];

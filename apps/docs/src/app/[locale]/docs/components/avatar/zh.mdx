@@ -1,0 +1,137 @@
+# 头像 Avatar
+
+代表用户或实体的方形 / 圆形头像：图片加载失败自动回退到 initials，再失败回退到默认图标；`color="auto"` 会按 `name` 哈希出稳定的色板，避免每次渲染随机变。`AvatarGroup` 把多个头像紧凑堆叠，超出 `max` 折叠为 `+N`。
+
+## 基础用法
+
+最简形态：传 `src` 渲染图片头像；同时建议传 `name` 作为 fallback。
+
+<LiveDemo code={`<Avatar src="https://i.pravatar.cc/64?u=ada" name="Ada Lovelace" />
+<Avatar name="Alan Turing" />
+<Avatar />`}>
+  <Flex gap={12} align="center">
+    <Avatar src="https://i.pravatar.cc/64?u=ada" name="Ada Lovelace" />
+    <Avatar name="Alan Turing" />
+    <Avatar />
+  </Flex>
+</LiveDemo>
+
+## 尺寸 size
+
+5 档命名尺寸 `xs` / `sm` / `md`（默认）/ `lg` / `xl`，也支持任意 `number` 像素值。
+
+<LiveDemo code={`<Avatar size="xs" name="A B" />
+<Avatar size="sm" name="A B" />
+<Avatar size="md" name="A B" />
+<Avatar size="lg" name="A B" />
+<Avatar size="xl" name="A B" />
+<Avatar size={56}  name="A B" />`}>
+  <Flex gap={12} align="center">
+    <Avatar size="xs" name="A B" />
+    <Avatar size="sm" name="A B" />
+    <Avatar size="md" name="A B" />
+    <Avatar size="lg" name="A B" />
+    <Avatar size="xl" name="A B" />
+    <Avatar size={56} name="A B" />
+  </Flex>
+</LiveDemo>
+
+## 自动配色 color="auto"
+
+按 `name` 哈希到固定色板（primary / success / warning / danger / neutral 之一），同名永远同色——非常适合聊天列表 / 评论区。
+
+<LiveDemo code={`<Avatar color="auto" name="Ada" />
+<Avatar color="auto" name="Bob" />
+<Avatar color="auto" name="Carol" />
+<Avatar color="auto" name="Dan" />
+<Avatar color="auto" name="Eve" />`}>
+  <Flex gap={12} align="center">
+    <Avatar color="auto" name="Ada" />
+    <Avatar color="auto" name="Bob" />
+    <Avatar color="auto" name="Carol" />
+    <Avatar color="auto" name="Dan" />
+    <Avatar color="auto" name="Eve" />
+  </Flex>
+</LiveDemo>
+
+## 状态点 status
+
+`status` 在右下角渲染一个带白边的小圆点，常用于聊天侧栏的在线状态。
+
+<LiveDemo code={`<Avatar name="Ada" status="online" />
+<Avatar name="Bob" status="busy" />
+<Avatar name="Eve" status="away" />
+<Avatar name="Tom" status="offline" />`}>
+  <Flex gap={16} align="center">
+    <Avatar name="Ada" status="online" />
+    <Avatar name="Bob" status="busy" />
+    <Avatar name="Eve" status="away" />
+    <Avatar name="Tom" status="offline" />
+  </Flex>
+</LiveDemo>
+
+## 形状 shape
+
+`shape="square"` 渲染圆角方形头像（适合品牌 logo / 项目图标）。
+
+<LiveDemo code={`<Avatar shape="circle" name="A B" />
+<Avatar shape="square" name="A B" />`}>
+  <Flex gap={12} align="center">
+    <Avatar shape="circle" name="A B" />
+    <Avatar shape="square" name="A B" />
+  </Flex>
+</LiveDemo>
+
+## AvatarGroup
+
+把多个头像堆叠为一组，`max` 控制最多展示几个，剩余折叠为 `+N`；`spacing` 控制重叠程度。
+
+<LiveDemo code={`<AvatarGroup max={3}>
+  <Avatar name="Ada" />
+  <Avatar name="Bob" />
+  <Avatar name="Carol" />
+  <Avatar name="Dan" />
+  <Avatar name="Eve" />
+</AvatarGroup>`}>
+  <AvatarGroup max={3}>
+    <Avatar name="Ada" color="auto" />
+    <Avatar name="Bob" color="auto" />
+    <Avatar name="Carol" color="auto" />
+    <Avatar name="Dan" color="auto" />
+    <Avatar name="Eve" color="auto" />
+  </AvatarGroup>
+</LiveDemo>
+
+## API
+
+### Avatar
+
+<PropsTable props={[
+  { name: 'src', type: 'string', description: '图片 URL；加载失败自动回退到 initials。' },
+  { name: 'alt', type: 'string', description: '图片可访问名；缺省时取 `name`。' },
+  { name: 'name', type: 'string', description: '用于生成 initials 与 `color="auto"` 的哈希源。' },
+  { name: 'fallbackIcon', type: 'ReactNode', description: '没有 `src` / `name` 时回退渲染的图标。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl' | number", default: "'md'", description: '命名档位或任意像素值。' },
+  { name: 'shape', type: "'circle' | 'square'", default: "'circle'" },
+  { name: 'color', type: "'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'auto'", default: "'neutral'", description: '`auto` 按 `name` 哈希。' },
+  { name: 'status', type: "'online' | 'offline' | 'busy' | 'away'", description: '右下角状态点。' },
+  { name: 'isBordered', type: 'boolean', default: 'false', description: '加一圈与背景同色的描边（堆叠时美观）。' },
+  { name: 'onError', type: '() => void', description: '图片加载失败回调。' },
+  { name: 'className', type: 'string' }
+]} />
+
+### AvatarGroup
+
+<PropsTable props={[
+  { name: 'max', type: 'number', description: '最多渲染几个 avatar；超出折叠为 `+N`。' },
+  { name: 'total', type: 'number', description: '显式总数（覆盖按 children 计算的结果）。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl' | number", description: '统一施加到每个子 Avatar。' },
+  { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: '重叠程度。' },
+  { name: 'renderSurplus', type: '(count: number) => ReactNode', description: '自定义 `+N` 渲染。' },
+  { name: 'children', type: 'ReactNode' },
+  { name: 'className', type: 'string' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  无 `src` 时 Avatar 渲染为 `role="img"` + `aria-label`，初始字母对屏幕阅读器隐藏。有 `src` 时回退到原生 `<img>` 的 alt 行为。
+</Callout>

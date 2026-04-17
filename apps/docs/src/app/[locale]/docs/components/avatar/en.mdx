@@ -1,0 +1,137 @@
+# Avatar
+
+A square / round avatar for users or entities: image-load failures fall back to initials, then to a default icon. `color="auto"` hashes a stable colour from `name`, so the same person never flicker-swaps colours. `AvatarGroup` stacks several avatars compactly and folds the overflow into a `+N` chip.
+
+## Basic usage
+
+The minimal form: pass `src` for an image avatar; always include `name` as a fallback.
+
+<LiveDemo code={`<Avatar src="https://i.pravatar.cc/64?u=ada" name="Ada Lovelace" />
+<Avatar name="Alan Turing" />
+<Avatar />`}>
+  <Flex gap={12} align="center">
+    <Avatar src="https://i.pravatar.cc/64?u=ada" name="Ada Lovelace" />
+    <Avatar name="Alan Turing" />
+    <Avatar />
+  </Flex>
+</LiveDemo>
+
+## Sizes
+
+Five named sizes — `xs` / `sm` / `md` (default) / `lg` / `xl` — plus arbitrary pixel `number` values.
+
+<LiveDemo code={`<Avatar size="xs" name="A B" />
+<Avatar size="sm" name="A B" />
+<Avatar size="md" name="A B" />
+<Avatar size="lg" name="A B" />
+<Avatar size="xl" name="A B" />
+<Avatar size={56}  name="A B" />`}>
+  <Flex gap={12} align="center">
+    <Avatar size="xs" name="A B" />
+    <Avatar size="sm" name="A B" />
+    <Avatar size="md" name="A B" />
+    <Avatar size="lg" name="A B" />
+    <Avatar size="xl" name="A B" />
+    <Avatar size={56} name="A B" />
+  </Flex>
+</LiveDemo>
+
+## Auto colour
+
+`color="auto"` hashes `name` to one of the brand palettes (primary / success / warning / danger / neutral). The same name always renders the same colour — perfect for chat lists and comment threads.
+
+<LiveDemo code={`<Avatar color="auto" name="Ada" />
+<Avatar color="auto" name="Bob" />
+<Avatar color="auto" name="Carol" />
+<Avatar color="auto" name="Dan" />
+<Avatar color="auto" name="Eve" />`}>
+  <Flex gap={12} align="center">
+    <Avatar color="auto" name="Ada" />
+    <Avatar color="auto" name="Bob" />
+    <Avatar color="auto" name="Carol" />
+    <Avatar color="auto" name="Dan" />
+    <Avatar color="auto" name="Eve" />
+  </Flex>
+</LiveDemo>
+
+## Status dot
+
+`status` adds a small dot with a white ring at the bottom-right — typical for chat presence indicators.
+
+<LiveDemo code={`<Avatar name="Ada" status="online" />
+<Avatar name="Bob" status="busy" />
+<Avatar name="Eve" status="away" />
+<Avatar name="Tom" status="offline" />`}>
+  <Flex gap={16} align="center">
+    <Avatar name="Ada" status="online" />
+    <Avatar name="Bob" status="busy" />
+    <Avatar name="Eve" status="away" />
+    <Avatar name="Tom" status="offline" />
+  </Flex>
+</LiveDemo>
+
+## Shape
+
+`shape="square"` renders a rounded-square avatar, suited to brand logos and project icons.
+
+<LiveDemo code={`<Avatar shape="circle" name="A B" />
+<Avatar shape="square" name="A B" />`}>
+  <Flex gap={12} align="center">
+    <Avatar shape="circle" name="A B" />
+    <Avatar shape="square" name="A B" />
+  </Flex>
+</LiveDemo>
+
+## AvatarGroup
+
+Stack several avatars into one cluster. `max` caps the visible count; the remainder is folded into a `+N` chip. `spacing` controls the overlap.
+
+<LiveDemo code={`<AvatarGroup max={3}>
+  <Avatar name="Ada" />
+  <Avatar name="Bob" />
+  <Avatar name="Carol" />
+  <Avatar name="Dan" />
+  <Avatar name="Eve" />
+</AvatarGroup>`}>
+  <AvatarGroup max={3}>
+    <Avatar name="Ada" color="auto" />
+    <Avatar name="Bob" color="auto" />
+    <Avatar name="Carol" color="auto" />
+    <Avatar name="Dan" color="auto" />
+    <Avatar name="Eve" color="auto" />
+  </AvatarGroup>
+</LiveDemo>
+
+## API
+
+### Avatar
+
+<PropsTable props={[
+  { name: 'src', type: 'string', description: 'Image URL; falls back to initials if loading fails.' },
+  { name: 'alt', type: 'string', description: 'Accessible image name; defaults to `name`.' },
+  { name: 'name', type: 'string', description: 'Source for initials and the `color="auto"` hash.' },
+  { name: 'fallbackIcon', type: 'ReactNode', description: 'Icon shown when neither `src` nor `name` is available.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl' | number", default: "'md'", description: 'Named step or pixel value.' },
+  { name: 'shape', type: "'circle' | 'square'", default: "'circle'" },
+  { name: 'color', type: "'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'auto'", default: "'neutral'", description: '`auto` hashes from `name`.' },
+  { name: 'status', type: "'online' | 'offline' | 'busy' | 'away'", description: 'Bottom-right status dot.' },
+  { name: 'isBordered', type: 'boolean', default: 'false', description: 'Adds a ring matching the background — looks great when stacked.' },
+  { name: 'onError', type: '() => void', description: 'Fires on image load failure.' },
+  { name: 'className', type: 'string' }
+]} />
+
+### AvatarGroup
+
+<PropsTable props={[
+  { name: 'max', type: 'number', description: 'Maximum visible avatars; the rest fold into `+N`.' },
+  { name: 'total', type: 'number', description: 'Explicit total (overrides the count derived from children).' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl' | number", description: 'Applied to every child Avatar.' },
+  { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Stack overlap density.' },
+  { name: 'renderSurplus', type: '(count: number) => ReactNode', description: 'Custom render for the `+N` chip.' },
+  { name: 'children', type: 'ReactNode' },
+  { name: 'className', type: 'string' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Without `src`, Avatar renders as `role="img"` with an `aria-label`; initials are hidden from screen readers. With `src`, native `<img>` alt semantics apply.
+</Callout>

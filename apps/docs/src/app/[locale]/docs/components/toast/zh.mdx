@@ -1,0 +1,103 @@
+# 通知 Toast
+
+命令式弹出的轻量提示。先在应用根部包一层 `<ToastProvider>`，再通过 `useToast()` 或 module-level `toast` 单例发出。自动 5s 关闭、hover 时暂停、相同 id 自动 update、`prefers-reduced-motion` 退化为淡入。
+
+<Callout variant="info" title="装在哪里">
+  把 `<ToastProvider>` 放到应用最外层（例如 Next.js 的 root layout）。一个进程同时只渲染最近一次挂载的 Provider 的 toast；命令式 `toast.*()` 在 Provider 外调用会 no-op + dev warn。
+</Callout>
+
+## 安装方式
+
+```tsx
+// app/layout.tsx
+import { ConfigProvider, ThemeProvider, ToastProvider } from '@timeui/react';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ConfigProvider>
+      <ThemeProvider mode="light">
+        <ToastProvider placement="top-right">
+          {children}
+        </ToastProvider>
+      </ThemeProvider>
+    </ConfigProvider>
+  );
+}
+```
+
+## 基础用法
+
+`useToast()` 返回 `ToastApi`，包含 `success` / `error` / `warning` / `info` / `loading` 五个快捷方法以及通用 `show`。每条 toast 默认 5s 自动关闭，hover 时暂停计时，移开继续。
+
+<LiveDemo code={`import { useToast } from '@timeui/react';
+
+function Demo() {
+  const toast = useToast();
+  return (
+    <Button onClick={() => toast.success('Saved successfully', { description: 'Your changes are now live.' })}>
+      Save
+    </Button>
+  );
+}`}>
+  <ToastBasicDemo />
+</LiveDemo>
+
+## Promise 流转
+
+`toast.promise(p, msgs)` 会立即弹出 loading toast，并在 promise resolve / reject 后自动 update 为 success / error。`success` / `error` 既可以是节点也可以是 `(value) => node` 函数。
+
+<LiveDemo code={`toast.promise(uploadFile(file), {
+  loading: 'Uploading file…',
+  success: (v) => \`Uploaded — \${v.url}\`,
+  error: (e) => \`Failed: \${e.message}\`,
+});`}>
+  <ToastPromiseDemo />
+</LiveDemo>
+
+## 命令式 vs Hook
+
+- 在 React 组件树内推荐用 `useToast()`，能跟随 Provider 重新挂载稳定取到 store。
+- 在非 React 环境（如 fetch 拦截器、状态机回调）使用 module-level `toast`，它代理到最近一次挂载的 Provider。
+
+## API
+
+### ToastProvider
+
+<PropsTable props={[
+  { name: 'placement', type: "'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'", default: "'top-right'", description: '默认弹出位置；单条 toast 可通过 `placement` 覆盖。' },
+  { name: 'maxToasts', type: 'number', default: '5', description: '同时渲染的最大数量；超出仅排队不渲染。' },
+  { name: 'children', type: 'ReactNode', required: true, description: '应用子树。' }
+]} />
+
+### ToastApi（来自 useToast() / toast）
+
+<PropsTable props={[
+  { name: 'show', type: '(opts: ToastOptions) => string', description: '通用入口；返回 toast id。' },
+  { name: 'success', type: '(msg: ReactNode, opts?) => string', description: '快捷：status = "success"。' },
+  { name: 'error', type: '(msg: ReactNode, opts?) => string', description: '快捷：status = "danger"。' },
+  { name: 'warning', type: '(msg: ReactNode, opts?) => string', description: '快捷：status = "warning"。' },
+  { name: 'info', type: '(msg: ReactNode, opts?) => string', description: '快捷：status = "info"。' },
+  { name: 'loading', type: '(msg: ReactNode, opts?) => string', description: '快捷：status = "loading"，默认不自动关闭。' },
+  { name: 'update', type: '(id: string, opts: Partial<ToastOptions>) => void', description: '局部更新一条已存在的 toast。' },
+  { name: 'dismiss', type: '(id?: string) => void', description: '关闭指定 id；不传则关闭全部。' },
+  { name: 'promise', type: '<T>(p: Promise<T>, msgs: ToastPromiseMessages<T>) => Promise<T>', description: 'loading → success / error 自动切换；返回原始 promise 以便链式。' }
+]} />
+
+### ToastOptions
+
+<PropsTable props={[
+  { name: 'id', type: 'string', description: '显式 id；同 id 再次 show 等价于 update。不传则内部生成。' },
+  { name: 'title', type: 'ReactNode', description: '标题（粗体行）。' },
+  { name: 'description', type: 'ReactNode', description: '次级描述行。' },
+  { name: 'status', type: "'info' | 'success' | 'warning' | 'danger' | 'loading'", default: "'info'", description: '决定 icon 与强调色。' },
+  { name: 'duration', type: 'number | null', default: '5000 / null（loading）', description: 'ms；`null` 显式禁用自动关闭。' },
+  { name: 'isClosable', type: 'boolean', default: 'true', description: '是否显示关闭按钮。' },
+  { name: 'icon', type: 'ReactNode', description: '覆盖 status 默认图标。' },
+  { name: 'action', type: '{ label: ReactNode; onPress: () => void }', description: '操作按钮；点击后 toast 会被关闭。' },
+  { name: 'onDismiss', type: '() => void', description: 'toast 关闭时回调（无论原因）。' },
+  { name: 'placement', type: 'ToastPlacement', description: '覆盖 Provider 默认位置。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  每个 toast 渲染为 `role="status"`（`danger` 为 `role="alert"`），`aria-live="polite"`。键盘可通过 Tab 进入操作按钮 / 关闭按钮；hover 或键盘聚焦时自动暂停 dismiss 计时。
+</Callout>

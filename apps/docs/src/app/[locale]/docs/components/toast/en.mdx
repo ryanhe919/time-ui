@@ -1,0 +1,103 @@
+# Toast
+
+Imperative, lightweight notifications. Wrap your app once with `<ToastProvider>`, then fire toasts from anywhere via `useToast()` or the module-level `toast` singleton. Auto-dismiss after 5 s, pauses on hover, same-id calls update in place, and degrades to a fade under `prefers-reduced-motion`.
+
+<Callout variant="info" title="Where to mount it">
+  Mount `<ToastProvider>` at the very top of the tree (e.g. Next.js root layout). Only the most recently mounted Provider is bound to the imperative `toast` singleton; calls outside any Provider are no-ops with a dev warning.
+</Callout>
+
+## Setup
+
+```tsx
+// app/layout.tsx
+import { ConfigProvider, ThemeProvider, ToastProvider } from '@timeui/react';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ConfigProvider>
+      <ThemeProvider mode="light">
+        <ToastProvider placement="top-right">
+          {children}
+        </ToastProvider>
+      </ThemeProvider>
+    </ConfigProvider>
+  );
+}
+```
+
+## Basic usage
+
+`useToast()` returns the `ToastApi` — five shortcuts (`success` / `error` / `warning` / `info` / `loading`) plus the generic `show`. Each toast auto-dismisses after 5 s, pauses while hovered, and resumes on mouse leave.
+
+<LiveDemo code={`import { useToast } from '@timeui/react';
+
+function Demo() {
+  const toast = useToast();
+  return (
+    <Button onClick={() => toast.success('Saved successfully', { description: 'Your changes are now live.' })}>
+      Save
+    </Button>
+  );
+}`}>
+  <ToastBasicDemo />
+</LiveDemo>
+
+## Promise flow
+
+`toast.promise(p, msgs)` immediately shows a loading toast and updates it to success / error when the promise settles. `success` / `error` accept a node or a `(value) => node` function.
+
+<LiveDemo code={`toast.promise(uploadFile(file), {
+  loading: 'Uploading file…',
+  success: (v) => \`Uploaded — \${v.url}\`,
+  error: (e) => \`Failed: \${e.message}\`,
+});`}>
+  <ToastPromiseDemo />
+</LiveDemo>
+
+## Hook vs. singleton
+
+- Inside React components, prefer `useToast()` — it follows Provider remounts.
+- Outside React (fetch interceptors, state-machine callbacks), use the module-level `toast`; it proxies to the most recently mounted Provider.
+
+## API
+
+### ToastProvider
+
+<PropsTable props={[
+  { name: 'placement', type: "'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'", default: "'top-right'", description: 'Default viewport corner; per-toast `placement` overrides.' },
+  { name: 'maxToasts', type: 'number', default: '5', description: 'Maximum simultaneously rendered toasts; the rest queue.' },
+  { name: 'children', type: 'ReactNode', required: true, description: 'Application subtree.' }
+]} />
+
+### ToastApi (returned by useToast() / toast)
+
+<PropsTable props={[
+  { name: 'show', type: '(opts: ToastOptions) => string', description: 'Generic entry; returns the toast id.' },
+  { name: 'success', type: '(msg: ReactNode, opts?) => string', description: 'Shortcut for status = "success".' },
+  { name: 'error', type: '(msg: ReactNode, opts?) => string', description: 'Shortcut for status = "danger".' },
+  { name: 'warning', type: '(msg: ReactNode, opts?) => string', description: 'Shortcut for status = "warning".' },
+  { name: 'info', type: '(msg: ReactNode, opts?) => string', description: 'Shortcut for status = "info".' },
+  { name: 'loading', type: '(msg: ReactNode, opts?) => string', description: 'Shortcut for status = "loading"; never auto-dismisses by default.' },
+  { name: 'update', type: '(id: string, opts: Partial<ToastOptions>) => void', description: 'Patch an existing toast.' },
+  { name: 'dismiss', type: '(id?: string) => void', description: 'Dismiss by id; pass nothing to clear all.' },
+  { name: 'promise', type: '<T>(p: Promise<T>, msgs: ToastPromiseMessages<T>) => Promise<T>', description: 'loading → success / error transition; returns the original promise for chaining.' }
+]} />
+
+### ToastOptions
+
+<PropsTable props={[
+  { name: 'id', type: 'string', description: 'Explicit id; calling `show` again with the same id updates the existing toast. Auto-generated otherwise.' },
+  { name: 'title', type: 'ReactNode', description: 'Title row (bold).' },
+  { name: 'description', type: 'ReactNode', description: 'Secondary description row.' },
+  { name: 'status', type: "'info' | 'success' | 'warning' | 'danger' | 'loading'", default: "'info'", description: 'Drives icon and accent colour.' },
+  { name: 'duration', type: 'number | null', default: '5000 / null (loading)', description: 'In ms; `null` disables auto-dismiss.' },
+  { name: 'isClosable', type: 'boolean', default: 'true' },
+  { name: 'icon', type: 'ReactNode', description: 'Override the default status icon.' },
+  { name: 'action', type: '{ label: ReactNode; onPress: () => void }', description: 'Action button; the toast closes after the press.' },
+  { name: 'onDismiss', type: '() => void', description: 'Fires whenever this toast leaves the viewport.' },
+  { name: 'placement', type: 'ToastPlacement', description: 'Override the Provider default position.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Each toast renders with `role="status"` (or `role="alert"` for `danger`), `aria-live="polite"`. Action and close buttons are reachable via Tab; hovering or focusing the toast pauses the dismissal timer.
+</Callout>

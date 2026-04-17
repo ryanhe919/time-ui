@@ -1,0 +1,79 @@
+# 空状态 Empty
+
+数据为空 / 查无结果 / 请求出错时的占位插画 + 文案 + 行动按钮。预置 4 个 image preset（`default` / `search` / `error` / `no-data`），3 档尺寸，`variant="inline"` 可压缩成一行用于卡片内嵌。
+
+## 基础用法
+
+最简形态：传 `title` + `description`，再可选地放一个主按钮到 `actions`。
+
+<LiveDemo code={`<Empty
+  title="Nothing here yet"
+  description="Create your first project to get started."
+  actions={<Button color="primary">New project</Button>}
+/>`}>
+  <Empty
+    title="Nothing here yet"
+    description="Create your first project to get started."
+    actions={<Button color="primary">New project</Button>}
+  />
+</LiveDemo>
+
+## Image preset
+
+不传 `image` 时走 `default`；其它三个 preset 是常见场景的内置 SVG。需要品牌插画时传 `image={<MyArt />}`。
+
+<LiveDemo code={`<Empty image="search"  title="No matches" description="Try a different keyword." />
+<Empty image="error"   title="Couldn't load" description="Refresh and try again." />
+<Empty image="no-data" title="No records"   description="Once you save data, it shows here." />`}>
+  <Stack spacing={32}>
+    <Empty image="search" title="No matches" description="Try a different keyword." />
+    <Empty image="error" title="Couldn't load" description="Refresh and try again." />
+    <Empty image="no-data" title="No records" description="Once you save data, it shows here." />
+  </Stack>
+</LiveDemo>
+
+## 尺寸 size
+
+`sm` / `md`（默认）/ `lg`。`sm` 适合卡片 / 抽屉内嵌，`lg` 适合空白页占满版心。
+
+## variant="inline"
+
+一行式空状态：image + 一行文字 + 可选 actions，水平排版，常用于表格"无数据"那一行。
+
+```tsx
+<Empty
+  variant="inline"
+  image="no-data"
+  title="No results in this view"
+  actions={<Button size="sm" variant="ghost">Reset filters</Button>}
+/>
+```
+
+## 自定义 children
+
+如果预设布局不够用，可以直接传 children 覆盖 `title` / `description` / `actions` 的渲染区。
+
+```tsx
+<Empty image={<MyArt />}>
+  <Heading level={3}>Welcome aboard</Heading>
+  <Text muted>Three quick steps to set things up.</Text>
+  <Steps items={[...]} />
+</Empty>
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'image', type: "ReactNode | 'default' | 'search' | 'error' | 'no-data'", default: "'default'", description: '插画。传字符串走预设，传 ReactNode 走自定义。' },
+  { name: 'title', type: 'ReactNode', description: '一级标题。' },
+  { name: 'description', type: 'ReactNode', description: '次级描述。' },
+  { name: 'actions', type: 'ReactNode', description: '主操作按钮区，通常 1 ~ 2 个 Button。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'variant', type: "'default' | 'inline'", default: "'default'", description: '`inline` 横向单行布局。' },
+  { name: 'children', type: 'ReactNode', description: '当传入时覆盖 `title` / `description` / `actions` 的默认结构。' },
+  { name: 'className', type: 'string' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  插画作为装饰用 `aria-hidden="true"`；标题渲染为 `<h3>`，描述用 `<p>`。`actions` 内按钮自带键盘可达。
+</Callout>

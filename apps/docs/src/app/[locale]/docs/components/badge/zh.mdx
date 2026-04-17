@@ -1,0 +1,102 @@
+# 徽章 Badge
+
+附着在另一个元素角落的小标签：未读计数、状态点、有无变更指示。两种 variant（`standard` 数字徽章 / `dot` 圆点）、4 种 placement、5 种 color、可脉动、可隐藏。
+
+<Callout variant="info" title="Badge 还是 Tag？">
+  - **Badge**：依附在另一个元素上（图标的右上角、按钮的角标），传达计数 / 状态点。
+  - **Tag**：独立显示的标签，通常带文字内容、可关闭 / 点击。
+</Callout>
+
+## 基础用法
+
+把要装饰的元素作为 `children` 传入，Badge 会绝对定位到角落。`content` 是数字时自动按 `max`（默认 99）截断为 `99+`。
+
+<LiveDemo code={`<Badge content={5} color="danger">
+  <Avatar name="Ada" />
+</Badge>
+<Badge content={120} max={99} color="primary">
+  <Avatar name="Bob" />
+</Badge>`}>
+  <Flex gap={24} align="center">
+    <Badge content={5} color="danger">
+      <Avatar name="Ada" />
+    </Badge>
+    <Badge content={120} max={99} color="primary">
+      <Avatar name="Bob" />
+    </Badge>
+  </Flex>
+</LiveDemo>
+
+## Dot 圆点
+
+`variant="dot"` 渲染一个不带文字的小圆点，用来表示"有未读 / 在线 / 有更新"。
+
+<LiveDemo code={`<Badge variant="dot" color="success">
+  <Avatar name="Ada" />
+</Badge>
+<Badge variant="dot" color="danger" isPulse>
+  <Avatar name="Bob" />
+</Badge>`}>
+  <Flex gap={24} align="center">
+    <Badge variant="dot" color="success">
+      <Avatar name="Ada" />
+    </Badge>
+    <Badge variant="dot" color="danger" isPulse>
+      <Avatar name="Bob" />
+    </Badge>
+  </Flex>
+</LiveDemo>
+
+## 位置 placement
+
+四个角落 `top-right`（默认）/ `top-left` / `bottom-right` / `bottom-left`。
+
+<LiveDemo code={`<Badge content="N" placement="top-right">    <Avatar /></Badge>
+<Badge content="N" placement="top-left">     <Avatar /></Badge>
+<Badge content="N" placement="bottom-right"> <Avatar /></Badge>
+<Badge content="N" placement="bottom-left">  <Avatar /></Badge>`}>
+  <Flex gap={24} align="center">
+    <Badge content="N" color="primary" placement="top-right"><Avatar /></Badge>
+    <Badge content="N" color="primary" placement="top-left"><Avatar /></Badge>
+    <Badge content="N" color="primary" placement="bottom-right"><Avatar /></Badge>
+    <Badge content="N" color="primary" placement="bottom-left"><Avatar /></Badge>
+  </Flex>
+</LiveDemo>
+
+## 隐藏与零值
+
+- `isInvisible`：保留布局但隐藏徽章（适合"读完后渐隐"动画）。
+- `showZero`（默认 `false`）：内容为 `0` 时是否仍渲染。
+
+```tsx
+<Badge content={count} isInvisible={count === 0}>
+  <BellIcon />
+</Badge>
+```
+
+## 单字符 + 描边
+
+- `isOneCharacter`：把徽章固定为正圆，适合单字符 / 单数字。
+- `showOutline`（默认 `true`）：徽章外圈一圈与背景同色的描边，让它从复杂背景上"浮起来"。
+
+## API
+
+<PropsTable props={[
+  { name: 'content', type: 'ReactNode | number', description: 'standard variant 的内容；数字会按 `max` 截断。' },
+  { name: 'variant', type: "'standard' | 'dot'", default: "'standard'" },
+  { name: 'color', type: "'neutral' | 'primary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
+  { name: 'placement', type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'", default: "'top-right'" },
+  { name: 'max', type: 'number', default: '99', description: '数字超出阈值时显示 `Xx+`。' },
+  { name: 'showZero', type: 'boolean', default: 'false', description: '内容为 0 时是否渲染。' },
+  { name: 'isInvisible', type: 'boolean', default: 'false', description: '隐藏徽章但保留布局。' },
+  { name: 'isOneCharacter', type: 'boolean', default: 'false', description: '固定为正圆。' },
+  { name: 'isPulse', type: 'boolean', default: 'false', description: '脉动动画（dot 常用）。' },
+  { name: 'showOutline', type: 'boolean', default: 'true', description: '描一圈与背景同色的边。' },
+  { name: 'children', type: 'ReactNode', description: '被装饰的元素。' },
+  { name: 'className', type: 'string' },
+  { name: 'aria-label', type: 'string', description: '当 `content` 不是文本时提供可访问名（如 dot variant）。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  Badge 渲染为视觉装饰：`standard` variant 用 `aria-label` 朗读数值；`dot` variant 必须显式传 `aria-label` 描述含义（如"未读"）。`isInvisible` 时保留 DOM 节点，但 `aria-hidden="true"`。
+</Callout>

@@ -1,0 +1,118 @@
+# 标签 Tag
+
+紧凑的标记控件：标注分类、状态、属性。3 种 variant（solid / soft / outline）、6 种 color、3 档 size、可关闭、可点击、可加 start/end 内容。
+
+<Callout variant="info" title="Tag 还是 Badge？">
+  - **Tag**：用户可见、表达**内容属性**（"React"、"Bug"、"已完成"），可关闭 / 点击。
+  - **Badge**：通常**附着在另一个元素上**（图标的右上角、按钮的角标），表达计数 / 状态点。
+</Callout>
+
+## Variant
+
+`solid`（实心，强调）/ `soft`（淡背景，常用默认）/ `outline`（描边，最克制）。
+
+<LiveDemo code={`<Tag variant="solid">Solid</Tag>
+<Tag variant="soft">Soft</Tag>
+<Tag variant="outline">Outline</Tag>`}>
+  <Flex gap={8} align="center">
+    <Tag variant="solid">Solid</Tag>
+    <Tag variant="soft">Soft</Tag>
+    <Tag variant="outline">Outline</Tag>
+  </Flex>
+</LiveDemo>
+
+## 颜色
+
+`neutral` / `primary` / `secondary` / `success` / `warning` / `danger`，每种 color 与三种 variant 自由组合。
+
+<LiveDemo code={`<Tag color="neutral">Neutral</Tag>
+<Tag color="primary">Primary</Tag>
+<Tag color="secondary">Secondary</Tag>
+<Tag color="success">Success</Tag>
+<Tag color="warning">Warning</Tag>
+<Tag color="danger">Danger</Tag>`}>
+  <Flex gap={8} wrap="wrap" align="center">
+    <Tag color="neutral">Neutral</Tag>
+    <Tag color="primary">Primary</Tag>
+    <Tag color="secondary">Secondary</Tag>
+    <Tag color="success">Success</Tag>
+    <Tag color="warning">Warning</Tag>
+    <Tag color="danger">Danger</Tag>
+  </Flex>
+</LiveDemo>
+
+## 尺寸 size
+
+`sm` / `md`（默认）/ `lg`，分别对应 20 / 24 / 28 px 高度。
+
+<LiveDemo code={`<Tag size="sm">Small</Tag>
+<Tag size="md">Medium</Tag>
+<Tag size="lg">Large</Tag>`}>
+  <Flex gap={8} align="center">
+    <Tag size="sm" color="primary">Small</Tag>
+    <Tag size="md" color="primary">Medium</Tag>
+    <Tag size="lg" color="primary">Large</Tag>
+  </Flex>
+</LiveDemo>
+
+## 形状 shape
+
+`rounded`（默认，圆角）/ `pill`（胶囊）。
+
+<LiveDemo code={`<Tag shape="rounded">Rounded</Tag>
+<Tag shape="pill">Pill</Tag>`}>
+  <Flex gap={8} align="center">
+    <Tag shape="rounded" color="success">Rounded</Tag>
+    <Tag shape="pill" color="success">Pill</Tag>
+  </Flex>
+</LiveDemo>
+
+## 可关闭
+
+`isClosable` 在尾部渲染一个 `×` 按钮；点击时触发 `onClose(e)`。建议把删除逻辑放在 `onClose` 而不是 `onPress`。
+
+<LiveDemo code={`<Tag isClosable onClose={() => console.log('closed')}>React</Tag>
+<Tag isClosable color="primary" onClose={() => {}}>TypeScript</Tag>`}>
+  <Flex gap={8} align="center">
+    <Tag isClosable onClose={() => {}}>React</Tag>
+    <Tag isClosable color="primary" onClose={() => {}}>TypeScript</Tag>
+  </Flex>
+</LiveDemo>
+
+## 可点击
+
+设置 `isInteractive` 后整个 tag 变为可聚焦的 `<button>`，回车 / 空格触发 `onPress`，常用于"作为筛选器"。
+
+<LiveDemo code={`<Tag isInteractive onPress={() => console.log('pressed')}>Filter: React</Tag>`}>
+  <Tag isInteractive onPress={() => {}}>Filter: React</Tag>
+</LiveDemo>
+
+## start / end content
+
+```tsx
+<Tag startContent={<DotIcon />} color="success">Online</Tag>
+<Tag endContent={<ExternalIcon />}>Visit site</Tag>
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'color', type: "'neutral' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'neutral'" },
+  { name: 'variant', type: "'solid' | 'soft' | 'outline'", default: "'soft'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'shape', type: "'rounded' | 'pill'", default: "'rounded'" },
+  { name: 'isClosable', type: 'boolean', default: 'false', description: '尾部渲染 `×` 按钮。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isInteractive', type: 'boolean', default: 'false', description: '渲染为可聚焦的 `<button>`，触发 `onPress`。' },
+  { name: 'startContent', type: 'ReactNode' },
+  { name: 'endContent', type: 'ReactNode' },
+  { name: 'onClose', type: '(e: MouseEvent) => void', description: '点击关闭按钮触发。' },
+  { name: 'onPress', type: '() => void', description: '`isInteractive` 时点击 / 回车触发。' },
+  { name: 'children', type: 'ReactNode' },
+  { name: 'className', type: 'string' },
+  { name: 'aria-label', type: 'string', description: '当 `children` 不是文本时提供可访问名。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  纯展示形态渲染为 `<span>`；`isInteractive` 切换为 `<button>` 自带键盘行为；`isClosable` 的关闭按钮单独是可聚焦元素，带 `aria-label="Remove"`。`isDisabled` 时整个 tag `aria-disabled="true"` 并屏蔽事件。
+</Callout>

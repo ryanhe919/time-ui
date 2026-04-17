@@ -1,0 +1,118 @@
+# Drawer
+
+An edge-anchored side panel: 4 placements, 5 sizes, focus trap + body scroll lock + Esc / overlay dismissal + return focus on close. Portaled into `<body>`, with `inside` / `outside` scroll modes.
+
+<Callout variant="info" title="Drawer vs. Modal vs. Popover">
+  - **Drawer** — a parallel side panel (settings, details, file tree) you observe alongside the main flow.
+  - **Modal** — interrupts the current task to demand confirmation.
+  - **Popover** — a lightweight, anchor-attached overlay (menu, hint card).
+</Callout>
+
+## Basic usage
+
+Click a button to open a Drawer from that edge. Press <kbd>Esc</kbd>, click the close icon, or click the overlay to dismiss; focus returns to the trigger.
+
+<LiveDemo code={`import { useState } from 'react';
+import { Drawer, DrawerHeader, DrawerBody, DrawerFooter, Button } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open drawer</Button>
+      <Drawer
+        isOpen={open}
+        onOpenChange={setOpen}
+        placement="right"
+        header={<DrawerHeader>Notifications</DrawerHeader>}
+        footer={
+          <DrawerFooter>
+            <Button variant="ghost" onClick={() => setOpen(false)}>Close</Button>
+            <Button onClick={() => setOpen(false)}>Mark all as read</Button>
+          </DrawerFooter>
+        }
+      >
+        <DrawerBody>You have 3 new notifications.</DrawerBody>
+      </Drawer>
+    </>
+  );
+}`}>
+  <DrawerBasicDemo />
+</LiveDemo>
+
+## Sizes
+
+Horizontal placements (`left` / `right`) consume width tokens; vertical placements (`top` / `bottom`) consume height tokens. `full` keeps a 16 px gutter for visual breathing room.
+
+<LiveDemo code={`<Flex gap={8}>
+  <Button onClick={openSm}>size = sm</Button>
+  <Button onClick={openMd}>size = md</Button>
+  <Button onClick={openLg}>size = lg</Button>
+  <Button onClick={openXl}>size = xl</Button>
+  <Button onClick={openFull}>size = full</Button>
+</Flex>`}>
+  <DrawerSizesDemo />
+</LiveDemo>
+
+## Compound usage
+
+`<DrawerHeader>` / `<DrawerBody>` / `<DrawerFooter>` ship with the same default tokens but let you drop in icons, subtitles, or rich form controls. You can also pass a ReactNode straight to the `header` / `footer` props for the convenience path.
+
+```tsx
+<Drawer isOpen={open} onOpenChange={setOpen}>
+  <DrawerHeader>Edit profile</DrawerHeader>
+  <DrawerBody>
+    <Input label="Name" defaultValue="Ada Lovelace" />
+    <Input label="Email" defaultValue="ada@example.com" />
+  </DrawerBody>
+  <DrawerFooter>
+    <Button variant="ghost">Cancel</Button>
+    <Button>Save</Button>
+  </DrawerFooter>
+</Drawer>
+```
+
+## Dismissal behaviour
+
+- `isDismissable` (default `true`) — overlay click closes the panel.
+- `isKeyboardDismissDisabled` (default `false`) — disable Esc dismissal.
+- `hideCloseButton` (default `false`) — hide the corner close icon.
+
+## Scroll behaviour
+
+- **`inside`** (default) — panel height is bounded; header / footer stay pinned and **only the body scrolls**.
+- **`outside`** — the entire panel scrolls with its parent.
+
+## API
+
+### Drawer
+
+<PropsTable props={[
+  { name: 'isOpen', type: 'boolean', description: 'Controlled open state.' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'placement', type: "'left' | 'right' | 'top' | 'bottom'", default: "'right'" },
+  { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'" },
+  { name: 'isDismissable', type: 'boolean', default: 'true', description: 'Whether overlay click closes the panel.' },
+  { name: 'isKeyboardDismissDisabled', type: 'boolean', default: 'false', description: 'Disable Esc dismissal.' },
+  { name: 'hideCloseButton', type: 'boolean', default: 'false' },
+  { name: 'scrollBehavior', type: "'inside' | 'outside'", default: "'inside'" },
+  { name: 'portalContainer', type: 'HTMLElement', description: 'Custom portal container; defaults to `document.body`.' },
+  { name: 'header', type: 'ReactNode', description: 'Top header slot; prefer `<DrawerHeader>`.' },
+  { name: 'footer', type: 'ReactNode', description: 'Bottom footer slot; prefer `<DrawerFooter>`.' },
+  { name: 'children', type: 'ReactNode', description: 'Panel body.' },
+  { name: 'className', type: 'string' },
+  { name: 'style', type: 'CSSProperties' },
+  { name: 'id', type: 'string' },
+  { name: 'aria-label', type: 'string' },
+  { name: 'aria-labelledby', type: 'string' },
+  { name: 'aria-describedby', type: 'string' }
+]} />
+
+### DrawerHeader / DrawerBody / DrawerFooter
+
+All three share the same signature and accept `children` / `className`. `DrawerHeader` renders an `<h2>`-style title row; `DrawerFooter` lays out children with `flex` + `justify-content: flex-end` + a default gap.
+
+<Callout variant="info" title="Accessibility">
+  The panel is `role="dialog"` + `aria-modal="true"`. While open, Tab / Shift+Tab cycles within the panel (focus trap), body scroll is locked, and focus returns to the previously focused element on close. Under `prefers-reduced-motion` the panel transition collapses to a simple fade.
+</Callout>

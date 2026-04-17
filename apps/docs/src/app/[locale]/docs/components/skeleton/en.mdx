@@ -1,0 +1,103 @@
+# Skeleton
+
+A loading placeholder that holds the final layout in place so the page doesn't collapse before the data arrives. Three shapes (`rect` / `circle` / `text`), three animations (`shimmer` / `pulse` / `none`), an `isLoaded` flag that swaps in the real content, and `SkeletonGroup` for batched control.
+
+## Basic usage
+
+Pass `width` / `height` to size the placeholder.
+
+<LiveDemo code={`<Skeleton width={120} height={16} />
+<Skeleton width={200} height={16} />
+<Skeleton width={160} height={16} />`}>
+  <Stack spacing={8}>
+    <Skeleton width={120} height={16} />
+    <Skeleton width={200} height={16} />
+    <Skeleton width={160} height={16} />
+  </Stack>
+</LiveDemo>
+
+## Shape
+
+- `rect` (default) — rectangular / rounded; controlled by `radius`.
+- `circle` — square dimensions; perfect for avatar placeholders.
+- `text` — multi-line text placeholder; the last line is auto-shortened. `lines` controls the row count.
+
+<LiveDemo code={`<Skeleton shape="circle" width={48} height={48} />
+<Skeleton shape="text" lines={3} width={240} />`}>
+  <Flex gap={16} align="center">
+    <Skeleton shape="circle" width={48} height={48} />
+    <Skeleton shape="text" lines={3} width={240} />
+  </Flex>
+</LiveDemo>
+
+## Animation
+
+- `shimmer` (default) — a highlight sweeps across, the closest match to macOS / iOS conventions.
+- `pulse` — a gentle brightness breathing.
+- `none` — flat grey block, the most restrained option.
+
+`prefers-reduced-motion` forces `none` regardless of prop.
+
+## Swap to real content
+
+When `isLoaded` is true, Skeleton stops rendering the placeholder and renders `children` instead — one prop swaps "placeholder ↔ data" without ternaries at the call site.
+
+```tsx
+<Skeleton isLoaded={!loading}>
+  <h2>{post.title}</h2>
+</Skeleton>
+```
+
+## SkeletonGroup
+
+Wrap a cluster of Skeletons to flip their state in one place; all children share one `animation`.
+
+<LiveDemo code={`<SkeletonGroup isLoaded={false}>
+  <Flex gap={12} align="center">
+    <Skeleton shape="circle" width={40} height={40} />
+    <Stack spacing={6}>
+      <Skeleton width={120} height={14} />
+      <Skeleton width={80} height={12} />
+    </Stack>
+  </Flex>
+</SkeletonGroup>`}>
+  <SkeletonGroup isLoaded={false}>
+    <Flex gap={12} align="center">
+      <Skeleton shape="circle" width={40} height={40} />
+      <Stack spacing={6}>
+        <Skeleton width={120} height={14} />
+        <Skeleton width={80} height={12} />
+      </Stack>
+    </Flex>
+  </SkeletonGroup>
+</LiveDemo>
+
+## API
+
+### Skeleton
+
+<PropsTable props={[
+  { name: 'shape', type: "'rect' | 'circle' | 'text'", default: "'rect'" },
+  { name: 'width', type: 'number | string', description: 'Pixels or any CSS length.' },
+  { name: 'height', type: 'number | string' },
+  { name: 'lines', type: 'number', default: '1', description: 'Row count for `shape="text"`.' },
+  { name: 'radius', type: 'number | string', description: 'Border radius for `rect`; falls back to a token.' },
+  { name: 'animation', type: "'shimmer' | 'pulse' | 'none'", default: "'shimmer'" },
+  { name: 'isLoaded', type: 'boolean', default: 'false', description: 'When true, render `children` instead.' },
+  { name: 'children', type: 'ReactNode', description: 'Real content to render once `isLoaded` is true.' },
+  { name: 'className', type: 'string' },
+  { name: 'aria-label', type: 'string', description: 'Defaults to "Loading"; override as needed.' }
+]} />
+
+### SkeletonGroup
+
+<PropsTable props={[
+  { name: 'isLoaded', type: 'boolean', default: 'false', description: 'Controls all descendant Skeletons together.' },
+  { name: 'animation', type: "'shimmer' | 'pulse' | 'none'", description: 'Override animation on every descendant.' },
+  { name: 'children', type: 'ReactNode' },
+  { name: 'className', type: 'string' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Skeletons render with `role="status"` + `aria-busy="true"` + `aria-label="Loading"`; once `isLoaded` flips, the aria attributes are removed and children take over. Under `prefers-reduced-motion`, the animation is forced to `none`.
+</Callout>
