@@ -1,5 +1,13 @@
 # @timeui/core
 
+## 1.2.0
+
+### Minor Changes
+
+- 3874cd0: Add `Upload` component with button and dropzone variants, supporting controlled/uncontrolled value, custom request pipeline with concurrency + abort, accept / size / count / duplicate validation, image preview with managed ObjectURL lifecycle, and full keyboard + screen reader a11y.
+
+  Adds `upload.*` i18n keys to `@timeui/core` (zh / en).
+
 ## 1.1.2
 
 ### Patch Changes
