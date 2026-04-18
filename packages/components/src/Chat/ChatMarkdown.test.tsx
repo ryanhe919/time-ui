@@ -5,8 +5,8 @@
  */
 
 import { createRef } from 'react';
-import { describe, it, expect } from 'vitest';
-import { screen, within } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { screen, within, fireEvent, act } from '@testing-library/react';
 import type { Components } from 'react-markdown';
 import { renderWithProviders, expectA11y } from '../test-utils';
 // Subpath import `@timeui/react/chat-markdown` points at the built dist which
@@ -31,14 +31,64 @@ describe('ChatMarkdown — inline & block rendering', () => {
     expect(inline?.closest('pre')).toBeNull();
   });
 
-  it('renders a fenced code block inside <pre><code>', () => {
+  it('renders a fenced code block inside <pre><code> with its source text', () => {
     const src = '```ts\nconst x = 1;\n```';
     const { container } = renderWithProviders(<ChatMarkdown>{src}</ChatMarkdown>);
+    // shiki 的异步高亮未必已完成，但同步渲染路径必定有 <pre>/<code>
+    // （fallback 分支渲染 `<pre><code>原始文本</code></pre>`；shiki 完成后
+    // 替换为 `<pre class="shiki">...</pre>`，也仍然是 <pre>/<code>）。
     const pre = container.querySelector('pre');
     expect(pre).not.toBeNull();
     const codeInPre = pre?.querySelector('code');
     expect(codeInPre).not.toBeNull();
-    expect(codeInPre?.textContent).toContain('const x = 1;');
+    expect(pre?.textContent).toContain('const x = 1;');
+  });
+
+  it('renders a fenced code block without a language as plain <pre><code>', () => {
+    const src = '```\njust text\n```';
+    const { container } = renderWithProviders(<ChatMarkdown>{src}</ChatMarkdown>);
+    const pre = container.querySelector('pre');
+    expect(pre).not.toBeNull();
+    expect(pre?.textContent).toContain('just text');
+    // 无语言 → 不会启动 shiki 高亮，仍应有内部 <code>
+    expect(pre?.querySelector('code')).not.toBeNull();
+  });
+
+  it('renders a copy button for fenced code blocks and not for inline code', () => {
+    const { container: fencedContainer } = renderWithProviders(
+      <ChatMarkdown>{'```ts\nconst x = 1;\n```'}</ChatMarkdown>,
+    );
+    const copyBtn = fencedContainer.querySelector('button[data-timeui-copy-btn]');
+    expect(copyBtn).not.toBeNull();
+    expect(copyBtn?.getAttribute('aria-label')).toBeTruthy();
+
+    const { container: inlineContainer } = renderWithProviders(
+      <ChatMarkdown>{'inline `x` here'}</ChatMarkdown>,
+    );
+    expect(inlineContainer.querySelector('button[data-timeui-copy-btn]')).toBeNull();
+    // inline <code> 仍然存在，且未被包在 <pre> 内
+    const inlineCode = inlineContainer.querySelector('code');
+    expect(inlineCode).not.toBeNull();
+    expect(inlineCode?.closest('pre')).toBeNull();
+  });
+
+  it('copies the raw source to clipboard when the copy button is clicked', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    // jsdom doesn't implement navigator.clipboard — define it on the prototype.
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      configurable: true,
+    });
+    const { container } = renderWithProviders(
+      <ChatMarkdown>{'```ts\nconst x = 1;\n```'}</ChatMarkdown>,
+    );
+    const btn = container.querySelector('button[data-timeui-copy-btn]') as HTMLButtonElement;
+    expect(btn).not.toBeNull();
+    await act(async () => {
+      fireEvent.click(btn);
+    });
+    expect(writeText).toHaveBeenCalledTimes(1);
+    expect(writeText).toHaveBeenCalledWith('const x = 1;');
   });
 
   it('renders an unordered list with three items', () => {
