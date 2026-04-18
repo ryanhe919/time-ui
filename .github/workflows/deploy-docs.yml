@@ -158,7 +158,12 @@ jobs:
       - name: Sync to server
         run: |
           set -euo pipefail
-          rsync -avz --delete -e "ssh" \
+          # `.env.production.local` is provisioned on the server and holds
+          # ANTHROPIC_* secrets — never let rsync --delete wipe it.
+          rsync -avz --delete \
+            --exclude='apps/docs/.env.production.local' \
+            --exclude='apps/docs/.env.local' \
+            -e "ssh" \
             deploy/ \
             "deploy-target:${{ secrets.DEPLOY_PATH }}/"
 
@@ -181,7 +186,10 @@ jobs:
           export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
           [ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
           cd "$DEPLOY_PATH/apps/docs"
-          PORT=3000 pm2 restart timeui-docs 2>/dev/null \
+          # Next.js standalone server reads .env.production.local from cwd
+          # via @next/env at boot. --update-env ensures pm2 re-inherits the
+          # current shell env too (harmless if the file is the source of truth).
+          PORT=3000 pm2 restart timeui-docs --update-env 2>/dev/null \
             || PORT=3000 pm2 start server.js --name timeui-docs
           pm2 save
           REMOTE
