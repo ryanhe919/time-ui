@@ -274,5 +274,5 @@ These pass straight through to the underlying Card and behave identically to the
 ]} />
 
 <Callout variant="info" title="Accessibility">
-  The delta pill carries `role='status'` plus an aria-label built from the i18n dictionary ("Up {value}" etc.) or overridden via `sr.deltaLabel`. When pressable the card inherits Card's `role='button'` + `tabIndex=0` keyboard semantics. The skeleton container uses `role='status'` + `aria-busy='true'` and announces "Loading" (from `@timeui/core` i18n).
+  The delta pill carries `role='status'` plus an aria-label built from the i18n dictionary (e.g. `Up {value}`) or overridden via `sr.deltaLabel`. When pressable the card inherits Card's `role='button'` + `tabIndex=0` keyboard semantics. The skeleton container uses `role='status'` + `aria-busy='true'` and announces "Loading" (from `@timeui/core` i18n).
 </Callout>
