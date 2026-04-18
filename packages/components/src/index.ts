@@ -47,6 +47,8 @@ export * from './DatePicker';
 export * from './Avatar';
 export * from './Tag';
 export * from './Badge';
+export * from './Card';
+export * from './StatCard';
 export * from './Skeleton';
 export * from './Empty';
 export * from './Steps';

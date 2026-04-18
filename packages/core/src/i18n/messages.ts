@@ -55,6 +55,15 @@ export interface Messages {
     liveError: string;
     liveRemoved: string;
   };
+  statCard: {
+    loading: string;
+    deltaUp: string;
+    deltaDown: string;
+    deltaFlat: string;
+    directionUp: string;
+    directionDown: string;
+    directionFlat: string;
+  };
 }
 
 export const zh: Messages = {
@@ -106,6 +115,15 @@ export const zh: Messages = {
     liveError: '{name} 上传失败',
     liveRemoved: '{name} 已删除',
   },
+  statCard: {
+    loading: '加载中',
+    deltaUp: '上升 {value}',
+    deltaDown: '下降 {value}',
+    deltaFlat: '持平 {value}',
+    directionUp: '上升',
+    directionDown: '下降',
+    directionFlat: '持平',
+  },
 };
 
 export const en: Messages = {
@@ -156,6 +174,15 @@ export const en: Messages = {
     liveSuccess: '{name} uploaded successfully',
     liveError: '{name} failed to upload',
     liveRemoved: '{name} removed',
+  },
+  statCard: {
+    loading: 'Loading',
+    deltaUp: 'Up {value}',
+    deltaDown: 'Down {value}',
+    deltaFlat: 'Flat {value}',
+    directionUp: 'up',
+    directionDown: 'down',
+    directionFlat: 'flat',
   },
 };
 

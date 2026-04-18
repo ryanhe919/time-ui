@@ -1,0 +1,6 @@
+---
+'@timeui/react': minor
+'@timeui/core': minor
+---
+
+Add `Card` and `StatCard` components. Card ships `flat` / `bordered` / `elevated` variants with governed interaction (isHoverable / isPressable / isDisabled), optional start / top accent bar, size-driven padding (sm 12 / md 16 / lg 24), and compound subcomponents `CardHeader` / `CardBody` / `CardFooter`. Visual treatment: bordered hover densifies via inset ring (geometry stays 1px — no jitter), elevated uses a three-layer shadow in light and inset-highlighted stack in dark, pressable :active depresses with `translateY(0.5px) scale(0.998)` in 80ms, focus-visible paints a color-mix halo layered over variant shadow, accent bar grows 3 → 4px on hover with a weighty curve. StatCard composes Card for KPI tiles: uppercase KPI label (CJK auto-detected to disable uppercase/tracking), `tabular-nums slashed-zero` value with emphasis-driven type scale, polarity-auto delta pill with a baseline translateY lift and an arrow tick animation re-keyed on direction/value changes, optional icon container with inset highlight, trend slot with bleed/non-bleed layouts, inline breathe-pulse skeleton state. Adds `statCard.*` i18n keys (zh / en) covering the aria-label templates and loading copy.
