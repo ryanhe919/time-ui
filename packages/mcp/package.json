@@ -1,0 +1,68 @@
+{
+  "name": "@timeui/mcp",
+  "version": "0.1.0",
+  "description": "MCP server and shared documentation index for TimeUI components.",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./stdio": {
+      "types": "./dist/stdio.d.ts",
+      "import": "./dist/stdio.js",
+      "require": "./dist/stdio.cjs"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js",
+      "require": "./dist/http.cjs"
+    }
+  },
+  "bin": {
+    "timeui-mcp": "./bin/timeui-mcp.mjs",
+    "timeui-mcp-http": "./bin/timeui-mcp-http.mjs"
+  },
+  "files": [
+    "dist",
+    "data",
+    "bin",
+    "README.md"
+  ],
+  "scripts": {
+    "build:index": "tsx scripts/build-index.ts",
+    "build": "pnpm build:index && tsup",
+    "dev": "tsup --watch",
+    "clean": "rimraf dist data/index.json tsconfig.tsbuildinfo",
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "express": "^4.21.2",
+    "zod": "^3.25.2",
+    "zod-to-json-schema": "^3.25.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.7.5",
+    "@vitest/coverage-v8": "^3.2.4",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

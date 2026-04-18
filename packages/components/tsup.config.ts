@@ -10,6 +10,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     'code-block': 'src/CodeBlock/index.ts',
+    'chat-markdown': 'src/Chat/ChatMarkdown.tsx',
   },
   format: ['esm', 'cjs'],
   dts: true,
@@ -17,5 +18,14 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   target: 'es2020',
-  external: ['react', 'react-dom', '@emotion/react', '@emotion/styled', 'shiki', /^@radix-ui\//],
+  external: [
+    'react',
+    'react-dom',
+    '@emotion/react',
+    '@emotion/styled',
+    'shiki',
+    'react-markdown',
+    'remark-gfm',
+    /^@radix-ui\//,
+  ],
 });

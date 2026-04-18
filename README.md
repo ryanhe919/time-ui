@@ -8,6 +8,7 @@
 - 🧱 Emotion 的 `css` prop + `useTheme()`，**不用 `@emotion/styled`**
 - 📦 tsup 同时输出 ESM / CJS / d.ts；`code-block` 独立 sub-entry，shiki 按需加载
 - 🔒 React 18+ peer dependency（不把 react 锁进 dependencies）
+- 🤖 内置 MCP server（`@timeui/mcp`）+ docs 站自带 AI 文档助手，接入 Anthropic 兼容 API（MiniMax / Claude）
 
 ## 仓库结构
 
@@ -19,6 +20,7 @@ packages/
   utils/       @timeui/utils    — 框架无关的纯函数
   icons/       @timeui/icons    — SVGR 图标（叶子包）
   components/  @timeui/react    — 发布入口，聚合所有组件
+  mcp/         @timeui/mcp      — MCP server + 文档索引，供 AI 客户端查询组件
 apps/
   docs/        Next.js 15 App Router + @next/mdx 的文档站（部署到 CentOS + pm2）
   playground/  Vite 本地沙盒
@@ -58,6 +60,26 @@ pnpm new:component Drawer
 ```
 
 脚手架会生成源文件、测试、barrel 导出、并在文档站的目录里放入 MDX 模板。详见 [`docs/guides/development.md`](./docs/guides/development.md)。
+
+## AI 集成
+
+TimeUI 提供 MCP（Model Context Protocol）server，让 AI 客户端可以直接查询组件文档；文档站也内置了 AI 助手。
+
+- **stdio MCP**（Claude Code / Cursor 等）：
+
+  ```bash
+  claude mcp add timeui -- npx -y @timeui/mcp timeui-mcp
+  ```
+
+- **Streamable HTTP**（默认监听 `127.0.0.1:3333`）：
+
+  ```bash
+  npx -y @timeui/mcp timeui-mcp-http --port 3333
+  ```
+
+- **站内 AI 助手**：在 `apps/docs/.env.local` 填好 MiniMax 凭据（参考 `apps/docs/.env.example`）后执行 `pnpm dev`，点击文档站 TopNav 右上的 ✨ 按钮即可打开。
+
+完整工具列表（`list_categories` / `list_components` / `get_component` / `search_components`）与参数说明见 [`packages/mcp/README.md`](./packages/mcp/README.md)。
 
 ## 项目文档
 

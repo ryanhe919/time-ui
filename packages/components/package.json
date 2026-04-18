@@ -27,6 +27,11 @@
       "import": "./dist/code-block.js",
       "require": "./dist/code-block.cjs"
     },
+    "./chat-markdown": {
+      "types": "./dist/chat-markdown.d.ts",
+      "import": "./dist/chat-markdown.js",
+      "require": "./dist/chat-markdown.cjs"
+    },
     "./test-utils": {
       "types": "./src/test-utils/index.ts",
       "import": "./src/test-utils/index.ts"
@@ -54,16 +59,26 @@
     "@emotion/react": "^11.11.0",
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0",
-    "shiki": ">=1.0.0"
+    "shiki": ">=1.0.0",
+    "react-markdown": ">=9.0.0",
+    "remark-gfm": ">=4.0.0"
   },
   "peerDependenciesMeta": {
     "shiki": {
+      "optional": true
+    },
+    "react-markdown": {
+      "optional": true
+    },
+    "remark-gfm": {
       "optional": true
     }
   },
   "devDependencies": {
     "@emotion/react": "^11.13.3",
     "shiki": "^1.0.0",
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",

@@ -32,6 +32,8 @@ pnpm --filter @timeui/docs test:e2e              # Playwright 针对已构建的
 pnpm --filter @timeui/docs test:storybook        # @storybook/test-runner（play + axe）
 pnpm --filter @timeui/docs chromatic             # 视觉回归（主路径）
 pnpm --filter @timeui/icons generate             # 从 svg/ 重新生成图标组件
+pnpm --filter @timeui/mcp build:index            # 重建 docs 索引 JSON
+pnpm --filter @timeui/mcp test                   # MCP 包单元测试
 pnpm changeset:snapshot                          # 发 canary 预览版
 ```
 
@@ -41,9 +43,11 @@ pnpm changeset:snapshot                          # 发 canary 预览版
 
 ```
 tokens → themes → core → components
-utils、icons 为叶子包
+utils、icons、mcp 为叶子包
 packages/ 禁止从 apps/ 引用
 ```
+
+> 特例：`@timeui/mcp` 的 `scripts/build-index.ts` 在**构建期**通过相对路径读取 `apps/docs` 的 navigation / i18n 生成 `data/index.json`。这只是构建产物的数据源，运行时包本身不 import `apps/docs`，也不依赖任何 `@timeui/*` 包。
 
 - `@timeui/tokens`：设计 token（颜色、spacing、字体、圆角、阴影），纯数据。
 - `@timeui/themes`：由 tokens 组合出 `lightTheme` / `darkTheme`，并对 Emotion 做 module augmentation（`DefaultTheme`）。
@@ -67,6 +71,7 @@ packages/ 禁止从 apps/ 引用
 3. 满足 CONTRIBUTING.md 的质量清单：forwardRef（若包裹 DOM）、controlled/uncontrolled 双支持、ARIA/键盘可达、axe 零违规、支持 `prefers-reduced-motion`。
 4. 新增 story（`apps/docs`）覆盖所有 variant/size/state。
 5. `pnpm changeset`：新组件用 `minor`，bugfix 用 `patch`，破坏性改动用 `major`；chore/docs/test/重构一般不需要 changeset。
+6. 如果新组件用到了重依赖（markdown 解析器、代码高亮等），考虑做成独立 subpath export（参考 `@timeui/react/code-block` 和 `@timeui/react/chat-markdown`），避免膨胀主 bundle。
 
 ### 发布
 
@@ -75,6 +80,14 @@ packages/ 禁止从 apps/ 引用
 ### 提交规范
 
 Conventional Commits，由 commitlint + Husky + lint-staged 强制（`*.{ts,tsx,js,jsx}` 会走 `eslint --fix` + Prettier）。例：`feat(button): add loading state`、`fix(select): prevent focus trap on disabled options`。
+
+### AI / MCP 集成
+
+- `@timeui/mcp` 是独立 npm 包，对 AI 客户端（Claude Code / Cursor 等）暴露组件文档查询工具：`list_categories` / `list_components` / `get_component` / `search_components`。
+- 数据源：`scripts/build-index.ts` 扫描 `apps/docs/.../components/**/*.mdx` 生成 `data/index.json`（31 组件 × 7 分类 × 2 locale），因此 MCP 包构建期与 docs 站 MDX 结构耦合。
+- 两种 transport：`timeui-mcp`（stdio，用于 IDE/CLI 客户端）与 `timeui-mcp-http`（Streamable HTTP，默认 `127.0.0.1:3333`）。
+- `apps/docs` 内置 AI 助手：`src/app/api/assistant/route.ts` 通过 `@anthropic-ai/sdk` + 自定义 `baseURL` 接 MiniMax / Claude（环境变量 `ANTHROPIC_BASE_URL` / `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL`），SSE 流式 + tool calling loop。凭据模板见 `apps/docs/.env.example`。
+- 助手 UI 使用 Chat 组件族 + `@timeui/react/chat-markdown` 做流式 markdown 渲染。`chat-markdown` 是独立 subpath export，`react-markdown` / `remark-gfm` 是 optional peerDep，不打进主 bundle。
 
 ## 常见陷阱
 

@@ -1,0 +1,170 @@
+# Markdown Rendering — ChatMarkdown
+
+`ChatMarkdown` turns a streamed markdown string from an LLM into fully rendered rich text. Built for chat: `children` is re-parsed on every change and `react-markdown` gracefully degrades unclosed fences / tags mid-stream, so the raw syntax never flashes in the UI.
+
+## Why a dedicated component
+
+`ChatMessage` renders its body as `white-space: pre-wrap` — that is exactly what you want for user messages: preserve the line breaks and spacing they typed. Assistant replies, on the other hand, are usually markdown: lists, tables, fenced code. For those, wrap the body explicitly in `<ChatMarkdown>`.
+
+The component ships as a **subpath + optional peerDep** to keep the main bundle lean:
+
+- `@timeui/react` never pulls in `react-markdown` / `remark-gfm` — if you don't use markdown, you pay nothing.
+- When you need it, import from `@timeui/react/chat-markdown` and declare the peers in your app.
+- Internal styles follow the Emotion theme tokens — paragraphs, inline code, fenced code, tables, links, and blockquotes all stay on-brand.
+
+## Basic usage
+
+A mixed markdown sample: paragraph, **bold**, `inline code`, ordered list, link.
+
+<LiveDemo
+  code={`<ChatMarkdown>{\`## Hello from Claude
+
+This is **bold** text mixed with *italics* and \\\`inline code\\\`.
+
+1. First point
+2. Second point
+3. Third point
+
+Read more at [the React docs](https://react.dev).\`}</ChatMarkdown>`}
+>
+  <ChatMarkdown>{`## Hello from Claude
+
+This is **bold** text mixed with *italics* and \`inline code\`.
+
+1. First point
+2. Second point
+3. Third point
+
+Read more at [the React docs](https://react.dev).`}</ChatMarkdown>
+</LiveDemo>
+
+## Streaming scenarios
+
+Hand `stream.text` from `useChatStream` straight to `ChatMarkdown`. Every frame re-parses, and an unclosed fenced code block is rendered as plain text until the closing fence arrives — no raw backticks flicker into view.
+
+```tsx
+import { ChatMessage, ChatMessageList, useChatStream } from '@timeui/react';
+import { ChatMarkdown } from '@timeui/react/chat-markdown';
+
+export function StreamingAnswer({ source }) {
+  const stream = useChatStream();
+
+  return (
+    <ChatMessageList>
+      {(stream.text || stream.isStreaming) && (
+        <ChatMessage role="assistant" isStreaming={stream.isStreaming}>
+          <ChatMarkdown>{stream.text}</ChatMarkdown>
+        </ChatMessage>
+      )}
+    </ChatMessageList>
+  );
+}
+```
+
+`ChatMessage` owns the bubble, avatar, and streaming cursor; `ChatMarkdown` owns the body. Keep the concerns separate.
+
+## Fenced code
+
+Fenced code renders as `pre > code` with theme `bg.sunken` + `border.subtle` and scrolls horizontally when lines overflow.
+
+<LiveDemo
+  code={`<ChatMarkdown>{\`Here is a React snippet:
+
+\\\`\\\`\\\`tsx
+function Greet({ name }: { name: string }) {
+  return <h1>Hello, {name}</h1>;
+}
+\\\`\\\`\\\`
+\`}</ChatMarkdown>`}
+>
+  <ChatMarkdown>{`Here is a React snippet:
+
+\`\`\`tsx
+function Greet({ name }: { name: string }) {
+  return <h1>Hello, {name}</h1>;
+}
+\`\`\`
+`}</ChatMarkdown>
+</LiveDemo>
+
+Need syntax highlighting? Override `components={{ code: ... }}` with your own shiki or prism renderer — see the custom-renderer section below.
+
+## GFM features
+
+`remark-gfm` adds GitHub Flavored Markdown extensions — tables, task lists, strikethrough, and autolinks — all enabled by default.
+
+<LiveDemo
+  code={`<ChatMarkdown>{\`| Model           | Context | Cost |
+| --------------- | ------- | ---- |
+| Claude Opus 4.7 | 1M      | $$$  |
+| Claude Sonnet   | 200k    | $$   |
+
+- [x] Table support
+- [x] Task lists
+- [ ] Todo item
+- ~~Strikethrough~~ also works
+
+Autolinks too: https://react.dev
+\`}</ChatMarkdown>`}
+>
+  <ChatMarkdown>{`| Model           | Context | Cost |
+| --------------- | ------- | ---- |
+| Claude Opus 4.7 | 1M      | $$$  |
+| Claude Sonnet   | 200k    | $$   |
+
+- [x] Table support
+- [x] Task lists
+- [ ] Todo item
+- ~~Strikethrough~~ also works
+
+Autolinks too: https://react.dev
+`}</ChatMarkdown>
+</LiveDemo>
+
+## Custom renderers
+
+`components` is shallow-merged with the built-in map and the caller wins on matching keys. The example below takes over links: every link opens in a new tab and gets an external-link glyph.
+
+```tsx
+<ChatMarkdown
+  components={{
+    a: ({ href, children, ...rest }) => (
+      <a href={href} target="_blank" rel="noreferrer noopener" {...rest}>
+        {children}
+        <span aria-hidden>↗</span>
+      </a>
+    ),
+  }}
+>
+  {answer}
+</ChatMarkdown>
+```
+
+The same pattern unlocks syntax-highlighted code blocks: swap `components={{ code: ... }}` with your shiki renderer. The `components` shape matches react-markdown's `Components` type — everything it supports is available here.
+
+## Import
+
+```ts
+import { ChatMarkdown } from '@timeui/react/chat-markdown';
+```
+
+Install the peers alongside it — they are **optional peerDependencies** of `@timeui/react`, so nothing is pulled in unless you opt into this subpath:
+
+```bash
+pnpm add react-markdown remark-gfm
+```
+
+Products that never render markdown (forms-only apps, data-display dashboards) pay no bundle cost.
+
+## Props
+
+| Name         | Type                           | Description                                                                         |
+| ------------ | ------------------------------ | ----------------------------------------------------------------------------------- |
+| `children`   | `string`                       | Raw markdown string. For streaming, pass the accumulated text — the component re-parses on every change. (required) |
+| `className`  | `string`                       | Forwarded to the outer `div`.                                                       |
+| `style`      | `CSSProperties`                | Forwarded inline style.                                                             |
+| `components` | `Components` (react-markdown)  | Override or extend the default element renderers. Shallow-merged; caller keys win.  |
+
+<Callout variant="info" title="Relationship with ChatMessage">
+  `ChatMarkdown` does not draw a bubble — it only renders the body. The typical layout is `<ChatMessage role="assistant">` for the role visuals, avatar, and streaming cursor, with `<ChatMarkdown>` nested as its `children`. That "container + renderer" split keeps `ChatMessage` simple and lets user messages stay on plain `pre-wrap` text.
+</Callout>

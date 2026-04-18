@@ -78,3 +78,4 @@ export {
   Steps,
 } from '@timeui/react';
 export { CodeBlock } from '@timeui/react/code-block';
+export { ChatMarkdown } from '@timeui/react/chat-markdown';

@@ -1,0 +1,170 @@
+# Markdown 渲染 ChatMarkdown
+
+`ChatMarkdown` 把 AI 流式输出的 markdown 字符串渲染成富文本。面向对话场景设计：`children` 每次变动都会重解析，流式途中未闭合的代码块 / 标签会由 `react-markdown` 自动平滑降级，不会显示原始语法。
+
+## 为什么需要一个专门组件
+
+`ChatMessage` 的默认排版是 `white-space: pre-wrap` —— 用户消息就该原样展示换行与空格。但 assistant 消息往往是 markdown：列表、表格、代码块都需要结构化渲染。这时候显式把正文包进 `<ChatMarkdown>` 即可。
+
+组件通过 **subpath + optional peerDep** 发布：
+
+- 主包 `@timeui/react` 不捆绑 `react-markdown` / `remark-gfm`，不装 markdown 也不会增加基础 bundle
+- 需要的项目从 `@timeui/react/chat-markdown` 引入，并把 `react-markdown` / `remark-gfm` 声明为依赖
+- 组件内部样式跟随 Emotion 主题 token，段落 / 行内代码 / 代码块 / 表格 / 链接 / 引用全部一致
+
+## 基础用法
+
+一段综合 markdown：段落、**粗体**、`行内代码`、有序列表、链接。
+
+<LiveDemo
+  code={`<ChatMarkdown>{\`## Hello from Claude
+
+这是一段 **加粗** 文本，混一点 *斜体*，还有 \\\`inline code\\\`。
+
+1. 第一点
+2. 第二点
+3. 第三点
+
+更多见 [官方文档](https://react.dev)。\`}</ChatMarkdown>`}
+>
+  <ChatMarkdown>{`## Hello from Claude
+
+这是一段 **加粗** 文本，混一点 *斜体*，还有 \`inline code\`。
+
+1. 第一点
+2. 第二点
+3. 第三点
+
+更多见 [官方文档](https://react.dev)。`}</ChatMarkdown>
+</LiveDemo>
+
+## 流式场景
+
+把 `useChatStream` 累加出来的 `stream.text` 直接交给 `ChatMarkdown`。每帧都会重新解析，未闭合的围栏代码块在合拢前会被当作纯文本，不会闪烁出原始 backtick。
+
+```tsx
+import { ChatMessage, ChatMessageList, useChatStream } from '@timeui/react';
+import { ChatMarkdown } from '@timeui/react/chat-markdown';
+
+export function StreamingAnswer({ source }) {
+  const stream = useChatStream();
+
+  return (
+    <ChatMessageList>
+      {(stream.text || stream.isStreaming) && (
+        <ChatMessage role="assistant" isStreaming={stream.isStreaming}>
+          <ChatMarkdown>{stream.text}</ChatMarkdown>
+        </ChatMessage>
+      )}
+    </ChatMessageList>
+  );
+}
+```
+
+`ChatMessage` 负责气泡、头像、流式光标；`ChatMarkdown` 负责正文富文本。两者职责解耦。
+
+## 代码块
+
+围栏代码块会渲染成 `pre > code`，使用主题 `bg.sunken` + `border.subtle`，自动横向滚动。
+
+<LiveDemo
+  code={`<ChatMarkdown>{\`这是一个 React 示例：
+
+\\\`\\\`\\\`tsx
+function Greet({ name }: { name: string }) {
+  return <h1>Hello, {name}</h1>;
+}
+\\\`\\\`\\\`
+\`}</ChatMarkdown>`}
+>
+  <ChatMarkdown>{`这是一个 React 示例：
+
+\`\`\`tsx
+function Greet({ name }: { name: string }) {
+  return <h1>Hello, {name}</h1>;
+}
+\`\`\`
+`}</ChatMarkdown>
+</LiveDemo>
+
+需要语法高亮？把 `components={{ code: ... }}` 覆盖成自己的 shiki / prism 渲染器即可，下面自定义渲染器一节有示例。
+
+## GFM 能力
+
+`remark-gfm` 提供表格、任务列表、删除线、自动链接等 GitHub Flavored Markdown 扩展，默认启用。
+
+<LiveDemo
+  code={`<ChatMarkdown>{\`| 模型            | 上下文 | 价格 |
+| --------------- | ------ | ---- |
+| Claude Opus 4.7 | 1M     | $$$  |
+| Claude Sonnet   | 200k   | $$   |
+
+- [x] 支持表格
+- [x] 支持任务列表
+- [ ] 待办项
+- ~~删除线~~ 也可以
+
+自动链接：https://react.dev
+\`}</ChatMarkdown>`}
+>
+  <ChatMarkdown>{`| 模型            | 上下文 | 价格 |
+| --------------- | ------ | ---- |
+| Claude Opus 4.7 | 1M     | $$$  |
+| Claude Sonnet   | 200k   | $$   |
+
+- [x] 支持表格
+- [x] 支持任务列表
+- [ ] 待办项
+- ~~删除线~~ 也可以
+
+自动链接：https://react.dev
+`}</ChatMarkdown>
+</LiveDemo>
+
+## 自定义渲染器
+
+`components` 会和组件默认映射浅合并，同名 key 以 caller 优先。下面这个例子接管链接，统一加 `target="_blank"` 和一个小图标。
+
+```tsx
+<ChatMarkdown
+  components={{
+    a: ({ href, children, ...rest }) => (
+      <a href={href} target="_blank" rel="noreferrer noopener" {...rest}>
+        {children}
+        <span aria-hidden>↗</span>
+      </a>
+    ),
+  }}
+>
+  {answer}
+</ChatMarkdown>
+```
+
+同理，把 `components={{ code: ... }}` 换成自己的 shiki 高亮器，就能拿到生产级代码块。组件本身对 `components` 的其它 key 不做限制，跟 `react-markdown` 的 `Components` 类型保持一致。
+
+## 导入方式
+
+```ts
+import { ChatMarkdown } from '@timeui/react/chat-markdown';
+```
+
+同时在项目里安装 peer deps（它们是 `@timeui/react` 的 **optional peerDependencies**，没装就别引入这个 subpath）：
+
+```bash
+pnpm add react-markdown remark-gfm
+```
+
+这样做的好处：不需要 markdown 的产品线（例如只做表单 / 数据展示的应用）不会把这两个依赖拖进 bundle。
+
+## Props
+
+| 名称         | 类型                          | 说明                                                                     |
+| ------------ | ----------------------------- | ------------------------------------------------------------------------ |
+| `children`   | `string`                      | 原始 markdown 字符串。流式场景传累积文本即可，组件内部会重解析。（必填） |
+| `className`  | `string`                      | 透传到最外层容器 `div`。                                                 |
+| `style`      | `CSSProperties`               | 透传 inline style。                                                      |
+| `components` | `Components`（react-markdown）| 覆盖或扩展默认 element 渲染器；与内部默认浅合并，caller 优先。           |
+
+<Callout variant="info" title="和 ChatMessage 的关系">
+  `ChatMarkdown` 不会自己画气泡，它只负责正文。外层通常是 `<ChatMessage role="assistant">` 提供角色视觉、头像、流式光标；`<ChatMarkdown>` 作为 `children` 传入。这种"容器 + 渲染器"分工让 `ChatMessage` 保持纯粹，用户消息也能继续走 `pre-wrap` 纯文本。
+</Callout>

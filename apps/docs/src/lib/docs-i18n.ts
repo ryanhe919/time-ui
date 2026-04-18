@@ -6,6 +6,23 @@
 
 import type { Locale } from '@timeui/react';
 
+/** 智能文档助手 Drawer 所需的文案集合。 */
+export interface AssistantDrawerMessages {
+  openLabel: string;
+  drawerTitle: string;
+  placeholder: string;
+  welcome: string;
+  suggestions: string[];
+  errorNoKey: string;
+  errorGeneric: string;
+  sendLabel: string;
+  closeLabel: string;
+  assistantName: string;
+  userName: string;
+  toolCallRunning: string;
+  knowledgeRefsTitle: string;
+}
+
 export interface DocsMessages {
   brand: string;
   sections: Record<string, string>;
@@ -22,6 +39,7 @@ export interface DocsMessages {
     toggleThemeDark: string;
     toggleLocale: string;
   };
+  assistant: AssistantDrawerMessages;
 }
 
 const zh: DocsMessages = {
@@ -33,16 +51,19 @@ const zh: DocsMessages = {
   },
   groups: {
     general: '通用',
+    layout: '布局',
     forms: '表单',
+    'data-display': '数据展示',
+    feedback: '反馈',
     overlays: '浮层',
     navigation: '导航',
-    'data-display': '数据展示',
   },
   pages: {
     introduction: '介绍',
     installation: '安装',
     overview: '总览',
     composer: '输入框',
+    markdown: 'Markdown 渲染',
     api: 'API 参考',
     button: '按钮',
     callout: '提示块',
@@ -86,6 +107,22 @@ const zh: DocsMessages = {
     toggleThemeDark: '切换到深色模式',
     toggleLocale: '切换语言',
   },
+  assistant: {
+    openLabel: 'AI 助手',
+    drawerTitle: '文档助手',
+    placeholder: '问一个关于组件的问题…',
+    welcome: '你好，我可以帮你检索 TimeUI 组件、对比 API、给出示例代码。试试下面的问题：',
+    suggestions: ['有哪些表单组件？', 'Button 支持哪些 variant？', '对比 Modal 和 Drawer'],
+    errorNoKey:
+      '尚未配置 ANTHROPIC_API_KEY。请在 apps/docs/.env.local 中填入 MiniMax 凭据后重启开发服务器。',
+    errorGeneric: '助手暂不可用，请稍后重试。',
+    sendLabel: '发送',
+    closeLabel: '关闭助手',
+    assistantName: '助手',
+    userName: '你',
+    toolCallRunning: '正在查询文档索引…',
+    knowledgeRefsTitle: '相关组件',
+  },
 };
 
 const en: DocsMessages = {
@@ -97,16 +134,19 @@ const en: DocsMessages = {
   },
   groups: {
     general: 'General',
+    layout: 'Layout',
     forms: 'Forms',
+    'data-display': 'Data Display',
+    feedback: 'Feedback',
     overlays: 'Overlays',
     navigation: 'Navigation',
-    'data-display': 'Data Display',
   },
   pages: {
     introduction: 'Introduction',
     installation: 'Installation',
     overview: 'Overview',
     composer: 'Composer',
+    markdown: 'Markdown',
     api: 'API Reference',
     button: 'Button',
     callout: 'Callout',
@@ -149,6 +189,27 @@ const en: DocsMessages = {
     toggleThemeLight: 'Switch to light mode',
     toggleThemeDark: 'Switch to dark mode',
     toggleLocale: 'Switch language',
+  },
+  assistant: {
+    openLabel: 'Ask AI',
+    drawerTitle: 'Docs Assistant',
+    placeholder: 'Ask a question about a component…',
+    welcome:
+      'Hi! I can look up TimeUI components, compare APIs, and surface example code. Try one of these:',
+    suggestions: [
+      'Which form components are available?',
+      'What variants does Button support?',
+      'Compare Modal vs Drawer',
+    ],
+    errorNoKey:
+      'ANTHROPIC_API_KEY is not configured. Add MiniMax credentials to apps/docs/.env.local and restart the dev server.',
+    errorGeneric: 'The assistant is temporarily unavailable. Please try again later.',
+    sendLabel: 'Send',
+    closeLabel: 'Close assistant',
+    assistantName: 'Assistant',
+    userName: 'You',
+    toolCallRunning: 'Querying documentation index…',
+    knowledgeRefsTitle: 'Related components',
   },
 };
 

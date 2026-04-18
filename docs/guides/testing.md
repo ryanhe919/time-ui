@@ -18,7 +18,10 @@ TimeUI 的质量把关分三层，三层都可以**在本地用 CI 相同的命�
 pnpm --filter @timeui/react test              # 跑一次
 pnpm --filter @timeui/react test:watch        # watch 模式
 pnpm --filter @timeui/react test:coverage     # v8 覆盖率
+pnpm --filter @timeui/mcp test:coverage       # MCP 包覆盖率（不在 CI 强制，本地自查用）
 ```
+
+> `pnpm test`（根目录）会跨包跑一遍 Vitest，**包含** `@timeui/mcp`；但 CI 的 coverage 门槛目前只校验 `@timeui/react`，`@timeui/mcp` 的覆盖率只在本地按需跑。
 
 覆盖率阈值（`packages/components/vitest.config.ts`）：
 

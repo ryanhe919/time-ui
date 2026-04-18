@@ -18,6 +18,7 @@ import type { Navigation } from '@/lib/navigation';
 import type { DocsMessages } from '@/lib/docs-i18n';
 import { buildDocsSearchIndex, type DocsSearchItem } from '@/lib/docs-search-index';
 import logo from '@/assets/logo.png';
+import { AssistantDrawer } from '@/components/assistant/AssistantDrawer';
 import { ThemeToggle } from './ThemeToggle';
 import { LocaleToggle } from './LocaleToggle';
 
@@ -35,12 +36,20 @@ const GithubIcon = () => (
   </svg>
 );
 
+// 四角星造型，保持和 github / 主题图标同一视觉密度。
+const AssistantIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2.5c.3 0 .6.2.7.5l1.6 4.2c.3.7.8 1.3 1.5 1.5l4.2 1.6c.7.3.7 1.2 0 1.5l-4.2 1.6c-.7.3-1.3.8-1.5 1.5l-1.6 4.2c-.3.7-1.2.7-1.5 0l-1.6-4.2c-.3-.7-.8-1.3-1.5-1.5l-4.2-1.6c-.7-.3-.7-1.2 0-1.5l4.2-1.6c.7-.3 1.3-.8 1.5-1.5l1.6-4.2c.1-.3.4-.5.7-.5zM18.5 3a.5.5 0 01.5.4l.3.7c.1.3.3.5.6.6l.7.3a.5.5 0 010 .9l-.7.3c-.3.1-.5.3-.6.6l-.3.7a.5.5 0 01-.9 0l-.3-.7c-.1-.3-.3-.5-.6-.6l-.7-.3a.5.5 0 010-.9l.7-.3c.3-.1.5-.3.6-.6l.3-.7a.5.5 0 01.4-.4z" />
+  </svg>
+);
+
 export function TopNav({ navigation, messages, locale }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const activeSection = pathname.match(/\/docs\/([^/]+)/)?.[1];
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
@@ -181,6 +190,33 @@ export function TopNav({ navigation, messages, locale }: Props) {
             gap: 2px;
           `}
         >
+          <button
+            type="button"
+            onClick={() => setAssistantOpen(true)}
+            aria-label={messages.assistant.openLabel}
+            aria-expanded={assistantOpen || undefined}
+            css={css`
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              width: 28px;
+              height: 28px;
+              border-radius: 50%;
+              border: 0;
+              background: transparent;
+              color: var(--c-text-secondary);
+              cursor: pointer;
+              transition:
+                background 200ms,
+                color 200ms;
+              &:hover {
+                background: var(--c-bg-tertiary);
+                color: var(--c-text);
+              }
+            `}
+          >
+            <AssistantIcon />
+          </button>
           <a
             href={GITHUB_URL}
             target="_blank"
@@ -212,6 +248,13 @@ export function TopNav({ navigation, messages, locale }: Props) {
           />
         </div>
       </div>
+
+      <AssistantDrawer
+        open={assistantOpen}
+        onClose={() => setAssistantOpen(false)}
+        locale={locale}
+        messages={messages.assistant}
+      />
     </header>
   );
 }

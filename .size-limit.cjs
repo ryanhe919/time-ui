@@ -31,6 +31,20 @@ module.exports = [
     ignore: ['react', 'react-dom', '@emotion/react', '@emotion/styled', 'shiki'],
   },
   {
+    name: '@timeui/react/chat-markdown',
+    path: 'packages/components/dist/chat-markdown.js',
+    import: '*',
+    limit: '5 KB',
+    ignore: [
+      'react',
+      'react-dom',
+      '@emotion/react',
+      '@emotion/styled',
+      'react-markdown',
+      'remark-gfm',
+    ],
+  },
+  {
     name: '@timeui/tokens — full import',
     path: 'packages/tokens/dist/index.js',
     import: '*',

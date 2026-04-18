@@ -33,14 +33,18 @@ const SECTIONS: readonly SectionConfig[] = [
   { slug: 'getting-started', pages: ['introduction', 'installation'] },
   {
     slug: 'chat',
-    pages: ['overview', 'composer', 'api'],
+    pages: ['overview', 'composer', 'markdown', 'api'],
   },
   {
     slug: 'components',
     groups: [
       {
         slug: 'general',
-        pages: ['button', 'callout', 'code-block', 'search', 'typography', 'layout'],
+        pages: ['button', 'typography'],
+      },
+      {
+        slug: 'layout',
+        pages: ['layout'],
       },
       {
         slug: 'forms',
@@ -49,24 +53,30 @@ const SECTIONS: readonly SectionConfig[] = [
           'input',
           'textarea',
           'select',
+          'search',
           'checkbox',
           'radio',
           'switch',
           'slider',
           'segmented-control',
+          'date-picker',
         ],
       },
       {
+        slug: 'data-display',
+        pages: ['table', 'avatar', 'tag', 'badge', 'code-block'],
+      },
+      {
+        slug: 'feedback',
+        pages: ['callout', 'toast', 'empty', 'skeleton'],
+      },
+      {
         slug: 'overlays',
-        pages: ['popover', 'tooltip', 'modal', 'drawer', 'menu', 'toast', 'date-picker'],
+        pages: ['popover', 'tooltip', 'modal', 'drawer', 'menu'],
       },
       {
         slug: 'navigation',
         pages: ['tabs', 'pagination', 'steps'],
-      },
-      {
-        slug: 'data-display',
-        pages: ['table', 'avatar', 'tag', 'badge', 'empty', 'skeleton'],
       },
     ],
   },
