@@ -72,6 +72,9 @@ import {
   SkeletonGroup,
   Empty,
   Steps,
+  Upload,
+  UploadList,
+  UploadItem,
 } from '@/components/timeui-client';
 import { PropsTable } from '@/components/mdx/PropsTable';
 import { LiveDemo } from '@/components/mdx/LiveDemo';
@@ -114,6 +117,12 @@ import { MenuSelectionDemo } from '@/components/mdx/MenuSelectionDemo';
 import { DatePickerBasicDemo } from '@/components/mdx/DatePickerBasicDemo';
 import { DateRangePickerDemo } from '@/components/mdx/DateRangePickerDemo';
 import { TagClosableDemo, TagInteractiveDemo } from '@/components/mdx/TagInteractiveDemo';
+import { UploadWithProgressDemo } from '@/components/mdx/UploadWithProgressDemo';
+import { UploadCustomRequestDemo } from '@/components/mdx/UploadCustomRequestDemo';
+import { UploadRejectDemo } from '@/components/mdx/UploadRejectDemo';
+import { UploadBeforeUploadDemo } from '@/components/mdx/UploadBeforeUploadDemo';
+import { UploadCustomRenderDemo } from '@/components/mdx/UploadCustomRenderDemo';
+import { UploadControlledDemo } from '@/components/mdx/UploadControlledDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -186,6 +195,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     DateRangePickerDemo,
     TagClosableDemo,
     TagInteractiveDemo,
+    UploadWithProgressDemo,
+    UploadCustomRequestDemo,
+    UploadRejectDemo,
+    UploadBeforeUploadDemo,
+    UploadCustomRenderDemo,
+    UploadControlledDemo,
 
     Button,
     Box,
@@ -252,6 +267,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     SkeletonGroup,
     Empty,
     Steps,
+    Upload,
+    UploadList,
+    UploadItem,
 
     code: (p: ComponentPropsWithoutRef<'code'>) =>
       typeof p.children === 'string' ? <Code {...p}>{p.children}</Code> : <code {...p} />,

@@ -1,0 +1,392 @@
+# 文件上传 Upload
+
+把文件选择（点击触发）与拖拽（dropzone）统一在一个组件里，自动维护上传队列、进度、成功 / 失败状态；支持受控 / 非受控、图片预览、并发控制与自定义请求。
+
+两种外观：默认的按钮触发（`variant='button'`）与大块拖拽区（`variant='dropzone'`）。无论哪种，文件列表（`UploadList`）都会在下方显示选择结果。
+
+## 交互模式
+
+### 基础按钮触发
+
+最简形态：一个按钮，点击弹出文件选择器。
+
+<LiveDemo code={`<Upload />`}>
+  <Upload />
+</LiveDemo>
+
+### 拖拽区 Dropzone
+
+把 `variant` 切到 `'dropzone'` 即可得到带大范围拖拽命中区的样式。内部会维护 `data-dragging` / `data-rejecting` 给主题接管高亮色。
+
+<LiveDemo code={`<Upload variant="dropzone" />`}>
+  <Upload variant="dropzone" />
+</LiveDemo>
+
+### 多选
+
+默认只接受一个文件，开启 `multiple` 后可一次选 / 拖多个。
+
+<LiveDemo code={`<Upload multiple />`}>
+  <Upload multiple />
+</LiveDemo>
+
+### 模拟进度
+
+传入 `customRequest` 的场景里，上传进度由调用方调用 `handlers.onProgress(percent)` 推送。下面的 demo 用 `setInterval` 每 160ms 推进 10% 模拟真实进度。
+
+<LiveDemo code={`import { Upload } from '@timeui/react';
+import type { UploadRequest } from '@timeui/react';
+
+const simulatedRequest: UploadRequest = ({ signal }, handlers) => {
+  let percent = 0;
+  const timer = setInterval(() => {
+    if (signal.aborted) {
+      clearInterval(timer);
+      return;
+    }
+    percent = Math.min(100, percent + 10);
+    handlers.onProgress(percent);
+    if (percent >= 100) {
+      clearInterval(timer);
+      handlers.onSuccess({ ok: true });
+    }
+  }, 160);
+  return () => clearInterval(timer);
+};
+
+export function Demo() {
+  return <Upload multiple customRequest={simulatedRequest} />;
+}`}>
+  <UploadWithProgressDemo />
+</LiveDemo>
+
+## 校验
+
+### 只收图片
+
+`accept` 的语义与原生 `<input type="file">` 保持一致（MIME 通配 / 后缀列表）。收到图片时组件会自动生成本地 `previewUrl`。
+
+<LiveDemo code={`<Upload accept="image/*" multiple />`}>
+  <Upload accept="image/*" multiple />
+</LiveDemo>
+
+### 大小限制
+
+`maxSize` 以**字节**为单位。不符合的文件会经 `onReject` 回调告诉你，带上拒绝原因（`'size'`）与可选的 i18n 默认消息。
+
+<LiveDemo code={`import { Upload, useToast } from '@timeui/react';
+import type { UploadRejection } from '@timeui/react';
+
+export function Demo() {
+  const toast = useToast();
+  const handleReject = (rejections: UploadRejection[]) => {
+    for (const r of rejections) {
+      toast.show({
+        status: 'danger',
+        title: '上传被拒绝',
+        description: r.message ?? r.file.name + ' (' + r.reason + ')',
+      });
+    }
+  };
+  return (
+    <Upload
+      multiple
+      maxSize={2 * 1024 * 1024}
+      onReject={handleReject}
+      description="单文件最大 2 MB。"
+    />
+  );
+}`}>
+  <UploadRejectDemo />
+</LiveDemo>
+
+### 数量上限
+
+`maxCount` 限制最多同时保留多少个文件（超出部分进入 `onReject` 的 `'count'` 分支）。
+
+<LiveDemo code={`<Upload multiple maxCount={3} />`}>
+  <Upload multiple maxCount={3} />
+</LiveDemo>
+
+## 自定义
+
+### 自定义请求（真实 XHR 骨架）
+
+真实项目里 `customRequest` 就是上传的出口：拿到 `File` 对象，发你自己的 fetch / XHR，按情况调 `handlers.onProgress` / `onSuccess` / `onError`。下面的 demo 并不会真的发请求（demo 内是 `setTimeout` 模拟，一半概率失败），但代码里给了 XHR 的典型写法可供复制。
+
+<LiveDemo code={`import { Upload } from '@timeui/react';
+import type { UploadRequest } from '@timeui/react';
+
+const uploadRequest: UploadRequest = ({ file, signal }, handlers) => {
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://example.com/upload');
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) handlers.onProgress(Math.round((e.loaded / e.total) * 100));
+  };
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      handlers.onSuccess(xhr.response);
+    } else {
+      handlers.onError(new Error('HTTP ' + xhr.status));
+    }
+  };
+  xhr.onerror = () => handlers.onError(new Error('Network error'));
+  signal.addEventListener('abort', () => xhr.abort());
+
+  const form = new FormData();
+  form.append('file', file);
+  xhr.send(form);
+};
+
+export function Demo() {
+  return <Upload multiple customRequest={uploadRequest} />;
+}`}>
+  <UploadCustomRequestDemo />
+</LiveDemo>
+
+### beforeUpload 预校验
+
+`beforeUpload` 在**单个文件**即将进入队列前触发，返回 `false` / `Promise<false>` 则该文件被拒（`reason === 'before-upload'`）。适合做自定义规则：文件名、魔数、签名等。
+
+<LiveDemo code={`import { Upload, useToast } from '@timeui/react';
+import type { UploadRejection } from '@timeui/react';
+
+export function Demo() {
+  const toast = useToast();
+  return (
+    <Upload
+      multiple
+      beforeUpload={(file) => !/secret/i.test(file.name)}
+      onReject={(rejections: UploadRejection[]) => {
+        for (const r of rejections) {
+          if (r.reason === 'before-upload') {
+            toast.show({
+              status: 'warning',
+              title: '文件名包含敏感词',
+              description: r.file.name,
+            });
+          }
+        }
+      }}
+      description='示例：文件名包含 "secret"（大小写不敏感）会被拦下。'
+    />
+  );
+}`}>
+  <UploadBeforeUploadDemo />
+</LiveDemo>
+
+### 禁用与只读
+
+`isDisabled` 同时禁 click 与 drop；`isReadOnly` 保留已选列表但禁止新增 / 删除。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Upload isDisabled />
+  <Upload isReadOnly defaultValue={[{ id: '1', name: 'report.pdf', size: 124000, type: 'application/pdf', status: 'success' }]} />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Upload isDisabled />
+    <Upload isReadOnly defaultValue={[{ id: '1', name: 'report.pdf', size: 124000, type: 'application/pdf', status: 'success' }]} />
+  </Stack>
+</LiveDemo>
+
+### 自定义列表项渲染
+
+`renderItem` 可完全接管单个文件的显示。它传入 `(file, actions)`，`actions.remove` / `actions.retry` 帮你触发标准行为。下面的 demo 展示图片缩略图 + 自定义胶囊删除按钮。
+
+<LiveDemo code={`import { Upload } from '@timeui/react';
+import type { UploadFile } from '@timeui/react';
+
+export function Demo() {
+  return (
+    <Upload
+      multiple
+      accept="image/*"
+      renderItem={(file: UploadFile, actions) => (
+        <li key={file.id} className="my-upload-item">
+          {file.previewUrl && <img src={file.previewUrl} alt="" />}
+          <span>{file.name}</span>
+          <button type="button" onClick={actions.remove}>Remove</button>
+        </li>
+      )}
+    />
+  );
+}`}>
+  <UploadCustomRenderDemo />
+</LiveDemo>
+
+## 表单集成
+
+### 作为表单字段
+
+`label` / `description` / `errorMessage` / `isRequired` 会自动包一层 `FormField`，语义上与 Input / Select / Checkbox 对齐——无需另外手写 label。
+
+<LiveDemo code={`<Upload
+  label="合同附件"
+  description="支持 PDF 与 Word 文档，单文件最大 10 MB。"
+  accept=".pdf,.doc,.docx"
+  multiple
+  isRequired
+  errorMessage="请至少上传一份合同。"
+/>`}>
+  <Upload
+    label="合同附件"
+    description="支持 PDF 与 Word 文档，单文件最大 10 MB。"
+    accept=".pdf,.doc,.docx"
+    multiple
+    isRequired
+    errorMessage="请至少上传一份合同。"
+  />
+</LiveDemo>
+
+### 尺寸 × 颜色 × 形态
+
+与 Button / Input 一致的 5 × 6 组合；两种 variant 都生效。
+
+<LiveDemo code={`<Stack spacing={16}>
+  <Stack spacing={8}>
+    <Upload size="xs" color="primary" />
+    <Upload size="sm" color="primary" />
+    <Upload size="md" color="primary" />
+    <Upload size="lg" color="primary" />
+    <Upload size="xl" color="primary" />
+  </Stack>
+  <Stack spacing={8}>
+    <Upload color="default" />
+    <Upload color="primary" />
+    <Upload color="secondary" />
+    <Upload color="success" />
+    <Upload color="warning" />
+    <Upload color="danger" />
+  </Stack>
+  <Upload variant="dropzone" color="primary" />
+</Stack>`}>
+  <Stack spacing={16}>
+    <Stack spacing={8}>
+      <Upload size="xs" color="primary" />
+      <Upload size="sm" color="primary" />
+      <Upload size="md" color="primary" />
+      <Upload size="lg" color="primary" />
+      <Upload size="xl" color="primary" />
+    </Stack>
+    <Stack spacing={8}>
+      <Upload color="default" />
+      <Upload color="primary" />
+      <Upload color="secondary" />
+      <Upload color="success" />
+      <Upload color="warning" />
+      <Upload color="danger" />
+    </Stack>
+    <Upload variant="dropzone" color="primary" />
+  </Stack>
+</LiveDemo>
+
+### 受控用法
+
+`value` + `onChange` 让你全权管理文件列表；`useRef<UploadHandle>` 还能从外部调 `open()` / `clear()` / `submit()` / `retry()` / `abort()`。
+
+<LiveDemo code={`import { useRef, useState } from 'react';
+import { Upload, Button } from '@timeui/react';
+import type { UploadFile, UploadHandle } from '@timeui/react';
+
+export function Demo() {
+  const [files, setFiles] = useState<UploadFile[]>([]);
+  const handleRef = useRef<UploadHandle>(null);
+
+  return (
+    <>
+      <Upload ref={handleRef} multiple value={files} onChange={setFiles} />
+      <Button onClick={() => handleRef.current?.open()}>打开文件选择器</Button>
+      <Button onClick={() => handleRef.current?.clear()}>清空</Button>
+    </>
+  );
+}`}>
+  <UploadControlledDemo />
+</LiveDemo>
+
+## 注意事项
+
+<Callout variant="warning" title="使用 customRequest 时请连通取消信号">
+  组件会给 `customRequest` 一个 `AbortSignal`，调用 `handle.abort(id)` 或组件卸载时会触发它。**你需要自己把这个 signal 接到 fetch / XMLHttpRequest 上**（例如 `xhr.addEventListener('abort', …)` 或 `fetch(url, { signal })`），否则 HTTP 请求不会真正中断。
+</Callout>
+
+<Callout variant="info" title="拖拽中的校验仅凭 accept 类型">
+  浏览器在 `dragenter` / `dragover` 阶段只能读到 MIME 类型，拿不到文件大小。因此 dropzone 的 `data-rejecting` 预拒态**只会**依据 `accept` 不匹配判定；超过 `maxSize` 或 `maxCount` 等约束必须等到真正 drop 后才能判断——那时会走 `onReject` 而不是视觉高亮。
+</Callout>
+
+<Callout variant="info" title="Safari < 14 的 data-rejecting 可能不准确">
+  早期 Safari 对 `DataTransferItem.type` 处理不一致，某些情况下无法提前识别类型不符的文件。建议关键场景依赖 `onReject` 的事后反馈，而不是仅仅依靠 dropzone 的高亮。
+</Callout>
+
+## API
+
+### Upload
+
+<PropsTable props={[
+  { name: 'value', type: 'UploadFile[]', description: '受控文件列表。' },
+  { name: 'defaultValue', type: 'UploadFile[]', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: UploadFile[], meta: UploadChangeMeta) => void', description: '文件列表变化回调，`meta.trigger` 描述变化原因。' },
+  { name: 'variant', type: "'button' | 'dropzone'", default: "'button'", description: '触发形态。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'" },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'" },
+  { name: 'fullWidth', type: 'boolean', default: 'false' },
+  { name: 'accept', type: 'string', description: '与原生 input 一致（MIME 通配或后缀列表）。' },
+  { name: 'multiple', type: 'boolean', default: 'false' },
+  { name: 'maxSize', type: 'number', description: '单文件最大字节数。' },
+  { name: 'maxCount', type: 'number', description: '列表最多保留多少项。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false' },
+  { name: 'customRequest', type: 'UploadRequest', description: '自定义上传实现；未传时组件只维护列表不发请求。' },
+  { name: 'concurrency', type: 'number', default: '3', description: '并发上传数。' },
+  { name: 'autoUpload', type: 'boolean', default: 'true', description: 'false 时需要手动 `handle.submit()` 才发起上传。' },
+  { name: 'beforeUpload', type: '(file: File, fileList: File[]) => boolean | Promise<boolean>', description: '预校验；返回 false 拒收。' },
+  { name: 'onReject', type: '(rejections: UploadRejection[]) => void', description: '批量拒收回调。' },
+  { name: 'onRemove', type: '(file: UploadFile) => boolean | Promise<boolean> | void', description: '返回 false / Promise<false> 可阻止删除。' },
+  { name: 'allowDuplicates', type: 'boolean', default: 'true', description: '是否允许同名文件重复入队。' },
+  { name: 'trigger', type: 'ReactNode', description: '替换默认按钮。' },
+  { name: 'dropzoneContent', type: 'ReactNode | ((state) => ReactNode)', description: '替换 dropzone 内部文案。' },
+  { name: 'showFileList', type: 'boolean', default: 'true' },
+  { name: 'renderItem', type: '(file, actions) => ReactNode', description: '自定义每一项渲染。' },
+  { name: 'emptyContent', type: 'ReactNode', description: '空列表占位。' },
+  { name: 'listPosition', type: "'bottom' | 'top' | 'none'", default: "'bottom'" },
+  { name: 'onUploadProgress', type: '(file: UploadFile, percent: number) => void' },
+  { name: 'onUploadComplete', type: '(value: UploadFile[]) => void', description: '整个队列空闲后触发一次。' },
+  { name: 'dropzoneHeight', type: 'number | string', default: '160' },
+  { name: 'noClick', type: 'boolean', default: 'false', description: '禁用点击打开（仅拖拽）。' },
+  { name: 'noDrag', type: 'boolean', default: 'false', description: '禁用拖拽（仅点击）。' },
+  { name: 'label', type: 'ReactNode', description: '触发隐式 FormField 包装。' },
+  { name: 'description', type: 'ReactNode' },
+  { name: 'errorMessage', type: 'ReactNode' },
+  { name: 'isRequired', type: 'boolean', default: 'false' },
+  { name: 'isInvalid', type: 'boolean' },
+  { name: 'name', type: 'string' }
+]} />
+
+### UploadHandle（通过 `ref` 暴露的命令式 API）
+
+<PropsTable props={[
+  { name: 'open', type: '() => void', description: '打开系统文件选择器。' },
+  { name: 'submit', type: '(ids?: string[]) => void', description: '手动触发上传（配合 `autoUpload={false}`）。' },
+  { name: 'retry', type: '(id: string) => void', description: '重试一个失败的文件。' },
+  { name: 'abort', type: '(id: string) => void', description: '中断一个进行中的文件。' },
+  { name: 'clear', type: '() => void', description: '清空列表。' }
+]} />
+
+### UploadFile
+
+<PropsTable props={[
+  { name: 'id', type: 'string', description: '组件生成的稳定 id。' },
+  { name: 'name', type: 'string' },
+  { name: 'size', type: 'number' },
+  { name: 'type', type: 'string' },
+  { name: 'status', type: "'ready' | 'uploading' | 'success' | 'error' | 'removed'" },
+  { name: 'percent', type: 'number', description: '0 – 100。' },
+  { name: 'file', type: 'File', description: '原始 File 对象；仅本次浏览器会话有效。' },
+  { name: 'previewUrl', type: 'string', description: '图片类型会自动生成 blob URL；组件自己释放。' },
+  { name: 'response', type: 'unknown', description: '成功时 `customRequest` 传入的任意返回值。' },
+  { name: 'error', type: 'Error', description: '失败时的错误对象。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  按钮形态即标准 `<button>`；dropzone 是 `role="button"` + `tabIndex={0}`，支持回车 / 空格打开选择器。文件列表是 `role="list"`，每项含删除与重试按钮（均有可读 label，由 `@timeui/core` 的 i18n 提供 zh / en 两套）。`prefers-reduced-motion` 下进度条只做状态切换，不做动画过渡。
+</Callout>

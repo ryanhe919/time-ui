@@ -76,6 +76,10 @@ export {
   SkeletonGroup,
   Empty,
   Steps,
+  Upload,
+  UploadList,
+  UploadItem,
 } from '@timeui/react';
+export type { UploadFile, UploadHandle } from '@timeui/react';
 export { CodeBlock } from '@timeui/react/code-block';
 export { ChatMarkdown } from '@timeui/react/chat-markdown';

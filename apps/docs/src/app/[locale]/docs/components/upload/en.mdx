@@ -1,0 +1,437 @@
+# Upload
+
+File picking (click to open) and drag-and-drop (dropzone) unified in one
+component, with an auto-managed upload queue, per-file progress, and
+success / error state. Supports controlled / uncontrolled usage, image
+preview, concurrency control, and a custom request hook.
+
+Two shapes: the default button trigger (`variant='button'`) and a large
+drop target (`variant='dropzone'`). In both, the `UploadList` beneath
+shows the selected files.
+
+## Interaction modes
+
+### Basic button trigger
+
+The simplest form — a button that opens the native file picker.
+
+<LiveDemo code={`<Upload />`}>
+  <Upload />
+</LiveDemo>
+
+### Dropzone
+
+Switch `variant` to `'dropzone'` for a large drop target. Internally the
+component tracks `data-dragging` / `data-rejecting` so your theme can take
+over the highlight color.
+
+<LiveDemo code={`<Upload variant="dropzone" />`}>
+  <Upload variant="dropzone" />
+</LiveDemo>
+
+### Multiple files
+
+By default only one file is accepted. Enable `multiple` to pick or drop
+several at once.
+
+<LiveDemo code={`<Upload multiple />`}>
+  <Upload multiple />
+</LiveDemo>
+
+### Simulated progress
+
+When a `customRequest` is provided, upload progress is pushed by the
+caller via `handlers.onProgress(percent)`. The demo below uses
+`setInterval` to advance 10% every 160ms, simulating real upload
+progress.
+
+<LiveDemo code={`import { Upload } from '@timeui/react';
+import type { UploadRequest } from '@timeui/react';
+
+const simulatedRequest: UploadRequest = ({ signal }, handlers) => {
+  let percent = 0;
+  const timer = setInterval(() => {
+    if (signal.aborted) {
+      clearInterval(timer);
+      return;
+    }
+    percent = Math.min(100, percent + 10);
+    handlers.onProgress(percent);
+    if (percent >= 100) {
+      clearInterval(timer);
+      handlers.onSuccess({ ok: true });
+    }
+  }, 160);
+  return () => clearInterval(timer);
+};
+
+export function Demo() {
+  return <Upload multiple customRequest={simulatedRequest} />;
+}`}>
+  <UploadWithProgressDemo />
+</LiveDemo>
+
+## Validation
+
+### Images only
+
+`accept` shares its semantics with the native `<input type="file">`
+(MIME globs or extension lists). For images, the component generates a
+local `previewUrl` automatically.
+
+<LiveDemo code={`<Upload accept="image/*" multiple />`}>
+  <Upload accept="image/*" multiple />
+</LiveDemo>
+
+### Size limit
+
+`maxSize` is expressed in **bytes**. Over-sized files are reported via
+`onReject` with `reason === 'size'` and a localized default message.
+
+<LiveDemo code={`import { Upload, useToast } from '@timeui/react';
+import type { UploadRejection } from '@timeui/react';
+
+export function Demo() {
+  const toast = useToast();
+  const handleReject = (rejections: UploadRejection[]) => {
+    for (const r of rejections) {
+      toast.show({
+        status: 'danger',
+        title: 'Upload rejected',
+        description: r.message ?? r.file.name + ' (' + r.reason + ')',
+      });
+    }
+  };
+  return (
+    <Upload
+      multiple
+      maxSize={2 * 1024 * 1024}
+      onReject={handleReject}
+      description="Max 2 MB per file."
+    />
+  );
+}`}>
+  <UploadRejectDemo />
+</LiveDemo>
+
+### Max count
+
+`maxCount` caps how many files the list can hold at once; extras go to
+the `'count'` branch of `onReject`.
+
+<LiveDemo code={`<Upload multiple maxCount={3} />`}>
+  <Upload multiple maxCount={3} />
+</LiveDemo>
+
+## Customization
+
+### Custom request (real XHR skeleton)
+
+In a real project `customRequest` is your upload outlet — you receive
+the `File`, run your own fetch / XHR, and call `handlers.onProgress` /
+`onSuccess` / `onError`. The demo below does **not** actually send a
+request (it's a `setTimeout` sim that fails half the time), but the code
+string shows a typical XHR implementation you can paste.
+
+<LiveDemo code={`import { Upload } from '@timeui/react';
+import type { UploadRequest } from '@timeui/react';
+
+const uploadRequest: UploadRequest = ({ file, signal }, handlers) => {
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://example.com/upload');
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) handlers.onProgress(Math.round((e.loaded / e.total) * 100));
+  };
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      handlers.onSuccess(xhr.response);
+    } else {
+      handlers.onError(new Error('HTTP ' + xhr.status));
+    }
+  };
+  xhr.onerror = () => handlers.onError(new Error('Network error'));
+  signal.addEventListener('abort', () => xhr.abort());
+
+  const form = new FormData();
+  form.append('file', file);
+  xhr.send(form);
+};
+
+export function Demo() {
+  return <Upload multiple customRequest={uploadRequest} />;
+}`}>
+  <UploadCustomRequestDemo />
+</LiveDemo>
+
+### beforeUpload pre-check
+
+`beforeUpload` fires **per file** before it enters the queue. Returning
+`false` / `Promise<false>` rejects it (`reason === 'before-upload'`).
+Good for bespoke rules: filename patterns, magic numbers, signatures.
+
+<LiveDemo code={`import { Upload, useToast } from '@timeui/react';
+import type { UploadRejection } from '@timeui/react';
+
+export function Demo() {
+  const toast = useToast();
+  return (
+    <Upload
+      multiple
+      beforeUpload={(file) => !/secret/i.test(file.name)}
+      onReject={(rejections: UploadRejection[]) => {
+        for (const r of rejections) {
+          if (r.reason === 'before-upload') {
+            toast.show({
+              status: 'warning',
+              title: 'Filename blocked',
+              description: r.file.name,
+            });
+          }
+        }
+      }}
+      description='Demo: any filename containing "secret" (case-insensitive) is blocked.'
+    />
+  );
+}`}>
+  <UploadBeforeUploadDemo />
+</LiveDemo>
+
+### Disabled & read-only
+
+`isDisabled` blocks both click and drop; `isReadOnly` keeps the list
+visible but prevents add / remove.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <Upload isDisabled />
+  <Upload isReadOnly defaultValue={[{ id: '1', name: 'report.pdf', size: 124000, type: 'application/pdf', status: 'success' }]} />
+</Stack>`}>
+  <Stack spacing={12}>
+    <Upload isDisabled />
+    <Upload isReadOnly defaultValue={[{ id: '1', name: 'report.pdf', size: 124000, type: 'application/pdf', status: 'success' }]} />
+  </Stack>
+</LiveDemo>
+
+### Custom list item
+
+`renderItem` takes over a single row's UI. It receives
+`(file, actions)`, where `actions.remove` / `actions.retry` fire the
+standard behaviors. The demo below shows a thumbnail + pill-style remove
+button.
+
+<LiveDemo code={`import { Upload } from '@timeui/react';
+import type { UploadFile } from '@timeui/react';
+
+export function Demo() {
+  return (
+    <Upload
+      multiple
+      accept="image/*"
+      renderItem={(file: UploadFile, actions) => (
+        <li key={file.id} className="my-upload-item">
+          {file.previewUrl && <img src={file.previewUrl} alt="" />}
+          <span>{file.name}</span>
+          <button type="button" onClick={actions.remove}>Remove</button>
+        </li>
+      )}
+    />
+  );
+}`}>
+  <UploadCustomRenderDemo />
+</LiveDemo>
+
+## Form integration
+
+### As a form field
+
+`label` / `description` / `errorMessage` / `isRequired` wrap the
+trigger in an implicit `FormField`, matching Input / Select / Checkbox —
+no need to write your own label.
+
+<LiveDemo code={`<Upload
+  label="Contract attachments"
+  description="PDF and Word documents; up to 10 MB each."
+  accept=".pdf,.doc,.docx"
+  multiple
+  isRequired
+  errorMessage="Please upload at least one contract."
+/>`}>
+  <Upload
+    label="Contract attachments"
+    description="PDF and Word documents; up to 10 MB each."
+    accept=".pdf,.doc,.docx"
+    multiple
+    isRequired
+    errorMessage="Please upload at least one contract."
+  />
+</LiveDemo>
+
+### Sizes × Colors × Variants
+
+The same 5 × 6 grid as Button / Input; both variants honor it.
+
+<LiveDemo code={`<Stack spacing={16}>
+  <Stack spacing={8}>
+    <Upload size="xs" color="primary" />
+    <Upload size="sm" color="primary" />
+    <Upload size="md" color="primary" />
+    <Upload size="lg" color="primary" />
+    <Upload size="xl" color="primary" />
+  </Stack>
+  <Stack spacing={8}>
+    <Upload color="default" />
+    <Upload color="primary" />
+    <Upload color="secondary" />
+    <Upload color="success" />
+    <Upload color="warning" />
+    <Upload color="danger" />
+  </Stack>
+  <Upload variant="dropzone" color="primary" />
+</Stack>`}>
+  <Stack spacing={16}>
+    <Stack spacing={8}>
+      <Upload size="xs" color="primary" />
+      <Upload size="sm" color="primary" />
+      <Upload size="md" color="primary" />
+      <Upload size="lg" color="primary" />
+      <Upload size="xl" color="primary" />
+    </Stack>
+    <Stack spacing={8}>
+      <Upload color="default" />
+      <Upload color="primary" />
+      <Upload color="secondary" />
+      <Upload color="success" />
+      <Upload color="warning" />
+      <Upload color="danger" />
+    </Stack>
+    <Upload variant="dropzone" color="primary" />
+  </Stack>
+</LiveDemo>
+
+### Controlled usage
+
+`value` + `onChange` puts the list under your control; a
+`useRef<UploadHandle>` also exposes imperative `open()` / `clear()` /
+`submit()` / `retry()` / `abort()`.
+
+<LiveDemo code={`import { useRef, useState } from 'react';
+import { Upload, Button } from '@timeui/react';
+import type { UploadFile, UploadHandle } from '@timeui/react';
+
+export function Demo() {
+  const [files, setFiles] = useState<UploadFile[]>([]);
+  const handleRef = useRef<UploadHandle>(null);
+
+  return (
+    <>
+      <Upload ref={handleRef} multiple value={files} onChange={setFiles} />
+      <Button onClick={() => handleRef.current?.open()}>Open picker</Button>
+      <Button onClick={() => handleRef.current?.clear()}>Clear</Button>
+    </>
+  );
+}`}>
+  <UploadControlledDemo />
+</LiveDemo>
+
+## Caveats
+
+<Callout variant="warning" title="Wire the abort signal when using customRequest">
+  The component hands `customRequest` an `AbortSignal`; it fires on
+  `handle.abort(id)` or when the component unmounts. **You need to wire
+  that signal to your fetch / XMLHttpRequest yourself** (e.g.
+  `xhr.addEventListener('abort', …)` or `fetch(url, { signal })`),
+  otherwise the actual HTTP request won't be cancelled.
+</Callout>
+
+<Callout variant="info" title="Drag-time validation only checks accept">
+  During `dragenter` / `dragover` browsers only expose the MIME type —
+  not the file size. The dropzone's `data-rejecting` pre-check therefore
+  only reflects `accept` mismatches; `maxSize` / `maxCount` can only be
+  evaluated once the drop actually happens, at which point `onReject`
+  fires (no visual highlight).
+</Callout>
+
+<Callout variant="info" title="data-rejecting is unreliable on Safari < 14">
+  Older Safari versions expose `DataTransferItem.type` inconsistently,
+  so the pre-drop rejection highlight may not fire. For critical flows,
+  rely on post-drop feedback through `onReject` rather than the
+  dropzone's highlight.
+</Callout>
+
+## API
+
+### Upload
+
+<PropsTable props={[
+  { name: 'value', type: 'UploadFile[]', description: 'Controlled file list.' },
+  { name: 'defaultValue', type: 'UploadFile[]', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: UploadFile[], meta: UploadChangeMeta) => void', description: 'File list change callback; `meta.trigger` describes the cause.' },
+  { name: 'variant', type: "'button' | 'dropzone'", default: "'button'", description: 'Trigger shape.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'" },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'" },
+  { name: 'fullWidth', type: 'boolean', default: 'false' },
+  { name: 'accept', type: 'string', description: 'Matches the native `<input>` attribute (MIME globs or extension list).' },
+  { name: 'multiple', type: 'boolean', default: 'false' },
+  { name: 'maxSize', type: 'number', description: 'Max bytes per file.' },
+  { name: 'maxCount', type: 'number', description: 'Max items the list keeps.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false' },
+  { name: 'customRequest', type: 'UploadRequest', description: 'Custom upload implementation; without it the component only manages the list.' },
+  { name: 'concurrency', type: 'number', default: '3', description: 'Concurrent uploads.' },
+  { name: 'autoUpload', type: 'boolean', default: 'true', description: 'When false, requires `handle.submit()` to start uploading.' },
+  { name: 'beforeUpload', type: '(file: File, fileList: File[]) => boolean | Promise<boolean>', description: 'Pre-check; return false to block.' },
+  { name: 'onReject', type: '(rejections: UploadRejection[]) => void', description: 'Batch rejection callback.' },
+  { name: 'onRemove', type: '(file: UploadFile) => boolean | Promise<boolean> | void', description: 'Return false / Promise<false> to prevent removal.' },
+  { name: 'allowDuplicates', type: 'boolean', default: 'true', description: 'Allow same-name files to queue twice.' },
+  { name: 'trigger', type: 'ReactNode', description: 'Replace the default button.' },
+  { name: 'dropzoneContent', type: 'ReactNode | ((state) => ReactNode)', description: 'Replace the dropzone copy.' },
+  { name: 'showFileList', type: 'boolean', default: 'true' },
+  { name: 'renderItem', type: '(file, actions) => ReactNode', description: 'Customize each row.' },
+  { name: 'emptyContent', type: 'ReactNode', description: 'Empty-list placeholder.' },
+  { name: 'listPosition', type: "'bottom' | 'top' | 'none'", default: "'bottom'" },
+  { name: 'onUploadProgress', type: '(file: UploadFile, percent: number) => void' },
+  { name: 'onUploadComplete', type: '(value: UploadFile[]) => void', description: 'Fires once when the queue goes idle.' },
+  { name: 'dropzoneHeight', type: 'number | string', default: '160' },
+  { name: 'noClick', type: 'boolean', default: 'false', description: 'Disable click-to-open (drag only).' },
+  { name: 'noDrag', type: 'boolean', default: 'false', description: 'Disable drag (click only).' },
+  { name: 'label', type: 'ReactNode', description: 'Triggers implicit FormField wrapping.' },
+  { name: 'description', type: 'ReactNode' },
+  { name: 'errorMessage', type: 'ReactNode' },
+  { name: 'isRequired', type: 'boolean', default: 'false' },
+  { name: 'isInvalid', type: 'boolean' },
+  { name: 'name', type: 'string' }
+]} />
+
+### UploadHandle (imperative API exposed via `ref`)
+
+<PropsTable props={[
+  { name: 'open', type: '() => void', description: 'Open the system file picker.' },
+  { name: 'submit', type: '(ids?: string[]) => void', description: 'Manually start uploading (pair with `autoUpload={false}`).' },
+  { name: 'retry', type: '(id: string) => void', description: 'Retry a failed file.' },
+  { name: 'abort', type: '(id: string) => void', description: 'Abort an in-flight file.' },
+  { name: 'clear', type: '() => void', description: 'Clear the list.' }
+]} />
+
+### UploadFile
+
+<PropsTable props={[
+  { name: 'id', type: 'string', description: 'Stable id generated by the component.' },
+  { name: 'name', type: 'string' },
+  { name: 'size', type: 'number' },
+  { name: 'type', type: 'string' },
+  { name: 'status', type: "'ready' | 'uploading' | 'success' | 'error' | 'removed'" },
+  { name: 'percent', type: 'number', description: '0 – 100.' },
+  { name: 'file', type: 'File', description: 'Raw File object; only valid for the current browser session.' },
+  { name: 'previewUrl', type: 'string', description: 'Auto-generated blob URL for image MIME types; the component revokes it for you.' },
+  { name: 'response', type: 'unknown', description: 'Whatever `customRequest` passes to `onSuccess`.' },
+  { name: 'error', type: 'Error', description: 'Populated when a file ends in the error state.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The button variant is a native `<button>`; the dropzone is
+  `role="button"` + `tabIndex={0}` and opens the picker on Enter /
+  Space. The list is `role="list"` with per-item remove / retry buttons
+  (each carrying readable labels from `@timeui/core`'s zh / en i18n).
+  Under `prefers-reduced-motion`, the progress bar switches state
+  without animating.
+</Callout>
