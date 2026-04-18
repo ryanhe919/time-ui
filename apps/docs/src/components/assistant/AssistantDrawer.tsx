@@ -64,6 +64,26 @@ const CloseIcon = () => (
   </svg>
 );
 
+// 清除对话图标：垃圾桶。与 CloseIcon 保持相同尺寸 / stroke 风格。
+const ClearIcon = () => (
+  <svg
+    viewBox="0 0 16 16"
+    width={16}
+    height={16}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.6}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M2.5 4h11" />
+    <path d="M6 4V2.75A.75.75 0 0 1 6.75 2h2.5a.75.75 0 0 1 .75.75V4" />
+    <path d="M3.75 4l.7 8.4a1.25 1.25 0 0 0 1.25 1.15h4.6a1.25 1.25 0 0 0 1.25-1.15L12.25 4" />
+    <path d="M6.75 7v4M9.25 7v4" />
+  </svg>
+);
+
 export function AssistantDrawer(props: Props) {
   const { open, onClose, locale, messages } = props;
   const theme = useTheme();
@@ -82,6 +102,9 @@ export function AssistantDrawer(props: Props) {
 
   // fetch 控制器 —— 关闭 drawer / 重发时中止正在跑的请求。
   const abortRef = useRef<AbortController | null>(null);
+
+  // panel ref —— 清空对话后把焦点还给输入框。
+  const panelRef = useRef<HTMLElement | null>(null);
 
   // 关 drawer → 停流；避免后台 fetch 继续消耗 token。
   useEffect(() => {
@@ -200,6 +223,26 @@ export function AssistantDrawer(props: Props) {
     setIsStreaming(false);
   }, []);
 
+  // 清除对话：先中止正在跑的流（避免回调继续 appendAssistant），再把状态全部清零，
+  // 最后把焦点还给 composer，这样用户可以直接继续问。不做二次确认，保持轻量节奏。
+  const handleClear = useCallback(() => {
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+    }
+    setIsStreaming(false);
+    setTurns([]);
+    setTopLevelError(null);
+    setComposerValue('');
+    // 下一帧再聚焦，给 React 重新渲染 composer（isDisabled 可能切换）的时间。
+    requestAnimationFrame(() => {
+      const textarea = panelRef.current?.querySelector<HTMLTextAreaElement>('textarea');
+      textarea?.focus();
+    });
+  }, []);
+
+  const canClear = turns.length > 0 || topLevelError !== null || isStreaming;
+
   // Drawer 容器 + overlay CSS
   const overlayCss = css`
     position: fixed;
@@ -298,10 +341,24 @@ export function AssistantDrawer(props: Props) {
     color: ${theme.colors.text.secondary};
     cursor: pointer;
     display: inline-flex;
-    &:hover {
+    &:hover:not(:disabled) {
       background: ${theme.colors.bg.muted};
       color: ${theme.colors.text.primary};
     }
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    &:focus-visible {
+      outline: 2px solid ${theme.colors.border.focus};
+      outline-offset: 2px;
+    }
+  `;
+
+  const headerActionsCss = css`
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   `;
 
   const listWrapperCss = css`
@@ -352,6 +409,7 @@ export function AssistantDrawer(props: Props) {
     <div aria-hidden={!open}>
       <div css={overlayCss} onClick={onClose} />
       <aside
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -361,14 +419,26 @@ export function AssistantDrawer(props: Props) {
       >
         <div css={headerCss}>
           <span id={titleId}>{messages.drawerTitle}</span>
-          <button
-            type="button"
-            css={closeBtnCss}
-            aria-label={messages.closeLabel}
-            onClick={onClose}
-          >
-            <CloseIcon />
-          </button>
+          <div css={headerActionsCss}>
+            <button
+              type="button"
+              css={closeBtnCss}
+              aria-label={messages.clearLabel}
+              title={messages.clearLabel}
+              onClick={handleClear}
+              disabled={!canClear}
+            >
+              <ClearIcon />
+            </button>
+            <button
+              type="button"
+              css={closeBtnCss}
+              aria-label={messages.closeLabel}
+              onClick={onClose}
+            >
+              <CloseIcon />
+            </button>
+          </div>
         </div>
 
         <div css={bodyCss}>

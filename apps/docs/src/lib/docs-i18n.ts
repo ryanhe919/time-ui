@@ -17,6 +17,7 @@ export interface AssistantDrawerMessages {
   errorGeneric: string;
   sendLabel: string;
   closeLabel: string;
+  clearLabel: string;
   assistantName: string;
   userName: string;
   toolCallRunning: string;
@@ -119,6 +120,7 @@ const zh: DocsMessages = {
     errorGeneric: '助手暂不可用，请稍后重试。',
     sendLabel: '发送',
     closeLabel: '关闭助手',
+    clearLabel: '清除对话，重新开始',
     assistantName: '助手',
     userName: '你',
     toolCallRunning: '正在查询文档索引…',
@@ -208,6 +210,7 @@ const en: DocsMessages = {
     errorGeneric: 'The assistant is temporarily unavailable. Please try again later.',
     sendLabel: 'Send',
     closeLabel: 'Close assistant',
+    clearLabel: 'Clear conversation and start over',
     assistantName: 'Assistant',
     userName: 'You',
     toolCallRunning: 'Querying documentation index…',
