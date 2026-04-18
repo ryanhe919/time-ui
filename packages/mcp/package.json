@@ -1,6 +1,6 @@
 {
   "name": "@timeui/mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "MCP server and shared documentation index for TimeUI components.",
   "license": "MIT",
   "sideEffects": false,
@@ -26,6 +26,7 @@
     }
   },
   "bin": {
+    "mcp": "./bin/timeui-mcp.mjs",
     "timeui-mcp": "./bin/timeui-mcp.mjs",
     "timeui-mcp-http": "./bin/timeui-mcp-http.mjs"
   },

@@ -1,5 +1,13 @@
 # @timeui/mcp
 
+## 0.1.2
+
+### Patch Changes
+
+- Add an `mcp` bin alias so `npx -y @timeui/mcp` works without `-p`.
+
+  npm/npx resolves a package's default executable by the last segment of the package name, so `@timeui/mcp` looks up `mcp` in the `bin` map. The previous release only registered `timeui-mcp` / `timeui-mcp-http`, which made `npx -y @timeui/mcp` fail with "could not determine executable to run". Both old names continue to work unchanged.
+
 ## 0.1.1
 
 ### Patch Changes
