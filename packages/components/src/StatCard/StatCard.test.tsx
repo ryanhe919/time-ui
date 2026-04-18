@@ -4,8 +4,11 @@
  * @description 验证 StatCard 组件的渲染、delta pill、arrow tick、skeleton、CJK label、polarity 推断。
  */
 
-import { describe, it, expect } from 'vitest';
+import { createRef } from 'react';
+import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { darkTheme, lightTheme } from '@timeui/themes';
 import { renderWithProviders } from '../test-utils';
 import { StatCard } from './index';
 
@@ -243,5 +246,176 @@ describe('StatCard — contract & visual', () => {
     expect(container.querySelector('[data-variant="elevated"]')).toBeTruthy();
     expect(container.querySelector('[data-color="success"]')).toBeTruthy();
     expect(container.querySelector('[data-pressable="true"]')).toBeTruthy();
+  });
+
+  it('#18 direction omitted defaults to flat and auto polarity resolves neutral', () => {
+    const { container } = renderWithProviders(
+      <StatCard label="n" value="1" delta={{ value: '0%' }} />,
+    );
+    const delta = getDeltaEl(container);
+    expect(delta).toHaveAttribute('data-direction', 'flat');
+    expect(delta).toHaveAttribute('data-polarity', 'neutral');
+    expect(delta).toHaveAttribute('aria-label', '持平 0%');
+  });
+
+  it('#19 explicit neutral polarity wins over automatic mapping', () => {
+    const { container } = renderWithProviders(
+      <StatCard
+        label="n"
+        value="1"
+        delta={{ value: '-1%', direction: 'down', polarity: 'neutral' }}
+      />,
+    );
+    expect(getDeltaEl(container)).toHaveAttribute('data-polarity', 'neutral');
+  });
+
+  it('#20 sr.valueLabel is forwarded to the numeric value node', () => {
+    const { container } = renderWithProviders(
+      <StatCard label="Revenue" value="$8,888" sr={{ valueLabel: 'Revenue value' }} />,
+    );
+    expect(getValueEl(container)).toHaveAttribute('aria-label', 'Revenue value');
+  });
+
+  it('#21 description and trend content render together', () => {
+    const { container } = renderWithProviders(
+      <StatCard
+        label="Revenue"
+        value="$8,888"
+        description="vs last quarter"
+        trend={<div>spark</div>}
+      />,
+    );
+    expect(container.querySelector('[data-slot="description"]')).toBeTruthy();
+    expect(screen.getByText('vs last quarter')).toBeInTheDocument();
+    expect(screen.getByText('spark')).toBeInTheDocument();
+  });
+
+  it('#22 emphasis scales font size across subtle/default/strong', () => {
+    renderWithProviders(<StatCard label="subtle" value="1" emphasis="subtle" />);
+    renderWithProviders(<StatCard label="default" value="1" emphasis="default" />);
+    renderWithProviders(<StatCard label="strong" value="1" emphasis="strong" />);
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/font-size:\s*20px/);
+    expect(styles).toMatch(/font-size:\s*28px/);
+    expect(styles).toMatch(/font-size:\s*36px/);
+  });
+
+  it('#23 valueAlign=center emits centering rules for row, content and value row', () => {
+    const { container } = renderWithProviders(
+      <StatCard label="Centered" value="1" valueAlign="center" />,
+    );
+    expect(container.querySelector('[data-slot="statcard-row"]')).toBeTruthy();
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/justify-content:\s*center/);
+    expect(styles).toMatch(/align-items:\s*center/);
+    expect(styles).toMatch(/text-align:\s*center/);
+  });
+
+  it('#24 loading state sets root aria-label fallback and data-loading marker', () => {
+    const { container } = renderWithProviders(<StatCard label="n" value="1" isLoading />);
+    const card = container.querySelector('[data-loading="true"]');
+    expect(card).toHaveAttribute('data-loading', 'true');
+    expect(card.querySelector('[data-slot="statcard-skeleton"]')).toBeTruthy();
+    expect(card).toHaveAttribute('aria-label', '加载中');
+  });
+
+  it('#25 icon palette uses dark-mode inset highlight variant', () => {
+    renderWithProviders(<StatCard label="n" value="1" icon={<span>i</span>} />, { theme: 'dark' });
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/inset 0 1px 0 rgba\(255,\s*255,\s*255,\s*0\.06\)/);
+  });
+
+  it('#26 trendBleed margin adapts by size tokens', () => {
+    renderWithProviders(
+      <StatCard label="sm" value="1" size="sm" trendBleed trend={<div>t</div>} />,
+    );
+    renderWithProviders(
+      <StatCard label="lg" value="1" size="lg" trendBleed trend={<div>t</div>} />,
+    );
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/margin:\s*12px -12px -12px/);
+    expect(styles).toMatch(/margin:\s*12px -24px -24px/);
+  });
+
+  it('#27 forwards ref, root class names and interactive callbacks through internal Card', async () => {
+    const ref = createRef<HTMLElement>();
+    const onClick = vi.fn();
+    const onPress = vi.fn();
+    const { container } = renderWithProviders(
+      <StatCard
+        ref={ref as never}
+        label="Open"
+        value="1"
+        isPressable
+        aria-label="open stat"
+        onClick={onClick}
+        onPress={onPress}
+        className="outer"
+        classNames={{
+          root: 'root-slot',
+          label: 'label-slot',
+          value: 'value-slot',
+          delta: 'delta-slot',
+          icon: 'icon-slot',
+          description: 'description-slot',
+          trend: 'trend-slot',
+        }}
+        description="desc"
+        icon={<span>i</span>}
+        delta={{ value: '+1%', direction: 'up' }}
+        trend={<div>trend</div>}
+      />,
+    );
+    const root = screen.getByRole('button', { name: 'open stat' });
+    expect(ref.current).toBe(root);
+    expect(root).toHaveClass('outer');
+    expect(root).toHaveClass('root-slot');
+    expect(container.querySelector('[data-slot="label"]')).toHaveClass('label-slot');
+    expect(container.querySelector('[data-slot="value"]')).toHaveClass('value-slot');
+    expect(container.querySelector('[data-slot="delta"]')).toHaveClass('delta-slot');
+    expect(container.querySelector('[data-slot="icon"]')).toHaveClass('icon-slot');
+    expect(container.querySelector('[data-slot="description"]')).toHaveClass('description-slot');
+    expect(container.querySelector('[data-slot="trend"]')).toHaveClass('trend-slot');
+    await userEvent.click(root);
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(onPress).toHaveBeenCalledOnce();
+  });
+
+  it('#28 fallback theme paths cover delta status fallbacks and icon palette fallbacks', () => {
+    const theme = structuredClone(lightTheme);
+    theme.colors.status.successBg = undefined as never;
+    theme.colors.status.success = undefined as never;
+    theme.colors.status.dangerBg = undefined as never;
+    theme.colors.status.danger = undefined as never;
+    theme.colors.success = { DEFAULT: 'rgb(0, 160, 90)' } as never;
+    theme.colors.danger = { DEFAULT: 'rgb(220, 40, 40)' } as never;
+    theme.colors.warning = { DEFAULT: 'rgb(200, 100, 0)' } as never;
+
+    renderWithProviders(
+      <StatCard
+        label="positive"
+        value="1"
+        color="warning"
+        icon={<span>i</span>}
+        delta={{ value: '+1%', direction: 'up' }}
+      />,
+      { theme },
+    );
+    renderWithProviders(
+      <StatCard label="negative" value="1" delta={{ value: '-1%', direction: 'down' }} />,
+      { theme },
+    );
+
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/background:#f5f5f5/);
+    expect(styles).toMatch(/color:#171717/);
+  });
+
+  it('#29 dark theme delta pill uses the dark inset bottom shadow fragment', () => {
+    renderWithProviders(
+      <StatCard label="dark" value="1" delta={{ value: '+1%', direction: 'up' }} />,
+      { theme: darkTheme },
+    );
+    expect(extractEmittedStyles()).toMatch(/inset 0 -1px 0 rgba\(255,\s*255,\s*255,\s*0\.05\)/);
   });
 });

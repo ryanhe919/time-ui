@@ -6,8 +6,9 @@
 
 import { createRef } from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { darkTheme, lightTheme } from '@timeui/themes';
 import { renderWithProviders } from '../test-utils';
 import { Card, CardHeader, CardBody, CardFooter } from './index';
 
@@ -242,5 +243,159 @@ describe('Card — contract', () => {
   it('#17 non-pressable default is a <div> without role=button', () => {
     renderWithProviders(<Card aria-label="s">s</Card>);
     expect(screen.queryByRole('button', { name: 's' })).not.toBeInTheDocument();
+  });
+
+  it('#18 explicit rel is preserved for external links', () => {
+    renderWithProviders(
+      <Card href="https://x.test" target="_blank" rel="external" aria-label="x">
+        ext
+      </Card>,
+    );
+    expect(screen.getByRole('link', { name: 'x' })).toHaveAttribute('rel', 'external');
+  });
+
+  it('#19 disabled pressable sets tabIndex=-1 and still calls onClick but not onPress', async () => {
+    const onClick = vi.fn();
+    const onPress = vi.fn();
+    renderWithProviders(
+      <Card isPressable isDisabled onClick={onClick} onPress={onPress} aria-label="disabled">
+        x
+      </Card>,
+    );
+    const btn = screen.getByRole('button', { name: 'disabled' });
+    expect(btn).toHaveAttribute('tabindex', '-1');
+    await userEvent.click(btn);
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('#20 native button semantics are preserved when rendered as button', () => {
+    const onPress = vi.fn();
+    renderWithProviders(
+      <Card as="button" isPressable onPress={onPress}>
+        Native button
+      </Card>,
+    );
+    const btn = screen.getByRole('button', { name: 'Native button' });
+    expect(btn.tagName).toBe('BUTTON');
+    expect(btn).not.toHaveAttribute('tabindex');
+    fireEvent.keyDown(btn, { key: 'Enter' });
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('#21 keyboard handler ignores unrelated keys and native anchors', async () => {
+    const onPress = vi.fn();
+    const { rerender } = renderWithProviders(
+      <Card isPressable onPress={onPress} aria-label="div button">
+        x
+      </Card>,
+    );
+    const divButton = screen.getByRole('button', { name: 'div button' });
+    divButton.focus();
+    await userEvent.keyboard('{Escape}');
+    expect(onPress).not.toHaveBeenCalled();
+
+    rerender(
+      <Card href="/docs" onPress={onPress} aria-label="native link">
+        docs
+      </Card>,
+    );
+    const link = screen.getByRole('link', { name: 'native link' });
+    fireEvent.keyDown(link, { key: 'Enter' });
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('#22 accentBar=top emits height-based pseudo-element hover growth', () => {
+    renderWithProviders(
+      <Card accentBar="top" isPressable aria-label="top">
+        top
+      </Card>,
+    );
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/height:\s*3px/);
+    expect(styles).toMatch(/hover::before[\s\S]*height:\s*4px/);
+  });
+
+  it('#23 flat hover uses ring fallback and custom color data attrs are forwarded', () => {
+    const { container } = renderWithProviders(
+      <Card
+        variant="flat"
+        color="warning"
+        isHoverable
+        fullWidth
+        className="card-root"
+        classNames={{ root: 'slot-root' }}
+        style={{ opacity: 0.9 }}
+      >
+        flat
+      </Card>,
+    );
+    const root = container.querySelector('[data-variant="flat"]');
+    expect(root).toHaveAttribute('data-fullwidth', 'true');
+    expect(root).toHaveClass('card-root');
+    expect(root).toHaveClass('slot-root');
+    expect(root).toHaveStyle({ opacity: '0.9' });
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/background:#f5f5f5/);
+    expect(styles).toMatch(/background-color:rgba\(245,\s*165,\s*36,\s*0\.1\)/);
+    expect(styles).toMatch(/hover:not\(\[aria-disabled='true'\]\)[\s\S]*inset 0 0 0 1px/);
+  });
+
+  it('#24 color default hover border uses strong-or-default border token', () => {
+    renderWithProviders(
+      <Card variant="bordered" color="default" isHoverable>
+        x
+      </Card>,
+    );
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/border-color:#a3a3a3/);
+  });
+
+  it('#25 custom element via `as` stays non-interactive unless requested', () => {
+    const { container } = renderWithProviders(<Card as="article">body</Card>);
+    const article = container.querySelector('article');
+    expect(article).toBeTruthy();
+    expect(article).not.toHaveAttribute('role');
+    expect(article).not.toHaveAttribute('tabindex');
+  });
+
+  it('#26 missing palette steps fall back to DEFAULT in dark non-default color paths', () => {
+    const theme = structuredClone(darkTheme);
+    theme.colors.warning = { DEFAULT: 'rgb(200, 100, 0)' } as never;
+
+    renderWithProviders(
+      <Card variant="bordered" color="warning" accentBar="start" isHoverable>
+        fallback
+      </Card>,
+      { theme },
+    );
+    renderWithProviders(
+      <Card variant="flat" color="warning" isHoverable>
+        fallback flat
+      </Card>,
+      { theme },
+    );
+
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/border-color:rgb\(200,\s*100,\s*0\)/);
+    expect(styles).toMatch(/background-color:#262626/);
+    expect(styles).toMatch(/box-shadow:inset 0 0 0 1px rgb\(200,\s*100,\s*0\)/);
+  });
+
+  it('#27 radius=none and default border/accent fall back to border.default when strong is absent', () => {
+    const theme = structuredClone(lightTheme);
+    theme.colors.border.strong = '' as never;
+
+    renderWithProviders(
+      <Card variant="bordered" color="default" radius="none" accentBar="start" isHoverable>
+        fallback border
+      </Card>,
+      { theme },
+    );
+
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/border-radius:0px/);
+    expect(styles).toMatch(/border-color:#e5e5e5/);
+    expect(styles).toMatch(/background:#e5e5e5/);
   });
 });
