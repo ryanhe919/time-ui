@@ -30,6 +30,7 @@ export * from './Switch';
 export * from './Slider';
 export * from './SegmentedControl';
 export * from './Select';
+export * from './Upload';
 export * from './Chat';
 
 export * from './Popover';

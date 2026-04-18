@@ -29,6 +29,32 @@ export interface Messages {
     placeholder: string;
     label: string;
   };
+  upload: {
+    triggerLabel: string;
+    triggerText: string;
+    dropzoneLabel: string;
+    dropzoneHint: string;
+    dropzoneSecondary: string;
+    dropzoneHintActive: string;
+    dropzoneHintReject: string;
+    rejectByType: string;
+    rejectBySize: string;
+    rejectByCount: string;
+    rejectByDuplicate: string;
+    rejectByBeforeUpload: string;
+    removeLabel: string;
+    retryLabel: string;
+    clearLabel: string;
+    statusReady: string;
+    statusUploading: string;
+    statusSuccess: string;
+    statusError: string;
+    liveAdded: string;
+    liveRejected: string;
+    liveSuccess: string;
+    liveError: string;
+    liveRemoved: string;
+  };
 }
 
 export const zh: Messages = {
@@ -54,6 +80,32 @@ export const zh: Messages = {
     placeholder: '搜索…',
     label: '搜索',
   },
+  upload: {
+    triggerLabel: '选择文件',
+    triggerText: '选择文件',
+    dropzoneLabel: '文件上传区，按 Enter 或 Space 选择文件',
+    dropzoneHint: '拖拽文件到此处',
+    dropzoneSecondary: '或点击选择文件',
+    dropzoneHintActive: '松开以添加文件',
+    dropzoneHintReject: '不支持的文件类型',
+    rejectByType: '{name} 的类型不被支持',
+    rejectBySize: '{name} 超过大小限制',
+    rejectByCount: '最多只能上传 {max} 个文件',
+    rejectByDuplicate: '{name} 已存在',
+    rejectByBeforeUpload: '{name} 被拦截',
+    removeLabel: '删除',
+    retryLabel: '重试',
+    clearLabel: '清空',
+    statusReady: '待上传',
+    statusUploading: '上传中',
+    statusSuccess: '已上传',
+    statusError: '上传失败',
+    liveAdded: '已添加 {count} 个文件',
+    liveRejected: '已拒绝 {count} 个文件',
+    liveSuccess: '{name} 上传成功',
+    liveError: '{name} 上传失败',
+    liveRemoved: '{name} 已删除',
+  },
 };
 
 export const en: Messages = {
@@ -78,6 +130,32 @@ export const en: Messages = {
   search: {
     placeholder: 'Search…',
     label: 'Search',
+  },
+  upload: {
+    triggerLabel: 'Choose file',
+    triggerText: 'Choose file',
+    dropzoneLabel: 'File upload area, press Enter or Space to choose files',
+    dropzoneHint: 'Drag files here',
+    dropzoneSecondary: 'or click to browse',
+    dropzoneHintActive: 'Release to add files',
+    dropzoneHintReject: 'File type not supported',
+    rejectByType: '{name} has an unsupported file type',
+    rejectBySize: '{name} exceeds the size limit',
+    rejectByCount: 'You can upload at most {max} files',
+    rejectByDuplicate: '{name} already exists',
+    rejectByBeforeUpload: '{name} was rejected',
+    removeLabel: 'Remove',
+    retryLabel: 'Retry',
+    clearLabel: 'Clear',
+    statusReady: 'Ready',
+    statusUploading: 'Uploading',
+    statusSuccess: 'Uploaded',
+    statusError: 'Failed',
+    liveAdded: 'Added {count} file(s)',
+    liveRejected: 'Rejected {count} file(s)',
+    liveSuccess: '{name} uploaded successfully',
+    liveError: '{name} failed to upload',
+    liveRemoved: '{name} removed',
   },
 };
 

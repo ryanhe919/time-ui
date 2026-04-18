@@ -4,6 +4,6 @@
  * @description 统一导出 Test-utils 模块的对外接口。
  */
 
-export { renderWithProviders } from './renderWithProviders';
+export { renderWithProviders, TimeUIProvider } from './renderWithProviders';
 export type { RenderWithProvidersOptions } from './renderWithProviders';
 export { expectA11y } from './a11y';
