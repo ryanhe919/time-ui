@@ -1,0 +1,74 @@
+# MCP Server
+
+`@timeui/mcp` is TimeUI's **Model Context Protocol** server: every component's documentation is exposed as a callable tool, so Claude Code, Cursor, Windsurf, and other MCP-capable clients can look up the real component API, examples, and category structure instead of guessing from training data.
+
+## Why it exists
+
+AI editors tend to fail in two predictable ways when recommending component usage:
+
+- **Stale training data** — the prop names or idioms the model learned no longer match the current release.
+- **No training data** — the model never saw this library and invents plausible-looking APIs.
+
+MCP makes TimeUI's docs queryable at conversation time, so the answers you get reflect **what's actually published**, not the model's guess.
+
+## Tools
+
+| Tool | Purpose |
+| --- | --- |
+| `list_categories` | Return all component categories (general / forms / overlays / …) with a count per category. |
+| `list_components` | Return component slug / title / short description / category, optionally filtered by a category slug. |
+| `get_component` | Fetch the full documentation (title, description, prose, code examples, docs URL) for a single slug. |
+| `search_components` | Full-text scored search across titles / descriptions / prose, with context snippets. |
+
+All tools accept an optional `locale` argument (`zh` / `en`, default `zh`).
+
+## Install & wire up
+
+### Claude Code
+
+```bash
+claude mcp add timeui -- npx -y @timeui/mcp timeui-mcp
+```
+
+Once added, just ask questions like `what form components does TimeUI have?` or `what variants does Button support?` — Claude will route through the MCP tools automatically.
+
+### Cursor / Windsurf
+
+Inside `.cursor/mcp.json` (Cursor) or the equivalent config:
+
+```json
+{
+  "mcpServers": {
+    "timeui": {
+      "command": "npx",
+      "args": ["-y", "@timeui/mcp", "timeui-mcp"]
+    }
+  }
+}
+```
+
+### HTTP transport (for remote clients)
+
+Alongside stdio, an MCP-spec-compliant Streamable HTTP transport is shipped for remote AI clients:
+
+```bash
+npx -y @timeui/mcp timeui-mcp-http --port 3333
+# MCP endpoint: http://127.0.0.1:3333/mcp
+```
+
+It binds to `127.0.0.1` by default so you don't accidentally expose it on LAN; pass `--host 0.0.0.0` when you do want external reach.
+
+## How it works
+
+- `@timeui/mcp` scans the docs site's MDX sources at build time and emits a static `data/index.json` (~340 KB, covering 31 components × 2 locales).
+- In stdio mode the AI client spawns a Node process per session; tool calls stay local, zero network.
+- In HTTP mode the server follows the MCP Streamable HTTP spec with per-session routing and reconnection.
+
+## Versioning
+
+`@timeui/mcp` versions independently of `@timeui/react`: whenever the component library ships a release, the MCP package rebuilds its index and ships alongside. The `latest` tag always tracks the docs of the current stable `@timeui/react`.
+
+## Related
+
+- [ChatMarkdown](/en/docs/chat/markdown) — the companion renderer for streaming markdown inside AI chat UIs.
+- The package-local `packages/mcp/README.md` has lower-level protocol usage notes.

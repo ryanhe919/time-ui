@@ -30,7 +30,7 @@ interface SectionConfig {
 }
 
 const SECTIONS: readonly SectionConfig[] = [
-  { slug: 'getting-started', pages: ['introduction', 'installation'] },
+  { slug: 'getting-started', pages: ['introduction', 'installation', 'mcp'] },
   {
     slug: 'chat',
     pages: ['overview', 'composer', 'markdown', 'api'],

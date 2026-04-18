@@ -61,6 +61,7 @@ const zh: DocsMessages = {
   pages: {
     introduction: '介绍',
     installation: '安装',
+    mcp: 'MCP Server',
     overview: '总览',
     composer: '输入框',
     markdown: 'Markdown 渲染',
@@ -144,6 +145,7 @@ const en: DocsMessages = {
   pages: {
     introduction: 'Introduction',
     installation: 'Installation',
+    mcp: 'MCP Server',
     overview: 'Overview',
     composer: 'Composer',
     markdown: 'Markdown',
