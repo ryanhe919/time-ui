@@ -1,0 +1,278 @@
+# StatCard
+
+A KPI-shaped card. Fixed label + value layout, delta pill with an arrow-tick animation, optional icon slot / description / trend area / skeleton state. All of Card's governance props (variant / color / size / radius / accentBar / pressable / href) pass through to the underlying `Card`.
+
+<Callout variant="info" title="Card vs. StatCard">
+  - Single KPI (value + delta + optional sparkline)? Use **StatCard** — no layout work needed.
+  - Anything else — forms, tables, structured blocks? Reach for **Card**.
+</Callout>
+
+## Basic usage
+
+`label` + `value` is the minimal form. Label gets uppercase + letter-tracking (automatically disabled when the string contains CJK), and value uses tabular-nums with slashed-zero.
+
+<LiveDemo code={`<StatCard label="ACTIVE USERS" value="12,480" />`}>
+  <div style={{ width: 'min(280px, 100%)' }}>
+    <StatCard label="ACTIVE USERS" value="12,480" />
+  </div>
+</LiveDemo>
+
+## Delta — three directions
+
+`delta.direction` is `'up' | 'down' | 'flat'`. Polarity defaults to `'auto'` — up = positive (green), down = negative (red), flat = neutral grey. Flip the mapping (e.g. churn: less is better) by passing `polarity='negative'`. The button below swaps snapshots so the arrow-tick animation replays.
+
+<LiveDemo code={`<StatCard label="MRR" value="$128,402" delta={{ value: '+12.4%', direction: 'up' }} />
+<StatCard label="CHURN RATE" value="2.1%" delta={{ value: '-0.4pp', direction: 'down' }} />
+<StatCard label="NPS" value="54" delta={{ value: '0', direction: 'flat' }} />`}>
+  <StatCardDeltaDemo />
+</LiveDemo>
+
+## With icon
+
+`icon` accepts any ReactNode; it renders inside a tinted container whose size follows `size`. `iconPlacement` switches between `'start'` (default) and `'end'`. The icon wrapper is `aria-hidden` and never appears in the accessibility tree.
+
+<LiveDemo code={`<StatCard
+  label="ORDERS"
+  value="3,248"
+  icon={<span aria-hidden>O</span>}
+  iconPlacement="start"
+/>
+<StatCard
+  label="REVENUE"
+  value="$1.2M"
+  icon={<span aria-hidden>$</span>}
+  iconPlacement="end"
+/>`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ minWidth: 200, flex: 1 }}>
+      <StatCard
+        label="ORDERS"
+        value="3,248"
+        icon={<span aria-hidden>O</span>}
+        iconPlacement="start"
+      />
+    </div>
+    <div style={{ minWidth: 200, flex: 1 }}>
+      <StatCard
+        label="REVENUE"
+        value="$1.2M"
+        icon={<span aria-hidden>$</span>}
+        iconPlacement="end"
+      />
+    </div>
+  </Flex>
+</LiveDemo>
+
+## Trend sparkline
+
+`trend` is a slot — pass a raw inline `<svg>`; no chart dependency is pulled in. `trendBleed` makes the trend zone bleed to the card's bottom edge (negative inline margins + a subtle top divider).
+
+<LiveDemo code={`<StatCard
+  label="VIEWS · LAST 30 DAYS"
+  value="24.8k"
+  delta={{ value: '+6.2%', direction: 'up' }}
+  trend={
+    <svg width="160" height="32" viewBox="0 0 160 32">
+      <polyline fill="none" stroke="currentColor" strokeWidth="1.5"
+        points="0,24 16,22 32,26 48,18 64,20 80,14 96,16 112,10 128,12 144,6 160,8" />
+    </svg>
+  }
+/>
+<StatCard
+  label="SUCCESS RATE"
+  value="99.82%"
+  delta={{ value: '+0.03pp', direction: 'up' }}
+  trendBleed
+  trend={
+    <svg width="100%" height="28" viewBox="0 0 160 28" preserveAspectRatio="none">
+      <polyline fill="none" stroke="currentColor" strokeWidth="1.5"
+        points="0,14 20,10 40,16 60,8 80,12 100,6 120,10 140,4 160,8" />
+    </svg>
+  }
+/>`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ minWidth: 220, flex: 1 }}>
+      <StatCard
+        label="VIEWS · LAST 30 DAYS"
+        value="24.8k"
+        delta={{ value: '+6.2%', direction: 'up' }}
+        trend={
+          <svg width="160" height="32" viewBox="0 0 160 32">
+            <polyline
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              points="0,24 16,22 32,26 48,18 64,20 80,14 96,16 112,10 128,12 144,6 160,8"
+            />
+          </svg>
+        }
+      />
+    </div>
+    <div style={{ minWidth: 220, flex: 1 }}>
+      <StatCard
+        label="SUCCESS RATE"
+        value="99.82%"
+        delta={{ value: '+0.03pp', direction: 'up' }}
+        trendBleed
+        trend={
+          <svg width="100%" height="28" viewBox="0 0 160 28" preserveAspectRatio="none">
+            <polyline
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              points="0,14 20,10 40,16 60,8 80,12 100,6 120,10 140,4 160,8"
+            />
+          </svg>
+        }
+      />
+    </div>
+  </Flex>
+</LiveDemo>
+
+## Loading
+
+`isLoading` swaps to a skeleton: label / value / delta / icon each breathe at the corresponding size, the wrapper carries `role='status'` + `aria-busy='true'`, and `prefers-reduced-motion` suppresses the animation.
+
+<LiveDemo code={`<StatCard
+  isLoading={loading}
+  label="ACTIVE USERS"
+  value="12,480"
+  delta={{ value: '+8.2%', direction: 'up' }}
+  icon={<span aria-hidden>U</span>}
+/>`}>
+  <StatCardLoadingDemo />
+</LiveDemo>
+
+## Emphasis
+
+`emphasis` drives value font-size / weight / line-height: `subtle` (20px) / `default` (28px) / `strong` (36px). Delta and description on the same row still align to the baseline.
+
+<LiveDemo code={`<StatCard emphasis="subtle" label="SUBTLE" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+<StatCard emphasis="default" label="DEFAULT" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+<StatCard emphasis="strong" label="STRONG" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ minWidth: 180, flex: 1 }}>
+      <StatCard emphasis="subtle" label="SUBTLE" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+    </div>
+    <div style={{ minWidth: 180, flex: 1 }}>
+      <StatCard emphasis="default" label="DEFAULT" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+    </div>
+    <div style={{ minWidth: 180, flex: 1 }}>
+      <StatCard emphasis="strong" label="STRONG" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+    </div>
+  </Flex>
+</LiveDemo>
+
+## Color + accent bar
+
+Compose Card's `color` + `accentBar='start'` to paint dashboard category colours. `variant='elevated'` adds a shadow layer on top of all four.
+
+<LiveDemo code={`<StatCard color="primary" accentBar="start" variant="elevated" label="PRIMARY" value="128" />
+<StatCard color="success" accentBar="start" variant="elevated" label="SUCCESS" value="96%" />
+<StatCard color="warning" accentBar="start" variant="elevated" label="WARNING" value="12" />
+<StatCard color="danger" accentBar="start" variant="elevated" label="DANGER" value="3" />`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ minWidth: 160, flex: 1 }}>
+      <StatCard color="primary" accentBar="start" variant="elevated" label="PRIMARY" value="128" />
+    </div>
+    <div style={{ minWidth: 160, flex: 1 }}>
+      <StatCard color="success" accentBar="start" variant="elevated" label="SUCCESS" value="96%" />
+    </div>
+    <div style={{ minWidth: 160, flex: 1 }}>
+      <StatCard color="warning" accentBar="start" variant="elevated" label="WARNING" value="12" />
+    </div>
+    <div style={{ minWidth: 160, flex: 1 }}>
+      <StatCard color="danger" accentBar="start" variant="elevated" label="DANGER" value="3" />
+    </div>
+  </Flex>
+</LiveDemo>
+
+## Pressable / link
+
+StatCard passes through `isPressable` / `isHoverable` / `href` so the whole card can navigate or fire `onPress` — classic drill-down cards on dashboards. Supplying `href` renders the root as `<a>`.
+
+<LiveDemo code={`<StatCard
+  isHoverable
+  href="#revenue"
+  aria-label="Go to revenue details"
+  label="REVENUE"
+  value="$1.2M"
+  description="Click to drill down"
+  delta={{ value: '+14%', direction: 'up' }}
+  accentBar="start"
+  color="primary"
+/>
+<StatCard
+  isPressable
+  isHoverable
+  onPress={() => console.log('pressed')}
+  label="ORDERS"
+  value="3,248"
+  description="Press fires onPress"
+  delta={{ value: '-2.1%', direction: 'down' }}
+  variant="elevated"
+/>`}>
+  <StatCardPressableDemo />
+</LiveDemo>
+
+## Caveats
+
+<Callout variant="info" title="delta aria-label falls back when value is not a string">
+  When `delta.value` is a plain string the screen reader hears the full sentence ("Up 12.4%"). If you pass a ReactNode (e.g. rich text), the component cannot extract text, and the aria-label falls back to just the direction word ("Up" / "Down" / "Flat"). For complete announcements pass `sr={{ deltaLabel: 'Up 12.4 percentage points' }}` explicitly.
+</Callout>
+
+<Callout variant="info" title="CJK labels auto-disable uppercase">
+  If the label contains CJK characters the component drops uppercase + letter-tracking and bumps the font slightly so CJK renders legibly. Mixed-case Latin labels keep the uppercase treatment — use English strings like "REVENUE" or "MRR" when you want that effect.
+</Callout>
+
+<Callout variant="info" title="Do not nest another focus target inside a pressable StatCard">
+  A StatCard usually holds only value / delta / optional trend. If you inject a `<Button>` / `<a>` inside `description` or `trend`, it competes with the outer pressable surface for focus. Use a secondary Card / menu for the sub-entry instead.
+</Callout>
+
+## API
+
+### Inherited Card props
+
+These pass straight through to the underlying Card and behave identically to the Card counterparts:
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'elevated'", default: "'bordered'", description: 'Passes through to the underlying Card.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Same as Card; also tints the icon container.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Drives padding / label / value / icon sizing.' },
+  { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'fullWidth', type: 'boolean', default: 'false' },
+  { name: 'isPressable', type: 'boolean', default: 'false' },
+  { name: 'isHoverable', type: 'boolean', default: 'false' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'accentBar', type: "'start' | 'top' | 'none'", default: "'none'" },
+  { name: 'as', type: 'ElementType' },
+  { name: 'href', type: 'string' },
+  { name: 'target', type: 'string' },
+  { name: 'rel', type: 'string' },
+  { name: 'onPress', type: '(e: MouseEvent) => void' },
+  { name: 'onClick', type: '(e: MouseEvent) => void' },
+  { name: 'className', type: 'string' },
+  { name: 'aria-label', type: 'string' }
+]} />
+
+### StatCard-specific props
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', required: true, description: 'Top caption; if the string contains CJK the component drops uppercase and bumps the font size.' },
+  { name: 'value', type: 'ReactNode', required: true, description: 'Main value; rendered with tabular-nums + slashed-zero.' },
+  { name: 'description', type: 'ReactNode', description: 'Supporting copy under the value.' },
+  { name: 'icon', type: 'ReactNode', description: 'Rendered inside a tinted container; receives aria-hidden automatically.' },
+  { name: 'iconPlacement', type: "'start' | 'end'", default: "'start'" },
+  { name: 'delta', type: '{ value: ReactNode; direction?: \'up\' | \'down\' | \'flat\'; polarity?: \'positive\' | \'negative\' | \'neutral\' | \'auto\' }', description: 'Change pill. With polarity=auto: up maps to positive, down to negative.' },
+  { name: 'trend', type: 'ReactNode', description: 'Bottom slot (typically an inline SVG sparkline).' },
+  { name: 'trendBleed', type: 'boolean', default: 'false', description: 'Let the trend bleed to the card edge; adds a subtle top divider.' },
+  { name: 'isLoading', type: 'boolean', default: 'false', description: 'Switch to the skeleton state.' },
+  { name: 'emphasis', type: "'subtle' | 'default' | 'strong'", default: "'default'", description: 'Size / weight / leading for the value.' },
+  { name: 'valueAlign', type: "'start' | 'center'", default: "'start'" },
+  { name: 'sr', type: '{ valueLabel?: string; deltaLabel?: string }', description: 'Screen-reader overrides. Strongly recommend setting `deltaLabel` when `delta.value` is a ReactNode.' },
+  { name: 'classNames', type: 'StatCardClassNames', description: 'Slot-level className overrides (root / header / body / footer / label / value / delta / icon / description / trend).' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The delta pill carries `role='status'` plus an aria-label built from the i18n dictionary ("Up {value}" etc.) or overridden via `sr.deltaLabel`. When pressable the card inherits Card's `role='button'` + `tabIndex=0` keyboard semantics. The skeleton container uses `role='status'` + `aria-busy='true'` and announces "Loading" (from `@timeui/core` i18n).
+</Callout>

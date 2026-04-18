@@ -79,6 +79,11 @@ export {
   Upload,
   UploadList,
   UploadItem,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  StatCard,
 } from '@timeui/react';
 export type { UploadFile, UploadHandle } from '@timeui/react';
 export { CodeBlock } from '@timeui/react/code-block';

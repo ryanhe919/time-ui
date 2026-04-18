@@ -99,6 +99,8 @@ const zh: DocsMessages = {
     skeleton: '骨架屏',
     empty: '空状态',
     upload: '文件上传',
+    card: '卡片',
+    'stat-card': '统计卡片',
   },
   nav: {
     onThisPage: '本页目录',
@@ -185,6 +187,8 @@ const en: DocsMessages = {
     skeleton: 'Skeleton',
     empty: 'Empty',
     upload: 'Upload',
+    card: 'Card',
+    'stat-card': 'Stat Card',
   },
   nav: {
     onThisPage: 'On this page',

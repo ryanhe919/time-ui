@@ -75,6 +75,11 @@ import {
   Upload,
   UploadList,
   UploadItem,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  StatCard,
 } from '@/components/timeui-client';
 import { PropsTable } from '@/components/mdx/PropsTable';
 import { LiveDemo } from '@/components/mdx/LiveDemo';
@@ -123,6 +128,10 @@ import { UploadRejectDemo } from '@/components/mdx/UploadRejectDemo';
 import { UploadBeforeUploadDemo } from '@/components/mdx/UploadBeforeUploadDemo';
 import { UploadCustomRenderDemo } from '@/components/mdx/UploadCustomRenderDemo';
 import { UploadControlledDemo } from '@/components/mdx/UploadControlledDemo';
+import { CardPressableDemo } from '@/components/mdx/CardPressableDemo';
+import { StatCardDeltaDemo } from '@/components/mdx/StatCardDeltaDemo';
+import { StatCardLoadingDemo } from '@/components/mdx/StatCardLoadingDemo';
+import { StatCardPressableDemo } from '@/components/mdx/StatCardPressableDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -201,6 +210,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     UploadBeforeUploadDemo,
     UploadCustomRenderDemo,
     UploadControlledDemo,
+    CardPressableDemo,
+    StatCardDeltaDemo,
+    StatCardLoadingDemo,
+    StatCardPressableDemo,
 
     Button,
     Box,
@@ -270,6 +283,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     Upload,
     UploadList,
     UploadItem,
+    Card,
+    CardHeader,
+    CardBody,
+    CardFooter,
+    StatCard,
 
     code: (p: ComponentPropsWithoutRef<'code'>) =>
       typeof p.children === 'string' ? <Code {...p}>{p.children}</Code> : <code {...p} />,

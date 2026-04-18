@@ -1,0 +1,269 @@
+# Card
+
+A generic container primitive: wrap one piece of information or a small cluster of controls. Three variants (flat / bordered / elevated), six colours, three sizes, an optional accent bar, and opt-in hover / pressable / link behaviour. `CardHeader` / `CardBody` / `CardFooter` are opt-in structural subcomponents — use them when semantics matter.
+
+<Callout variant="info" title="Card vs. StatCard">
+  - **Card** — an open container. Put whatever you want inside; you decide the semantics.
+  - **StatCard** — a KPI-shaped derivative with built-in label + value + delta pill + optional trend slot.
+</Callout>
+
+## Basic usage
+
+The default is `variant='bordered'`. Compose content with `CardHeader` / `CardBody` / `CardFooter`. All three are optional — Card wraps arbitrary children by itself.
+
+<LiveDemo code={`<Card>
+  <CardHeader title="Project Aurora" subtitle="Production" />
+  <CardBody>
+    <Text size="sm" color="secondary">Healthy for 12 days.</Text>
+  </CardBody>
+  <CardFooter justify="end">
+    <Button size="sm" variant="bordered">View details</Button>
+  </CardFooter>
+</Card>`}>
+  <div style={{ width: 'min(360px, 100%)' }}>
+    <Card>
+      <CardHeader title="Project Aurora" subtitle="Production" />
+      <CardBody>
+        <Text size="sm" color="secondary">Healthy for 12 days.</Text>
+      </CardBody>
+      <CardFooter justify="end">
+        <Button size="sm" variant="bordered">View details</Button>
+      </CardFooter>
+    </Card>
+  </div>
+</LiveDemo>
+
+## Variants
+
+`flat` (tinted background, no border) / `bordered` (default, 1px hairline) / `elevated` (border + three-layer shadow; hover deepens shadow and lifts 1px).
+
+<LiveDemo code={`<Card variant="flat">
+  <CardHeader title="Flat" subtitle="Soft background, borderless" />
+</Card>
+<Card variant="bordered">
+  <CardHeader title="Bordered" subtitle="Default 1px hairline" />
+</Card>
+<Card variant="elevated">
+  <CardHeader title="Elevated" subtitle="Shadowed layer" />
+</Card>`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ width: 200 }}>
+      <Card variant="flat">
+        <CardHeader title="Flat" subtitle="Soft background" />
+      </Card>
+    </div>
+    <div style={{ width: 200 }}>
+      <Card variant="bordered">
+        <CardHeader title="Bordered" subtitle="Default hairline" />
+      </Card>
+    </div>
+    <div style={{ width: 200 }}>
+      <Card variant="elevated">
+        <CardHeader title="Elevated" subtitle="Shadowed layer" />
+      </Card>
+    </div>
+  </Flex>
+</LiveDemo>
+
+## Header / Body / Footer
+
+`CardHeader` accepts `title` / `subtitle` / `startContent` / `endContent`; `CardFooter`'s `justify` can be `start` / `end` (default) / `between`.
+
+<LiveDemo code={`<Card>
+  <CardHeader
+    title="Export report"
+    subtitle="CSV · last 30 days"
+    endContent={<Tag color="success" variant="soft">Ready</Tag>}
+  />
+  <CardBody>
+    <Text size="sm" color="secondary">
+      File generated, approx 2.4 MB.
+    </Text>
+  </CardBody>
+  <CardFooter justify="between">
+    <Button size="sm" variant="flat">Cancel</Button>
+    <Button size="sm">Download</Button>
+  </CardFooter>
+</Card>`}>
+  <div style={{ width: 'min(400px, 100%)' }}>
+    <Card>
+      <CardHeader
+        title="Export report"
+        subtitle="CSV · last 30 days"
+        endContent={<Tag color="success" variant="soft">Ready</Tag>}
+      />
+      <CardBody>
+        <Text size="sm" color="secondary">
+          File generated, approx 2.4 MB.
+        </Text>
+      </CardBody>
+      <CardFooter justify="between">
+        <Button size="sm" variant="flat">Cancel</Button>
+        <Button size="sm">Download</Button>
+      </CardFooter>
+    </Card>
+  </div>
+</LiveDemo>
+
+## Pressable
+
+`isPressable` turns the whole card into a focusable target that responds to click, Enter, and Space — the callback lives on `onPress`. `isHoverable` is visual-only; it does not add keyboard semantics. `color='primary'` drives the hover border / ring colour.
+
+<LiveDemo code={`<Card isPressable color="primary" onPress={() => setCount(c => c + 1)}>
+  <CardHeader title="Pressable card" subtitle="Click / Enter / Space fires onPress" />
+  <CardBody>
+    <Text size="sm" color="secondary">Press count: <strong>{count}</strong></Text>
+  </CardBody>
+</Card>
+<Card isHoverable>
+  <CardHeader title="Hoverable only" subtitle="isHoverable is visual only" />
+</Card>`}>
+  <CardPressableDemo />
+</LiveDemo>
+
+## As a link
+
+Passing `href` renders the root as an `<a>` (unless `as` overrides it) and implicitly marks the card pressable. When `target='_blank'` and `rel` is omitted, the component fills in `noopener noreferrer` automatically.
+
+<LiveDemo code={`<Card
+  href="https://react.dev"
+  target="_blank"
+  rel="noreferrer"
+  aria-label="Read the React docs"
+  variant="elevated"
+>
+  <CardHeader title="React docs" subtitle="react.dev ↗" />
+  <CardBody>
+    <Text size="sm" color="secondary">The whole card is one anchor with native keyboard behaviour.</Text>
+  </CardBody>
+</Card>`}>
+  <div style={{ width: 'min(360px, 100%)' }}>
+    <Card
+      href="https://react.dev"
+      target="_blank"
+      rel="noreferrer"
+      aria-label="Read the React docs"
+      variant="elevated"
+    >
+      <CardHeader title="React docs" subtitle="react.dev ↗" />
+      <CardBody>
+        <Text size="sm" color="secondary">The whole card is one anchor with native keyboard behaviour.</Text>
+      </CardBody>
+    </Card>
+  </div>
+</LiveDemo>
+
+## Accent bar + colour
+
+`accentBar='start'` paints a 3px bar on the inline-start edge; when the card is hoverable / pressable, hover micro-animates it to 4px. `color` drives the bar colour.
+
+<LiveDemo code={`<Card accentBar="start" color="default"><CardHeader title="Default" /></Card>
+<Card accentBar="start" color="primary"><CardHeader title="Primary" /></Card>
+<Card accentBar="start" color="secondary"><CardHeader title="Secondary" /></Card>
+<Card accentBar="start" color="success"><CardHeader title="Success" /></Card>
+<Card accentBar="start" color="warning"><CardHeader title="Warning" /></Card>
+<Card accentBar="start" color="danger"><CardHeader title="Danger" /></Card>`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ width: 160 }}><Card accentBar="start" color="default"><CardHeader title="Default" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="primary"><CardHeader title="Primary" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="secondary"><CardHeader title="Secondary" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="success"><CardHeader title="Success" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="warning"><CardHeader title="Warning" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="danger"><CardHeader title="Danger" /></Card></div>
+  </Flex>
+</LiveDemo>
+
+## Disabled
+
+`isDisabled` on a pressable card dims the surface to 0.55 opacity, sets `cursor: not-allowed` and `aria-disabled='true'`; keyboard activation and `onPress` are blocked.
+
+<LiveDemo code={`<Card
+  isPressable
+  isDisabled
+  color="primary"
+  onPress={() => console.log('never fires')}
+>
+  <CardHeader title="Disabled" subtitle="onPress will not fire" />
+</Card>`}>
+  <div style={{ width: 'min(320px, 100%)' }}>
+    <Card
+      isPressable
+      isDisabled
+      color="primary"
+      onPress={() => {}}
+    >
+      <CardHeader title="Disabled" subtitle="onPress will not fire" />
+    </Card>
+  </div>
+</LiveDemo>
+
+## Caveats
+
+<Callout variant="info" title="color is not always visible">
+  A Card defaults to a neutral look. `color` only affects visuals when (a) `accentBar !== 'none'` (it drives the bar colour) or (b) the card is `isPressable` / `isHoverable` (it drives hover border / ring / background). A static `<Card color='primary'>` looks exactly like `color='default'`.
+</Callout>
+
+<Callout variant="info" title="onPress vs. onClick">
+  **Prefer `onPress`**: the component normalises mouse click and keyboard Enter / Space into one callback. `onClick` still forwards the native event but keyboard activation does not synthesise one. When `isDisabled` is true `onPress` is blocked; `onClick` can still fire from the underlying event — so wire business callbacks to `onPress` for predictable semantics.
+</Callout>
+
+<Callout variant="info" title="Do not nest a primary action inside a pressable card's footer">
+  A pressable card is already the focus target. Placing a primary Button in the footer creates two focus stops and ambiguous Enter behaviour. Either keep the primary action in the footer (and leave the card non-pressable) or put only a secondary link inside the footer of a pressable card.
+</Callout>
+
+## API
+
+### Card
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'elevated'", default: "'bordered'", description: 'Surface treatment.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Palette token; only visible with accentBar or in hover / pressable states.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and gap scale.' },
+  { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Corner radius token.' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Stretch to fill the parent width.' },
+  { name: 'isPressable', type: 'boolean', default: 'false', description: 'Make the whole card a focusable target (tabIndex=0 + Enter / Space).' },
+  { name: 'isHoverable', type: 'boolean', default: 'false', description: 'Visual hover feedback only; no keyboard semantics.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Dim the surface and block onPress.' },
+  { name: 'accentBar', type: "'start' | 'top' | 'none'", default: "'none'", description: 'Decorative colour bar position.' },
+  { name: 'as', type: 'ElementType', description: 'Override the root tag; takes precedence over href.' },
+  { name: 'href', type: 'string', description: 'Supplying href renders `<a>` and implicitly marks the card pressable.' },
+  { name: 'target', type: 'string', description: 'Only honoured when rendering `<a>`.' },
+  { name: 'rel', type: 'string', description: 'Only honoured when rendering `<a>`; filled in automatically for `target=_blank`.' },
+  { name: 'onPress', type: '(e: MouseEvent) => void', description: 'Fires on click, Enter, or Space when pressable.' },
+  { name: 'onClick', type: '(e: MouseEvent) => void', description: 'Native click forwarder; not synthesised on keyboard activation.' },
+  { name: 'className', type: 'string' },
+  { name: 'classNames', type: '{ root?: string; header?: string; body?: string; footer?: string }', description: 'Slot-level className overrides.' },
+  { name: 'aria-label', type: 'string', description: 'Strongly recommended when the card is pressable or a link.' }
+]} />
+
+### CardHeader
+
+<PropsTable props={[
+  { name: 'title', type: 'ReactNode', description: 'Primary title.' },
+  { name: 'subtitle', type: 'ReactNode', description: 'Secondary title.' },
+  { name: 'startContent', type: 'ReactNode', description: 'Leading slot (avatar / icon).' },
+  { name: 'endContent', type: 'ReactNode', description: 'Trailing slot (tag / button / overflow menu).' },
+  { name: 'as', type: 'ElementType', default: "'header'", description: 'Root tag.' },
+  { name: 'className', type: 'string' }
+]} />
+
+### CardBody
+
+<PropsTable props={[
+  { name: 'as', type: 'ElementType', default: "'section'", description: 'Root tag.' },
+  { name: 'className', type: 'string' },
+  { name: 'children', type: 'ReactNode' }
+]} />
+
+### CardFooter
+
+<PropsTable props={[
+  { name: 'justify', type: "'start' | 'end' | 'between'", default: "'end'", description: 'Flex main-axis alignment.' },
+  { name: 'as', type: 'ElementType', default: "'footer'", description: 'Root tag.' },
+  { name: 'className', type: 'string' },
+  { name: 'children', type: 'ReactNode' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Renders a `<div>` by default; rendering `<a>` when `href` is present picks up native anchor semantics. When pressable on a non-native focusable tag the component adds `role='button'` + `tabIndex=0` and handles Enter / Space. `isDisabled` sets `aria-disabled='true'` and blocks `onPress`. Under `prefers-reduced-motion` the hover / press transitions and the accent-bar width animation are suppressed.
+</Callout>

@@ -1,0 +1,269 @@
+# 卡片 Card
+
+通用的容器原语：承载一段信息 / 一组控件。三种 variant（flat / bordered / elevated）、六种 color、三档 size、可选的 accent bar、可整卡 hover / pressable / 链接化。`CardHeader` / `CardBody` / `CardFooter` 是可选的结构子组件——只在需要语义化时才用。
+
+<Callout variant="info" title="Card 还是 StatCard？">
+  - **Card**：开放容器。内部可放任意内容，由你自己决定语义。
+  - **StatCard**：KPI 专用派生组件，label + value + delta pill + 可选 trend，视觉与语义都已对齐。
+</Callout>
+
+## 基础用法
+
+默认 `variant='bordered'`，配合 `CardHeader` / `CardBody` / `CardFooter` 组织内容。三个子组件都不是必须的——Card 自身就能包住任何 children。
+
+<LiveDemo code={`<Card>
+  <CardHeader title="项目 Aurora" subtitle="生产环境" />
+  <CardBody>
+    <Text size="sm" color="secondary">运行 12 天无异常。</Text>
+  </CardBody>
+  <CardFooter justify="end">
+    <Button size="sm" variant="bordered">查看详情</Button>
+  </CardFooter>
+</Card>`}>
+  <div style={{ width: 'min(360px, 100%)' }}>
+    <Card>
+      <CardHeader title="项目 Aurora" subtitle="生产环境" />
+      <CardBody>
+        <Text size="sm" color="secondary">运行 12 天无异常。</Text>
+      </CardBody>
+      <CardFooter justify="end">
+        <Button size="sm" variant="bordered">查看详情</Button>
+      </CardFooter>
+    </Card>
+  </div>
+</LiveDemo>
+
+## Variant
+
+`flat`（淡背景，无边框）/ `bordered`（默认，1px 描边）/ `elevated`（描边 + 三层阴影，hover 时阴影加深 + 轻微抬升 1px）。
+
+<LiveDemo code={`<Card variant="flat">
+  <CardHeader title="Flat" subtitle="柔和背景，无边框" />
+</Card>
+<Card variant="bordered">
+  <CardHeader title="Bordered" subtitle="默认，1px hairline" />
+</Card>
+<Card variant="elevated">
+  <CardHeader title="Elevated" subtitle="阴影层级" />
+</Card>`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ width: 200 }}>
+      <Card variant="flat">
+        <CardHeader title="Flat" subtitle="柔和背景" />
+      </Card>
+    </div>
+    <div style={{ width: 200 }}>
+      <Card variant="bordered">
+        <CardHeader title="Bordered" subtitle="默认描边" />
+      </Card>
+    </div>
+    <div style={{ width: 200 }}>
+      <Card variant="elevated">
+        <CardHeader title="Elevated" subtitle="阴影层级" />
+      </Card>
+    </div>
+  </Flex>
+</LiveDemo>
+
+## Header / Body / Footer
+
+`CardHeader` 支持 `title` / `subtitle` / `startContent` / `endContent`；`CardFooter` 的 `justify` 支持 `start` / `end`（默认） / `between`。
+
+<LiveDemo code={`<Card>
+  <CardHeader
+    title="导出报表"
+    subtitle="CSV · 最近 30 天"
+    endContent={<Tag color="success" variant="soft">Ready</Tag>}
+  />
+  <CardBody>
+    <Text size="sm" color="secondary">
+      文件已生成，预计 2.4 MB。
+    </Text>
+  </CardBody>
+  <CardFooter justify="between">
+    <Button size="sm" variant="flat">取消</Button>
+    <Button size="sm">下载</Button>
+  </CardFooter>
+</Card>`}>
+  <div style={{ width: 'min(400px, 100%)' }}>
+    <Card>
+      <CardHeader
+        title="导出报表"
+        subtitle="CSV · 最近 30 天"
+        endContent={<Tag color="success" variant="soft">Ready</Tag>}
+      />
+      <CardBody>
+        <Text size="sm" color="secondary">
+          文件已生成，预计 2.4 MB。
+        </Text>
+      </CardBody>
+      <CardFooter justify="between">
+        <Button size="sm" variant="flat">取消</Button>
+        <Button size="sm">下载</Button>
+      </CardFooter>
+    </Card>
+  </div>
+</LiveDemo>
+
+## 可按 Pressable
+
+`isPressable` 让整卡变成一个可聚焦 / 可 Enter / Space 触发的目标，回调走 `onPress`；`isHoverable` 只给视觉反馈、不改键盘语义。`color='primary'` 决定 hover 时的边框 / 环色。
+
+<LiveDemo code={`<Card isPressable color="primary" onPress={() => setCount(c => c + 1)}>
+  <CardHeader title="可按卡片" subtitle="点击 / Enter / Space 触发 onPress" />
+  <CardBody>
+    <Text size="sm" color="secondary">已触发次数: <strong>{count}</strong></Text>
+  </CardBody>
+</Card>
+<Card isHoverable>
+  <CardHeader title="仅 hover" subtitle="isHoverable 只加视觉，没有键盘语义" />
+</Card>`}>
+  <CardPressableDemo />
+</LiveDemo>
+
+## 作为链接 Link
+
+传入 `href` 会把根节点渲染成 `<a>`（除非用 `as` 强制覆盖），此时 `isPressable` 自动为真。`target='_blank'` 时若未显式传 `rel`，组件会自动补 `noopener noreferrer`。
+
+<LiveDemo code={`<Card
+  href="https://react.dev"
+  target="_blank"
+  rel="noreferrer"
+  aria-label="阅读 React 文档"
+  variant="elevated"
+>
+  <CardHeader title="React 官方文档" subtitle="react.dev ↗" />
+  <CardBody>
+    <Text size="sm" color="secondary">整卡都是一个 anchor，原生键盘行为。</Text>
+  </CardBody>
+</Card>`}>
+  <div style={{ width: 'min(360px, 100%)' }}>
+    <Card
+      href="https://react.dev"
+      target="_blank"
+      rel="noreferrer"
+      aria-label="阅读 React 文档"
+      variant="elevated"
+    >
+      <CardHeader title="React 官方文档" subtitle="react.dev ↗" />
+      <CardBody>
+        <Text size="sm" color="secondary">整卡都是一个 anchor，原生键盘行为。</Text>
+      </CardBody>
+    </Card>
+  </div>
+</LiveDemo>
+
+## Accent bar + 颜色
+
+`accentBar='start'` 在左侧渲染 3px 色条；hover（当 `isHoverable` / `isPressable`）时会 micro-animate 到 4px。`color` 决定色条颜色。
+
+<LiveDemo code={`<Card accentBar="start" color="default"><CardHeader title="Default" /></Card>
+<Card accentBar="start" color="primary"><CardHeader title="Primary" /></Card>
+<Card accentBar="start" color="secondary"><CardHeader title="Secondary" /></Card>
+<Card accentBar="start" color="success"><CardHeader title="Success" /></Card>
+<Card accentBar="start" color="warning"><CardHeader title="Warning" /></Card>
+<Card accentBar="start" color="danger"><CardHeader title="Danger" /></Card>`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ width: 160 }}><Card accentBar="start" color="default"><CardHeader title="Default" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="primary"><CardHeader title="Primary" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="secondary"><CardHeader title="Secondary" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="success"><CardHeader title="Success" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="warning"><CardHeader title="Warning" /></Card></div>
+    <div style={{ width: 160 }}><Card accentBar="start" color="danger"><CardHeader title="Danger" /></Card></div>
+  </Flex>
+</LiveDemo>
+
+## 禁用 Disabled
+
+`isDisabled` 与 `isPressable` 叠加时整卡降到 0.55 透明度、`cursor: not-allowed`、`aria-disabled='true'`，键盘事件与 `onPress` 都被拦下。
+
+<LiveDemo code={`<Card
+  isPressable
+  isDisabled
+  color="primary"
+  onPress={() => console.log('这条不会触发')}
+>
+  <CardHeader title="已禁用" subtitle="onPress 不会被触发" />
+</Card>`}>
+  <div style={{ width: 'min(320px, 100%)' }}>
+    <Card
+      isPressable
+      isDisabled
+      color="primary"
+      onPress={() => {}}
+    >
+      <CardHeader title="已禁用" subtitle="onPress 不会被触发" />
+    </Card>
+  </div>
+</LiveDemo>
+
+## 注意事项
+
+<Callout variant="info" title="color 并非总是可见">
+  Card 默认 neutral 外观。`color` 只在以下两种情况影响视觉：1）`accentBar !== 'none'` 时决定色条颜色；2）`isPressable` / `isHoverable` 时决定 hover 的边框 / 环 / 背景色。纯静态 `<Card color='primary'>` 看起来与 `color='default'` 一致。
+</Callout>
+
+<Callout variant="info" title="onPress vs onClick">
+  **推荐用 `onPress`**：组件会把鼠标点击与键盘 Enter/Space 都归一化成 `onPress`。`onClick` 仍然保留透传原生 click，但键盘触发时不会合成原生 click 事件。被禁用时 `onPress` 不触发，但 `onClick` 仍可能被原生事件触发——所以 **`isDisabled` + 业务回调请一律挂 `onPress`**，语义更稳。
+</Callout>
+
+<Callout variant="info" title="整卡可按时不要再在 Footer 里放 primary 按钮">
+  整卡已经是一个聚焦目标，再在 Footer 放一个 primary Button 会产生双聚焦点；用户不知道回车会触发哪一个。需要两个动作时，建议把主动作放在 Footer（Card 本体不 pressable），或整卡 pressable 但 Footer 只放次级链接。
+</Callout>
+
+## API
+
+### Card
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'elevated'", default: "'bordered'", description: '外观档位。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '配色；只在 accentBar 或交互态下可见。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '内边距与 gap。' },
+  { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'", description: '圆角档位。' },
+  { name: 'fullWidth', type: 'boolean', default: 'false', description: '占满父容器宽度。' },
+  { name: 'isPressable', type: 'boolean', default: 'false', description: '整卡作为按键目标，`tabIndex=0` 并响应 Enter / Space。' },
+  { name: 'isHoverable', type: 'boolean', default: 'false', description: '只启用 hover 视觉反馈，不加键盘语义。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '视觉降透明 + 屏蔽 onPress。' },
+  { name: 'accentBar', type: "'start' | 'top' | 'none'", default: "'none'", description: '装饰色条位置。' },
+  { name: 'as', type: 'ElementType', description: '覆盖根节点 tag；优先级高于 href。' },
+  { name: 'href', type: 'string', description: '提供 href 自动渲染 `<a>` 并视为 pressable。' },
+  { name: 'target', type: 'string', description: '仅 `<a>` 生效。' },
+  { name: 'rel', type: 'string', description: '仅 `<a>` 生效；`target=_blank` 时自动补 `noopener noreferrer`。' },
+  { name: 'onPress', type: '(e: MouseEvent) => void', description: 'pressable 时点击 / Enter / Space 触发。' },
+  { name: 'onClick', type: '(e: MouseEvent) => void', description: '透传原生 click；键盘触发时不会合成。' },
+  { name: 'className', type: 'string' },
+  { name: 'classNames', type: '{ root?: string; header?: string; body?: string; footer?: string }', description: '分 slot 注入 className。' },
+  { name: 'aria-label', type: 'string', description: 'pressable / 链接化时强烈建议提供。' }
+]} />
+
+### CardHeader
+
+<PropsTable props={[
+  { name: 'title', type: 'ReactNode', description: '主标题。' },
+  { name: 'subtitle', type: 'ReactNode', description: '副标题。' },
+  { name: 'startContent', type: 'ReactNode', description: '起始槽（头像 / 图标）。' },
+  { name: 'endContent', type: 'ReactNode', description: '结尾槽（Tag / Button / 更多菜单）。' },
+  { name: 'as', type: 'ElementType', default: "'header'", description: '根节点 tag。' },
+  { name: 'className', type: 'string' }
+]} />
+
+### CardBody
+
+<PropsTable props={[
+  { name: 'as', type: 'ElementType', default: "'section'", description: '根节点 tag。' },
+  { name: 'className', type: 'string' },
+  { name: 'children', type: 'ReactNode' }
+]} />
+
+### CardFooter
+
+<PropsTable props={[
+  { name: 'justify', type: "'start' | 'end' | 'between'", default: "'end'", description: 'flex 主轴对齐。' },
+  { name: 'as', type: 'ElementType', default: "'footer'", description: '根节点 tag。' },
+  { name: 'className', type: 'string' },
+  { name: 'children', type: 'ReactNode' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  默认渲染为 `<div>`；`href` 时为 `<a>` 走原生锚点语义；`isPressable` 且非原生可聚焦标签时加 `role='button'` + `tabIndex=0` + Enter/Space 键盘处理。`isDisabled` 设置 `aria-disabled='true'` 并屏蔽 `onPress`。`prefers-reduced-motion` 下 hover / press 的过渡与 accent bar 的宽度动画都会被关闭。
+</Callout>

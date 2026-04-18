@@ -1,0 +1,278 @@
+# 统计卡片 StatCard
+
+KPI 场景专用卡片。固定 label + value 布局、delta pill 带 arrow tick 动画、可选 icon 容器 / description / trend 插槽 / 骨架态。其他治理参数（variant / color / size / radius / accentBar / pressable / href）都直接透传给内部 `Card`。
+
+<Callout variant="info" title="Card 还是 StatCard？">
+  - 需要展示单条 KPI（数字 + 变化率 + 趋势图）用 **StatCard**，无需自己组装排版。
+  - 展示结构化内容、表单、表格或任意组合 — 用 **Card**。
+</Callout>
+
+## 基础用法
+
+`label` + `value` 是最小集。label 小写 uppercase + tracking（CJK 文字会自动关掉 uppercase、换成更易读的字号），value 使用 tabular-nums 与 slashed-zero。
+
+<LiveDemo code={`<StatCard label="活跃用户" value="12,480" />`}>
+  <div style={{ width: 'min(280px, 100%)' }}>
+    <StatCard label="活跃用户" value="12,480" />
+  </div>
+</LiveDemo>
+
+## Delta 三态
+
+`delta.direction` 为 `'up' | 'down' | 'flat'`；polarity 默认 `'auto'`——up 即正向（绿）、down 即负向（红）、flat 中性灰。业务语义颠倒时（例如 churn 越低越好）可以手动传 `polarity='negative'` 锁定颜色。下方按钮切换快照会让 arrow tick 动画重播。
+
+<LiveDemo code={`<StatCard label="月度经常性收入" value="$128,402" delta={{ value: '+12.4%', direction: 'up' }} />
+<StatCard label="客户流失率" value="2.1%" delta={{ value: '-0.4pp', direction: 'down' }} />
+<StatCard label="NPS" value="54" delta={{ value: '0', direction: 'flat' }} />`}>
+  <StatCardDeltaDemo />
+</LiveDemo>
+
+## 带 Icon
+
+`icon` 是任意 ReactNode，会被放进一个尺寸随 size 变化的容器里；`iconPlacement` 在 `'start'`（默认）与 `'end'` 之间切换。icon 容器使用 `aria-hidden`，不会进入可访问性树。
+
+<LiveDemo code={`<StatCard
+  label="订单"
+  value="3,248"
+  icon={<span aria-hidden>O</span>}
+  iconPlacement="start"
+/>
+<StatCard
+  label="营收"
+  value="$1.2M"
+  icon={<span aria-hidden>¥</span>}
+  iconPlacement="end"
+/>`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ minWidth: 200, flex: 1 }}>
+      <StatCard
+        label="订单"
+        value="3,248"
+        icon={<span aria-hidden>O</span>}
+        iconPlacement="start"
+      />
+    </div>
+    <div style={{ minWidth: 200, flex: 1 }}>
+      <StatCard
+        label="营收"
+        value="$1.2M"
+        icon={<span aria-hidden>¥</span>}
+        iconPlacement="end"
+      />
+    </div>
+  </Flex>
+</LiveDemo>
+
+## Trend 迷你图
+
+`trend` 是一个插槽——传一段裸 SVG 即可；不引任何图表依赖。`trendBleed` 让趋势区域紧贴卡片底边（左右 margin 取负内边距、顶部加细分割线）。
+
+<LiveDemo code={`<StatCard
+  label="过去 30 天访问量"
+  value="24.8k"
+  delta={{ value: '+6.2%', direction: 'up' }}
+  trend={
+    <svg width="160" height="32" viewBox="0 0 160 32">
+      <polyline fill="none" stroke="currentColor" strokeWidth="1.5"
+        points="0,24 16,22 32,26 48,18 64,20 80,14 96,16 112,10 128,12 144,6 160,8" />
+    </svg>
+  }
+/>
+<StatCard
+  label="请求成功率"
+  value="99.82%"
+  delta={{ value: '+0.03pp', direction: 'up' }}
+  trendBleed
+  trend={
+    <svg width="100%" height="28" viewBox="0 0 160 28" preserveAspectRatio="none">
+      <polyline fill="none" stroke="currentColor" strokeWidth="1.5"
+        points="0,14 20,10 40,16 60,8 80,12 100,6 120,10 140,4 160,8" />
+    </svg>
+  }
+/>`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ minWidth: 220, flex: 1 }}>
+      <StatCard
+        label="过去 30 天访问量"
+        value="24.8k"
+        delta={{ value: '+6.2%', direction: 'up' }}
+        trend={
+          <svg width="160" height="32" viewBox="0 0 160 32" style={{ color: 'currentColor' }}>
+            <polyline
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              points="0,24 16,22 32,26 48,18 64,20 80,14 96,16 112,10 128,12 144,6 160,8"
+            />
+          </svg>
+        }
+      />
+    </div>
+    <div style={{ minWidth: 220, flex: 1 }}>
+      <StatCard
+        label="请求成功率"
+        value="99.82%"
+        delta={{ value: '+0.03pp', direction: 'up' }}
+        trendBleed
+        trend={
+          <svg width="100%" height="28" viewBox="0 0 160 28" preserveAspectRatio="none">
+            <polyline
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              points="0,14 20,10 40,16 60,8 80,12 100,6 120,10 140,4 160,8"
+            />
+          </svg>
+        }
+      />
+    </div>
+  </Flex>
+</LiveDemo>
+
+## 加载态
+
+`isLoading` 切到骨架态：label / value / delta / icon 各自以对应尺寸的灰块呼吸，整体带 `role='status'` + `aria-busy='true'`，`prefers-reduced-motion` 下不做动画。
+
+<LiveDemo code={`<StatCard
+  isLoading={loading}
+  label="活跃用户"
+  value="12,480"
+  delta={{ value: '+8.2%', direction: 'up' }}
+  icon={<span aria-hidden>U</span>}
+/>`}>
+  <StatCardLoadingDemo />
+</LiveDemo>
+
+## Emphasis 三档
+
+`emphasis` 决定 value 字号 / 字重 / 行高：`subtle`（20px） / `default`（28px） / `strong`（36px）。同一行的 delta / description 会对齐基线。
+
+<LiveDemo code={`<StatCard emphasis="subtle" label="SUBTLE" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+<StatCard emphasis="default" label="DEFAULT" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+<StatCard emphasis="strong" label="STRONG" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ minWidth: 180, flex: 1 }}>
+      <StatCard emphasis="subtle" label="SUBTLE" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+    </div>
+    <div style={{ minWidth: 180, flex: 1 }}>
+      <StatCard emphasis="default" label="DEFAULT" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+    </div>
+    <div style={{ minWidth: 180, flex: 1 }}>
+      <StatCard emphasis="strong" label="STRONG" value="12,480" delta={{ value: '+1.2%', direction: 'up' }} />
+    </div>
+  </Flex>
+</LiveDemo>
+
+## Color × AccentBar
+
+透传 Card 的 `color` + `accentBar='start'` 组合可以用作仪表板分类色。`variant='elevated'` 给整组卡片再加一层阴影。
+
+<LiveDemo code={`<StatCard color="primary" accentBar="start" variant="elevated" label="PRIMARY" value="128" />
+<StatCard color="success" accentBar="start" variant="elevated" label="SUCCESS" value="96%" />
+<StatCard color="warning" accentBar="start" variant="elevated" label="WARNING" value="12" />
+<StatCard color="danger" accentBar="start" variant="elevated" label="DANGER" value="3" />`}>
+  <Flex gap={12} wrap="wrap" align="stretch">
+    <div style={{ minWidth: 160, flex: 1 }}>
+      <StatCard color="primary" accentBar="start" variant="elevated" label="PRIMARY" value="128" />
+    </div>
+    <div style={{ minWidth: 160, flex: 1 }}>
+      <StatCard color="success" accentBar="start" variant="elevated" label="SUCCESS" value="96%" />
+    </div>
+    <div style={{ minWidth: 160, flex: 1 }}>
+      <StatCard color="warning" accentBar="start" variant="elevated" label="WARNING" value="12" />
+    </div>
+    <div style={{ minWidth: 160, flex: 1 }}>
+      <StatCard color="danger" accentBar="start" variant="elevated" label="DANGER" value="3" />
+    </div>
+  </Flex>
+</LiveDemo>
+
+## 可按 / 链接化
+
+StatCard 透传 `isPressable` / `isHoverable` / `href` 等，整卡可跳转或响应 `onPress`——常见于仪表板卡片点击钻取详情。`href` 会把根节点渲染成 `<a>`。
+
+<LiveDemo code={`<StatCard
+  isHoverable
+  href="#revenue"
+  aria-label="跳转到营收详情"
+  label="营收"
+  value="$1.2M"
+  description="点击查看详情"
+  delta={{ value: '+14%', direction: 'up' }}
+  accentBar="start"
+  color="primary"
+/>
+<StatCard
+  isPressable
+  isHoverable
+  onPress={() => console.log('pressed')}
+  label="订单量"
+  value="3,248"
+  description="按下触发 onPress"
+  delta={{ value: '-2.1%', direction: 'down' }}
+  variant="elevated"
+/>`}>
+  <StatCardPressableDemo />
+</LiveDemo>
+
+## 注意事项
+
+<Callout variant="info" title="delta aria-label 的降级">
+  当 `delta.value` 是字符串时，屏幕阅读器会念完整句（"上升 12.4%"）。但若你把 `delta.value` 传成 ReactNode（比如一个带 span 的富文本），组件拿不到纯文本——此时 aria-label 只会念方向词（"上升" / "下降" / "持平"）。需要完整播报时请手动传 `sr={{ deltaLabel: '上升 12.4 百分点' }}` 显式兜底。
+</Callout>
+
+<Callout variant="info" title="label 自动切 CJK 模式">
+  label 是字符串且包含 CJK 时，组件会自动关掉 uppercase 与放大字号，避免中文在 uppercase + tracking 下变形。上面的演示里 "活跃用户" / "订单" 等就是这个效果。想保留 uppercase 效果请在 label 中使用英文（见 ColorVariants 那组）。
+</Callout>
+
+<Callout variant="info" title="整卡 pressable 时避免嵌入另一个焦点目标">
+  StatCard 内通常只有 value / delta，本身不包可聚焦元素。但若你在 `description` 或 `trend` 里放 `<Button>` / `<a>`，会与外层的 pressable 叠成两个焦点目标——把次级入口做成次级 Card 或菜单更稳。
+</Callout>
+
+## API
+
+### 从 Card 透传的 props
+
+这些参数直接透传给内部 Card，行为与 `Card` 一致：
+
+<PropsTable props={[
+  { name: 'variant', type: "'flat' | 'bordered' | 'elevated'", default: "'bordered'", description: '透传到内部 Card。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '同 Card；同时驱动 icon 容器的 tint。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '影响 padding / label / value / icon 尺寸。' },
+  { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'fullWidth', type: 'boolean', default: 'false' },
+  { name: 'isPressable', type: 'boolean', default: 'false' },
+  { name: 'isHoverable', type: 'boolean', default: 'false' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'accentBar', type: "'start' | 'top' | 'none'", default: "'none'" },
+  { name: 'as', type: 'ElementType' },
+  { name: 'href', type: 'string' },
+  { name: 'target', type: 'string' },
+  { name: 'rel', type: 'string' },
+  { name: 'onPress', type: '(e: MouseEvent) => void' },
+  { name: 'onClick', type: '(e: MouseEvent) => void' },
+  { name: 'className', type: 'string' },
+  { name: 'aria-label', type: 'string' }
+]} />
+
+### StatCard 专有 props
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', required: true, description: '顶部小标题；字符串含 CJK 时自动切 CJK 字号且关闭 uppercase。' },
+  { name: 'value', type: 'ReactNode', required: true, description: '主要数值；使用 tabular-nums + slashed-zero。' },
+  { name: 'description', type: 'ReactNode', description: '数值下方的辅助说明文字。' },
+  { name: 'icon', type: 'ReactNode', description: '渲染到带 tint 的 icon 容器内，自动 aria-hidden。' },
+  { name: 'iconPlacement', type: "'start' | 'end'", default: "'start'" },
+  { name: 'delta', type: '{ value: ReactNode; direction?: \'up\' | \'down\' | \'flat\'; polarity?: \'positive\' | \'negative\' | \'neutral\' | \'auto\' }', description: '变化率 pill；polarity=auto 时 up 为正向、down 为负向。' },
+  { name: 'trend', type: 'ReactNode', description: '底部插槽（通常是 inline SVG 迷你图）。' },
+  { name: 'trendBleed', type: 'boolean', default: 'false', description: 'trend 紧贴卡片下沿，顶部加细分割线。' },
+  { name: 'isLoading', type: 'boolean', default: 'false', description: '切换到骨架态；各项按对应尺寸渲染灰块。' },
+  { name: 'emphasis', type: "'subtle' | 'default' | 'strong'", default: "'default'", description: 'value 的字号 / 字重 / 行高档位。' },
+  { name: 'valueAlign', type: "'start' | 'center'", default: "'start'" },
+  { name: 'sr', type: '{ valueLabel?: string; deltaLabel?: string }', description: '屏幕阅读器兜底文案；`deltaLabel` 在 `delta.value` 为 ReactNode 时强烈建议填。' },
+  { name: 'classNames', type: 'StatCardClassNames', description: '分 slot 注入 className（root / header / body / footer / label / value / delta / icon / description / trend）。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  delta pill 带 `role='status'` 与 `aria-label`（按 i18n 拼出"上升/下降/持平 {value}"，或使用 `sr.deltaLabel` 覆盖）；整卡 pressable 时沿用 Card 的 `role='button'` / `tabIndex=0` 键盘语义。骨架态 `role='status'` + `aria-busy='true'`，读屏会念 "加载中"（来自 `@timeui/core` 的 i18n 字典）。
+</Callout>
