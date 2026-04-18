@@ -5,6 +5,8 @@
  *   通过 SSE 把文本分片、工具调用进度与命中组件引用同步给前端。
  */
 
+import path from 'node:path';
+
 import Anthropic from '@anthropic-ai/sdk';
 import type {
   MessageParam,
@@ -14,6 +16,7 @@ import type {
   ToolUseBlock,
 } from '@anthropic-ai/sdk/resources/messages';
 import {
+  loadIndex,
   listCategories,
   listComponents,
   getComponent,
@@ -46,6 +49,29 @@ const ENABLE_PROMPT_CACHE = process.env.ANTHROPIC_PROMPT_CACHE === '1';
 const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL ?? 'MiniMax-M1';
 // 防止工具调用 loop 无限展开，超出硬上限直接收尾回答。
 const MAX_TOOL_ROUNDS = 6;
+
+// webpack 会把 @timeui/mcp 打进 route bundle 并把 data.ts 里的 __dirname 烘焙
+// 成构建机器绝对路径，导致运行时 loadIndex() 用 DEFAULT_INDEX_PATH 读文件时
+// 在服务器上 ENOENT。改由 route 显式用 process.cwd()（pm2 启动时 cd 到
+// apps/docs）拼出索引真实路径，首次请求时把它塞进 loadIndex 的内部缓存，后续
+// 纯函数工具（listCategories / listComponents / ...）再无参调用就命中缓存。
+// 路径前提：next.config 的 outputFileTracingIncludes 已经把 packages/mcp/data
+// 同步进了 standalone 产物，相对 apps/docs 往上两级即是。
+const DOCS_INDEX_PATH = path.resolve(
+  process.cwd(),
+  '..',
+  '..',
+  'packages',
+  'mcp',
+  'data',
+  'index.json',
+);
+let indexWarmed = false;
+function warmDocsIndex(): void {
+  if (indexWarmed) return;
+  loadIndex(DOCS_INDEX_PATH);
+  indexWarmed = true;
+}
 
 // ---------- Tool schema ----------
 
@@ -270,6 +296,18 @@ export async function POST(req: NextRequest): Promise<Response> {
     // baseURL 允许空；SDK 默认指向 api.anthropic.com。生产环境应显式配 MiniMax。
     baseURL: process.env.ANTHROPIC_BASE_URL,
   });
+
+  // 先同步预热 mcp 索引缓存；如果文件不在预期位置（比如 outputFileTracing
+  // 漏抓或部署结构变了），提前走 SSE error 分支，不让错误埋进 tool loop。
+  try {
+    warmDocsIndex();
+  } catch (err) {
+    console.error('[assistant] failed to warm docs index at', DOCS_INDEX_PATH, err);
+    return errorResponse(
+      'index-load-failed',
+      `Docs index not found at ${DOCS_INDEX_PATH}. Check outputFileTracingIncludes / deploy layout.`,
+    );
+  }
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {

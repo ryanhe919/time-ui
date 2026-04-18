@@ -21,13 +21,20 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { getComponent, listCategories, listComponents, searchComponents } from './tools';
 
 // 从 package.json 动态拿 version，避免硬编码导致与发布态脱钩。
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const PACKAGE_ROOT = path.resolve(__dirname, '..');
-const pkg = JSON.parse(readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8')) as {
-  name: string;
-  version: string;
-};
+// IMPORTANT: 延迟到调用时再读盘。顶层副作用会被 webpack 在 bundle 时烘焙
+// __dirname 为构建机器的绝对路径（例如 `/home/runner/...`），一旦 route 端
+// import 本包就会在服务器上 ENOENT 炸掉。移到函数体内后，只有真正调用
+// createServer()（stdio / http bin、嵌入式宿主）的场景才触发 FS，docs AI
+// 路由只用 tools/* 纯函数，不会踩到。
+function loadPackageMeta(): { name: string; version: string } {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const PACKAGE_ROOT = path.resolve(__dirname, '..');
+  return JSON.parse(readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8')) as {
+    name: string;
+    version: string;
+  };
+}
 
 const LocaleSchema = z
   .enum(['zh', 'en'])
@@ -137,6 +144,7 @@ const TOOL_SPECS: [
  * 调用方（stdio.ts / http.ts / 外部进程）自行挑选 transport 再 `await server.connect(transport)`。
  */
 export function createServer(): Server {
+  const pkg = loadPackageMeta();
   const server = new Server(
     {
       name: pkg.name,
