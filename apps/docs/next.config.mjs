@@ -58,7 +58,22 @@ const nextConfig = {
 
   outputFileTracingRoot: path.join(__dirname, '../..'),
 
+  // @timeui/mcp reads its data/index.json at runtime via a dynamic
+  // `path.resolve(__dirname, '..', 'data', 'index.json')`. If webpack bundles
+  // the package, `__dirname` gets inlined to the BUILD machine's absolute path
+  // (e.g. GitHub Actions `/home/runner/...`), which obviously doesn't exist on
+  // the deploy target. Marking it external keeps the import resolved at runtime
+  // against `node_modules/@timeui/mcp`.
+  serverExternalPackages: ['@timeui/mcp'],
+
   outputFileTracingIncludes: {
+    // standalone tracer follows import graphs only; the JSON index is loaded
+    // via fs.readFileSync so we have to list it explicitly.
+    '/api/assistant': [
+      '../../packages/mcp/data/**',
+      '../../packages/mcp/dist/**',
+      '../../packages/mcp/package.json',
+    ],
     '*': ['node_modules/styled-jsx/**'],
   },
 
