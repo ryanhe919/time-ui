@@ -1,5 +1,16 @@
 # @timeui/react
 
+## 1.4.0
+
+### Minor Changes
+
+- Add streaming Markdown renderer as a subpath export, and introduce a companion `@timeui/mcp` package (first release) that powers an in-docs AI assistant.
+  - **`@timeui/react/chat-markdown`** — new subpath export. A theme-aware streaming markdown renderer for AI chat output (paragraphs / lists / fenced code / tables / blockquotes / links), with graceful mid-stream degradation on unclosed fences. `react-markdown` and `remark-gfm` are declared as optional peer dependencies, so the main bundle is unaffected (same split model as `./code-block`).
+  - **Sidebar category collapse** — the docs site sidebar now collapses per-category with localStorage-persisted state. Component categories were restructured into `general / layout / forms / data-display / feedback / overlays / navigation`.
+  - **Companion package `@timeui/mcp`** (published separately, first release) — MCP server over stdio and Streamable HTTP with four tools (`list_categories`, `list_components`, `get_component`, `search_components`), backed by a build-time index of the docs MDX. Can be wired into Claude Code / Cursor via `npx -y @timeui/mcp timeui-mcp`.
+
+  No breaking changes; existing `@timeui/react` imports and public API are unchanged.
+
 ## 1.3.2
 
 ### Patch Changes
