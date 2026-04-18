@@ -79,7 +79,7 @@ jobs:
           fi
 
       # ── SSH deploy to CentOS / Alibaba Cloud ──────────────────
-      # Required secrets:
+      # Required secrets (infra):
       #   DEPLOY_HOST         — server IP (e.g. 47.x.x.x)
       #   DEPLOY_USER         — SSH user (e.g. root)
       #   DEPLOY_KEY          — ed25519 private key
@@ -89,6 +89,15 @@ jobs:
       #                         for DEPLOY_HOST. Pin this once from a trusted machine via
       #                         `ssh-keyscan -H -p <port> <host>` and commit its output
       #                         to the secret — this defeats first-use MITM attacks.
+      #
+      # Optional secrets (docs AI assistant — consumed by apps/docs/src/app/api/assistant):
+      #   ANTHROPIC_API_KEY        — required to enable the assistant
+      #   ANTHROPIC_BASE_URL       — e.g. https://api.minimaxi.com/anthropic
+      #   ANTHROPIC_MODEL          — e.g. MiniMax-M1
+      #   ANTHROPIC_PROMPT_CACHE   — "1" to enable Anthropic cache_control markers
+      # If ANTHROPIC_API_KEY is absent, the "Provision assistant env" step is skipped
+      # and whatever .env.production.local already exists on the server is preserved
+      # (rsync --exclude below). That lets operators manage the file manually too.
 
       - name: Setup SSH (key + host verification)
         env:
@@ -158,14 +167,56 @@ jobs:
       - name: Sync to server
         run: |
           set -euo pipefail
-          # `.env.production.local` is provisioned on the server and holds
-          # ANTHROPIC_* secrets — never let rsync --delete wipe it.
+          # `.env.production.local` is owned by the server (written either by the
+          # next step from GitHub Secrets, or manually by an operator) and holds
+          # ANTHROPIC_* values — never let rsync --delete wipe it.
           rsync -avz --delete \
             --exclude='apps/docs/.env.production.local' \
             --exclude='apps/docs/.env.local' \
             -e "ssh" \
             deploy/ \
             "deploy-target:${{ secrets.DEPLOY_PATH }}/"
+
+      # Render .env.production.local from GitHub Secrets and atomically publish it
+      # to the server. Runs AFTER rsync so the file sits outside the build bundle
+      # (never in an artifact, never in the runner image cache). Skipped entirely
+      # when ANTHROPIC_API_KEY is unset — the server's existing file (if any) is
+      # preserved by the rsync --exclude above.
+      - name: Provision assistant env on server
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
+          ANTHROPIC_PROMPT_CACHE: ${{ secrets.ANTHROPIC_PROMPT_CACHE }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "::warning::ANTHROPIC_API_KEY secret not set — skipping server env provisioning. The docs assistant will return 'no-key' until a .env.production.local is provided on the server."
+            exit 0
+          fi
+
+          # 1. Render env file locally, strict perms via umask.
+          umask 077
+          ENV_FILE="$(mktemp)"
+          trap 'rm -f "$ENV_FILE"' EXIT
+          # Values cannot contain newlines; GitHub Secrets strip trailing newlines
+          # anyway. We intentionally do NOT quote — Next's @next/env parser handles
+          # raw KEY=VALUE lines and quoting would leak literal quotes into process.env.
+          {
+            printf 'ANTHROPIC_API_KEY=%s\n' "$ANTHROPIC_API_KEY"
+            [ -n "${ANTHROPIC_BASE_URL:-}" ]     && printf 'ANTHROPIC_BASE_URL=%s\n'     "$ANTHROPIC_BASE_URL"
+            [ -n "${ANTHROPIC_MODEL:-}" ]        && printf 'ANTHROPIC_MODEL=%s\n'        "$ANTHROPIC_MODEL"
+            [ -n "${ANTHROPIC_PROMPT_CACHE:-}" ] && printf 'ANTHROPIC_PROMPT_CACHE=%s\n' "$ANTHROPIC_PROMPT_CACHE"
+          } >> "$ENV_FILE"
+
+          # 2. Atomic publish: scp to <path>.tmp, chmod on server, mv into place.
+          # DEPLOY_PATH was validated earlier (^/[A-Za-z0-9_./-]+$) so it's safe to
+          # interpolate into a single-argument remote command — no shell metachars.
+          REMOTE_DIR="$DEPLOY_PATH/apps/docs"
+          ssh deploy-target "mkdir -p '$REMOTE_DIR'"
+          scp -q "$ENV_FILE" "deploy-target:$REMOTE_DIR/.env.production.local.tmp"
+          ssh deploy-target "chmod 600 '$REMOTE_DIR/.env.production.local.tmp' && mv '$REMOTE_DIR/.env.production.local.tmp' '$REMOTE_DIR/.env.production.local'"
 
       - name: Restart on server
         run: |
