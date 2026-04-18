@@ -20,7 +20,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { css, useTheme } from '@emotion/react';
-import { mergeRefs, useControllableState } from '../utils';
+import { mergeRefs, useControllableState, useScrollLock } from '../utils';
 import type {
   ModalBodyProps,
   ModalFooterProps,
@@ -225,15 +225,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(props
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
-  // ── body scroll lock ──
-  useEffect(() => {
-    if (!open || !blockScrollOnMount || typeof document === 'undefined') return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [open, blockScrollOnMount]);
+  // ── body scroll lock（含滚动条宽度补偿，避免内容水平抖动） ──
+  useScrollLock(open && blockScrollOnMount);
 
   // ── focus 管理：记忆 → autoFocus → 关闭归还 ──
   useEffect(() => {

@@ -21,7 +21,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { css, useTheme } from '@emotion/react';
-import { mergeRefs, useControllableState } from '../utils';
+import { mergeRefs, useControllableState, useScrollLock } from '../utils';
 import type {
   DrawerBodyProps,
   DrawerFooterProps,
@@ -270,15 +270,8 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
-  // ── body scroll lock ──
-  useEffect(() => {
-    if (!open || typeof document === 'undefined') return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [open]);
+  // ── body scroll lock（含滚动条宽度补偿，避免内容水平抖动） ──
+  useScrollLock(open);
 
   // ── focus 管理：记忆 → 自动聚焦 → 关闭归还 ──
   useEffect(() => {
