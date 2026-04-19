@@ -1,5 +1,11 @@
 # @timeui/react
 
+## 1.7.0
+
+### Minor Changes
+
+- 9110af2: Maintenance release: verify full build/test/size budgets pass on pnpm 10.33 + Node 22, and tighten StatCard loading-state test type-safety.
+
 ## 1.6.0
 
 ### Minor Changes
