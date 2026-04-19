@@ -7,7 +7,7 @@
 import { __resetIndexCache } from './data';
 import { getComponent, listCategories, listComponents, searchComponents } from './tools';
 
-const TOTAL_COMPONENTS = 31;
+const TOTAL_COMPONENTS = 34;
 
 beforeEach(() => {
   __resetIndexCache();

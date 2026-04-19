@@ -315,7 +315,7 @@ describe('StatCard — contract & visual', () => {
     const { container } = renderWithProviders(<StatCard label="n" value="1" isLoading />);
     const card = container.querySelector('[data-loading="true"]');
     expect(card).toHaveAttribute('data-loading', 'true');
-    expect(card.querySelector('[data-slot="statcard-skeleton"]')).toBeTruthy();
+    expect(card!.querySelector('[data-slot="statcard-skeleton"]')).toBeTruthy();
     expect(card).toHaveAttribute('aria-label', '加载中');
   });
 
