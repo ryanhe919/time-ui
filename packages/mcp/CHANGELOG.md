@@ -1,5 +1,11 @@
 # @timeui/mcp
 
+## 0.2.0
+
+### Minor Changes
+
+- ece0f77: Coordinated minor release across all TimeUI packages: aligns all packages on a shared minor-bump cadence and verifies the full monorepo on pnpm 10.33 + Node 22 toolchain.
+
 ## 0.1.2
 
 ### Patch Changes
