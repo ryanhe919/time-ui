@@ -1,5 +1,16 @@
 # @timeui/themes
 
+## 1.2.0
+
+### Minor Changes
+
+- ece0f77: Coordinated minor release across all TimeUI packages: aligns all packages on a shared minor-bump cadence and verifies the full monorepo on pnpm 10.33 + Node 22 toolchain.
+
+### Patch Changes
+
+- Updated dependencies [ece0f77]
+  - @timeui/tokens@1.4.0
+
 ## 1.1.2
 
 ### Patch Changes
