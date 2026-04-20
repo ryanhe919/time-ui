@@ -24,7 +24,7 @@
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.1",
     "shiki": "^1.0.0",
-    "styled-jsx": "5.1.6"
+    "styled-jsx": "5.1.7"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
