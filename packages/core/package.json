@@ -1,6 +1,6 @@
 {
   "name": "@timeui/core",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Shared hooks, context providers (ConfigProvider, ThemeProvider) for TimeUI.",
   "license": "MIT",
   "sideEffects": false,

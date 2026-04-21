@@ -1,5 +1,12 @@
 # @timeui/themes
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @timeui/tokens@1.4.1
+
 ## 1.2.0
 
 ### Minor Changes

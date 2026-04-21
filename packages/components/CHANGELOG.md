@@ -1,5 +1,15 @@
 # @timeui/react
 
+## 1.8.1
+
+### Patch Changes
+
+- Tighten Menu horizontal spacing and localize Pagination defaults through the global ConfigProvider locale.
+- Updated dependencies
+  - @timeui/core@1.4.1
+  - @timeui/tokens@1.4.1
+  - @timeui/themes@1.2.1
+
 ## 1.8.0
 
 ### Minor Changes

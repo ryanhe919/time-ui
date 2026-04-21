@@ -1,5 +1,11 @@
 # @timeui/tokens
 
+## 1.4.1
+
+### Patch Changes
+
+- Tighten Menu horizontal spacing and localize Pagination defaults through the global ConfigProvider locale.
+
 ## 1.4.0
 
 ### Minor Changes
