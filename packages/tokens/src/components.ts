@@ -477,14 +477,15 @@ export const toastTokens = {
 } as const;
 
 export const menuTokens = {
-  minWidth: '180px',
+  minWidth: '152px',
   maxWidth: '320px',
   maxHeight: '320px',
   paddingY: '6px',
+  panelPaddingX: '6px',
   radius: '12px',
   offset: '6px',
   itemHeight: '36px',
-  itemPaddingX: '12px',
+  itemPaddingX: '8px',
   itemPaddingY: '6px',
   itemRadius: '8px',
   itemGap: '10px',
@@ -493,7 +494,7 @@ export const menuTokens = {
   shortcutFontSize: '12px',
   shortcutLetterSpacing: '0.02em',
   sectionLabelHeight: '28px',
-  sectionLabelPaddingX: '12px',
+  sectionLabelPaddingX: '8px',
   sectionLabelFontSize: '11px',
   sectionLabelFontWeight: 600,
   sectionLabelLetterSpacing: '0.04em',

@@ -29,6 +29,15 @@ export interface Messages {
     placeholder: string;
     label: string;
   };
+  pagination: {
+    navLabel: string;
+    prev: string;
+    next: string;
+    jumperLabel: string;
+    sizeChangerLabel: string;
+    pageLabel: string;
+    pageSizeOption: string;
+  };
   upload: {
     triggerLabel: string;
     triggerText: string;
@@ -89,6 +98,15 @@ export const zh: Messages = {
     placeholder: '搜索…',
     label: '搜索',
   },
+  pagination: {
+    navLabel: '分页',
+    prev: '上一页',
+    next: '下一页',
+    jumperLabel: '跳至页码',
+    sizeChangerLabel: '每页条数',
+    pageLabel: '第 {page} 页',
+    pageSizeOption: '{pageSize} 条/页',
+  },
   upload: {
     triggerLabel: '选择文件',
     triggerText: '选择文件',
@@ -148,6 +166,15 @@ export const en: Messages = {
   search: {
     placeholder: 'Search…',
     label: 'Search',
+  },
+  pagination: {
+    navLabel: 'Pagination',
+    prev: 'Previous page',
+    next: 'Next page',
+    jumperLabel: 'Go to page',
+    sizeChangerLabel: 'Items per page',
+    pageLabel: 'Page {page}',
+    pageSizeOption: '{pageSize} / page',
   },
   upload: {
     triggerLabel: 'Choose file',

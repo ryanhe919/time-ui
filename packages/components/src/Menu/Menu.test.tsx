@@ -251,6 +251,40 @@ describe('Menu — items vs children', () => {
     expect(screen.getByText('Group B')).toBeInTheDocument();
     expect(getItems()).toHaveLength(3);
   });
+
+  it('uses compact horizontal spacing for short menus', () => {
+    installRectMocks();
+    renderWithProviders(
+      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m">
+        <Menu.Section label="Account">
+          <Menu.Item itemKey="profile" shortcut="⌘P">
+            Profile
+          </Menu.Item>
+          <Menu.Item itemKey="settings" shortcut="⌘,">
+            Settings
+          </Menu.Item>
+        </Menu.Section>
+        <Menu.Divider />
+        <Menu.Item itemKey="signout" isDanger>
+          Sign out
+        </Menu.Item>
+      </Menu>,
+    );
+
+    const menu = screen.getByRole('menu');
+    const profile = screen.getByRole('menuitem', { name: /profile/i });
+    const section = screen.getByText('Account');
+    const profileWrap = profile.parentElement;
+
+    expect(window.getComputedStyle(menu).minWidth).toBe('152px');
+    expect(profileWrap).not.toBeNull();
+    expect(window.getComputedStyle(profileWrap as HTMLElement).paddingLeft).toBe('6px');
+    expect(window.getComputedStyle(profileWrap as HTMLElement).paddingRight).toBe('6px');
+    expect(window.getComputedStyle(profile).paddingLeft).toBe('8px');
+    expect(window.getComputedStyle(profile).paddingRight).toBe('8px');
+    expect(window.getComputedStyle(section).paddingLeft).toContain('14px');
+    expect(window.getComputedStyle(section).paddingRight).toContain('14px');
+  });
 });
 
 // ────────────────────────────────────────────────────────────

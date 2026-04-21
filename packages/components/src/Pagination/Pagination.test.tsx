@@ -10,13 +10,19 @@ import userEvent from '@testing-library/user-event';
 import { renderWithProviders, expectA11y } from '../test-utils';
 import { Pagination, buildPaginationItems } from './Pagination';
 
-const getNav = () => screen.getByRole('navigation', { name: /pagination/i });
+const getNav = () => screen.getByRole('navigation');
+
+const PAGINATION_PAGE_NAME_RE = (page: number) => new RegExp(`^(Page ${page}|第 ${page} 页)$`);
+const PREV_PAGE_RE = /^(Previous page|上一页)$/i;
+const NEXT_PAGE_RE = /^(Next page|下一页)$/i;
+const JUMPER_RE = /^(Go to page|跳至页码)$/i;
+const SIZE_CHANGER_RE = /^(Items per page|每页条数)$/i;
 
 const getPageButton = (page: number) =>
-  screen.getByRole('button', { name: new RegExp(`^Page ${page}$`) });
+  screen.getByRole('button', { name: PAGINATION_PAGE_NAME_RE(page) });
 
 const queryPageButton = (page: number) =>
-  screen.queryByRole('button', { name: new RegExp(`^Page ${page}$`) });
+  screen.queryByRole('button', { name: PAGINATION_PAGE_NAME_RE(page) });
 
 describe('buildPaginationItems', () => {
   it('returns single page when totalPages <= 1', () => {
@@ -100,11 +106,19 @@ describe('Pagination — rendering', () => {
     renderWithProviders(<Pagination total={50} />);
     const nav = getNav();
     expect(nav).toBeInTheDocument();
-    expect(nav).toHaveAttribute('aria-label', 'Pagination');
+    expect(nav).toHaveAttribute('aria-label', '分页');
     expect(within(nav).getByRole('list')).toBeInTheDocument();
     // total=50, pageSize=10 → 5 页
     expect(getPageButton(1)).toBeInTheDocument();
     expect(getPageButton(5)).toBeInTheDocument();
+  });
+
+  it('uses English defaults when locale=en', () => {
+    renderWithProviders(<Pagination total={50} />, { config: { locale: 'en' } });
+    const nav = getNav();
+    expect(nav).toHaveAttribute('aria-label', 'Pagination');
+    expect(screen.getByRole('button', { name: 'Previous page' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Page 1' })).toBeInTheDocument();
   });
 
   it('uses custom aria-label and id', () => {
@@ -132,6 +146,20 @@ describe('Pagination — rendering', () => {
     renderWithProviders(<Pagination total={0} />);
     expect(getPageButton(1)).toBeInTheDocument();
     expect(queryPageButton(2)).toBeNull();
+  });
+
+  it('uses ConfigProvider locale for default labels', () => {
+    renderWithProviders(
+      <Pagination total={100} defaultPage={2} showQuickJumper showSizeChanger />,
+      { config: { locale: 'zh' } },
+    );
+
+    expect(screen.getByRole('navigation', { name: '分页' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '上一页' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '下一页' })).toBeInTheDocument();
+    expect(screen.getByLabelText('跳至页码')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '第 2 页' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: '每页条数' })).toBeInTheDocument();
   });
 });
 
@@ -174,20 +202,20 @@ describe('Pagination — prev/next controls', () => {
     const { rerender } = renderWithProviders(
       <Pagination total={30} page={1} onChange={() => {}} />,
     );
-    expect(screen.getByRole('button', { name: /previous page/i })).toBeDisabled();
-    expect(screen.getByRole('button', { name: /next page/i })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: PREV_PAGE_RE })).toBeDisabled();
+    expect(screen.getByRole('button', { name: NEXT_PAGE_RE })).not.toBeDisabled();
 
     rerender(<Pagination total={30} page={3} onChange={() => {}} />);
-    expect(screen.getByRole('button', { name: /previous page/i })).not.toBeDisabled();
-    expect(screen.getByRole('button', { name: /next page/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: PREV_PAGE_RE })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: NEXT_PAGE_RE })).toBeDisabled();
   });
 
   it('prev decrements page; next increments page', async () => {
     const onChange = vi.fn();
     renderWithProviders(<Pagination total={50} defaultPage={3} onChange={onChange} />);
-    await userEvent.click(screen.getByRole('button', { name: /next page/i }));
+    await userEvent.click(screen.getByRole('button', { name: NEXT_PAGE_RE }));
     expect(onChange).toHaveBeenLastCalledWith(4);
-    await userEvent.click(screen.getByRole('button', { name: /previous page/i }));
+    await userEvent.click(screen.getByRole('button', { name: PREV_PAGE_RE }));
     expect(onChange).toHaveBeenLastCalledWith(3);
   });
 
@@ -200,8 +228,8 @@ describe('Pagination — prev/next controls', () => {
 
   it('hideControls=true: no prev/next buttons rendered', () => {
     renderWithProviders(<Pagination total={50} defaultPage={2} hideControls />);
-    expect(screen.queryByRole('button', { name: /previous page/i })).toBeNull();
-    expect(screen.queryByRole('button', { name: /next page/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: PREV_PAGE_RE })).toBeNull();
+    expect(screen.queryByRole('button', { name: NEXT_PAGE_RE })).toBeNull();
   });
 
   it('uses custom prev/next labels from props.labels', () => {
@@ -244,8 +272,8 @@ describe('Pagination — variant', () => {
     expect(queryPageButton(1)).toBeNull();
     expect(queryPageButton(10)).toBeNull();
     // 但是有 prev/next + summary
-    expect(screen.getByRole('button', { name: /previous page/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /next page/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: PREV_PAGE_RE })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: NEXT_PAGE_RE })).toBeInTheDocument();
     expect(screen.getByText('3 / 10')).toBeInTheDocument();
   });
 
@@ -293,7 +321,7 @@ describe('Pagination — quickJumper', () => {
     renderWithProviders(
       <Pagination total={100} defaultPage={1} showQuickJumper onChange={onChange} />,
     );
-    const input = screen.getByLabelText(/go to page/i);
+    const input = screen.getByLabelText(JUMPER_RE);
     expect(input).toBeInTheDocument();
     await userEvent.type(input, '5');
     fireEvent.keyDown(input, { key: 'Enter' });
@@ -305,7 +333,7 @@ describe('Pagination — quickJumper', () => {
     renderWithProviders(
       <Pagination total={100} defaultPage={1} showQuickJumper onChange={onChange} />,
     );
-    const input = screen.getByLabelText(/go to page/i) as HTMLInputElement;
+    const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     fireEvent.change(input, { target: { value: '999' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(onChange).toHaveBeenCalledWith(10);
@@ -316,7 +344,7 @@ describe('Pagination — quickJumper', () => {
     renderWithProviders(
       <Pagination total={100} defaultPage={5} showQuickJumper onChange={onChange} />,
     );
-    const input = screen.getByLabelText(/go to page/i) as HTMLInputElement;
+    const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     fireEvent.change(input, { target: { value: '-5' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(onChange).toHaveBeenLastCalledWith(1);
@@ -327,7 +355,7 @@ describe('Pagination — quickJumper', () => {
     renderWithProviders(
       <Pagination total={100} defaultPage={3} showQuickJumper onChange={onChange} />,
     );
-    const input = screen.getByLabelText(/go to page/i) as HTMLInputElement;
+    const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     // 空
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(onChange).not.toHaveBeenCalled();
@@ -346,7 +374,7 @@ describe('Pagination — quickJumper', () => {
     renderWithProviders(
       <Pagination total={100} defaultPage={3} showQuickJumper onChange={onChange} />,
     );
-    const input = screen.getByLabelText(/go to page/i) as HTMLInputElement;
+    const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     fireEvent.change(input, { target: { value: '5' } });
     fireEvent.keyDown(input, { key: 'a' });
     expect(onChange).not.toHaveBeenCalled();
@@ -357,7 +385,7 @@ describe('Pagination — quickJumper', () => {
     renderWithProviders(
       <Pagination total={100} defaultPage={5} showQuickJumper onChange={onChange} />,
     );
-    const input = screen.getByLabelText(/go to page/i) as HTMLInputElement;
+    const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     fireEvent.change(input, { target: { value: '5' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(onChange).not.toHaveBeenCalled();
@@ -372,7 +400,7 @@ describe('Pagination — quickJumper', () => {
 
   it('jumper input is disabled when isDisabled is true', () => {
     renderWithProviders(<Pagination total={100} defaultPage={3} showQuickJumper isDisabled />);
-    const input = screen.getByLabelText(/go to page/i) as HTMLInputElement;
+    const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     expect(input).toBeDisabled();
   });
 });
@@ -380,9 +408,9 @@ describe('Pagination — quickJumper', () => {
 describe('Pagination — sizeChanger', () => {
   it('renders a Select using existing component (combobox role)', () => {
     renderWithProviders(<Pagination total={500} defaultPage={2} showSizeChanger />);
-    const combobox = screen.getByRole('combobox', { name: /items per page/i });
+    const combobox = screen.getByRole('combobox', { name: SIZE_CHANGER_RE });
     expect(combobox).toBeInTheDocument();
-    expect(combobox).toHaveTextContent('10 / page');
+    expect(combobox).toHaveTextContent('10 条/页');
   });
 
   it('changing pageSize calls onPageSizeChange and resets page to 1', async () => {
@@ -397,8 +425,8 @@ describe('Pagination — sizeChanger', () => {
         onChange={onChange}
       />,
     );
-    await userEvent.click(screen.getByRole('combobox', { name: /items per page/i }));
-    const opt = await screen.findByRole('option', { name: /50 \/ page/i });
+    await userEvent.click(screen.getByRole('combobox', { name: SIZE_CHANGER_RE }));
+    const opt = await screen.findByRole('option', { name: '50 条/页' });
     await userEvent.click(opt);
     expect(onPageSizeChange).toHaveBeenCalledWith(50);
     expect(onChange).toHaveBeenLastCalledWith(1);
@@ -406,17 +434,17 @@ describe('Pagination — sizeChanger', () => {
 
   it('respects custom pageSizeOptions', async () => {
     renderWithProviders(<Pagination total={500} showSizeChanger pageSizeOptions={[5, 15, 30]} />);
-    await userEvent.click(screen.getByRole('combobox', { name: /items per page/i }));
+    await userEvent.click(screen.getByRole('combobox', { name: SIZE_CHANGER_RE }));
     const listbox = await screen.findByRole('listbox');
     const labels = within(listbox)
       .getAllByRole('option')
       .map((o) => o.textContent?.trim());
-    expect(labels).toEqual(['5 / page', '15 / page', '30 / page']);
+    expect(labels).toEqual(['5 条/页', '15 条/页', '30 条/页']);
   });
 
   it('size=lg propagates to the inner Select', () => {
     renderWithProviders(<Pagination total={500} size="lg" showSizeChanger />);
-    const combobox = screen.getByRole('combobox', { name: /items per page/i });
+    const combobox = screen.getByRole('combobox', { name: SIZE_CHANGER_RE });
     // Select 内部 wrapper data-size 透传——证明 size=lg 分支走通。
     const wrapper = combobox.closest('[data-size]') as HTMLElement;
     expect(wrapper).not.toBeNull();
@@ -425,7 +453,7 @@ describe('Pagination — sizeChanger', () => {
 
   it('size=sm propagates to the inner Select', () => {
     renderWithProviders(<Pagination total={500} size="sm" showSizeChanger />);
-    const combobox = screen.getByRole('combobox', { name: /items per page/i });
+    const combobox = screen.getByRole('combobox', { name: SIZE_CHANGER_RE });
     const wrapper = combobox.closest('[data-size]') as HTMLElement;
     expect(wrapper.getAttribute('data-size')).toBe('sm');
   });

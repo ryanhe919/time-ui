@@ -19,10 +19,14 @@ import {
   type ReactNode,
 } from 'react';
 import { useTheme, css, type Theme } from '@emotion/react';
+import { useI18n } from '@timeui/core';
 import { useControllableState } from '../utils';
 import { Select } from '../Select';
 import { SelectOption } from '../Select/SelectOption';
 import type { PaginationItem, PaginationProps, PaginationSize } from './Pagination.types';
+
+const formatTemplate = (template: string, params: Record<string, string | number>): string =>
+  template.replace(/\{(\w+)\}/g, (_, key: string) => String(params[key] ?? ''));
 
 /**
  * 生成页码列表（含 ellipsis 占位）。
@@ -250,6 +254,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
   ref,
 ) {
   const theme = useTheme();
+  const i18n = useI18n();
 
   // mini 强制 sm
   const size: PaginationSize = variant === 'mini' ? 'sm' : sizeProp;
@@ -307,10 +312,10 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
   const isPrevDisabled = isDisabled || clampedPage <= 1;
   const isNextDisabled = isDisabled || clampedPage >= totalPages;
 
-  const prevLabel = labels?.prev ?? 'Previous page';
-  const nextLabel = labels?.next ?? 'Next page';
-  const jumperLabel = labels?.jumperLabel ?? 'Go to page';
-  const sizeChangerLabel = labels?.sizeChangerLabel ?? 'Items per page';
+  const prevLabel = labels?.prev ?? i18n.pagination.prev;
+  const nextLabel = labels?.next ?? i18n.pagination.next;
+  const jumperLabel = labels?.jumperLabel ?? i18n.pagination.jumperLabel;
+  const sizeChangerLabel = labels?.sizeChangerLabel ?? i18n.pagination.sizeChangerLabel;
   const summary = labels?.summary ?? ((p: number, t: number): ReactNode => `${p} / ${t}`);
 
   const iconSize = SIZE_TO_ICON[size];
@@ -466,7 +471,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
               isActive={isActive}
               isDisabled={isDisabled}
               ariaCurrent={isActive ? 'page' : undefined}
-              ariaLabel={`Page ${it.page}`}
+              ariaLabel={formatTemplate(i18n.pagination.pageLabel, { page: it.page })}
               onClick={() => goTo(it.page)}
             >
               {it.page}
@@ -526,7 +531,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
         >
           {pageSizeOptions.map((opt) => (
             <SelectOption key={opt} value={String(opt)}>
-              {`${opt} / page`}
+              {formatTemplate(i18n.pagination.pageSizeOption, { pageSize: opt })}
             </SelectOption>
           ))}
         </Select>
@@ -539,7 +544,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
       ref={ref}
       id={id}
       role="navigation"
-      aria-label={ariaLabel ?? 'Pagination'}
+      aria-label={ariaLabel ?? i18n.pagination.navLabel}
       data-variant={variant}
       data-size={size}
       data-disabled={isDisabled || undefined}

@@ -574,7 +574,7 @@ const MenuPanel = forwardRef<HTMLDivElement, MenuPanelProps>(function MenuPanel(
     display: flex;
     align-items: center;
     height: ${tokens.sectionLabelHeight};
-    padding: 0 ${tokens.sectionLabelPaddingX};
+    padding: 0 calc(${tokens.panelPaddingX} + ${tokens.sectionLabelPaddingX});
     font-size: ${tokens.sectionLabelFontSize};
     font-weight: ${tokens.sectionLabelFontWeight};
     letter-spacing: ${tokens.sectionLabelLetterSpacing};
@@ -584,12 +584,12 @@ const MenuPanel = forwardRef<HTMLDivElement, MenuPanelProps>(function MenuPanel(
 
   const dividerCss = css`
     height: ${tokens.dividerHeight};
-    margin: ${tokens.dividerMarginY} ${tokens.itemPaddingX};
+    margin: ${tokens.dividerMarginY} ${tokens.panelPaddingX};
     background: ${theme.colors.border.subtle};
   `;
 
   const itemRowWrapCss = css`
-    padding: 0 ${tokens.itemPaddingX};
+    padding: 0 ${tokens.panelPaddingX};
   `;
 
   // 计算每个 item 的 flat index（与 flatItems 一一对应）。
