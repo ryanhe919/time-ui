@@ -21,13 +21,14 @@ describe('utils/getFieldVariantStyles', () => {
     expect(styles.styles).not.toContain('outline: 2px solid');
   });
 
-  it('builds flat primary styles with outline focus path', () => {
+  it('builds flat primary styles with edge-only focus path', () => {
     const styles = getFieldVariantStyles({
       theme: lightTheme,
       variant: 'flat',
       color: 'primary',
     });
-    expect(styles.styles).toContain('outline: 2px solid');
+    expect(styles.styles).toContain('outline: none');
+    expect(styles.styles).toContain('box-shadow: inset 0 0 0 1px');
     expect(styles.styles).toContain('border-color:');
     expect(styles.styles).toContain('background-color: rgba(');
     expect(styles.styles).toContain('&:focus-visible');
@@ -57,7 +58,7 @@ describe('utils/getFieldVariantStyles', () => {
     expect(styles.styles).toContain(`background-color: ${lightTheme.colors.default[200]}`);
   });
 
-  it('builds bordered invalid styles with outline focus path', () => {
+  it('builds bordered invalid styles with edge-only focus path', () => {
     const styles = getFieldVariantStyles({
       theme: lightTheme,
       variant: 'bordered',
@@ -67,7 +68,9 @@ describe('utils/getFieldVariantStyles', () => {
     expect(styles.styles).toContain(
       `border: ${lightTheme.borders.width.thin} solid ${lightTheme.colors.status.danger}`,
     );
-    expect(styles.styles).toContain(`outline: 2px solid ${lightTheme.colors.secondary[500]}`);
     expect(styles.styles).toContain(`border-color: ${lightTheme.colors.secondary[500]}`);
+    expect(styles.styles).toContain(
+      `box-shadow: inset 0 0 0 1px ${lightTheme.colors.secondary[500]}`,
+    );
   });
 });

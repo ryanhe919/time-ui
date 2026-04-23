@@ -762,7 +762,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
             border-style: solid;
             border-color: ${theme.colors.primary.DEFAULT};
             color: ${theme.colors.text.primary};
-            box-shadow: 0 0 0 4px ${theme.colors.primary.DEFAULT}22;
+            box-shadow: inset 0 0 0 1px ${theme.colors.primary.DEFAULT};
           }
           &[data-dragging='true']::before {
             opacity: 1;
@@ -775,7 +775,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
             border-style: solid;
             border-color: ${theme.colors.status.danger};
             color: ${theme.colors.status.danger};
-            box-shadow: 0 0 0 4px ${theme.colors.status.danger}22;
+            box-shadow: inset 0 0 0 1px ${theme.colors.status.danger};
           }
           &[data-rejecting='true']::before {
             background: radial-gradient(
@@ -791,8 +791,9 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
           }
 
           &:focus-visible {
-            outline: 2px solid ${theme.colors.focus};
-            outline-offset: 2px;
+            outline: none;
+            border-color: ${theme.colors.focus};
+            box-shadow: inset 0 0 0 1px ${theme.colors.focus};
           }
 
           @media (prefers-reduced-motion: reduce) {

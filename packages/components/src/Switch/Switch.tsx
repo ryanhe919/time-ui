@@ -170,11 +170,10 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
             background-color: ${checked ? trackOnBg : trackOffBg};
             transition:
               background-color ${duration} ${easing},
-              outline-color ${duration} ${easing};
-            outline: 2px solid transparent;
-            outline-offset: 2px;
+              box-shadow ${duration} ${easing};
+            outline: none;
             input:focus-visible + & {
-              outline-color: ${focusColor};
+              box-shadow: inset 0 0 0 2px ${focusColor};
             }
             @media (prefers-reduced-motion: reduce) {
               transition: none;

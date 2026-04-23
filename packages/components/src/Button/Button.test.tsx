@@ -106,6 +106,27 @@ describe('Button', () => {
     }
   });
 
+  it('uses thin borders for outlined button variants', () => {
+    renderWithProviders(
+      <>
+        <Button variant="bordered" color="primary">
+          Bordered
+        </Button>
+        <Button variant="ghost" color="primary">
+          Ghost
+        </Button>
+        <Button variant="faded" color="primary">
+          Faded
+        </Button>
+      </>,
+    );
+
+    const styles = getHeadCss();
+    expect(styles).toContain('border:1px solid rgb(0, 111, 238)');
+    expect(styles).toContain('border:1px solid rgb(228, 228, 231)');
+    expect(styles).not.toContain('border:2px solid rgb(0, 111, 238)');
+  });
+
   it('replaces startIcon with spinner and hides endIcon while loading', () => {
     renderWithProviders(
       <Button

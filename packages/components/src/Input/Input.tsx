@@ -270,8 +270,8 @@ function InputControl({
       color: ${theme.colors.text.primary};
     }
     &:focus-visible {
-      outline: 2px solid ${theme.colors.focus};
-      outline-offset: 1px;
+      outline: none;
+      box-shadow: inset 0 0 0 1.5px ${theme.colors.focus};
     }
     &:disabled {
       opacity: 0.5;

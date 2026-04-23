@@ -138,8 +138,9 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
             box-shadow ${durationFast};
 
           input:focus-visible ~ & {
-            outline: 2px solid ${focusColor};
-            outline-offset: 2px;
+            outline: none;
+            border-color: ${focusColor};
+            box-shadow: inset 0 0 0 1px ${focusColor};
           }
 
           label:hover input:not(:disabled):not(:checked) ~ & {

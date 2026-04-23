@@ -143,7 +143,7 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
   const scale = theme.colors[c];
   const neutral = theme.colors.default;
   const focusColor = theme.colors.focus;
-  const borderThick = theme.borders.width.thick;
+  const borderThin = theme.borders.width.thin;
 
   const sizeTokens = theme.components.button[size];
   const sizeRadiusMap: Record<ButtonSize, ButtonRadius> = {
@@ -172,8 +172,8 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
     case 'bordered':
       bg = 'transparent';
       fg = scale[600];
-      border = `${borderThick} solid ${scale.DEFAULT}`;
-      hoverBg = withAlpha(scale.DEFAULT, 0.2);
+      border = `${borderThin} solid ${scale.DEFAULT}`;
+      hoverBg = withAlpha(scale.DEFAULT, 0.12);
       break;
     case 'light':
       bg = 'transparent';
@@ -188,7 +188,7 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
     case 'faded':
       bg = neutral[100];
       fg = scale[600];
-      border = `${borderThick} solid ${neutral[500]}`;
+      border = `${borderThin} solid ${neutral[200]}`;
       break;
     case 'shadow':
       bg = scale.DEFAULT;
@@ -202,7 +202,7 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
     case 'ghost':
       bg = 'transparent';
       fg = scale[600];
-      border = `${borderThick} solid ${scale.DEFAULT}`;
+      border = `${borderThin} solid ${scale.DEFAULT}`;
       hoverBg = scale.DEFAULT;
       hoverFg = scale.foreground;
       break;
@@ -267,8 +267,8 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
         }
 
         &:focus-visible {
-          outline: 2px solid ${focusColor};
-          outline-offset: 2px;
+          outline: none;
+          box-shadow: ${boxShadow === 'none' ? '' : `${boxShadow},`} inset 0 0 0 2px ${focusColor};
           z-index: 1;
         }
 

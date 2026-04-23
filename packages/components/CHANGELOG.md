@@ -1,5 +1,11 @@
 # @timeui/react
 
+## 1.9.1
+
+### Patch Changes
+
+- Refine button borders and form control focus styles.
+
 ## 1.9.0
 
 ### Minor Changes

@@ -483,8 +483,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
         color: ${textDisabled};
       }
       &:focus-visible {
-        outline: 2px solid ${focusColor};
-        outline-offset: 1px;
+        outline: none;
+        box-shadow: inset 0 0 0 1.5px ${focusColor};
       }
       @media (prefers-reduced-motion: reduce) {
         transition: none;
@@ -532,8 +532,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
         background: ${hoverBg};
       }
       &:focus-visible {
-        outline: 2px solid ${focusColor};
-        outline-offset: 1px;
+        outline: none;
+        box-shadow: inset 0 0 0 1.5px ${focusColor};
       }
       @media (prefers-reduced-motion: reduce) {
         transition: none;
@@ -630,8 +630,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
         background: ${hoverBg};
       }
       &:focus-visible {
-        outline: 2px solid ${focusColor};
-        outline-offset: -2px;
+        outline: none;
+        box-shadow: inset 0 0 0 1.5px ${focusColor};
       }
       @media (prefers-reduced-motion: reduce) {
         transition: none;
@@ -674,8 +674,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
         color: ${textDisabled};
       }
       &:focus-visible {
-        outline: 2px solid ${focusColor};
-        outline-offset: 1px;
+        outline: none;
+        box-shadow: inset 0 0 0 1.5px ${focusColor};
       }
       @media (prefers-reduced-motion: reduce) {
         transition: none;
@@ -715,8 +715,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
         opacity: 0.4;
       }
       &:focus-visible {
-        outline: 2px solid ${focusColor};
-        outline-offset: 1px;
+        outline: none;
+        box-shadow: inset 0 0 0 1.5px ${focusColor};
       }
       &[data-selected='true'] {
         background: ${primaryBg};

@@ -524,8 +524,8 @@ export const SearchDialog = forwardRef<HTMLDivElement, SearchDialogProps>(
       opacity: ${isDisabled ? 0.5 : 1};
       transition: background-color 120ms ease;
       &:focus-visible {
-        outline: 2px solid ${focusColor};
-        outline-offset: -2px;
+        outline: none;
+        box-shadow: inset 0 0 0 1px ${focusColor};
         background: ${sunkenBg};
       }
       @media (prefers-reduced-motion: reduce) {

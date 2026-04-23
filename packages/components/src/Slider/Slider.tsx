@@ -298,8 +298,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(pr
             box-shadow ${duration} ${easing};
           cursor: ${isDisabled ? 'not-allowed' : isReadOnly ? 'default' : 'grab'};
           &:focus-within {
-            outline: 2px solid ${focusColor};
-            outline-offset: 3px;
+            outline: none;
+            border-color: ${focusColor};
+            box-shadow:
+              ${theme.shadows.sm},
+              inset 0 0 0 1px ${focusColor};
           }
           @media (prefers-reduced-motion: reduce) {
             transition: none;

@@ -48,7 +48,7 @@ export function getFieldVariantStyles({
   let focusBorderBottom: string | null = null;
   let focusBorderColor: string | null = null;
   let focusBackground: string | null = null;
-  let useOutline = true;
+  let useEdgeFocus = true;
 
   switch (variant) {
     case 'flat': {
@@ -92,7 +92,7 @@ export function getFieldVariantStyles({
       borderBottom = `${borderThin} solid ${colors.border.strong}`;
       hoverBorderBottom = palette ? palette[500] : colors.default[600];
       focusBorderBottom = `${borderThick} solid ${focusColor}`;
-      useOutline = false;
+      useEdgeFocus = false;
       break;
     }
   }
@@ -121,7 +121,6 @@ export function getFieldVariantStyles({
       background-color ${duration} ${easing},
       color ${duration} ${easing},
       border-color ${duration} ${easing},
-      outline-color ${duration} ${easing},
       box-shadow ${duration} ${easing};
 
     &:hover:not(:disabled):not([aria-disabled='true']) {
@@ -130,13 +129,13 @@ export function getFieldVariantStyles({
       ${hoverBorderBottom ? `border-bottom-color: ${hoverBorderBottom};` : ''}
     }
 
-    ${useOutline
+    ${useEdgeFocus
       ? `
           &:focus-visible,
           &:focus-within {
-            outline: 2px solid ${focusColor};
-            outline-offset: 2px;
-            ${focusBorderColor ? `border-color: ${focusBorderColor};` : ''}
+            outline: none;
+            border-color: ${focusBorderColor ?? focusColor};
+            box-shadow: inset 0 0 0 1px ${focusBorderColor ?? focusColor};
             ${focusBackground ? `background-color: ${focusBackground};` : ''}
           }
         `

@@ -101,8 +101,9 @@ export const Search = forwardRef<HTMLButtonElement, SearchProps>(function Search
           background: ${variant === 'flat' ? theme.colors.bg.muted : theme.colors.bg.muted};
         }
         &:focus-visible {
-          outline: 2px solid ${theme.colors.focus};
-          outline-offset: 2px;
+          outline: none;
+          border-color: ${theme.colors.focus};
+          box-shadow: inset 0 0 0 1px ${theme.colors.focus};
         }
         &:disabled {
           opacity: 0.5;
