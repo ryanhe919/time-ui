@@ -1,5 +1,20 @@
 # @timeui/react
 
+## 1.9.0
+
+### Minor Changes
+
+- 6383a70: `DatePicker`: add a year view to the calendar panel.
+
+  Clicking the month title in the calendar header now opens a 12-year grid; header arrows paginate by decade, and selecting a year returns to the date view. Keyboard and screen-reader behavior are covered by the existing accessibility contract and a new regression test.
+
+### Patch Changes
+
+- Updated dependencies [6383a70]
+  - @timeui/core@1.4.2
+  - @timeui/themes@1.2.2
+  - @timeui/tokens@1.4.2
+
 ## 1.8.1
 
 ### Patch Changes
