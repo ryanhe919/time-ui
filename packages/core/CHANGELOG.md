@@ -1,5 +1,15 @@
 # @timeui/core
 
+## 1.4.2
+
+### Patch Changes
+
+- 6383a70: Coordinate a patch bump across the remaining publishable packages. No user-facing code changes in these packages — version aligned with the `@timeui/react` minor release.
+- Updated dependencies [6383a70]
+  - @timeui/themes@1.2.2
+  - @timeui/tokens@1.4.2
+  - @timeui/utils@1.2.1
+
 ## 1.4.1
 
 ### Patch Changes
