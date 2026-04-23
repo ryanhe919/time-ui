@@ -10,6 +10,12 @@ import createMDX from '@next/mdx';
 import remarkGfm from 'remark-gfm';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const reactSourceEntry = path.join(__dirname, '../../packages/components/src/index.ts');
+const codeBlockSourceEntry = path.join(__dirname, '../../packages/components/src/CodeBlock/index.ts');
+const chatMarkdownSourceEntry = path.join(
+  __dirname,
+  '../../packages/components/src/Chat/ChatMarkdown.tsx',
+);
 
 const withMDX = createMDX({
   options: {
@@ -76,6 +82,28 @@ const nextConfig = {
     ],
     '*': ['node_modules/styled-jsx/**'],
   },
+
+  ...(isDev
+    ? {
+        turbopack: {
+          resolveAlias: {
+            '@timeui/react': reactSourceEntry,
+            '@timeui/react/code-block': codeBlockSourceEntry,
+            '@timeui/react/chat-markdown': chatMarkdownSourceEntry,
+          },
+        },
+        webpack(config) {
+          config.resolve ??= {};
+          config.resolve.alias = {
+            ...(config.resolve.alias ?? {}),
+            '@timeui/react$': reactSourceEntry,
+            '@timeui/react/code-block$': codeBlockSourceEntry,
+            '@timeui/react/chat-markdown$': chatMarkdownSourceEntry,
+          };
+          return config;
+        },
+      }
+    : {}),
 
   async headers() {
     return [
