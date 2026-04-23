@@ -107,22 +107,157 @@ function extractTitle(mdx: string, fallback: string): string {
   return fallback;
 }
 
-// 第一段非空、非 JSX 的正文视作 description；最多裁到 240 字符，保留一个自然结尾。
+// 第一段非空、非 JSX / 非 import / 非代码块的正文视作 description。
+// 最多裁到 240 字符；会尝试把"后接列表的引导句"与第一条列表项合并，避免以冒号截断。
+const DESC_MAX = 240;
+
+// 把一段 markdown 文字里的常见语法剥干净，保留对 LLM 的自然可读性。
+// - 反引号 `foo` → foo
+// - 粗体 **foo** / __foo__ → foo
+// - 斜体 *foo* / _foo_ → foo（仅在两侧都是非空白时，避免把列表项的 "- " 当斜体处理）
+// - 链接 [text](url) → text
+// - 图片 ![alt](url) → alt
+// - 行内 JSX 标签（尖括号包围的单个 token）全部移除，保留其间文字。
+function stripInlineMarkdown(text: string): string {
+  let s = text;
+  s = s.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1');
+  s = s.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+  s = s.replace(/`([^`]+)`/g, '$1');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '$1');
+  s = s.replace(/__([^_]+)__/g, '$1');
+  s = s.replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\*)/g, '$1$2');
+  s = s.replace(/(^|[^_\w])_([^_\s][^_]*?)_(?!_)/g, '$1$2');
+  // 合并多空格并裁剪（保留内联尖括号文字，如 <select> / <FormField> 作为字面量上下文）。
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+// 把一段话在预算内截到最后一个句末标点；否则加省略号。
+// 优先选择**预算内**最靠后的完整句末，哪怕只是第一句——完整句子永远比半截词+"…"更可读。
+function clampToSentence(text: string, limit: number): string {
+  if (text.length <= limit) return text;
+  const sliced = text.slice(0, limit);
+  const lastStop = Math.max(
+    sliced.lastIndexOf('。'),
+    sliced.lastIndexOf('！'),
+    sliced.lastIndexOf('？'),
+    sliced.lastIndexOf('. '),
+    sliced.lastIndexOf('! '),
+    sliced.lastIndexOf('? '),
+  );
+  if (lastStop > 0) {
+    return sliced.slice(0, lastStop + 1).trim();
+  }
+  return `${sliced.trim()}…`;
+}
+
+function endsWithColon(text: string): boolean {
+  const t = text.trimEnd();
+  return t.endsWith(':') || t.endsWith('：');
+}
+
+// 回退策略：当引导句无法与列表合并时，把正文回退到**冒号之前**最近一个完整句末标点。
+function trimToLastSentenceBefore(text: string): string | null {
+  const t = text.trimEnd().replace(/[:：]\s*$/, '');
+  const lastStop = Math.max(
+    t.lastIndexOf('。'),
+    t.lastIndexOf('！'),
+    t.lastIndexOf('？'),
+    t.lastIndexOf('. '),
+    t.lastIndexOf('! '),
+    t.lastIndexOf('? '),
+    t.endsWith('.') ? t.length - 1 : -1,
+  );
+  if (lastStop <= 0) return null;
+  const ch = t.charAt(lastStop);
+  if (ch === '。' || ch === '！' || ch === '？') return t.slice(0, lastStop + 1).trim();
+  return t.slice(0, lastStop + 1).trim();
+}
+
+// 把 "- item" / "* item" / "1. item" 的所有顶层条目抽出来做正文补齐用。
+function listItemTexts(block: string): string[] {
+  const lines = block.split('\n');
+  const out: string[] = [];
+  for (const line of lines) {
+    const m = /^(?:[-*+]|\d+\.)\s+(.+)$/.exec(line);
+    if (m && m[1]) out.push(m[1].trim());
+  }
+  return out;
+}
+
+// 判断一个 block 是否为"内容段落"（不是 heading / fenced code / JSX / import / 列表 / 表格等）。
+function isProseBlock(block: string): boolean {
+  if (!block) return false;
+  if (/^#{1,6}\s/.test(block)) return false; // heading
+  if (/^```/.test(block)) return false; // fenced code
+  if (/^<[A-Za-z]/.test(block)) return false; // JSX 起始
+  if (/^(?:import|export)\s/.test(block)) return false;
+  if (/^>\s/.test(block)) return false; // blockquote
+  if (/^\s*(?:[-*+]|\d+\.)\s/.test(block)) return false; // 列表
+  if (/^\s*\|/.test(block)) return false; // 表格
+  return true;
+}
+
 function extractDescription(mdx: string): string {
   const normalized = mdx.replace(/\r\n/g, '\n');
-  // 去掉第一个一级标题之后再找段落。
-  const afterH1 = normalized.replace(/^#\s+.+?\n/, '');
-  const blocks = afterH1.split(/\n\s*\n/);
-  for (const raw of blocks) {
-    const block = raw.trim();
-    if (!block) continue;
-    if (/^[#<>`]/.test(block)) continue; // 跳过下一个 heading / JSX / 代码块
-    // 合并软换行并移除 markdown 反引号标记，保留其它字面。
-    const collapsed = block.replace(/\s*\n\s*/g, ' ').replace(/`([^`]+)`/g, '$1');
-    if (collapsed.length <= 240) return collapsed;
-    const sliced = collapsed.slice(0, 240);
-    const lastStop = Math.max(sliced.lastIndexOf('。'), sliced.lastIndexOf('. '));
-    return lastStop > 120 ? `${sliced.slice(0, lastStop + 1).trim()}` : `${sliced.trim()}…`;
+  // 1) 过滤顶部的 import / export 行，直到遇到第一个非 import 行。
+  const lines = normalized.split('\n');
+  let startIdx = 0;
+  for (; startIdx < lines.length; startIdx += 1) {
+    const l = lines[startIdx]!.trim();
+    if (l === '') continue;
+    if (/^(?:import|export)\s/.test(l)) continue;
+    break;
+  }
+  // 2) 跳过第一个一级标题。
+  while (startIdx < lines.length && lines[startIdx]!.trim() === '') startIdx += 1;
+  if (startIdx < lines.length && /^#\s+/.test(lines[startIdx]!)) startIdx += 1;
+
+  // 3) 剥离 fenced code block，避免内部 ``` 里的文字混入。
+  const body: string[] = [];
+  let inFence = false;
+  for (let i = startIdx; i < lines.length; i += 1) {
+    const l = lines[i]!;
+    if (/^```/.test(l.trim())) {
+      inFence = !inFence;
+      body.push('');
+      continue;
+    }
+    if (inFence) continue;
+    body.push(l);
+  }
+
+  const blocks = body.join('\n').split(/\n\s*\n/);
+  for (let i = 0; i < blocks.length; i += 1) {
+    const raw = blocks[i]!.trim();
+    if (!isProseBlock(raw)) continue;
+    // 合并软换行 → 单行。
+    const collapsedRaw = raw.replace(/\s*\n\s*/g, ' ');
+    const cleaned = stripInlineMarkdown(collapsedRaw);
+    if (!cleaned) continue;
+
+    // 以冒号结尾且下一块是列表 → 这是引导句，尝试合并后续列表项。
+    if (endsWithColon(cleaned)) {
+      const next = blocks[i + 1]?.trim() ?? '';
+      const items = /^(?:[-*+]|\d+\.)\s/.test(next) ? listItemTexts(next) : [];
+      if (items.length > 0) {
+        let merged = cleaned;
+        let appended = 0;
+        for (const it of items) {
+          const candidate = `${merged} ${stripInlineMarkdown(it)}`.trim();
+          if (candidate.length > DESC_MAX) break;
+          merged = candidate;
+          appended += 1;
+        }
+        if (appended > 0) return clampToSentence(merged, DESC_MAX);
+      }
+      // 没列表可借 / 条目塞不进预算：退而求其次，回退到冒号前最近的句末标点。
+      const trimmedBack = trimToLastSentenceBefore(cleaned);
+      if (trimmedBack) return clampToSentence(trimmedBack, DESC_MAX);
+      // 实在找不到完整句子，继续找下一个真正的 prose 段落。
+      continue;
+    }
+
+    return clampToSentence(cleaned, DESC_MAX);
   }
   return '';
 }

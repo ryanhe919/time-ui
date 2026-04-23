@@ -1,42 +1,42 @@
-name: Feature request
-description: Suggest a new component, prop, or capability.
+name: 功能建议
+description: 建议新的组件、属性或能力。
 title: '[Feat]: '
 labels: ['enhancement', 'triage']
 body:
   - type: input
     id: package
     attributes:
-      label: Target package
+      label: 目标包
       placeholder: '@timeui/react'
     validations:
       required: true
   - type: textarea
     id: problem
     attributes:
-      label: Problem
-      description: What user problem are you trying to solve?
+      label: 要解决的问题
+      description: 你想解决什么用户问题？
     validations:
       required: true
   - type: textarea
     id: proposal
     attributes:
-      label: Proposed solution
+      label: 建议方案
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considered
+      label: 考虑过的替代方案
   - type: textarea
     id: a11y
     attributes:
-      label: Accessibility considerations
-      description: WAI-ARIA patterns, keyboard, screen reader behavior.
+      label: 可访问性考量
+      description: 例如 WAI-ARIA 模式、键盘交互、屏幕阅读器行为等。
   - type: checkboxes
     id: checks
     attributes:
-      label: Pre-flight
+      label: 提交前确认
       options:
-        - label: I searched existing issues and RFCs.
+        - label: 我已搜索过现有 issues 和 RFC。
           required: true
-        - label: This is additive and does not conflict with existing APIs (or is flagged as breaking).
+        - label: 该建议是增量性的，不与现有 API 冲突（或已明确标注为破坏性变更）。

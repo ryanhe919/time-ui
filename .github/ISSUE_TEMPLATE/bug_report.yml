@@ -1,64 +1,64 @@
-name: Bug report
-description: Report a reproducible problem in TimeUI.
+name: Bug 反馈
+description: 报告一个可复现的 TimeUI 问题。
 title: '[Bug]: '
 labels: ['bug', 'triage']
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to file a bug! Please fill out the sections below.
+        感谢你提交 Bug 反馈！请尽量完整填写下面的信息。
   - type: input
     id: package
     attributes:
-      label: Package
-      description: Which TimeUI package is affected?
+      label: 受影响的包
+      description: 哪个 TimeUI 包受到了影响？
       placeholder: '@timeui/react, @timeui/icons, @timeui/tokens, …'
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: Version
-      placeholder: 'e.g. 0.3.1'
+      label: 版本
+      placeholder: '例如 0.3.1'
     validations:
       required: true
   - type: textarea
     id: description
     attributes:
-      label: Description
-      description: What went wrong?
+      label: 问题描述
+      description: 具体出了什么问题？
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
-      label: Reproduction
-      description: Minimal repro — StackBlitz/CodeSandbox link preferred, or a code snippet.
+      label: 复现方式
+      description: 请提供最小复现，优先附上 StackBlitz/CodeSandbox 链接，或贴出关键代码片段。
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: 期望行为
     validations:
       required: true
   - type: textarea
     id: actual
     attributes:
-      label: Actual behavior
+      label: 实际行为
     validations:
       required: true
   - type: input
     id: env
     attributes:
-      label: Environment
+      label: 环境信息
       placeholder: 'React 18.3, Node 22, Chrome 124, macOS 14'
   - type: checkboxes
     id: checks
     attributes:
-      label: Pre-flight
+      label: 提交前确认
       options:
-        - label: I searched existing issues.
+        - label: 我已搜索过现有 issues。
           required: true
-        - label: I am on the latest minor version of the affected package.
+        - label: 我使用的是受影响包的最新 minor 版本。
           required: true

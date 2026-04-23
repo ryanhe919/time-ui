@@ -1,5 +1,5 @@
-name: RFC (Request for Comments)
-description: Propose a substantial change to TimeUI — new subsystem, breaking API, governance, or policy.
+name: RFC（设计提案）
+description: 提议对 TimeUI 做较大改动，例如新子系统、破坏性 API、治理或策略调整。
 title: '[RFC]: '
 labels: ['rfc']
 body:
@@ -10,48 +10,48 @@ body:
   - type: input
     id: title
     attributes:
-      label: Short title
+      label: 简短标题
     validations:
       required: true
   - type: textarea
     id: summary
     attributes:
-      label: Summary
-      description: One-paragraph explanation.
+      label: 概要
+      description: 请用一段话概述提案内容。
     validations:
       required: true
   - type: textarea
     id: motivation
     attributes:
-      label: Motivation
-      description: Why are we doing this? What use cases does it support?
+      label: 动机
+      description: 为什么要做这件事？它支持哪些使用场景？
     validations:
       required: true
   - type: textarea
     id: detailed-design
     attributes:
-      label: Detailed design
-      description: APIs, types, examples, edge cases, migration strategy.
+      label: 详细设计
+      description: 包括 API、类型、示例、边界情况和迁移策略等。
     validations:
       required: true
   - type: textarea
     id: drawbacks
     attributes:
-      label: Drawbacks
+      label: 缺点与代价
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives
+      label: 替代方案
     validations:
       required: true
   - type: textarea
     id: adoption
     attributes:
-      label: Adoption strategy
-      description: Breaking change? Codemod? Deprecation window?
+      label: 落地与采纳策略
+      description: 是否有破坏性变更？是否需要 codemod？弃用窗口如何安排？
   - type: textarea
     id: unresolved
     attributes:
-      label: Unresolved questions
+      label: 尚未解决的问题

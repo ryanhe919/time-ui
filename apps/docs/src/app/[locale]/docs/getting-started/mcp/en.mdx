@@ -2,6 +2,20 @@
 
 `@timeui/mcp` is TimeUI's **Model Context Protocol** server: every component's documentation is exposed as a callable tool, so Claude Code, Cursor, Windsurf, and other MCP-capable clients can look up the real component API, examples, and category structure instead of guessing from training data.
 
+## 30-second setup
+
+One command to wire TimeUI into Claude Code:
+
+```bash
+claude mcp add timeui -- npx -y @timeui/mcp timeui-mcp
+```
+
+Then just describe what you want to build:
+
+> Build me a login page with TimeUI's form components. Start by telling me which form components TimeUI ships.
+
+Claude will call the MCP tools to look up the real API, examples, and categories from the currently published version before writing any code — no hallucinated prop names. Setup for other clients (Cursor / Windsurf / Claude Desktop) is covered in [Install & wire up](#install--wire-up) below.
+
 ## Why it exists
 
 AI editors tend to fail in two predictable ways when recommending component usage:
@@ -21,6 +35,55 @@ MCP makes TimeUI's docs queryable at conversation time, so the answers you get r
 | `search_components` | Full-text scored search across titles / descriptions / prose, with context snippets. |
 
 All tools accept an optional `locale` argument (`zh` / `en`, default `zh`).
+
+## Example conversations
+
+Three scenarios showing how the assistant picks a tool and chains parameters on its own. You never call the tools by hand — you just ask.
+
+### Scenario A: discovery — "What form components does TimeUI have?"
+
+The assistant usually starts with `list_categories` to orient itself, then narrows down with `list_components`:
+
+```json
+// 1. Scan categories first
+{ "name": "list_categories", "arguments": { "locale": "en" } }
+// → [{ "slug": "forms", "label": "Forms", "componentCount": 11 }, ...]
+
+// 2. Drill into the forms category
+{ "name": "list_components", "arguments": { "locale": "en", "category": "forms" } }
+// → [{ "slug": "input", "title": "Input", "href": "/en/docs/components/input" }, ...]
+```
+
+The reply you get is something like: "TimeUI's forms category has 11 components — Input, Textarea, Select, Checkbox, Radio, Switch, … Which ones should I wire into the login page?"
+
+### Scenario B: targeted lookup — "What variants does Button support?"
+
+The assistant already has the component name, so it goes straight to `get_component`:
+
+```json
+{ "name": "get_component", "arguments": { "slug": "button", "locale": "en" } }
+```
+
+The returned `content` field is the full MDX prose (including the Props table) and `examples` is an array of runnable code snippets. The assistant lifts `variant: 'solid' | 'soft' | 'light' | 'outline' | 'ghost' | 'link'` straight from the docs and replies: "Button supports 6 variants, with `solid` as the default. Here's a `variant="light"` snippet …"
+
+### Scenario C: search — "What's the component for showing a loading state?"
+
+You didn't name the component, so the assistant uses `search_components`:
+
+```json
+{ "name": "search_components", "arguments": { "query": "loading placeholder", "locale": "en", "limit": 5 } }
+```
+
+It gets back a scored list with snippet context around each hit:
+
+```json
+[
+  { "slug": "skeleton", "title": "Skeleton", "snippet": "…placeholder while content is loading…", "score": 42 },
+  { "slug": "button", "title": "Button", "snippet": "…loading state disables the click…", "score": 18 }
+]
+```
+
+The assistant picks the top hit (Skeleton), optionally follows up with `get_component` for details, and replies: "You want Skeleton for content placeholders. If you only need an inline spinner inside a button, Button itself has a `loading` prop."
 
 ## Install & wire up
 
@@ -57,6 +120,36 @@ npx -y @timeui/mcp timeui-mcp-http --port 3333
 ```
 
 It binds to `127.0.0.1` by default so you don't accidentally expose it on LAN; pass `--host 0.0.0.0` when you do want external reach.
+
+### Claude Desktop
+
+Claude Desktop's MCP integration currently uses **stdio only** (config file: `claude_desktop_config.json` — on macOS at `~/Library/Application Support/Claude/claude_desktop_config.json`, on Windows at `%APPDATA%\Claude\claude_desktop_config.json`). Launch the stdio binary directly via `npx`:
+
+```json
+{
+  "mcpServers": {
+    "timeui": {
+      "command": "npx",
+      "args": ["-y", "@timeui/mcp", "timeui-mcp"]
+    }
+  }
+}
+```
+
+Restart Claude Desktop and you should see the TimeUI tools show up in conversations.
+
+If you already have `timeui-mcp-http` running on a remote host and want Claude Desktop to talk to it, use a community stdio ↔ HTTP adapter (for example `mcp-remote` or `supergateway`) to bridge the remote endpoint back to a local stdio process. With `mcp-remote`:
+
+```json
+{
+  "mcpServers": {
+    "timeui": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://your-host:3333/mcp"]
+    }
+  }
+}
+```
 
 ## How it works
 

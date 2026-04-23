@@ -1,35 +1,35 @@
 <!--
-  Thanks for contributing to TimeUI! Please fill out the checklist below.
-  Small fixes and docs tweaks can omit sections that don't apply.
+  感谢你为 TimeUI 做出贡献！请填写下面的检查项。
+  如果只是很小的修复或文档调整，可以省略不适用的部分。
 -->
 
-## Summary
+## 概要
 
-<!-- What does this PR do? Why? Link any related issue or RFC. -->
+<!-- 这个 PR 做了什么？为什么要做？请附上相关 issue 或 RFC。 -->
 
 Closes #
 
-## Changes
+## 变更内容
 
 -
 -
 
-## Checklist
+## 检查清单
 
-- [ ] Tests added or updated (unit / interaction / a11y)
-- [ ] Docs updated (Storybook stories, MDX, JSDoc)
-- [ ] Accessibility reviewed (keyboard, ARIA, contrast, screen reader)
-- [ ] Size budgets respected (`pnpm size`)
-- [ ] Changeset added (`pnpm changeset`) — unless this is chore/docs-only
-- [ ] No unrelated refactors
+- [ ] 已新增或更新测试（单元 / 交互 / 可访问性）
+- [ ] 已更新文档（Storybook stories、MDX、JSDoc）
+- [ ] 已检查可访问性（键盘操作、ARIA、对比度、屏幕阅读器）
+- [ ] 已满足体积预算要求（`pnpm size`）
+- [ ] 已添加 changeset（`pnpm changeset`），除非这次变更仅涉及 chore/docs
+- [ ] 未包含无关重构
 
-## Breaking change?
+## 是否存在破坏性变更？
 
-- [ ] Yes — migration notes included below
-- [ ] No
+- [ ] 是，迁移说明已写在下方
+- [ ] 否
 
-<!-- If yes, describe what breaks and how users should migrate. -->
+<!-- 如果有，请说明会破坏什么，以及用户应如何迁移。 -->
 
-## Screenshots / Recordings
+## 截图 / 录屏
 
-<!-- For UI changes, include before/after. -->
+<!-- 如果涉及 UI 变更，请提供前后对比。 -->

@@ -2,6 +2,20 @@
 
 `@timeui/mcp` 是 TimeUI 的 **Model Context Protocol** 服务器：把全部组件文档封装成可调用的工具，让 Claude Code、Cursor、Windsurf 等 AI 客户端能直接查真实的组件 API、示例代码与分类结构，而不是从记忆里猜。
 
+## 30 秒接入
+
+一条命令把 TimeUI 接进 Claude Code：
+
+```bash
+claude mcp add timeui -- npx -y @timeui/mcp timeui-mcp
+```
+
+然后在对话里直接写真实需求：
+
+> 帮我用 TimeUI 的 Form 组件做一个登录页。先告诉我 TimeUI 里有哪些表单组件。
+
+Claude 会自动调用 MCP 工具去查当前发布版的真实 API、示例和分类，再动手写代码——不会瞎编 prop 名。其他 IDE（Cursor / Windsurf / Claude Desktop）的接入方式见下文 [安装 & 接入](#安装--接入)。
+
 ## 为什么需要它
 
 AI 编辑器在推荐组件用法时，常见两种失败模式：
@@ -21,6 +35,55 @@ MCP Server 把 TimeUI 的文档做成可调用接口，AI 每次回答时可以�
 | `search_components` | 全文打分检索标题 / 描述 / 正文，返回带片段的命中列表。 |
 
 所有工具均支持 `locale` 参数（`zh` / `en`），默认 `zh`。
+
+## 实战对话示例
+
+下面三个场景展示 AI 如何根据你的提问自己挑工具、自己串参数。你不需要手动调工具，只需要正常提问。
+
+### 场景 A：探索类 —— "TimeUI 有哪些表单组件？"
+
+AI 通常会先调 `list_categories` 拿到分类清单，再带 `category` 精确调 `list_components`：
+
+```json
+// 1. 先看分类
+{ "name": "list_categories", "arguments": { "locale": "zh" } }
+// → [{ "slug": "forms", "label": "表单", "componentCount": 11 }, ...]
+
+// 2. 再拿 forms 分类下的组件
+{ "name": "list_components", "arguments": { "locale": "zh", "category": "forms" } }
+// → [{ "slug": "input", "title": "Input 输入框", "href": "/zh/docs/components/input" }, ...]
+```
+
+AI 回你的内容大致是："TimeUI 的 forms 分类里有 11 个组件，包括 Input、Textarea、Select、Checkbox、Radio、Switch…… 要我用哪些拼登录页？"
+
+### 场景 B：精确查询类 —— "Button 的 variant 有哪些？"
+
+AI 已经知道组件名了，直接用 `get_component` 读单页详情：
+
+```json
+{ "name": "get_component", "arguments": { "slug": "button", "locale": "zh" } }
+```
+
+返回对象里的 `content` 字段是完整正文（含 Props 表），`examples` 是 MDX 里抽出来的代码片段。AI 从里面直接摘出 `variant: 'solid' | 'soft' | 'light' | 'outline' | 'ghost' | 'link'` 这类信息，然后告诉你："Button 支持 6 种 variant，其中 `solid` 是默认值；下面是一个 `variant="light"` 的示例……"
+
+### 场景 C：搜索类 —— "用来显示加载状态的组件叫什么？"
+
+你没说组件名，AI 会用 `search_components` 模糊找：
+
+```json
+{ "name": "search_components", "arguments": { "query": "loading 加载", "locale": "zh", "limit": 5 } }
+```
+
+返回按打分排序的命中列表，每条带 snippet 上下文片段：
+
+```json
+[
+  { "slug": "skeleton", "title": "Skeleton 骨架屏", "snippet": "…在内容加载时占位…", "score": 42 },
+  { "slug": "button", "title": "Button 按钮", "snippet": "…loading 态会禁用点击…", "score": 18 }
+]
+```
+
+AI 会挑分数最高的项（这里是 Skeleton），必要时再 `get_component` 取详情，最后回你："你要找的应该是 Skeleton（骨架屏）；如果只是按钮内部的 loading 态，Button 自己就有 `loading` prop。"
 
 ## 安装 & 接入
 
@@ -57,6 +120,36 @@ npx -y @timeui/mcp timeui-mcp-http --port 3333
 ```
 
 默认绑定 `127.0.0.1` 避免意外暴露；需要对外监听时加 `--host 0.0.0.0`。
+
+### Claude Desktop
+
+Claude Desktop 目前的 MCP 集成仍然走 **stdio**（配置文件为 `claude_desktop_config.json`，macOS 位于 `~/Library/Application Support/Claude/claude_desktop_config.json`，Windows 位于 `%APPDATA%\Claude\claude_desktop_config.json`）。推荐直接用 `npx` 启动 stdio 进程：
+
+```json
+{
+  "mcpServers": {
+    "timeui": {
+      "command": "npx",
+      "args": ["-y", "@timeui/mcp", "timeui-mcp"]
+    }
+  }
+}
+```
+
+保存后重启 Claude Desktop，就能在对话里看到 TimeUI 的工具被自动拉起来。
+
+如果你已经在局域网 / 服务器上跑着 `timeui-mcp-http`，想用桌面端接它的 HTTP endpoint，可以借助社区的 stdio ↔ HTTP 适配器（例如 `mcp-remote` / `supergateway`）把远程 endpoint 反代成本地 stdio。以 `mcp-remote` 为例：
+
+```json
+{
+  "mcpServers": {
+    "timeui": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://your-host:3333/mcp"]
+    }
+  }
+}
+```
 
 ## 原理
 

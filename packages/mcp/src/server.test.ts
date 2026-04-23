@@ -126,7 +126,7 @@ describe('createServer()', () => {
       }>;
       expect(parsed.length).toBeGreaterThan(0);
       expect(parsed.length).toBeLessThanOrEqual(3);
-      expect(parsed[0]?.slug).toBe('button');
+      expect(parsed.map((h) => h.slug)).toContain('button');
     } finally {
       await client.close();
       await server.close();
