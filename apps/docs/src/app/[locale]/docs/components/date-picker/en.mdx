@@ -10,6 +10,10 @@
 
 The everyday "pick a date" control. `isClearable` exposes a clear button when a value is set; `showTodayButton` adds a "Today" shortcut at the bottom of the panel.
 
+<Callout variant="info" title="Fast year switching">
+  Click the month label in the calendar header to open a year grid. The arrow buttons page that grid by 12 years at a time, and choosing a year drops you straight back into the day view. Keyboard users can still jump by year with `Shift + PageUp / PageDown`.
+</Callout>
+
 <LiveDemo code={`import { useState } from 'react';
 import { DatePicker } from '@timeui/react';
 
@@ -114,5 +118,5 @@ A range picker with presets and a two-month view. The first click sets `start`; 
 ]} />
 
 <Callout variant="info" title="Accessibility">
-  The trigger is a combobox-pattern `<input>`; the overlay is a `dialog`. The calendar is `role="grid"` + `gridcell`: arrows move, PageUp/Down change month, Shift+PageUp/Down change year, Home / End jump to the start / end of the row, Enter selects. Under `prefers-reduced-motion` all transitions are removed.
+  The trigger is a combobox-pattern `<input>`; the overlay is a `dialog`. The calendar also supports mouse-driven year switching from the header, while the day grid keeps full keyboard navigation: arrows move, PageUp/Down change month, Shift+PageUp/Down change year, Home / End jump to the start / end of the row, Enter selects. Under `prefers-reduced-motion` all transitions are removed.
 </Callout>

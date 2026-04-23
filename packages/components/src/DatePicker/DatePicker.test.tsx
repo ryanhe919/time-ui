@@ -422,6 +422,43 @@ describe('DatePicker — month navigation', () => {
     expect(screen.getByLabelText('Previous month')).toBeDisabled();
     expect(screen.getByLabelText('Next month')).toBeDisabled();
   });
+
+  it('can open year picker and jump directly to another year', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderWithProviders(<DatePicker defaultValue={new Date(2026, 3, 17)} aria-label="d" />);
+    await openCalendar(user);
+
+    await user.click(screen.getByLabelText('Choose year'));
+    expect(screen.getByRole('listbox', { name: 'Choose year' })).toBeInTheDocument();
+    await user.click(screen.getByLabelText('Next years'));
+    await user.click(screen.getByRole('option', { name: '2030' }));
+    const els = document.querySelectorAll('[aria-live="polite"]');
+    expect(els[0]?.textContent ?? '').toMatch(/2030/);
+    expect(screen.queryByRole('listbox', { name: 'Choose year' })).toBeNull();
+  });
+
+  it('year picker keeps bounded years disabled and clamps to reachable month', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderWithProviders(
+      <DatePicker
+        defaultValue={new Date(2027, 3, 17)}
+        minValue={new Date(2026, 7, 1)}
+        maxValue={new Date(2027, 2, 31)}
+        aria-label="d"
+      />,
+    );
+    await openCalendar(user);
+
+    await user.click(screen.getByLabelText('Choose year'));
+    expect(screen.getByRole('option', { name: '2025' })).toBeDisabled();
+
+    await user.click(screen.getByRole('option', { name: '2026' }));
+    const els = document.querySelectorAll('[aria-live="polite"]');
+    expect(els[0]?.textContent ?? '').toMatch(/2026/);
+    expect((els[0]?.textContent ?? '').toLowerCase()).toMatch(/aug|8/);
+  });
 });
 
 // ────────────────────────────────────────────────────────────

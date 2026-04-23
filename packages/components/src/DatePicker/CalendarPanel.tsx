@@ -19,6 +19,7 @@ import {
   useId,
   useMemo,
   useRef,
+  useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
@@ -101,6 +102,7 @@ export interface CalendarPanelProps {
 
 const TODAY_LABEL = 'Today';
 const CLEAR_LABEL = 'Clear';
+const YEAR_GRID_SIZE = 12;
 
 function isChineseLocale(locale?: string): boolean {
   return locale?.toLowerCase().startsWith('zh') ?? false;
@@ -148,6 +150,10 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
     const calendarLabel = isZh ? '日历' : 'Calendar';
     const previousMonthLabel = isZh ? '上个月' : 'Previous month';
     const nextMonthLabel = isZh ? '下个月' : 'Next month';
+    const chooseYearLabel = isZh ? '选择年份' : 'Choose year';
+    const chooseDateLabel = isZh ? '返回日期视图' : 'Back to date view';
+    const previousYearsLabel = isZh ? '上一组年份' : 'Previous years';
+    const nextYearsLabel = isZh ? '下一组年份' : 'Next years';
 
     const autoId = useId();
     const safeAutoId = autoId.replace(/:/g, '');
@@ -168,6 +174,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       onChange: onMonthAnchorChange,
       name: 'CalendarPanel.monthAnchor',
     });
+    const [pickerView, setPickerView] = useState<'days' | 'years'>('days');
 
     // ── focusedDate（受控 / 非受控双轨）——roving tabindex 的核心。
     // 非受控时，初值为当月第 1 天（或 selected）。
@@ -215,6 +222,16 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
     }, [monthAnchor, setMonthAnchor]);
     const goNextMonth = useCallback(() => {
       setMonthAnchor(addMonths(monthAnchor, 1));
+    }, [monthAnchor, setMonthAnchor]);
+    const goPrevYearRange = useCallback(() => {
+      setMonthAnchor(
+        new Date(monthAnchor.getFullYear() - YEAR_GRID_SIZE, monthAnchor.getMonth(), 1),
+      );
+    }, [monthAnchor, setMonthAnchor]);
+    const goNextYearRange = useCallback(() => {
+      setMonthAnchor(
+        new Date(monthAnchor.getFullYear() + YEAR_GRID_SIZE, monthAnchor.getMonth(), 1),
+      );
     }, [monthAnchor, setMonthAnchor]);
 
     // 用于月份过渡动画方向（+1=向前/右滑，-1=后退/左滑）。
@@ -267,6 +284,46 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       if (mode !== 'range') return;
       onHoverDate?.(null);
     }, [mode, onHoverDate]);
+
+    const startOfYear = useCallback((year: number) => new Date(year, 0, 1, 0, 0, 0, 0), []);
+    const endOfYear = useCallback((year: number) => new Date(year, 11, 31, 23, 59, 59, 999), []);
+
+    const isYearReachable = useCallback(
+      (year: number) => {
+        if (minValue && compareDays(endOfYear(year), minValue) < 0) return false;
+        if (maxValue && compareDays(startOfYear(year), maxValue) > 0) return false;
+        return true;
+      },
+      [endOfYear, maxValue, minValue, startOfYear],
+    );
+
+    const getMonthAnchorForYear = useCallback(
+      (year: number) => {
+        const desired = new Date(year, monthAnchor.getMonth(), 1, 0, 0, 0, 0);
+        const minMonth =
+          minValue && minValue.getFullYear() === year
+            ? startOfMonth(minValue)
+            : new Date(year, 0, 1, 0, 0, 0, 0);
+        const maxMonth =
+          maxValue && maxValue.getFullYear() === year
+            ? startOfMonth(maxValue)
+            : new Date(year, 11, 1, 0, 0, 0, 0);
+        if (compareDays(desired, minMonth) < 0) return minMonth;
+        if (compareDays(desired, maxMonth) > 0) return maxMonth;
+        return desired;
+      },
+      [maxValue, minValue, monthAnchor],
+    );
+
+    const handleYearSelect = useCallback(
+      (year: number) => {
+        if (!isYearReachable(year)) return;
+        setSlide(year >= monthAnchor.getFullYear() ? 1 : -1);
+        setMonthAnchor(getMonthAnchorForYear(year));
+        setPickerView('days');
+      },
+      [getMonthAnchorForYear, isYearReachable, monthAnchor, setMonthAnchor, setSlide],
+    );
 
     // ── 键盘导航 ──
     const moveFocus = useCallback(
@@ -458,6 +515,31 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       overflow: hidden;
     `;
 
+    const pickerToggleCss = css`
+      ${monthLabelCss}
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 0 8px;
+      border: 0;
+      border-radius: ${tokens.headerNavButtonRadius};
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 120ms ease;
+      &:hover {
+        background: ${hoverBg};
+      }
+      &:focus-visible {
+        outline: 2px solid ${focusColor};
+        outline-offset: 1px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    `;
+
     const gridCss = css`
       display: grid;
       grid-template-columns: repeat(7, ${tokens.cellSize});
@@ -600,6 +682,51 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       }
     `;
 
+    const yearGridCss = css`
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: ${tokens.cellGap};
+      min-height: calc(4 * ${tokens.cellSize} + 3 * ${tokens.cellGap});
+    `;
+
+    const yearButtonCss = css`
+      height: ${tokens.cellSize};
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      border: 0;
+      border-radius: ${tokens.cellRadius};
+      background: transparent;
+      color: ${textPrimary};
+      font: inherit;
+      font-size: ${tokens.cellFontSize};
+      font-weight: ${tokens.cellFontWeight};
+      cursor: pointer;
+      transition:
+        background-color 120ms ease,
+        color 120ms ease;
+      &:hover:not(:disabled) {
+        background: ${hoverBg};
+      }
+      &:disabled {
+        color: ${textDisabled};
+        cursor: not-allowed;
+        opacity: 0.4;
+      }
+      &:focus-visible {
+        outline: 2px solid ${focusColor};
+        outline-offset: 1px;
+      }
+      &[data-selected='true'] {
+        background: ${primaryBg};
+        color: ${primaryFg};
+      }
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    `;
+
     const clearBtnCss = css`
       ${footerBtnCss}
       color: ${dangerColor};
@@ -727,6 +854,24 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
 
     // 渲染
     const labelText = monthLabel(monthAnchor, locale);
+    const yearRangeStart = Math.floor(monthAnchor.getFullYear() / YEAR_GRID_SIZE) * YEAR_GRID_SIZE;
+    const yearRangeLabel = `${yearRangeStart} - ${yearRangeStart + YEAR_GRID_SIZE - 1}`;
+    const yearOptions = useMemo(
+      () =>
+        Array.from({ length: YEAR_GRID_SIZE }, (_, index) => {
+          const year = yearRangeStart + index;
+          return {
+            year,
+            disabled: !isYearReachable(year),
+            selected: year === monthAnchor.getFullYear(),
+          };
+        }),
+      [isYearReachable, monthAnchor, yearRangeStart],
+    );
+    const centerLabel = pickerView === 'years' ? yearRangeLabel : labelText;
+    const centerButtonLabel = pickerView === 'years' ? chooseDateLabel : chooseYearLabel;
+    const previousNavLabel = pickerView === 'years' ? previousYearsLabel : previousMonthLabel;
+    const nextNavLabel = pickerView === 'years' ? nextYearsLabel : nextMonthLabel;
 
     return (
       <div
@@ -748,9 +893,14 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
           ) : (
             <button
               type="button"
-              aria-label={previousMonthLabel}
-              disabled={prevDisabled}
+              aria-label={previousNavLabel}
+              disabled={pickerView === 'days' ? prevDisabled : false}
               onClick={() => {
+                if (pickerView === 'years') {
+                  setSlide(-1);
+                  goPrevYearRange();
+                  return;
+                }
                 setSlide(-1);
                 goPrevMonth();
               }}
@@ -772,14 +922,19 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
               </svg>
             </button>
           )}
-          <div
-            css={monthLabelCss}
+          <button
+            type="button"
+            css={pickerToggleCss}
             aria-live="polite"
             data-slot="month-label"
-            // TODO: 点击进入 month/year picker（本轮未实现）。
+            aria-label={centerButtonLabel}
+            aria-pressed={pickerView === 'years'}
+            onClick={() => {
+              setPickerView((prev) => (prev === 'years' ? 'days' : 'years'));
+            }}
           >
-            {labelText}
-          </div>
+            {centerLabel}
+          </button>
           {hideNextButton ? (
             <span
               css={css`
@@ -790,9 +945,14 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
           ) : (
             <button
               type="button"
-              aria-label={nextMonthLabel}
-              disabled={nextDisabled}
+              aria-label={nextNavLabel}
+              disabled={pickerView === 'days' ? nextDisabled : false}
               onClick={() => {
+                if (pickerView === 'years') {
+                  setSlide(1);
+                  goNextYearRange();
+                  return;
+                }
                 setSlide(1);
                 goNextMonth();
               }}
@@ -816,173 +976,196 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
           )}
         </div>
 
-        <div css={weekdaysCss} role="row" aria-hidden>
-          {weekdays.map((label, idx) => (
-            <div key={`${label}-${idx}`} css={weekdayCellCss} role="columnheader">
-              {label}
+        {pickerView === 'days' ? (
+          <>
+            <div css={weekdaysCss} role="row" aria-hidden>
+              {weekdays.map((label, idx) => (
+                <div key={`${label}-${idx}`} css={weekdayCellCss} role="columnheader">
+                  {label}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div css={gridWrapCss}>
-          <div
-            ref={gridRef}
-            role="grid"
-            tabIndex={-1}
-            css={gridCss}
-            // key 触发动画 re-trigger。
-            key={`${monthAnchor.getFullYear()}-${monthAnchor.getMonth()}`}
-            onKeyDown={handleGridKeyDown}
-            onMouseLeave={handleGridLeave}
-            aria-label={labelText}
-          >
-            {cells.map((c) => {
-              const dateAttr = c.date.toISOString().slice(0, 10);
-              // DateRangePicker 双月视图下，相邻月份 outside cell 渲染为不可交互的 grid 占位，
-              // 避免两个 panel 重复显示同一天的视觉冗余。
-              if (hideOutsideMonth && !c.isCurrentMonth) {
-                return (
-                  <span
-                    key={dateAttr}
-                    aria-hidden
-                    data-date={dateAttr}
-                    data-outside-placeholder=""
-                    css={css`
-                      width: ${tokens.cellSize};
-                      height: ${tokens.cellSize};
-                      display: inline-block;
-                    `}
-                  />
-                );
-              }
-              // isAnySelected 聚合 single 选中与 range 两端，后续 5 处判断共用。
-              const isAnySelected = c.isSelected || c.isRangeStart || c.isRangeEnd;
-              // 计算 cell 的视觉样式（行内 style 优先于 css 块以避免大量 styled 实例）。
-              const cellInline: CSSProperties = {};
-              // 圆角策略：start/end 的内侧（朝向区间中段的一侧）保持直角，
-              // 与 mid 段浅蓝条无缝拼接；外侧走 rangeEndRadius 圆角。
-              // 单日（isSelected 或 start === end）四角全圆。
-              if (isAnySelected) {
-                const r = tokens.rangeEndRadius;
-                const isStartOnly = c.isRangeStart && !c.isRangeEnd;
-                const isEndOnly = c.isRangeEnd && !c.isRangeStart;
-                if (isStartOnly) {
-                  cellInline.borderTopLeftRadius = r;
-                  cellInline.borderBottomLeftRadius = r;
-                  cellInline.borderTopRightRadius = 0;
-                  cellInline.borderBottomRightRadius = 0;
-                } else if (isEndOnly) {
-                  cellInline.borderTopRightRadius = r;
-                  cellInline.borderBottomRightRadius = r;
-                  cellInline.borderTopLeftRadius = 0;
-                  cellInline.borderBottomLeftRadius = 0;
-                } else {
-                  cellInline.borderRadius = r;
-                }
-              }
-              if (!c.isCurrentMonth && !isAnySelected) {
-                cellInline.color = textDisabled;
-              }
-              if (c.isDisabled) {
-                cellInline.opacity = 0.4;
-                cellInline.cursor = 'not-allowed';
-              }
-              const uniformRadius =
-                cellInline.borderRadius === undefined ? undefined : String(cellInline.borderRadius);
-              const borderTopLeftRadius =
-                cellInline.borderTopLeftRadius === undefined
-                  ? uniformRadius
-                  : String(cellInline.borderTopLeftRadius);
-              const borderTopRightRadius =
-                cellInline.borderTopRightRadius === undefined
-                  ? uniformRadius
-                  : String(cellInline.borderTopRightRadius);
-              const borderBottomLeftRadius =
-                cellInline.borderBottomLeftRadius === undefined
-                  ? uniformRadius
-                  : String(cellInline.borderBottomLeftRadius);
-              const borderBottomRightRadius =
-                cellInline.borderBottomRightRadius === undefined
-                  ? uniformRadius
-                  : String(cellInline.borderBottomRightRadius);
-              const ariaLabelDay = c.date.toLocaleDateString(locale, {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              });
-              return (
-                <button
-                  key={dateAttr}
-                  type="button"
-                  role="gridcell"
-                  data-date={dateAttr}
-                  data-current-month={c.isCurrentMonth || undefined}
-                  data-today={c.isToday || undefined}
-                  data-selected={isAnySelected || undefined}
-                  data-in-range={c.isInRangeMid || undefined}
-                  data-preview={c.isPreview || undefined}
-                  data-range-start={c.isRangeStart || undefined}
-                  data-range-end={c.isRangeEnd || undefined}
-                  data-range-bridge-left={c.rangeBridgeLeft || undefined}
-                  data-range-bridge-right={c.rangeBridgeRight || undefined}
-                  data-preview-bridge-left={c.previewBridgeLeft || undefined}
-                  data-preview-bridge-right={c.previewBridgeRight || undefined}
-                  data-disabled={c.isDisabled || undefined}
-                  aria-selected={isAnySelected}
-                  aria-disabled={c.isDisabled || undefined}
-                  aria-label={ariaLabelDay}
-                  tabIndex={c.isFocused ? 0 : -1}
-                  disabled={c.isDisabled}
-                  onClick={() => handleCellClick(c.date)}
-                  onMouseEnter={() => handleCellEnter(c.date)}
-                  onFocus={() => {
-                    // grid 内导航后由 useEffect 维护焦点，无需在此回写 focusedDate。
-                  }}
-                  css={cellBaseCss}
-                  style={cellInline}
-                >
-                  <span
-                    data-slot="day-label"
-                    style={{
-                      position: 'relative',
-                      zIndex: 1,
-                      width: '100%',
-                      height: '100%',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderTopLeftRadius,
-                      borderTopRightRadius,
-                      borderBottomLeftRadius,
-                      borderBottomRightRadius,
-                      background: isAnySelected ? primaryBg : 'transparent',
-                      color: isAnySelected ? primaryFg : 'inherit',
-                    }}
-                  >
-                    {c.date.getDate()}
-                  </span>
-                  {c.isToday && !isAnySelected ? (
-                    <span
-                      aria-hidden
-                      style={{
-                        position: 'absolute',
-                        zIndex: 1,
-                        width: tokens.cellTodayDotSize,
-                        height: tokens.cellTodayDotSize,
-                        borderRadius: '50%',
-                        background: primaryBg,
-                        bottom: tokens.cellTodayDotOffset,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
+            <div css={gridWrapCss}>
+              <div
+                ref={gridRef}
+                role="grid"
+                tabIndex={-1}
+                css={gridCss}
+                // key 触发动画 re-trigger。
+                key={`${monthAnchor.getFullYear()}-${monthAnchor.getMonth()}`}
+                onKeyDown={handleGridKeyDown}
+                onMouseLeave={handleGridLeave}
+                aria-label={labelText}
+              >
+                {cells.map((c) => {
+                  const dateAttr = c.date.toISOString().slice(0, 10);
+                  // DateRangePicker 双月视图下，相邻月份 outside cell 渲染为不可交互的 grid 占位，
+                  // 避免两个 panel 重复显示同一天的视觉冗余。
+                  if (hideOutsideMonth && !c.isCurrentMonth) {
+                    return (
+                      <span
+                        key={dateAttr}
+                        aria-hidden
+                        data-date={dateAttr}
+                        data-outside-placeholder=""
+                        css={css`
+                          width: ${tokens.cellSize};
+                          height: ${tokens.cellSize};
+                          display: inline-block;
+                        `}
+                      />
+                    );
+                  }
+                  // isAnySelected 聚合 single 选中与 range 两端，后续 5 处判断共用。
+                  const isAnySelected = c.isSelected || c.isRangeStart || c.isRangeEnd;
+                  // 计算 cell 的视觉样式（行内 style 优先于 css 块以避免大量 styled 实例）。
+                  const cellInline: CSSProperties = {};
+                  // 圆角策略：start/end 的内侧（朝向区间中段的一侧）保持直角，
+                  // 与 mid 段浅蓝条无缝拼接；外侧走 rangeEndRadius 圆角。
+                  // 单日（isSelected 或 start === end）四角全圆。
+                  if (isAnySelected) {
+                    const r = tokens.rangeEndRadius;
+                    const isStartOnly = c.isRangeStart && !c.isRangeEnd;
+                    const isEndOnly = c.isRangeEnd && !c.isRangeStart;
+                    if (isStartOnly) {
+                      cellInline.borderTopLeftRadius = r;
+                      cellInline.borderBottomLeftRadius = r;
+                      cellInline.borderTopRightRadius = 0;
+                      cellInline.borderBottomRightRadius = 0;
+                    } else if (isEndOnly) {
+                      cellInline.borderTopRightRadius = r;
+                      cellInline.borderBottomRightRadius = r;
+                      cellInline.borderTopLeftRadius = 0;
+                      cellInline.borderBottomLeftRadius = 0;
+                    } else {
+                      cellInline.borderRadius = r;
+                    }
+                  }
+                  if (!c.isCurrentMonth && !isAnySelected) {
+                    cellInline.color = textDisabled;
+                  }
+                  if (c.isDisabled) {
+                    cellInline.opacity = 0.4;
+                    cellInline.cursor = 'not-allowed';
+                  }
+                  const uniformRadius =
+                    cellInline.borderRadius === undefined
+                      ? undefined
+                      : String(cellInline.borderRadius);
+                  const borderTopLeftRadius =
+                    cellInline.borderTopLeftRadius === undefined
+                      ? uniformRadius
+                      : String(cellInline.borderTopLeftRadius);
+                  const borderTopRightRadius =
+                    cellInline.borderTopRightRadius === undefined
+                      ? uniformRadius
+                      : String(cellInline.borderTopRightRadius);
+                  const borderBottomLeftRadius =
+                    cellInline.borderBottomLeftRadius === undefined
+                      ? uniformRadius
+                      : String(cellInline.borderBottomLeftRadius);
+                  const borderBottomRightRadius =
+                    cellInline.borderBottomRightRadius === undefined
+                      ? uniformRadius
+                      : String(cellInline.borderBottomRightRadius);
+                  const ariaLabelDay = c.date.toLocaleDateString(locale, {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  });
+                  return (
+                    <button
+                      key={dateAttr}
+                      type="button"
+                      role="gridcell"
+                      data-date={dateAttr}
+                      data-current-month={c.isCurrentMonth || undefined}
+                      data-today={c.isToday || undefined}
+                      data-selected={isAnySelected || undefined}
+                      data-in-range={c.isInRangeMid || undefined}
+                      data-preview={c.isPreview || undefined}
+                      data-range-start={c.isRangeStart || undefined}
+                      data-range-end={c.isRangeEnd || undefined}
+                      data-range-bridge-left={c.rangeBridgeLeft || undefined}
+                      data-range-bridge-right={c.rangeBridgeRight || undefined}
+                      data-preview-bridge-left={c.previewBridgeLeft || undefined}
+                      data-preview-bridge-right={c.previewBridgeRight || undefined}
+                      data-disabled={c.isDisabled || undefined}
+                      aria-selected={isAnySelected}
+                      aria-disabled={c.isDisabled || undefined}
+                      aria-label={ariaLabelDay}
+                      tabIndex={c.isFocused ? 0 : -1}
+                      disabled={c.isDisabled}
+                      onClick={() => handleCellClick(c.date)}
+                      onMouseEnter={() => handleCellEnter(c.date)}
+                      onFocus={() => {
+                        // grid 内导航后由 useEffect 维护焦点，无需在此回写 focusedDate。
                       }}
-                    />
-                  ) : null}
-                </button>
-              );
-            })}
+                      css={cellBaseCss}
+                      style={cellInline}
+                    >
+                      <span
+                        data-slot="day-label"
+                        style={{
+                          position: 'relative',
+                          zIndex: 1,
+                          width: '100%',
+                          height: '100%',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderTopLeftRadius,
+                          borderTopRightRadius,
+                          borderBottomLeftRadius,
+                          borderBottomRightRadius,
+                          background: isAnySelected ? primaryBg : 'transparent',
+                          color: isAnySelected ? primaryFg : 'inherit',
+                        }}
+                      >
+                        {c.date.getDate()}
+                      </span>
+                      {c.isToday && !isAnySelected ? (
+                        <span
+                          aria-hidden
+                          style={{
+                            position: 'absolute',
+                            zIndex: 1,
+                            width: tokens.cellTodayDotSize,
+                            height: tokens.cellTodayDotSize,
+                            borderRadius: '50%',
+                            background: primaryBg,
+                            bottom: tokens.cellTodayDotOffset,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                          }}
+                        />
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div css={yearGridCss} role="listbox" aria-label={chooseYearLabel}>
+            {yearOptions.map((option) => (
+              <button
+                key={option.year}
+                type="button"
+                role="option"
+                aria-selected={option.selected}
+                disabled={option.disabled}
+                data-selected={option.selected || undefined}
+                css={yearButtonCss}
+                onClick={() => handleYearSelect(option.year)}
+              >
+                {option.year}
+              </button>
+            ))}
           </div>
-        </div>
+        )}
 
         {showFooter && (showTodayButton || showClearButton || footer) ? (
           <div css={footerCss} data-slot="footer">

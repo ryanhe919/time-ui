@@ -10,6 +10,10 @@
 
 最常见的"选个日期"。`isClearable` 在已有值时显示清除按钮，`showTodayButton` 在面板底部加一个"今天"快捷按钮。
 
+<Callout variant="info" title="快速切换年份">
+  点击面板头部的月份标题，可切换到年份网格；左右箭头会按 12 年一组翻页，点中某个年份后立即返回日期视图。键盘仍支持 `Shift + PageUp / PageDown` 按年切换。
+</Callout>
+
 <LiveDemo code={`import { useState } from 'react';
 import { DatePicker } from '@timeui/react';
 
@@ -114,5 +118,5 @@ export function Demo() {
 ]} />
 
 <Callout variant="info" title="可访问性">
-  触发器为带 combobox 模式的 `<input>`，弹层以 `dialog` 渲染。日历网格用 `role="grid"` + `gridcell`：方向键移动、PageUp/Down 切月、Shift+PageUp/Down 切年、Home / End 跳到本周首尾、回车选定。`prefers-reduced-motion` 下取消所有过渡。
+  触发器为带 combobox 模式的 `<input>`，弹层以 `dialog` 渲染。日历支持鼠标点击标题切换年份视图；在日期网格里也可用方向键移动、PageUp/Down 切月、Shift+PageUp/Down 切年、Home / End 跳到本周首尾、回车选定。`prefers-reduced-motion` 下取消所有过渡。
 </Callout>
