@@ -1,0 +1,113 @@
+# Date Time Picker
+
+`DateTimePicker` extends `DatePicker` with a side-by-side time column so a single control covers year-month-day **and** hour-minute-second. Minute and second columns are opt-in — fields you hide stay fixed at `0` in the emitted `Date`, so downstream consumers always receive a complete `Date` object.
+
+<Callout variant="info" title="Calendar on the left, time on the right">
+  The panel reuses the shared `CalendarPanel` (same keyboard shortcuts, min/max, `isDateUnavailable`) and pairs it with a `TimePanel` — three optional listboxes for Hour / Minute / Second, plus an AM/PM column when `use12Hours` is on. A `[Now] [Clear] [OK]` footer lets you stage changes as a draft; the value only commits on **OK**, which avoids accidental onChange storms while you spin the time columns.
+</Callout>
+
+## Basic usage
+
+By default the picker opens Hour + Minute columns and emits a `Date` whose seconds are `0`. `isClearable` adds a clear button in the input and in the footer.
+
+<LiveDemo code={`import { useState } from 'react';
+import { DateTimePicker } from '@timeui/react';
+
+export function Demo() {
+  const [value, setValue] = useState<Date | null>(null);
+  return (
+    <DateTimePicker
+      value={value}
+      onChange={setValue}
+      placeholder="Pick a date and time"
+      isClearable
+    />
+  );
+}`}>
+  <DateTimePickerBasicDemo />
+</LiveDemo>
+
+## Granularity — hide minutes or seconds
+
+Toggle the time columns via `showMinute` (default `true`) and `showSecond` (default `false`). **Hidden fields are forced to `0` when the value is committed** — this is the whole point of the opt-in model: pick the precision you want, and never worry about stray `getSeconds() === 37` leaking out.
+
+<LiveDemo code={`// hour only — minute & second are always 0
+<DateTimePicker showMinute={false} />
+
+// hour + minute (default)
+<DateTimePicker />
+
+// hour + minute + second
+<DateTimePicker showSecond />`}>
+  <DateTimePickerGranularityDemo />
+</LiveDemo>
+
+## 12-hour mode
+
+`use12Hours` adds a fourth AM/PM column. The value is still a native `Date` (24-hour internally); only the formatting and the listbox change.
+
+```tsx
+<DateTimePicker use12Hours isClearable />
+```
+
+## Stepping through time
+
+`hourStep` / `minuteStep` / `secondStep` (default `1`) thin out the listbox options — useful for appointment windows or log aggregation granularity.
+
+```tsx
+<DateTimePicker minuteStep={15} secondStep={10} />
+```
+
+## Commit flow — draft + OK
+
+Unlike `DatePicker` (where picking a day closes the panel), `DateTimePicker` treats the panel as a staging area. Clicking a day or spinning the time columns updates an internal draft; `onChange` only fires when you press **OK**. This keeps the UX sane for multi-step adjustments. If you prefer instant commits, wire `onChange` to your own state and drive the picker with `isOpen` / `onOpenChange`.
+
+Footer buttons:
+- **Now** fills the draft with today + the current time (still respects `minValue` / `maxValue`).
+- **Clear** (only when `isClearable`) wipes the value and closes the panel.
+- **OK** commits the draft and closes the panel.
+
+## Localisation and formatting
+
+- `locale` — BCP-47 tag forwarded to `Intl`.
+- `format(d)` / `parse(s)` — override the input text round-trip. The default format is `YYYY-MM-DD HH:mm` (with `:ss` and ` AM/PM` appearing when those switches are on); the default parser accepts the same shape plus raw ISO-8601 as a fallback.
+
+## API
+
+<PropsTable props={[
+  { name: 'value', type: 'Date | null', description: 'Controlled value.' },
+  { name: 'defaultValue', type: 'Date | null' },
+  { name: 'onChange', type: '(value: Date | null) => void', description: 'Fires on OK / Clear only.' },
+  { name: 'showMinute', type: 'boolean', default: 'true', description: 'Render the minute column; hidden means the minute is forced to 0.' },
+  { name: 'showSecond', type: 'boolean', default: 'false', description: 'Render the second column; hidden means the second is forced to 0.' },
+  { name: 'hourStep', type: 'number', default: '1' },
+  { name: 'minuteStep', type: 'number', default: '1' },
+  { name: 'secondStep', type: 'number', default: '1' },
+  { name: 'use12Hours', type: 'boolean', default: 'false', description: 'Show AM/PM column and format hour in 12h.' },
+  { name: 'showNowButton', type: 'boolean', default: 'true' },
+  { name: 'showConfirmButton', type: 'boolean', default: 'true', description: 'The OK button at the bottom-right.' },
+  { name: 'nowLabel', type: 'string', description: 'Override the Now button text.' },
+  { name: 'confirmLabel', type: 'string', description: 'Override the OK button text.' },
+  { name: 'minValue', type: 'Date' },
+  { name: 'maxValue', type: 'Date' },
+  { name: 'isDateUnavailable', type: '(date: Date) => boolean' },
+  { name: 'weekStartsOn', type: '0 | 1 | 2 | 3 | 4 | 5 | 6', default: '0' },
+  { name: 'locale', type: 'string' },
+  { name: 'format', type: '(d: Date) => string' },
+  { name: 'parse', type: '(s: string) => Date | null' },
+  { name: 'placeholder', type: 'string' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isInvalid', type: 'boolean', default: 'false' },
+  { name: 'isClearable', type: 'boolean', default: 'false' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
+  { name: 'isOpen', type: 'boolean' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'aria-label', type: 'string' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  Each time column is a `listbox` with `option` children so screen readers announce the selected hour / minute / second alongside the date grid. The trigger remains a combobox-pattern `<input>`; the overlay stays a `dialog`. Under `prefers-reduced-motion` all transitions (slide animation, scroll snap) are removed.
+</Callout>

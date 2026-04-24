@@ -44,6 +44,7 @@ export * from './Drawer';
 export * from './Toast';
 export * from './Menu';
 export * from './DatePicker';
+export * from './DateTimePicker';
 export * from './Avatar';
 export * from './Tag';
 export * from './Badge';
