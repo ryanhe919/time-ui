@@ -30,6 +30,7 @@ import { useControllableState } from '../utils';
 import { Popover } from '../Popover';
 import { Input } from '../Input';
 import { CalendarPanel } from './CalendarPanel';
+import { getDatePickerPanelSizing } from './panel-sizing';
 import {
   defaultFormat,
   defaultParse,
@@ -74,6 +75,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       onOpenChange,
       placement = 'bottom-start',
       size = 'md',
+      panelSize = 'md',
       minValue,
       maxValue,
       isDateUnavailable,
@@ -98,6 +100,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
 
     const theme = useTheme();
     const tokens = theme.components.datePicker;
+    const panelSizing = getDatePickerPanelSizing(tokens, panelSize);
     const isZh = isChineseLocale(locale);
     const resolvedPlaceholder = placeholder ?? (isZh ? '选择日期' : 'Select a date');
     const openCalendarLabel = isZh ? '打开日历' : 'Open calendar';
@@ -339,11 +342,11 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
 
     const panelCss = css`
       box-sizing: border-box;
-      min-width: ${tokens.panelMinWidth};
-      padding: ${tokens.panelPaddingY} ${tokens.panelPaddingX};
+      min-width: ${panelSizing.panelMinWidth};
+      padding: ${panelSizing.panelPaddingY} ${panelSizing.panelPaddingX};
       background: ${theme.colors.bg.surface ?? theme.colors.bg.canvas};
       color: ${theme.colors.text.primary};
-      border-radius: ${tokens.panelRadius};
+      border-radius: ${panelSizing.panelRadius};
       box-shadow: ${theme.mode === 'dark' ? tokens.shadowDark : tokens.shadow};
       /* 抵消 Popover bodyCss 自带的 padding —— 与 Menu 同一手法，让 panel 自管间距。 */
       margin: -${theme.components.popover.paddingY} -${theme.components.popover.paddingX};
@@ -369,9 +372,10 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         aria-label={pickerAriaLabel}
         style={popoverStyle}
       >
-        <div ref={panelRef} css={panelCss} data-slot="datepicker-panel">
+        <div ref={panelRef} css={panelCss} data-slot="datepicker-panel" data-panel-size={panelSize}>
           <CalendarPanel
             mode="single"
+            panelSize={panelSize}
             selected={currentValue}
             defaultMonthAnchor={initialAnchor}
             onSelectDate={handleSelectDate}

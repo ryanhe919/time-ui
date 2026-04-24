@@ -120,6 +120,20 @@ describe('DateRangePicker — base rendering', () => {
     await user.click(screen.getByLabelText('Open calendar'));
     expect(screen.getAllByRole('grid')).toHaveLength(1);
   });
+
+  it('applies panelSize to the range popover and both calendar panels', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderWithProviders(<DateRangePicker panelSize="sm" aria-label="r" />);
+    await user.click(screen.getByLabelText('Open calendar'));
+    expect(document.querySelector('[data-slot="daterangepicker-panel"]')).toHaveAttribute(
+      'data-panel-size',
+      'sm',
+    );
+    expect(document.querySelectorAll('[data-timeui-calendar][data-panel-size="sm"]')).toHaveLength(
+      2,
+    );
+  });
 });
 
 // ────────────────────────────────────────────────────────────
