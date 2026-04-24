@@ -120,6 +120,7 @@ import { ToastPromiseDemo } from '@/components/mdx/ToastPromiseDemo';
 import { MenuBasicDemo } from '@/components/mdx/MenuBasicDemo';
 import { MenuSelectionDemo } from '@/components/mdx/MenuSelectionDemo';
 import { DatePickerBasicDemo } from '@/components/mdx/DatePickerBasicDemo';
+import { DatePickerSizesDemo } from '@/components/mdx/DatePickerSizesDemo';
 import { DateRangePickerDemo } from '@/components/mdx/DateRangePickerDemo';
 import { DateTimePickerBasicDemo } from '@/components/mdx/DateTimePickerBasicDemo';
 import { DateTimePickerGranularityDemo } from '@/components/mdx/DateTimePickerGranularityDemo';
@@ -203,6 +204,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     MenuBasicDemo,
     MenuSelectionDemo,
     DatePickerBasicDemo,
+    DatePickerSizesDemo,
     DateRangePickerDemo,
     DateTimePickerBasicDemo,
     DateTimePickerGranularityDemo,

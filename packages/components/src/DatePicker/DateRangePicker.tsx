@@ -28,6 +28,7 @@ import { Popover } from '../Popover';
 import { Input } from '../Input';
 import { MenuRow } from '../Menu';
 import { CalendarPanel } from './CalendarPanel';
+import { getDatePickerPanelSizing } from './panel-sizing';
 import {
   addMonths,
   defaultFormat,
@@ -73,6 +74,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       onOpenChange,
       placement = 'bottom-start',
       size = 'md',
+      panelSize = 'md',
       minValue,
       maxValue,
       isDateUnavailable,
@@ -98,6 +100,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
     const theme = useTheme();
     const tokens = theme.components.datePicker;
+    const panelSizing = getDatePickerPanelSizing(tokens, panelSize);
     const isZh = isChineseLocale(locale);
     const resolvedPlaceholder = placeholder ?? (isZh ? '选择日期范围' : 'Select a date range');
     const openCalendarLabel = isZh ? '打开日历' : 'Open calendar';
@@ -405,21 +408,21 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
     // ── styles ──
     const isRange = visibleMonths === 2;
-    const panelMin = isRange ? tokens.panelRangeMinWidth : tokens.panelMinWidth;
+    const panelMin = isRange ? panelSizing.panelRangeMinWidth : panelSizing.panelMinWidth;
 
     const panelCss = css`
       box-sizing: border-box;
       min-width: ${panelMin};
       width: max-content;
       max-width: calc(100vw - 32px);
-      padding: ${tokens.panelPaddingY} ${tokens.panelPaddingX};
+      padding: ${panelSizing.panelPaddingY} ${panelSizing.panelPaddingX};
       background: ${theme.colors.bg.surface ?? theme.colors.bg.canvas};
       color: ${theme.colors.text.primary};
-      border-radius: ${tokens.panelRadius};
+      border-radius: ${panelSizing.panelRadius};
       box-shadow: ${theme.mode === 'dark' ? tokens.shadowDark : tokens.shadow};
       margin: -${theme.components.popover.paddingY} -${theme.components.popover.paddingX};
       display: flex;
-      gap: ${tokens.panelGap};
+      gap: ${panelSizing.panelGap};
     `;
 
     const presetsListCss = css`
@@ -428,7 +431,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       display: flex;
       flex-direction: column;
       gap: 2px;
-      padding-right: ${tokens.panelGap};
+      padding-right: ${panelSizing.panelGap};
       border-right: 1px solid ${theme.colors.border.subtle};
       max-height: 320px;
       overflow-y: auto;
@@ -438,7 +441,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       flex: none;
       width: max-content;
       display: flex;
-      gap: ${tokens.panelGap};
+      gap: ${panelSizing.panelGap};
     `;
 
     // 关键：Popover 默认 panel CSS 带 `max-width: 320px`（popoverTokens.maxWidth），
@@ -463,7 +466,12 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         aria-label={pickerAriaLabel}
         style={popoverStyle}
       >
-        <div ref={panelRef} css={panelCss} data-slot="daterangepicker-panel">
+        <div
+          ref={panelRef}
+          css={panelCss}
+          data-slot="daterangepicker-panel"
+          data-panel-size={panelSize}
+        >
           {presets && presets.length > 0 ? (
             <div css={presetsListCss} role="listbox" aria-label={presetsLabel} data-slot="presets">
               {presets.map((p, i) => (
@@ -486,6 +494,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
           <div css={calendarsRowCss}>
             <CalendarPanel
               mode="range"
+              panelSize={panelSize}
               range={calendarRange}
               hoverEnd={hoverEnd}
               monthAnchor={leftAnchor}
@@ -509,6 +518,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             {isRange ? (
               <CalendarPanel
                 mode="range"
+                panelSize={panelSize}
                 range={calendarRange}
                 hoverEnd={hoverEnd}
                 monthAnchor={rightAnchor}

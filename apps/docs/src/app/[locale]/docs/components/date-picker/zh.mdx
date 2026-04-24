@@ -32,6 +32,16 @@ export function Demo() {
   <DatePickerBasicDemo />
 </LiveDemo>
 
+## 面板尺寸
+
+`panelSize` 只调整弹出的日历面板，不影响输入框尺寸。下面三个示例分别对应 `sm` / `md` / `lg`。
+
+<LiveDemo code={`<DatePicker panelSize="sm" placeholder="Small panel" />
+<DatePicker panelSize="md" placeholder="Medium panel" />
+<DatePicker panelSize="lg" placeholder="Large panel" />`}>
+  <DatePickerSizesDemo />
+</LiveDemo>
+
 ## DateRangePicker — 区间
 
 带 presets 与双月视图的区间选择。第一次点击设定 `start`，第二次点击若早于 `start` 则自动交换；hover 时面板内会高亮预览区间。
@@ -77,6 +87,7 @@ export function Demo() {
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
   { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '触发器尺寸。' },
+  { name: 'panelSize', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '弹出日历面板尺寸；会同步调整面板宽度、日期格、头部与底部操作区。' },
   { name: 'minValue', type: 'Date', description: '最早可选日期（含）。' },
   { name: 'maxValue', type: 'Date', description: '最晚可选日期（含）。' },
   { name: 'isDateUnavailable', type: '(date: Date) => boolean', description: '自定义禁用任意天。' },

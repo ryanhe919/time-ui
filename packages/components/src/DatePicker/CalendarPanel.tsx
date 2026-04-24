@@ -42,6 +42,8 @@ import {
   weekdayLabels,
   type WeekStartsOn,
 } from './date-utils';
+import { getDatePickerPanelSizing } from './panel-sizing';
+import type { DatePickerPanelSize } from './DatePicker.types';
 
 export type CalendarMode = 'single' | 'range';
 
@@ -86,6 +88,8 @@ export interface CalendarPanelProps {
   /** 是否隐藏 prev/next（DateRangePicker 双月时左/右面板分别用得上）。 */
   hidePrevButton?: boolean;
   hideNextButton?: boolean;
+  /** 面板尺寸预设，默认 'md'。 */
+  panelSize?: DatePickerPanelSize;
   /**
    * 是否隐藏相邻月份的 outside-month cell（保留 grid 占位但不渲染数字 / 不可交互）。
    * DateRangePicker 双月视图用它避免两个 panel 重复显示同一天，视觉更克制。
@@ -134,6 +138,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       showClearButton = true,
       hidePrevButton = false,
       hideNextButton = false,
+      panelSize = 'md',
       hideOutsideMonth = false,
       footer,
       'aria-label': ariaLabel,
@@ -144,6 +149,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
 
     const theme = useTheme();
     const tokens = theme.components.datePicker;
+    const panelSizing = getDatePickerPanelSizing(tokens, panelSize);
     const isZh = isChineseLocale(locale);
     const todayLabel = isZh ? '今天' : TODAY_LABEL;
     const clearLabel = isZh ? '清除' : CLEAR_LABEL;
@@ -446,30 +452,30 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: ${tokens.headerHeight};
-      gap: ${tokens.headerGap};
-      margin-bottom: ${tokens.headerGap};
+      height: ${panelSizing.headerHeight};
+      gap: ${panelSizing.headerGap};
+      margin-bottom: ${panelSizing.headerGap};
     `;
 
     const monthLabelCss = css`
       flex: 1;
       text-align: center;
-      font-size: ${tokens.headerFontSize};
+      font-size: ${panelSizing.headerFontSize};
       font-weight: ${tokens.headerFontWeight};
       color: ${textPrimary};
       user-select: none;
     `;
 
     const navButtonCss = css`
-      width: ${tokens.headerNavButtonSize};
-      height: ${tokens.headerNavButtonSize};
+      width: ${panelSizing.headerNavButtonSize};
+      height: ${panelSizing.headerNavButtonSize};
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 0;
       margin: 0;
       border: 0;
-      border-radius: ${tokens.headerNavButtonRadius};
+      border-radius: ${panelSizing.headerNavButtonRadius};
       background: transparent;
       color: ${textSecondary};
       cursor: pointer;
@@ -493,9 +499,9 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
 
     const weekdaysCss = css`
       display: grid;
-      grid-template-columns: repeat(7, ${tokens.cellSize});
-      gap: ${tokens.cellGap};
-      height: ${tokens.weekdayHeight};
+      grid-template-columns: repeat(7, ${panelSizing.cellSize});
+      gap: ${panelSizing.cellGap};
+      height: ${panelSizing.weekdayHeight};
       align-items: center;
       justify-content: space-between;
       margin-bottom: 4px;
@@ -503,7 +509,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
 
     const weekdayCellCss = css`
       text-align: center;
-      font-size: ${tokens.weekdayFontSize};
+      font-size: ${panelSizing.weekdayFontSize};
       font-weight: ${tokens.weekdayFontWeight};
       letter-spacing: ${tokens.weekdayLetterSpacing};
       color: ${textSecondary};
@@ -524,7 +530,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       width: 100%;
       padding: 0 8px;
       border: 0;
-      border-radius: ${tokens.headerNavButtonRadius};
+      border-radius: ${panelSizing.headerNavButtonRadius};
       background: transparent;
       cursor: pointer;
       transition: background-color 120ms ease;
@@ -542,16 +548,16 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
 
     const gridCss = css`
       display: grid;
-      grid-template-columns: repeat(7, ${tokens.cellSize});
-      gap: ${tokens.cellGap};
+      grid-template-columns: repeat(7, ${panelSizing.cellSize});
+      gap: ${panelSizing.cellGap};
       animation: timeui-cal-slide ${tokens.monthSlideDuration} ${theme.motion.easing.easeOut};
       @keyframes timeui-cal-slide {
         from {
           opacity: 0;
           transform: translateX(
             ${slideDirRef.current === 1
-              ? tokens.monthSlideTranslate
-              : `-${tokens.monthSlideTranslate}`}
+              ? panelSizing.monthSlideTranslate
+              : `-${panelSizing.monthSlideTranslate}`}
           );
         }
         to {
@@ -566,12 +572,12 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
     `;
 
     const cellBaseCss = css`
-      width: ${tokens.cellSize};
-      height: ${tokens.cellSize};
+      width: ${panelSizing.cellSize};
+      height: ${panelSizing.cellSize};
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: ${tokens.cellFontSize};
+      font-size: ${panelSizing.cellFontSize};
       font-weight: ${tokens.cellFontWeight};
       color: ${textPrimary};
       background: transparent;
@@ -579,7 +585,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       padding: 0;
       margin: 0;
       cursor: pointer;
-      border-radius: ${tokens.cellRadius};
+      border-radius: ${panelSizing.cellRadius};
       position: relative;
       isolation: isolate;
       user-select: none;
@@ -615,16 +621,16 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       &[data-preview='true']::before,
       &[data-range-bridge-left='true'][data-range-bridge-right='true']::before,
       &[data-preview-bridge-left='true'][data-preview-bridge-right='true']::before {
-        left: calc(-1 * (${tokens.cellGap} / 2));
-        right: calc(-1 * (${tokens.cellGap} / 2));
+        left: calc(-1 * (${panelSizing.cellGap} / 2));
+        right: calc(-1 * (${panelSizing.cellGap} / 2));
       }
       &[data-range-bridge-left='true']::before,
       &[data-preview-bridge-left='true']::before {
-        left: calc(-1 * (${tokens.cellGap} / 2));
+        left: calc(-1 * (${panelSizing.cellGap} / 2));
       }
       &[data-range-bridge-right='true']::before,
       &[data-preview-bridge-right='true']::before {
-        right: calc(-1 * (${tokens.cellGap} / 2));
+        right: calc(-1 * (${panelSizing.cellGap} / 2));
       }
       &:hover:not([data-disabled='true']):not([data-selected='true']) {
         background: ${hoverBg};
@@ -642,12 +648,12 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: ${tokens.footerHeight};
-      padding: 0 ${tokens.footerPaddingX};
-      gap: ${tokens.footerGap};
+      height: ${panelSizing.footerHeight};
+      padding: 0 ${panelSizing.footerPaddingX};
+      gap: ${panelSizing.footerGap};
       border-top: ${tokens.footerBorderTop} solid ${theme.colors.border.subtle};
-      margin: ${tokens.headerGap} -${tokens.panelPaddingX} -${tokens.panelPaddingY};
-      margin-top: ${tokens.headerGap};
+      margin: ${panelSizing.headerGap} -${panelSizing.panelPaddingX} -${panelSizing.panelPaddingY};
+      margin-top: ${panelSizing.headerGap};
     `;
 
     const footerBtnCss = css`
@@ -661,7 +667,7 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
       background: transparent;
       color: ${primaryBg};
       font: inherit;
-      font-size: ${tokens.cellFontSize};
+      font-size: ${panelSizing.cellFontSize};
       font-weight: 500;
       cursor: pointer;
       border-radius: 6px;
@@ -685,22 +691,22 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
     const yearGridCss = css`
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: ${tokens.cellGap};
-      min-height: calc(4 * ${tokens.cellSize} + 3 * ${tokens.cellGap});
+      gap: ${panelSizing.cellGap};
+      min-height: calc(4 * ${panelSizing.cellSize} + 3 * ${panelSizing.cellGap});
     `;
 
     const yearButtonCss = css`
-      height: ${tokens.cellSize};
+      height: ${panelSizing.cellSize};
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 0 10px;
       border: 0;
-      border-radius: ${tokens.cellRadius};
+      border-radius: ${panelSizing.cellRadius};
       background: transparent;
       color: ${textPrimary};
       font: inherit;
-      font-size: ${tokens.cellFontSize};
+      font-size: ${panelSizing.cellFontSize};
       font-weight: ${tokens.cellFontWeight};
       cursor: pointer;
       transition:
@@ -881,13 +887,14 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
         style={style}
         aria-label={ariaLabel ?? calendarLabel}
         data-timeui-calendar=""
+        data-panel-size={panelSize}
       >
         <div css={headerCss}>
           {hidePrevButton ? (
             <span
               css={css`
-                width: ${tokens.headerNavButtonSize};
-                height: ${tokens.headerNavButtonSize};
+                width: ${panelSizing.headerNavButtonSize};
+                height: ${panelSizing.headerNavButtonSize};
               `}
             />
           ) : (
@@ -908,8 +915,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
               data-slot="prev"
             >
               <svg
-                width={parseInt(tokens.headerNavIconSize, 10) || 16}
-                height={parseInt(tokens.headerNavIconSize, 10) || 16}
+                width={parseInt(panelSizing.headerNavIconSize, 10) || 16}
+                height={parseInt(panelSizing.headerNavIconSize, 10) || 16}
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -938,8 +945,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
           {hideNextButton ? (
             <span
               css={css`
-                width: ${tokens.headerNavButtonSize};
-                height: ${tokens.headerNavButtonSize};
+                width: ${panelSizing.headerNavButtonSize};
+                height: ${panelSizing.headerNavButtonSize};
               `}
             />
           ) : (
@@ -960,8 +967,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
               data-slot="next"
             >
               <svg
-                width={parseInt(tokens.headerNavIconSize, 10) || 16}
-                height={parseInt(tokens.headerNavIconSize, 10) || 16}
+                width={parseInt(panelSizing.headerNavIconSize, 10) || 16}
+                height={parseInt(panelSizing.headerNavIconSize, 10) || 16}
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -1010,8 +1017,8 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
                         data-date={dateAttr}
                         data-outside-placeholder=""
                         css={css`
-                          width: ${tokens.cellSize};
-                          height: ${tokens.cellSize};
+                          width: ${panelSizing.cellSize};
+                          height: ${panelSizing.cellSize};
                           display: inline-block;
                         `}
                       />
@@ -1132,11 +1139,11 @@ export const CalendarPanel = forwardRef<HTMLDivElement, CalendarPanelProps>(
                           style={{
                             position: 'absolute',
                             zIndex: 1,
-                            width: tokens.cellTodayDotSize,
-                            height: tokens.cellTodayDotSize,
+                            width: panelSizing.cellTodayDotSize,
+                            height: panelSizing.cellTodayDotSize,
                             borderRadius: '50%',
                             background: primaryBg,
-                            bottom: tokens.cellTodayDotOffset,
+                            bottom: panelSizing.cellTodayDotOffset,
                             left: '50%',
                             transform: 'translateX(-50%)',
                           }}

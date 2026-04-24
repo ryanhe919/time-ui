@@ -9,6 +9,7 @@ import type { PopoverPlacement } from '../Popover/Popover.types';
 import type { WeekStartsOn } from './date-utils';
 
 export type DatePickerSize = 'sm' | 'md' | 'lg';
+export type DatePickerPanelSize = 'sm' | 'md' | 'lg';
 
 export type DateValue = Date;
 
@@ -31,6 +32,8 @@ export interface DatePickerCommonProps {
   placement?: PopoverPlacement;
   /** 触发器尺寸，跟随 Input。 */
   size?: DatePickerSize;
+  /** 弹出日历面板尺寸，默认 'md'。 */
+  panelSize?: DatePickerPanelSize;
   minValue?: DateValue;
   maxValue?: DateValue;
   /** 自定义某天禁用（如周末禁选）。 */

@@ -12,6 +12,7 @@ export type {
   DatePickerCommonProps,
   DateRangePickerProps,
   DatePickerSize,
+  DatePickerPanelSize,
   DateValue,
   DateRangeValue,
   DateRangePresetEntry,

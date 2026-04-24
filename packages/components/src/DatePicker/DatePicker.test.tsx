@@ -97,6 +97,21 @@ describe('DatePicker — base rendering', () => {
     renderWithProviders(<DatePicker aria-label="Birthday" />);
     expect(screen.getByLabelText('Birthday')).toBeInTheDocument();
   });
+
+  it('applies panelSize to the popover calendar panel', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    renderWithProviders(<DatePicker panelSize="lg" aria-label="d" />);
+    await user.click(screen.getByLabelText('Open calendar'));
+    expect(document.querySelector('[data-slot="datepicker-panel"]')).toHaveAttribute(
+      'data-panel-size',
+      'lg',
+    );
+    expect(screen.getByRole('grid').closest('[data-timeui-calendar]')).toHaveAttribute(
+      'data-panel-size',
+      'lg',
+    );
+  });
 });
 
 // ────────────────────────────────────────────────────────────
