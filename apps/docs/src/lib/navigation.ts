@@ -60,6 +60,7 @@ const SECTIONS: readonly SectionConfig[] = [
           'slider',
           'segmented-control',
           'date-picker',
+          'date-time-picker',
           'upload',
         ],
       },

@@ -1,0 +1,113 @@
+# 日期时间选择 Date Time Picker
+
+`DateTimePicker` 在 `DatePicker` 的基础上横向拼接了时间列，让一个控件同时承担年月日与时分秒。分钟、秒都是**可选择性开放**——被关闭的字段在最终 `Date` 中恒为 `0`，因此调用方拿到的永远是一个完整的 `Date` 对象。
+
+<Callout variant="info" title="左日历、右时间">
+  面板复用共享的 `CalendarPanel`（键盘、min/max、`isDateUnavailable` 完全一致），右侧拼接 `TimePanel` —— 小时 / 分钟 / 秒三列可选 `listbox`，`use12Hours` 打开时再加一列 AM/PM。底部 `[此刻] [清除] [确定]`：面板内所有交互先落入 draft，只有点 **确定** 才会触发 `onChange`，避免你拨动时间列时触发一堆意外回调。
+</Callout>
+
+## 基本用法
+
+默认显示小时 + 分钟列，秒恒为 `0`。`isClearable` 同时在输入框和底部显示清除按钮。
+
+<LiveDemo code={`import { useState } from 'react';
+import { DateTimePicker } from '@timeui/react';
+
+export function Demo() {
+  const [value, setValue] = useState<Date | null>(null);
+  return (
+    <DateTimePicker
+      value={value}
+      onChange={setValue}
+      placeholder="选择日期时间"
+      isClearable
+    />
+  );
+}`}>
+  <DateTimePickerBasicDemo />
+</LiveDemo>
+
+## 选择性开放分 / 秒
+
+通过 `showMinute`（默认 `true`）与 `showSecond`（默认 `false`）开关时间列。**被隐藏的字段在提交时强制置 0** —— 这正是"可选择性开放"的语义：你想要哪一级精度，就开哪一列，不用担心下游拿到一个多余的 `getSeconds() === 37`。
+
+<LiveDemo code={`// 仅时 —— 分 / 秒恒为 0
+<DateTimePicker showMinute={false} />
+
+// 时 + 分（默认）
+<DateTimePicker />
+
+// 时 + 分 + 秒
+<DateTimePicker showSecond />`}>
+  <DateTimePickerGranularityDemo />
+</LiveDemo>
+
+## 12 小时制
+
+`use12Hours` 追加一列 AM/PM。对外 `value` 仍是原生 `Date`（内部始终 24 小时制），只是 listbox 渲染与格式化字符串会变。
+
+```tsx
+<DateTimePicker use12Hours isClearable />
+```
+
+## 步长
+
+`hourStep` / `minuteStep` / `secondStep`（默认 `1`）会稀疏化对应列的选项 —— 用于预约窗口或日志聚合粒度很方便。
+
+```tsx
+<DateTimePicker minuteStep={15} secondStep={10} />
+```
+
+## 提交流程：draft + 确定
+
+与 `DatePicker` "点一下就关"不同，`DateTimePicker` 把面板当成一个 staging 区。点击日期或拨动时间列只改 draft，只有点 **确定** 才会触发 `onChange`。如果你更想要即点即生效，可以自己用 `isOpen` / `onOpenChange` 和外部 state 驱动。
+
+底部按钮：
+- **此刻**：把 draft 填为"今天 + 当前时间"（仍受 `minValue` / `maxValue` 约束）。
+- **清除**（仅当 `isClearable`）：清空 value 并关闭面板。
+- **确定**：提交 draft 并关闭面板。
+
+## 本地化与格式
+
+- `locale`：传给 `Intl` 的 BCP-47 标记。
+- `format(d)` / `parse(s)`：自定义输入框的展示与解析。默认格式 `YYYY-MM-DD HH:mm`（`showSecond` 打开时追加 `:ss`，`use12Hours` 打开时追加 ` AM/PM`）；默认解析器同时宽容地接收 ISO-8601。
+
+## API
+
+<PropsTable props={[
+  { name: 'value', type: 'Date | null', description: '受控值。' },
+  { name: 'defaultValue', type: 'Date | null' },
+  { name: 'onChange', type: '(value: Date | null) => void', description: '仅在确定 / 清除时触发。' },
+  { name: 'showMinute', type: 'boolean', default: 'true', description: '是否渲染分钟列；隐藏时分钟恒为 0。' },
+  { name: 'showSecond', type: 'boolean', default: 'false', description: '是否渲染秒钟列；隐藏时秒恒为 0。' },
+  { name: 'hourStep', type: 'number', default: '1' },
+  { name: 'minuteStep', type: 'number', default: '1' },
+  { name: 'secondStep', type: 'number', default: '1' },
+  { name: 'use12Hours', type: 'boolean', default: 'false', description: '显示 AM/PM 列并按 12 小时制格式化。' },
+  { name: 'showNowButton', type: 'boolean', default: 'true' },
+  { name: 'showConfirmButton', type: 'boolean', default: 'true', description: '右下角的"确定"按钮。' },
+  { name: 'nowLabel', type: 'string', description: '覆盖"此刻"文案。' },
+  { name: 'confirmLabel', type: 'string', description: '覆盖"确定"文案。' },
+  { name: 'minValue', type: 'Date' },
+  { name: 'maxValue', type: 'Date' },
+  { name: 'isDateUnavailable', type: '(date: Date) => boolean' },
+  { name: 'weekStartsOn', type: '0 | 1 | 2 | 3 | 4 | 5 | 6', default: '0' },
+  { name: 'locale', type: 'string' },
+  { name: 'format', type: '(d: Date) => string' },
+  { name: 'parse', type: '(s: string) => Date | null' },
+  { name: 'placeholder', type: 'string' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false' },
+  { name: 'isDisabled', type: 'boolean', default: 'false' },
+  { name: 'isInvalid', type: 'boolean', default: 'false' },
+  { name: 'isClearable', type: 'boolean', default: 'false' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
+  { name: 'isOpen', type: 'boolean' },
+  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'onOpenChange', type: '(open: boolean) => void' },
+  { name: 'aria-label', type: 'string' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  每列时间都是 `listbox`，子项为 `option`，读屏器会朗读当前选中的时 / 分 / 秒和日历选中的日期。触发器仍是 combobox 形态的 `<input>`，浮层仍是 `dialog`。在 `prefers-reduced-motion` 下，月份切换动画与滚动 snap 都会被移除。
+</Callout>

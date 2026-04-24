@@ -121,6 +121,8 @@ import { MenuBasicDemo } from '@/components/mdx/MenuBasicDemo';
 import { MenuSelectionDemo } from '@/components/mdx/MenuSelectionDemo';
 import { DatePickerBasicDemo } from '@/components/mdx/DatePickerBasicDemo';
 import { DateRangePickerDemo } from '@/components/mdx/DateRangePickerDemo';
+import { DateTimePickerBasicDemo } from '@/components/mdx/DateTimePickerBasicDemo';
+import { DateTimePickerGranularityDemo } from '@/components/mdx/DateTimePickerGranularityDemo';
 import { TagClosableDemo, TagInteractiveDemo } from '@/components/mdx/TagInteractiveDemo';
 import { UploadWithProgressDemo } from '@/components/mdx/UploadWithProgressDemo';
 import { UploadCustomRequestDemo } from '@/components/mdx/UploadCustomRequestDemo';
@@ -202,6 +204,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     MenuSelectionDemo,
     DatePickerBasicDemo,
     DateRangePickerDemo,
+    DateTimePickerBasicDemo,
+    DateTimePickerGranularityDemo,
     TagClosableDemo,
     TagInteractiveDemo,
     UploadWithProgressDemo,
