@@ -68,12 +68,19 @@ export function TopNav({ navigation, messages, locale }: Props) {
         /* sticky header 层级；低于 popover (1500) / toast (1700) / tooltip (1800)
            让浮层和 toast 能正常盖在 header 之上。 */
         z-index: 1100;
-        height: 48px;
+        /* Settle effect: collapse 48 → 44px once the user has scrolled,
+           giving the page a quieter "documented" feel after the hero. */
+        height: ${scrolled ? 44 : 48}px;
         background: var(--c-nav-bg);
         backdrop-filter: saturate(180%) blur(20px);
         -webkit-backdrop-filter: saturate(180%) blur(20px);
         border-bottom: 1px solid ${scrolled ? 'var(--c-hairline)' : 'transparent'};
-        transition: border-color 320ms cubic-bezier(0.42, 0, 0.18, 1);
+        transition:
+          height 320ms var(--ease-editorial),
+          border-color 320ms var(--ease-editorial);
+        @media (prefers-reduced-motion: reduce) {
+          transition: none;
+        }
       `}
     >
       <div
@@ -94,10 +101,11 @@ export function TopNav({ navigation, messages, locale }: Props) {
           css={css`
             display: inline-flex;
             align-items: center;
+            gap: 10px;
             line-height: 1;
-            transition: opacity 200ms;
+            transition: transform 320ms var(--ease-editorial);
             &:hover {
-              opacity: 0.7;
+              transform: translateX(2px);
             }
           `}
         >
@@ -116,6 +124,29 @@ export function TopNav({ navigation, messages, locale }: Props) {
               margin-block: -16px;
             `}
           />
+          <span
+            aria-hidden
+            css={css`
+              display: inline-flex;
+              align-items: center;
+              gap: 4px;
+              font-family: var(--docs-mono);
+              font-size: 10px;
+              letter-spacing: 0.16em;
+              color: var(--c-text-tertiary);
+              text-transform: uppercase;
+              line-height: 1;
+            `}
+          >
+            <span
+              css={css`
+                color: var(--c-iris);
+              `}
+            >
+              /
+            </span>
+            DOCS
+          </span>
         </Link>
 
         <nav
@@ -135,6 +166,8 @@ export function TopNav({ navigation, messages, locale }: Props) {
                 key={s.slug}
                 href={firstItem?.href ?? `/${locale}/docs/${s.slug}`}
                 css={css`
+                  position: relative;
+                  overflow: visible;
                   display: inline-flex;
                   align-items: center;
                   padding: 0 12px;
@@ -144,9 +177,30 @@ export function TopNav({ navigation, messages, locale }: Props) {
                   letter-spacing: -0.005em;
                   color: ${active ? 'var(--c-text)' : 'var(--c-text-secondary)'};
                   transition: color 200ms ease;
+                  &::after {
+                    content: '';
+                    position: absolute;
+                    left: 12px;
+                    right: 12px;
+                    bottom: 4px;
+                    height: 1.5px;
+                    background: var(--c-accent);
+                    transform-origin: left center;
+                    transform: ${active ? 'scaleX(1)' : 'scaleX(0)'};
+                    opacity: ${active ? 1 : 0};
+                    transition:
+                      transform 280ms var(--ease-editorial),
+                      opacity 280ms var(--ease-editorial);
+                  }
                   &:hover {
                     color: var(--c-text);
                   }
+                  ${active
+                    ? ''
+                    : `&:hover::after {
+                        transform: scaleX(0.4);
+                        opacity: 0.5;
+                      }`}
                 `}
               >
                 {messages.sections[s.slug] ?? s.slug}
@@ -158,6 +212,17 @@ export function TopNav({ navigation, messages, locale }: Props) {
         <div
           css={css`
             flex: 1;
+          `}
+        />
+
+        <span
+          aria-hidden
+          css={css`
+            display: inline-block;
+            width: 1px;
+            height: 14px;
+            background: var(--c-hairline);
+            margin: 0 12px 0 0;
           `}
         />
 
@@ -202,16 +267,26 @@ export function TopNav({ navigation, messages, locale }: Props) {
               width: 28px;
               height: 28px;
               border-radius: 50%;
-              border: 0;
+              border: 1px solid transparent;
               background: transparent;
               color: var(--c-text-secondary);
               cursor: pointer;
               transition:
-                background 200ms,
-                color 200ms;
+                background 240ms var(--ease-editorial),
+                color 240ms var(--ease-editorial),
+                border-color 240ms var(--ease-editorial),
+                transform 240ms var(--ease-editorial);
               &:hover {
                 background: var(--c-bg-tertiary);
+                border-color: var(--c-hairline-strong);
                 color: var(--c-text);
+              }
+              &:active {
+                transform: scale(0.92);
+              }
+              &:focus-visible {
+                outline: 2px solid var(--c-accent);
+                outline-offset: 2px;
               }
             `}
           >
@@ -229,13 +304,24 @@ export function TopNav({ navigation, messages, locale }: Props) {
               width: 28px;
               height: 28px;
               border-radius: 50%;
+              border: 1px solid transparent;
               color: var(--c-text-secondary);
               transition:
-                background 200ms,
-                color 200ms;
+                background 240ms var(--ease-editorial),
+                color 240ms var(--ease-editorial),
+                border-color 240ms var(--ease-editorial),
+                transform 240ms var(--ease-editorial);
               &:hover {
                 background: var(--c-bg-tertiary);
+                border-color: var(--c-hairline-strong);
                 color: var(--c-text);
+              }
+              &:active {
+                transform: scale(0.92);
+              }
+              &:focus-visible {
+                outline: 2px solid var(--c-accent);
+                outline-offset: 2px;
               }
             `}
           >

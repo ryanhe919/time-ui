@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { css } from '@emotion/react';
 
@@ -22,6 +22,9 @@ interface Props {
   label: string;
 }
 
+const DOT_DIAMETER = 7;
+const DOT_RADIUS = DOT_DIAMETER / 2;
+
 function toSlug(text: string): string {
   const slug = text
     .trim()
@@ -32,10 +35,17 @@ function toSlug(text: string): string {
   return slug || 'section';
 }
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
 export function TableOfContents({ label }: Props) {
   const pathname = usePathname();
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [progress, setProgress] = useState<number>(0);
+  const [dotOffset, setDotOffset] = useState<number>(0);
+  const itemRefs = useRef<Map<string, HTMLLIElement | null>>(new Map());
 
   useEffect(() => {
     const article =
@@ -80,7 +90,46 @@ export function TableOfContents({ label }: Props) {
     return () => observer.disconnect();
   }, [pathname]);
 
+  useEffect(() => {
+    const article =
+      document.querySelector<HTMLElement>('.mdx-article') ||
+      document.querySelector<HTMLElement>('main article') ||
+      document.querySelector<HTMLElement>('main');
+    if (!article) return;
+
+    const computeProgress = () => {
+      const rect = article.getBoundingClientRect();
+      const articleTop = rect.top + window.scrollY;
+      const articleHeight = article.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      const denom = articleHeight - viewportHeight;
+      if (denom <= 0) {
+        setProgress(0);
+        return;
+      }
+      const next = clamp((window.scrollY - articleTop) / denom, 0, 1);
+      setProgress(next);
+    };
+
+    computeProgress();
+    window.addEventListener('scroll', computeProgress, { passive: true });
+    window.addEventListener('resize', computeProgress, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', computeProgress);
+      window.removeEventListener('resize', computeProgress);
+    };
+  }, [pathname, headings.length]);
+
+  useEffect(() => {
+    if (!activeId) return;
+    const el = itemRefs.current.get(activeId);
+    if (!el) return;
+    setDotOffset(el.offsetTop + el.offsetHeight / 2 - DOT_RADIUS);
+  }, [activeId, headings]);
+
   if (headings.length === 0) return null;
+
+  const totalLabel = headings.length.toString().padStart(2, '0');
 
   return (
     <nav
@@ -95,7 +144,33 @@ export function TableOfContents({ label }: Props) {
       `}
     >
       <div
+        aria-hidden
         css={css`
+          height: 2px;
+          width: 100%;
+          background: var(--c-leader);
+          border-radius: 1px;
+          overflow: hidden;
+          margin-bottom: 24px;
+        `}
+      >
+        <div
+          css={css`
+            height: 100%;
+            background: linear-gradient(90deg, var(--c-iris) 0%, var(--c-accent) 100%);
+            transition: width 120ms linear;
+            @media (prefers-reduced-motion: reduce) {
+              transition: none;
+            }
+          `}
+          style={{ width: `${progress * 100}%` }}
+        />
+      </div>
+      <div
+        css={css`
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
           font-size: 11px;
           font-weight: 600;
           letter-spacing: 0.06em;
@@ -104,56 +179,106 @@ export function TableOfContents({ label }: Props) {
           margin-bottom: 16px;
         `}
       >
-        {label}
+        <span>{label}</span>
+        <span
+          aria-hidden
+          css={css`
+            color: var(--c-text-tertiary);
+          `}
+        >
+          {' / '}
+        </span>
+        <span
+          css={css`
+            font-family: var(--docs-mono);
+            color: var(--c-iris);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+          `}
+        >
+          {totalLabel}
+        </span>
       </div>
       <ul
         css={css`
+          position: relative;
           list-style: none;
           padding: 0;
           margin: 0;
           display: flex;
           flex-direction: column;
           gap: 10px;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 1px;
+            background: var(--c-leader);
+          }
         `}
       >
+        <span
+          aria-hidden
+          css={css`
+            position: absolute;
+            top: 0;
+            left: -3px;
+            width: ${DOT_DIAMETER}px;
+            height: ${DOT_DIAMETER}px;
+            border-radius: 50%;
+            background: var(--c-iris);
+            box-shadow: 0 0 0 4px var(--c-iris-soft);
+            transition:
+              transform 360ms var(--ease-editorial),
+              opacity 240ms var(--ease-editorial);
+            pointer-events: none;
+            @media (prefers-reduced-motion: reduce) {
+              transition: none;
+            }
+          `}
+          style={{
+            transform: `translateY(${dotOffset}px)`,
+            opacity: activeId ? 1 : 0,
+          }}
+        />
         {headings.map((h) => {
           const active = h.id === activeId;
           return (
             <li
               key={h.id}
+              ref={(node) => {
+                if (node) {
+                  itemRefs.current.set(h.id, node);
+                } else {
+                  itemRefs.current.delete(h.id);
+                }
+              }}
               css={css`
-                padding-left: ${h.level === 3 ? 14 : 0}px;
+                padding-left: ${h.level === 3 ? 32 : 16}px;
               `}
             >
               <a
                 href={`#${h.id}`}
                 css={css`
-                  display: flex;
-                  align-items: center;
-                  gap: 8px;
+                  display: block;
                   font-size: 12px;
                   line-height: 1.4;
-                  color: ${active ? 'var(--c-accent)' : 'var(--c-text-secondary)'};
+                  color: ${active ? 'var(--c-iris)' : 'var(--c-text-secondary)'};
                   font-weight: ${active ? 500 : 400};
                   letter-spacing: -0.003em;
-                  transition: color 200ms;
+                  transition: color 200ms var(--ease-editorial);
                   &:hover {
                     color: var(--c-text);
                   }
+                  @media (prefers-reduced-motion: reduce) {
+                    transition: none;
+                  }
                 `}
               >
-                <span
-                  aria-hidden
-                  css={css`
-                    flex-shrink: 0;
-                    width: 4px;
-                    height: 4px;
-                    border-radius: 50%;
-                    background: ${active ? 'var(--c-accent)' : 'transparent'};
-                    transition: background 200ms;
-                  `}
-                />
-                <span>{h.text}</span>
+                {h.text}
               </a>
             </li>
           );
