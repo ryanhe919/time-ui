@@ -178,10 +178,11 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
   // `useControllableState` itself warns when both `value` and `defaultValue` are defined —
   // so to avoid spurious warnings we only synthesise an empty defaultValue when neither was
   // supplied (true uncontrolled-with-no-initial case).
+  const isControlled = value !== undefined;
   const hookDefaultValue = useMemo<UploadFile[] | undefined>(() => {
-    if (value !== undefined) return undefined;
+    if (isControlled) return undefined;
     return defaultValue ?? [];
-  }, [value !== undefined, defaultValue]);
+  }, [isControlled, defaultValue]);
   const [currentValue, setStateRaw] = useControllableState<UploadFile[]>({
     value,
     defaultValue: hookDefaultValue as UploadFile[],
@@ -315,6 +316,17 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
   // —— preview ——
   useFilePreview(currentValue);
 
+  // —— live region ——
+  const liveRef = useRef<HTMLDivElement | null>(null);
+  const announce = useCallback((msg: string) => {
+    if (!liveRef.current) return;
+    // 清空再写入，强制屏幕阅读器重读
+    liveRef.current.textContent = '';
+    window.setTimeout(() => {
+      if (liveRef.current) liveRef.current.textContent = msg;
+    }, 10);
+  }, []);
+
   // —— ingest 统一入口 ——
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
@@ -410,19 +422,9 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
       commit,
       queue,
       i18n,
+      announce,
     ],
   );
-
-  // —— live region ——
-  const liveRef = useRef<HTMLDivElement | null>(null);
-  const announce = useCallback((msg: string) => {
-    if (!liveRef.current) return;
-    // 清空再写入，强制屏幕阅读器重读
-    liveRef.current.textContent = '';
-    window.setTimeout(() => {
-      if (liveRef.current) liveRef.current.textContent = msg;
-    }, 10);
-  }, []);
 
   // —— 触发器事件 ——
   const handleInputChange = useCallback(
@@ -542,7 +544,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
       commit(next, { trigger: 'remove', file });
       announce(interpolate(i18n.upload.liveRemoved, { name: file.name }));
     },
-    [isDisabled, isReadOnly, queue, commit, i18n],
+    [isDisabled, isReadOnly, queue, commit, i18n, announce],
   );
 
   const retryFile = useCallback(
