@@ -69,6 +69,24 @@
   --r-control: 12px;
   --tracking-display: -0.022em;
   --tracking-tight: -0.005em;
+
+  /* Iris — secondary editorial accent (inky indigo). Used for numbering,
+     decorative spines, scroll progress, orbital rail dot, hover halos.
+     Primary Apple blue (`--c-accent`) stays reserved for interactive intent. */
+  --c-iris: #3b3799;
+  --c-iris-soft: rgba(59, 55, 153, 0.14);
+  --c-iris-glow: rgba(59, 55, 153, 0.28);
+
+  /* Hairline upgrade — a faint warm tone, reads closer to ink than pure gray. */
+  --c-leader: rgba(17, 17, 40, 0.14);
+
+  /* Mesh gradient for hero halos — two soft ellipses, very low opacity. */
+  --c-mesh:
+    radial-gradient(ellipse 640px 320px at 12% -8%, rgba(59, 55, 153, 0.09), transparent 60%),
+    radial-gradient(ellipse 520px 280px at 88% -12%, rgba(0, 113, 227, 0.08), transparent 65%);
+
+  /* Editorial motion curve — one curve rules them all. */
+  --ease-editorial: cubic-bezier(0.42, 0, 0.18, 1);
 }
 
 html[data-theme='dark'] {
@@ -90,6 +108,15 @@ html[data-theme='dark'] {
   --c-code-bg: rgba(255, 255, 255, 0.08);
   --c-code-border: rgba(255, 255, 255, 0.1);
   --c-code-text: #f5f5f7;
+
+  /* Dark-mode iris — raises to a paler iris so it sits correctly against ink. */
+  --c-iris: #a6a0ff;
+  --c-iris-soft: rgba(166, 160, 255, 0.14);
+  --c-iris-glow: rgba(166, 160, 255, 0.32);
+  --c-leader: rgba(255, 255, 255, 0.14);
+  --c-mesh:
+    radial-gradient(ellipse 640px 320px at 12% -8%, rgba(166, 160, 255, 0.12), transparent 60%),
+    radial-gradient(ellipse 520px 280px at 88% -12%, rgba(41, 151, 255, 0.1), transparent 65%);
 }
 
 *,
@@ -118,6 +145,28 @@ body {
   font-feature-settings: 'kern', 'liga', 'calt', 'ss01';
 }
 
+/* ============================================================
+ * Ambient grain — a barely-there fractal-noise overlay sitting
+ * BEHIND body content. Fixed full-viewport, never intercepts
+ * pointer events. Slightly stronger in dark mode to keep texture
+ * legible against ink. Lives at z-index: -1 so it never competes
+ * with the TopNav (z 1100) / ReadingProgress (z 1200) / popovers.
+ * ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.025;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
+  background-repeat: repeat;
+}
+html[data-theme='dark'] body::before {
+  opacity: 0.04;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -144,6 +193,27 @@ button {
   color: var(--c-text);
   /* Kill the default tab-size of 8 inside code. */
   tab-size: 2;
+  /* Anchor for the hero mesh halo pseudo below. */
+  position: relative;
+}
+
+/* Hero mesh halo — a soft mesh gradient floating behind the first H1
+   area. `--c-mesh` already swaps for light/dark, so no extra rule needed. */
+.mdx-article::before {
+  content: '';
+  position: absolute;
+  inset: -80px -120px auto -120px;
+  height: 360px;
+  background: var(--c-mesh);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.9;
+}
+
+/* Defensive: if a LiveDemo ever scopes its own `.mdx-article`, never let
+   the halo bleed inside the preview boundary. */
+.mdx-article [data-live-preview]::before {
+  content: none !important;
 }
 
 /* ----- H1: editorial serif display with italic accent ----- */
@@ -476,21 +546,21 @@ button {
   border: 0;
   margin: 80px auto;
   height: 1px;
-  max-width: 120px;
+  max-width: 160px;
   background: var(--c-rule);
   position: relative;
 }
 .mdx-article hr::after {
-  content: '✦';
+  content: '\25c7 \00b7 \25c7';
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -55%);
   background: var(--c-bg);
-  color: var(--c-accent);
+  color: var(--c-iris);
   padding: 0 10px;
-  font-size: 11px;
-  letter-spacing: 0.1em;
+  font-size: 9px;
+  letter-spacing: 0.4em;
 }
 
 /* ----- Tables (used by some embedded HTML; PropsTable is a custom comp) ----- */
@@ -536,9 +606,18 @@ button {
   }
 }
 
+/* Section reveal stagger — each top-level H2 fades up on page load.
+   Scoped to direct children so it never fires on H2s inside LiveDemo
+   preview boundaries (those are descendants of [data-live-preview]). */
+.mdx-article > h2 {
+  animation: docs-fade-up 540ms var(--ease-editorial) both;
+  animation-delay: 120ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mdx-article > h1:first-child,
-  .mdx-article > h1 + p {
+  .mdx-article > h1 + p,
+  .mdx-article > h2 {
     animation: none !important;
   }
   html {
@@ -552,6 +631,19 @@ button {
 }
 
 /* ============================================================
+ * Eyebrow utility — small monospace caps label, free for any
+ * sibling of an editorial heading or hero block.
+ * ============================================================ */
+.docs-eyebrow {
+  font-family: var(--docs-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-tertiary);
+}
+
+/* ============================================================
  * Selection — Apple blue
  * ============================================================ */
 
@@ -561,6 +653,18 @@ button {
 }
 html[data-theme='dark'] ::selection {
   background: rgba(41, 151, 255, 0.32);
+}
+
+/* Editorial-tone selection on display headings + pull quotes — uses the
+   iris glow instead of Apple blue so the marquee feels printy, not UI. */
+.mdx-article h1::selection,
+.mdx-article h2::selection,
+.mdx-article blockquote::selection,
+.mdx-article h1 ::selection,
+.mdx-article h2 ::selection,
+.mdx-article blockquote ::selection {
+  background: var(--c-iris-glow);
+  color: inherit;
 }
 
 /* Subtle scrollbar in dark mode (matches macOS) */

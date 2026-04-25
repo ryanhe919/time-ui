@@ -69,29 +69,41 @@ export function Sidebar({ navigation, messages }: SidebarProps) {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 7px 12px;
+            /* Reserve a 4px gutter on the left so the active bar doesn't
+               shift the row horizontally when toggled on. */
+            padding: 7px 12px 7px 16px;
             font-size: 13px;
             line-height: 1.4;
-            color: ${active ? 'var(--c-accent)' : 'var(--c-text-secondary)'};
+            color: ${active ? 'var(--c-text)' : 'var(--c-text-secondary)'};
             font-weight: ${active ? 500 : 400};
             letter-spacing: -0.003em;
-            transition: color 200ms;
+            background: ${active ? 'var(--c-iris-soft)' : 'transparent'};
+            border-radius: 8px;
+            transition:
+              color 200ms,
+              background 240ms var(--ease-editorial);
             &:hover {
               color: var(--c-text);
             }
+            &::before {
+              content: '';
+              position: absolute;
+              left: 4px;
+              top: 50%;
+              width: 2px;
+              height: 16px;
+              margin-top: -8px;
+              border-radius: 2px;
+              background: var(--c-iris);
+              transform: ${active ? 'scaleY(1)' : 'scaleY(0)'};
+              opacity: ${active ? 1 : 0};
+              transform-origin: center;
+              transition:
+                transform 280ms var(--ease-editorial),
+                opacity 280ms var(--ease-editorial);
+            }
           `}
         >
-          <span
-            aria-hidden
-            css={css`
-              flex-shrink: 0;
-              width: 4px;
-              height: 4px;
-              border-radius: 50%;
-              background: ${active ? 'var(--c-accent)' : 'transparent'};
-              transition: background 200ms;
-            `}
-          />
           <span>{messages.pages[item.slug] ?? item.slug}</span>
         </Link>
       </li>
@@ -107,6 +119,10 @@ export function Sidebar({ navigation, messages }: SidebarProps) {
       }))
     : [{ items: currentSection.items }];
 
+  // Section 总条目数 —— 用于右上角 monospace 计数 eyebrow。
+  const totalCount = blocks.reduce((sum, b) => sum + b.items.length, 0);
+  const paddedCount = String(totalCount).padStart(2, '0');
+
   return (
     <nav
       aria-label="Documentation navigation"
@@ -115,6 +131,21 @@ export function Sidebar({ navigation, messages }: SidebarProps) {
         padding: 40px 0;
         overflow-y: auto;
         font-family: var(--docs-sans);
+
+        animation: sidebar-reveal 320ms var(--ease-editorial) both;
+        @keyframes sidebar-reveal {
+          from {
+            opacity: 0;
+            transform: translateX(-6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          animation: none;
+        }
 
         /* Firefox */
         scrollbar-width: thin;
@@ -145,6 +176,10 @@ export function Sidebar({ navigation, messages }: SidebarProps) {
     >
       <div
         css={css`
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          gap: 8px;
           font-size: 11px;
           font-weight: 600;
           letter-spacing: 0.06em;
@@ -154,7 +189,19 @@ export function Sidebar({ navigation, messages }: SidebarProps) {
           margin-bottom: 16px;
         `}
       >
-        {messages.sections[currentSection.slug] ?? currentSection.slug}
+        <span>{messages.sections[currentSection.slug] ?? currentSection.slug}</span>
+        <span
+          aria-hidden
+          css={css`
+            font-family: var(--docs-mono);
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            color: var(--c-text-tertiary);
+            font-weight: 400;
+          `}
+        >
+          — {paddedCount}
+        </span>
       </div>
 
       {blocks.map((block, idx) => {
@@ -169,7 +216,9 @@ export function Sidebar({ navigation, messages }: SidebarProps) {
             key={key}
             css={css`
               & + & {
-                margin-top: 20px;
+                border-top: 1px dotted var(--c-leader);
+                padding-top: 16px;
+                margin-top: 16px;
               }
             `}
           >
@@ -210,7 +259,29 @@ export function Sidebar({ navigation, messages }: SidebarProps) {
                   }
                 `}
               >
-                <span>{block.label}</span>
+                <span
+                  css={css`
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    min-width: 0;
+                  `}
+                >
+                  <span
+                    aria-hidden
+                    css={css`
+                      flex-shrink: 0;
+                      width: 7px;
+                      height: 7px;
+                      border-radius: 999px;
+                      border: 1px solid currentColor;
+                      background: ${!isCollapsed ? 'var(--c-iris)' : 'transparent'};
+                      box-sizing: border-box;
+                      transition: background 200ms var(--ease-editorial);
+                    `}
+                  />
+                  <span>{block.label}</span>
+                </span>
                 <svg
                   aria-hidden
                   width="10"
