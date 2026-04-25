@@ -263,8 +263,28 @@ jobs:
             /*) ;;
             *) echo "remote: DEPLOY_PATH must be absolute"; exit 1 ;;
           esac
+
+          # Non-interactive SSH shells skip ~/.bashrc, so neither nvm's Node
+          # bin nor pnpm's global bin land on PATH automatically. Sourcing
+          # nvm.sh only defines the `nvm` function — we still need `nvm use`
+          # to actually prepend a Node version to PATH. Without this, pm2
+          # (installed via `pnpm add -g`) is "command not found".
           export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
-          [ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
+          export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+          # shellcheck disable=SC1091
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+          nvm use default >/dev/null 2>&1 || nvm use --lts >/dev/null 2>&1 || true
+          export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
+          export PATH="$PNPM_HOME:$PATH"
+
+          if ! command -v pm2 >/dev/null 2>&1; then
+            echo "remote: pm2 not on PATH"
+            echo "  PATH=$PATH"
+            echo "  node=$(command -v node || echo missing)"
+            echo "  pnpm global bin=$(command -v pnpm >/dev/null && pnpm bin -g 2>/dev/null || echo 'pnpm missing')"
+            exit 127
+          fi
+
           cd "$DEPLOY_PATH/apps/docs"
           # Next.js standalone server reads .env.production.local from cwd
           # via @next/env at boot. --update-env ensures pm2 re-inherits the
@@ -286,8 +306,16 @@ jobs:
           ssh -T deploy-target "bash -s -- $REMOTE_ARG" <<'REMOTE' | tee health.out
           set -euo pipefail
           DEPLOY_PATH="$1"
+
+          # See "Restart on server" for why nvm/pnpm need explicit activation
+          # under non-interactive SSH.
           export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
-          [ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
+          export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+          # shellcheck disable=SC1091
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+          nvm use default >/dev/null 2>&1 || nvm use --lts >/dev/null 2>&1 || true
+          export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
+          export PATH="$PNPM_HOME:$PATH"
 
           echo "--- pm2 status ---"
           pm2 describe timeui-docs | grep -E 'status|pid|uptime|restarts|exec cwd' || true
