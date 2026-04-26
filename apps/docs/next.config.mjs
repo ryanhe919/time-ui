@@ -16,6 +16,10 @@ const chatMarkdownSourceEntry = path.join(
   __dirname,
   '../../packages/components/src/Chat/ChatMarkdown.tsx',
 );
+const richTextEditorSourceEntry = path.join(
+  __dirname,
+  '../../packages/components/src/RichTextEditor/index.ts',
+);
 
 const withMDX = createMDX({
   options: {
@@ -90,6 +94,7 @@ const nextConfig = {
             '@timeui/react': reactSourceEntry,
             '@timeui/react/code-block': codeBlockSourceEntry,
             '@timeui/react/chat-markdown': chatMarkdownSourceEntry,
+            '@timeui/react/rich-text-editor': richTextEditorSourceEntry,
           },
         },
         webpack(config) {
@@ -99,6 +104,7 @@ const nextConfig = {
             '@timeui/react$': reactSourceEntry,
             '@timeui/react/code-block$': codeBlockSourceEntry,
             '@timeui/react/chat-markdown$': chatMarkdownSourceEntry,
+            '@timeui/react/rich-text-editor$': richTextEditorSourceEntry,
           };
           return config;
         },
