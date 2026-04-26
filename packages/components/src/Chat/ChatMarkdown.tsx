@@ -159,7 +159,7 @@ function CodeBlockInline({ code, language }: CodeBlockInlineProps): ReactNode {
 
   const wrapperCss = css`
     position: relative;
-    margin: 0 0 0.65em;
+    margin: 0 0 0.5em;
     border-radius: 8px;
     border: 1px solid ${border};
     background: ${bg};
@@ -297,7 +297,7 @@ export const ChatMarkdown = forwardRef<HTMLDivElement, ChatMarkdownProps>(
       }
 
       p {
-        margin: 0 0 0.65em;
+        margin: 0 0 0.5em;
       }
       p:last-child {
         margin-bottom: 0;
@@ -322,24 +322,43 @@ export const ChatMarkdown = forwardRef<HTMLDivElement, ChatMarkdownProps>(
 
       ul,
       ol {
-        margin: 0 0 0.65em;
-        padding-left: 1.4em;
+        margin: 0.25em 0 0.4em;
+        padding-left: 1.25em;
+      }
+      /* LLM 经常在段落和列表之间多换一行；把 p→ul/ol 的过渡收紧。 */
+      p + ul,
+      p + ol {
+        margin-top: -0.15em;
+      }
+      /* loose markdown 偶尔把每个 bullet 拆成独立 <ul>；让相邻列表视觉合并。 */
+      ul + ul,
+      ol + ol,
+      ul + ol,
+      ol + ul {
+        margin-top: -0.3em;
       }
       li {
-        margin: 0.12em 0;
+        margin: 0;
       }
+      li + li {
+        margin-top: 0.15em;
+      }
+      /* react-markdown 在 loose list 里会把 <li> 内容包进 <p>；消掉它的外 margin。 */
       li > p {
         margin: 0;
+      }
+      li > p + p {
+        margin-top: 0.3em;
       }
       ul ul,
       ul ol,
       ol ul,
       ol ol {
-        margin: 0.2em 0 0.2em;
+        margin: 0.1em 0 0;
       }
 
       blockquote {
-        margin: 0 0 0.65em;
+        margin: 0 0 0.5em;
         padding: 4px 12px;
         border-left: 3px solid ${theme.colors.border.default};
         color: ${theme.colors.text.secondary};
@@ -350,7 +369,7 @@ export const ChatMarkdown = forwardRef<HTMLDivElement, ChatMarkdownProps>(
       hr {
         border: 0;
         border-top: 1px solid ${theme.colors.border.subtle};
-        margin: 0.9em 0;
+        margin: 0.7em 0;
       }
 
       h1,
@@ -359,9 +378,13 @@ export const ChatMarkdown = forwardRef<HTMLDivElement, ChatMarkdownProps>(
       h4,
       h5,
       h6 {
-        margin: 0.9em 0 0.4em;
+        margin: 0.6em 0 0.25em;
         line-height: 1.3;
         font-weight: 600;
+      }
+      /* 第一个标题不要再吃额外上 margin（已被 :first-of-type 处理，但保险）。 */
+      :is(h1, h2, h3, h4, h5, h6):first-of-type {
+        margin-top: 0;
       }
       h1 {
         font-size: 1.25em;
@@ -390,7 +413,7 @@ export const ChatMarkdown = forwardRef<HTMLDivElement, ChatMarkdownProps>(
       }
 
       pre {
-        margin: 0 0 0.65em;
+        margin: 0 0 0.5em;
         padding: 10px 12px;
         background: ${theme.colors.bg.sunken ?? theme.colors.bg.muted};
         border: 1px solid ${theme.colors.border.subtle};
@@ -409,7 +432,7 @@ export const ChatMarkdown = forwardRef<HTMLDivElement, ChatMarkdownProps>(
       }
 
       table {
-        margin: 0 0 0.65em;
+        margin: 0 0 0.5em;
         border-collapse: collapse;
         border: 1px solid ${theme.colors.border.subtle};
         border-radius: 6px;
