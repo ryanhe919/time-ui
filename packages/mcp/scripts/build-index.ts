@@ -1,7 +1,12 @@
 /**
  * @author Ryan He
  * @date 2026-04-18
- * @description 构建 docs 下所有组件 mdx 的静态索引，输出到 data/index.json 与 apps/docs/public/assistant-index.json。
+ * @description 构建 docs 下所有 MDX 的静态索引，输出三份：
+ *   - packages/mcp/data/index.json            — 完整版，随包发布
+ *   - apps/docs/public/mcp-index.json         — 完整版，供 @timeui/mcp 运行时 HTTP 拉取（与 docs 同步）
+ *   - apps/docs/public/assistant-index.json   — 精简版（去 content），供 docs 站前端 AI 助手用
+ * 组件 (`components` section) 与指南 (`getting-started` / `chat` 等无 group 的 section) 走同一套抽取流程，
+ * 只是落到 index 的 `components[]` / `guides[]` 两个独立数组里。
  */
 
 import { promises as fs } from 'node:fs';
@@ -21,6 +26,7 @@ interface NavigationModule {
   getNavigation: (locale: string) => {
     sections: {
       slug: string;
+      items: { slug: string }[];
       groups?: { slug: string; items: { slug: string }[] }[];
     }[];
   };
@@ -28,6 +34,7 @@ interface NavigationModule {
 
 interface DocsI18nModule {
   getDocsMessages: (locale: Locale) => {
+    sections: Record<string, string>;
     groups: Record<string, string>;
     pages: Record<string, string>;
   };
@@ -46,15 +53,19 @@ const __dirname = path.dirname(__filename);
 // packages/mcp/scripts → packages/mcp → packages → repo root
 const PKG_ROOT = path.resolve(__dirname, '..');
 const REPO_ROOT = path.resolve(PKG_ROOT, '..', '..');
-const DOCS_COMPONENTS_ROOT = path.resolve(REPO_ROOT, 'apps/docs/src/app/[locale]/docs/components');
-const OUT_FULL = path.resolve(PKG_ROOT, 'data/index.json');
-const OUT_PUBLIC = path.resolve(REPO_ROOT, 'apps/docs/public/assistant-index.json');
+const DOCS_ROOT = path.resolve(REPO_ROOT, 'apps/docs/src/app/[locale]/docs');
+const OUT_BUNDLED = path.resolve(PKG_ROOT, 'data/index.json');
+const OUT_PUBLIC_LITE = path.resolve(REPO_ROOT, 'apps/docs/public/assistant-index.json');
+const OUT_PUBLIC_FULL = path.resolve(REPO_ROOT, 'apps/docs/public/mcp-index.json');
+
+/** Section slugs whose pages should be exposed as `guides[]` rather than `components[]`. */
+const GUIDE_SECTIONS = new Set(['getting-started', 'chat']);
 
 interface ExampleEntry {
   code: string;
 }
 
-interface ComponentTranslation {
+interface PageTranslation {
   title: string;
   description: string;
   content: string;
@@ -65,18 +76,29 @@ interface ComponentTranslation {
 interface ComponentEntry {
   slug: string;
   category: string;
-  translations: Record<Locale, ComponentTranslation>;
+  translations: Record<Locale, PageTranslation>;
 }
 
-interface CategoryEntry {
+interface GuideEntry {
+  slug: string;
+  /** Top-level section slug, e.g. 'getting-started' or 'chat'. */
+  section: string;
+  translations: Record<Locale, PageTranslation>;
+}
+
+interface LabelEntry {
   slug: string;
   label: string;
 }
 
 interface DocsIndex {
   generatedAt: string;
-  categories: Record<Locale, CategoryEntry[]>;
+  /** Component category labels (forms / overlays / ...), keyed by locale. */
+  categories: Record<Locale, LabelEntry[]>;
+  /** Top-level guide section labels (getting-started / chat / ...), keyed by locale. */
+  sections: Record<Locale, LabelEntry[]>;
   components: ComponentEntry[];
+  guides: GuideEntry[];
 }
 
 // 通过 navigation 的 groups 建 slug→category + 保留 groups 的顺序。
@@ -95,6 +117,18 @@ function buildComponentsLayout(): {
     for (const s of slugs) slugToCategory.set(s, g.slug);
   }
   return { categories, slugToCategory };
+}
+
+// 收集所有 guide 类 section（无 groups、按 pages 平铺）：保留 navigation 中的声明顺序。
+function buildGuidesLayout(): { section: string; slugs: string[] }[] {
+  const nav = getNavigation('zh');
+  const out: { section: string; slugs: string[] }[] = [];
+  for (const s of nav.sections) {
+    if (!GUIDE_SECTIONS.has(s.slug)) continue;
+    const slugs = (s.items ?? []).map((it) => it.slug);
+    out.push({ section: s.slug, slugs });
+  }
+  return out;
 }
 
 // 提取第一个一级标题行（`# ...`），作为页面标题；缺失时回落到 docs-i18n.pages。
@@ -300,14 +334,41 @@ async function readMdxIfExists(file: string): Promise<string | null> {
   }
 }
 
-function emptyTranslation(slug: string, locale: Locale): ComponentTranslation {
+function emptyTranslation(section: string, slug: string, locale: Locale): PageTranslation {
   return {
     title: slug,
     description: '',
     content: '',
     examples: [],
-    href: `/${locale}/docs/components/${slug}`,
+    href: `/${locale}/docs/${section}/${slug}`,
   };
+}
+
+// 通用的 MDX 抽取流程：所有 page 类（component / guide）都走这一个函数。
+async function buildTranslationsForPage(
+  section: string,
+  slug: string,
+): Promise<Record<Locale, PageTranslation>> {
+  const translations: Record<Locale, PageTranslation> = {
+    zh: emptyTranslation(section, slug, 'zh'),
+    en: emptyTranslation(section, slug, 'en'),
+  };
+
+  for (const locale of LOCALES) {
+    const file = path.join(DOCS_ROOT, section, slug, `${locale}.mdx`);
+    const mdx = await readMdxIfExists(file);
+    if (!mdx) continue;
+    const fallbackTitle = getDocsMessages(locale).pages[slug] ?? slug;
+    translations[locale] = {
+      title: extractTitle(mdx, fallbackTitle),
+      description: extractDescription(mdx),
+      content: extractContent(mdx),
+      examples: extractExamples(mdx),
+      href: `/${locale}/docs/${section}/${slug}`,
+    };
+  }
+
+  return translations;
 }
 
 async function main(): Promise<void> {
@@ -316,82 +377,88 @@ async function main(): Promise<void> {
     throw new Error('navigation: `components` section missing groups');
   }
 
-  const componentSlugs: string[] = [];
-  for (const c of catLayout) {
-    for (const s of c.slugs) componentSlugs.push(s);
-  }
-
+  // -- components --
   const components: ComponentEntry[] = [];
-  for (const slug of componentSlugs) {
-    const category = slugToCategory.get(slug) ?? 'uncategorized';
-    const translations: Record<Locale, ComponentTranslation> = {
-      zh: emptyTranslation(slug, 'zh'),
-      en: emptyTranslation(slug, 'en'),
-    };
-
-    for (const locale of LOCALES) {
-      const file = path.join(DOCS_COMPONENTS_ROOT, slug, `${locale}.mdx`);
-      const mdx = await readMdxIfExists(file);
-      if (!mdx) {
-        // 没有对应 locale 文档时保留 empty shell，页面标题回落到 i18n 词典。
-        continue;
-      }
-      const fallbackTitle = getDocsMessages(locale).pages[slug] ?? slug;
-      translations[locale] = {
-        title: extractTitle(mdx, fallbackTitle),
-        description: extractDescription(mdx),
-        content: extractContent(mdx),
-        examples: extractExamples(mdx),
-        href: `/${locale}/docs/components/${slug}`,
-      };
+  for (const c of catLayout) {
+    for (const slug of c.slugs) {
+      const category = slugToCategory.get(slug) ?? 'uncategorized';
+      const translations = await buildTranslationsForPage('components', slug);
+      components.push({ slug, category, translations });
     }
-
-    components.push({ slug, category, translations });
   }
 
-  // 分类清单按每个 locale 独立构造，顺序沿用 navigation 的声明顺序。
-  const categories: Record<Locale, CategoryEntry[]> = { zh: [], en: [] };
+  // -- guides --
+  const guideLayout = buildGuidesLayout();
+  const guides: GuideEntry[] = [];
+  for (const g of guideLayout) {
+    for (const slug of g.slugs) {
+      const translations = await buildTranslationsForPage(g.section, slug);
+      guides.push({ slug, section: g.section, translations });
+    }
+  }
+
+  // -- labels (categories for components, sections for guides) --
+  const categories: Record<Locale, LabelEntry[]> = { zh: [], en: [] };
   for (const c of catLayout) {
     for (const locale of LOCALES) {
       const messages = getDocsMessages(locale);
-      const label = messages.groups[c.slug] ?? c.slug;
-      categories[locale].push({ slug: c.slug, label });
+      categories[locale].push({ slug: c.slug, label: messages.groups[c.slug] ?? c.slug });
+    }
+  }
+  const sections: Record<Locale, LabelEntry[]> = { zh: [], en: [] };
+  for (const g of guideLayout) {
+    for (const locale of LOCALES) {
+      const messages = getDocsMessages(locale);
+      sections[locale].push({ slug: g.section, label: messages.sections[g.section] ?? g.section });
     }
   }
 
   const index: DocsIndex = {
     generatedAt: new Date().toISOString(),
     categories,
+    sections,
     components,
+    guides,
   };
 
-  await fs.mkdir(path.dirname(OUT_FULL), { recursive: true });
-  await fs.mkdir(path.dirname(OUT_PUBLIC), { recursive: true });
+  await fs.mkdir(path.dirname(OUT_BUNDLED), { recursive: true });
+  await fs.mkdir(path.dirname(OUT_PUBLIC_LITE), { recursive: true });
   const fullJson = JSON.stringify(index, null, 2);
-  await fs.writeFile(OUT_FULL, fullJson, 'utf8');
+  await fs.writeFile(OUT_BUNDLED, fullJson, 'utf8');
+
+  // 完整版同时落到 docs/public，让部署后的 docs 站可以通过 /mcp-index.json 暴露给 MCP runtime fetch，
+  // 这样消费者无需重新发版 @timeui/mcp 也能拿到最新的文档（详见 src/data.ts initIndex）。
+  const compactFullJson = JSON.stringify(index);
+  await fs.writeFile(OUT_PUBLIC_FULL, compactFullJson, 'utf8');
 
   // 精简版：去掉冗长的 content 字段以减小前端加载体积；详情仍由 API route 从完整 index 取。
+  const stripContent = <T extends { translations: Record<Locale, PageTranslation> }>(p: T): T => ({
+    ...p,
+    translations: {
+      zh: { ...p.translations.zh, content: '' },
+      en: { ...p.translations.en, content: '' },
+    },
+  });
   const lite: DocsIndex = {
     ...index,
-    components: index.components.map((c) => ({
-      ...c,
-      translations: {
-        zh: { ...c.translations.zh, content: '' },
-        en: { ...c.translations.en, content: '' },
-      },
-    })),
+    components: index.components.map(stripContent),
+    guides: index.guides.map(stripContent),
   };
   const liteJson = JSON.stringify(lite);
-  await fs.writeFile(OUT_PUBLIC, liteJson, 'utf8');
+  await fs.writeFile(OUT_PUBLIC_LITE, liteJson, 'utf8');
 
   const fullBytes = Buffer.byteLength(fullJson, 'utf8');
+  const fullCompactBytes = Buffer.byteLength(compactFullJson, 'utf8');
   const liteBytes = Buffer.byteLength(liteJson, 'utf8');
   console.log(
     [
       `[build-index] components: ${components.length}`,
+      `guides: ${guides.length}`,
       `categories: ${categories.zh.length}`,
-      `full: ${OUT_FULL} (${fullBytes} B)`,
-      `lite: ${OUT_PUBLIC} (${liteBytes} B)`,
+      `sections: ${sections.zh.length}`,
+      `bundled: ${OUT_BUNDLED} (${fullBytes} B)`,
+      `mcp-index: ${OUT_PUBLIC_FULL} (${fullCompactBytes} B)`,
+      `assistant-index: ${OUT_PUBLIC_LITE} (${liteBytes} B)`,
     ].join(' | '),
   );
 }

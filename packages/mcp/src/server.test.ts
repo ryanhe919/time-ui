@@ -24,13 +24,22 @@ describe('createServer()', () => {
     expect(server).toBeTruthy();
   });
 
-  it('exposes all 4 tools via tools/list', async () => {
+  it('exposes all 8 tools (components + guides) via tools/list', async () => {
     const { server, client } = await connectPair();
     try {
       const { tools } = await client.listTools();
       const names = tools.map((t) => t.name).sort();
       expect(names).toEqual(
-        ['get_component', 'list_categories', 'list_components', 'search_components'].sort(),
+        [
+          'get_component',
+          'get_guide',
+          'list_categories',
+          'list_components',
+          'list_guides',
+          'list_sections',
+          'search_components',
+          'search_guides',
+        ].sort(),
       );
       for (const tool of tools) {
         expect(typeof tool.description).toBe('string');
@@ -39,6 +48,30 @@ describe('createServer()', () => {
         // zod-to-json-schema 顶层应为 object 且剥离了 $schema。
         expect((tool.inputSchema as { type?: string }).type).toBe('object');
         expect(Object.prototype.hasOwnProperty.call(tool.inputSchema, '$schema')).toBe(false);
+      }
+    } finally {
+      await client.close();
+      await server.close();
+    }
+  });
+
+  it('tools/call search_guides returns guide hits with section field', async () => {
+    const { server, client } = await connectPair();
+    try {
+      const result = await client.callTool({
+        name: 'search_guides',
+        arguments: { query: 'install', locale: 'en' },
+      });
+      expect(result.isError).not.toBe(true);
+      const content = result.content as Array<{ type: string; text: string }>;
+      const parsed = JSON.parse(content[0]!.text) as Array<{
+        slug: string;
+        section: string;
+      }>;
+      expect(parsed.length).toBeGreaterThan(0);
+      expect(parsed.some((h) => h.slug === 'installation')).toBe(true);
+      for (const hit of parsed) {
+        expect(typeof hit.section).toBe('string');
       }
     } finally {
       await client.close();

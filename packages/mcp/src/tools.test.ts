@@ -1,13 +1,25 @@
 /**
  * @author Ryan He
  * @date 2026-04-18
- * @description tools.ts 单测：覆盖 listCategories / listComponents / getComponent / searchComponents 四个纯函数。
+ * @description tools.ts 单测：覆盖 components 4 件套与 guides 4 件套共 8 个纯函数。
  */
 
-import { __resetIndexCache } from './data';
-import { getComponent, listCategories, listComponents, searchComponents } from './tools';
+import { __resetIndexCache, loadIndex } from './data';
+import {
+  getComponent,
+  getGuide,
+  listCategories,
+  listComponents,
+  listGuides,
+  listSections,
+  searchComponents,
+  searchGuides,
+} from './tools';
 
-const TOTAL_COMPONENTS = 34;
+// 不写死数字：直接从当前 bundled index 推导，避免新增组件 / 指南后这里反复手改。
+const idx = loadIndex();
+const TOTAL_COMPONENTS = idx.components.length;
+const TOTAL_GUIDES = idx.guides.length;
 
 beforeEach(() => {
   __resetIndexCache();
@@ -181,5 +193,110 @@ describe('searchComponents()', () => {
     expect(hits.length).toBeGreaterThan(0);
     const slugs = hits.map((h) => h.slug);
     expect(slugs).toContain('button');
+  });
+});
+
+// =============================================================================
+// Guides 4 件套
+// =============================================================================
+
+describe('listSections()', () => {
+  it('returns the zh section list with slug/label/guideCount by default', () => {
+    const sections = listSections();
+    expect(sections.length).toBeGreaterThan(0);
+    for (const s of sections) {
+      expect(typeof s.slug).toBe('string');
+      expect(typeof s.label).toBe('string');
+      expect(typeof s.guideCount).toBe('number');
+      expect(s.guideCount).toBeGreaterThanOrEqual(0);
+    }
+    // zh 至少有一个含 CJK 的 label。
+    expect(sections.some((s) => /[一-鿿]/.test(s.label))).toBe(true);
+  });
+
+  it('returns English labels when locale is en', () => {
+    const sections = listSections({ locale: 'en' });
+    const gettingStarted = sections.find((s) => s.slug === 'getting-started');
+    expect(gettingStarted).toBeTruthy();
+    for (const s of sections) {
+      expect(/[一-鿿]/.test(s.label)).toBe(false);
+    }
+  });
+
+  it('guide counts across sections sum to TOTAL_GUIDES', () => {
+    const sum = listSections().reduce((acc, s) => acc + s.guideCount, 0);
+    expect(sum).toBe(TOTAL_GUIDES);
+  });
+});
+
+describe('listGuides()', () => {
+  it('returns every guide when no filter is provided', () => {
+    const all = listGuides();
+    expect(all.length).toBe(TOTAL_GUIDES);
+    for (const item of all) {
+      expect(typeof item.slug).toBe('string');
+      expect(typeof item.title).toBe('string');
+      expect(typeof item.description).toBe('string');
+      expect(typeof item.section).toBe('string');
+      expect(typeof item.href).toBe('string');
+    }
+  });
+
+  it('filters by section slug', () => {
+    const gs = listGuides({ section: 'getting-started' });
+    expect(gs.length).toBeGreaterThan(0);
+    expect(gs.length).toBeLessThan(TOTAL_GUIDES);
+    for (const item of gs) {
+      expect(item.section).toBe('getting-started');
+    }
+  });
+
+  it('returns [] for unknown sections without throwing', () => {
+    expect(() => listGuides({ section: 'nope' })).not.toThrow();
+    expect(listGuides({ section: 'nope' })).toEqual([]);
+  });
+});
+
+describe('getGuide()', () => {
+  it('returns zh details for installation by default', () => {
+    const detail = getGuide({ slug: 'installation' });
+    expect(detail).not.toBeNull();
+    expect(detail?.slug).toBe('installation');
+    expect(detail?.section).toBe('getting-started');
+    expect(typeof detail?.description).toBe('string');
+    expect(typeof detail?.content).toBe('string');
+    expect(detail?.content.length).toBeGreaterThan(0);
+    expect(Array.isArray(detail?.examples)).toBe(true);
+  });
+
+  it('returns null for unknown slugs', () => {
+    expect(getGuide({ slug: 'nonexistent' })).toBeNull();
+    expect(getGuide({ slug: '', locale: 'en' })).toBeNull();
+  });
+});
+
+describe('searchGuides()', () => {
+  it('finds installation when searching "install"', () => {
+    const hits = searchGuides({ query: 'install', locale: 'en' });
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits.some((h) => h.slug === 'installation')).toBe(true);
+  });
+
+  it('does not return component slugs', () => {
+    const hits = searchGuides({ query: 'install', locale: 'en' });
+    for (const h of hits) {
+      // 所有命中都应该带 section 字段（guides 独有），不会混进 components。
+      expect(typeof h.section).toBe('string');
+    }
+  });
+
+  it('returns [] for queries that match nothing', () => {
+    expect(searchGuides({ query: 'xyznowayexists' })).toEqual([]);
+  });
+
+  it('respects locale: zh "安装" hits installation guide', () => {
+    const hits = searchGuides({ query: '安装' });
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits.some((h) => h.slug === 'installation')).toBe(true);
   });
 });

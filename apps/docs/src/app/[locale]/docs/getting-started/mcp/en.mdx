@@ -27,6 +27,10 @@ MCP makes TimeUI's docs queryable at conversation time, so the answers you get r
 
 ## Tools
 
+Tools are split into "asking about a component" and "asking how to use the library". All tools accept an optional `locale` argument (`zh` / `en`, default `zh`).
+
+**Components (the 35 UI components under `packages/components`)**
+
 | Tool | Purpose |
 | --- | --- |
 | `list_categories` | Return all component categories (general / forms / overlays / …) with a count per category. |
@@ -34,7 +38,14 @@ MCP makes TimeUI's docs queryable at conversation time, so the answers you get r
 | `get_component` | Fetch the full documentation (title, description, prose, code examples, docs URL) for a single slug. |
 | `search_components` | Full-text scored search across titles / descriptions / prose, with context snippets. |
 
-All tools accept an optional `locale` argument (`zh` / `en`, default `zh`).
+**Guides (installation, integration, chat API, and other non-component docs)**
+
+| Tool | Purpose |
+| --- | --- |
+| `list_sections` | Return all guide sections (getting-started / chat / …) with a count per section. |
+| `list_guides` | Return guide slug / title / description / section (installation, introduction, mcp, overview, api …), optionally filtered by section. |
+| `get_guide` | Fetch the full prose + code examples of a single guide page by slug. |
+| `search_guides` | Scored search across guide pages only — use for "how do I install", "how do I wire up SSE", "where is the chat API". Does NOT return component slugs. |
 
 ## Example conversations
 
@@ -153,13 +164,28 @@ If you already have `timeui-mcp-http` running on a remote host and want Claude D
 
 ## How it works
 
-- `@timeui/mcp` scans the docs site's MDX sources at build time and emits a static `data/index.json` (~340 KB, covering 31 components × 2 locales).
-- In stdio mode the AI client spawns a Node process per session; tool calls stay local, zero network.
+- At build time, `scripts/build-index.ts` scans every MDX page under `apps/docs` and emits three indexes: the package-bundled `data/index.json` (shipped on npm), `apps/docs/public/mcp-index.json` (full payload, deployed with the docs site), and `apps/docs/public/assistant-index.json` (lite, for the in-page assistant).
+- At runtime, `runStdio` / `runHttp` first try to fetch the latest `mcp-index.json` from the configured remote (defaults to `http://aliyun.ryanstone.cn/mcp-index.json`, 3-second timeout), and fall back to the bundled snapshot on failure or when offline — so **you don't need to reinstall the package** to see fresh docs.
+- In stdio mode the AI client spawns a Node process per session; tool calls stay local, zero network (apart from the one startup refresh).
 - In HTTP mode the server follows the MCP Streamable HTTP spec with per-session routing and reconnection.
+
+### Customizing the index source
+
+Use an env var to point at a different index or disable the remote:
+
+```bash
+# Point at your self-hosted docs deployment
+TIMEUI_MCP_INDEX_URL=https://your-docs.example.com/mcp-index.json npx @timeui/mcp timeui-mcp
+
+# Stay fully offline (always use the bundled snapshot)
+TIMEUI_MCP_INDEX_URL=off npx @timeui/mcp timeui-mcp
+```
 
 ## Versioning
 
-`@timeui/mcp` versions independently of `@timeui/react`: whenever the component library ships a release, the MCP package rebuilds its index and ships alongside. The `latest` tag always tracks the docs of the current stable `@timeui/react`.
+- **Component APIs** (props / behavior of `@timeui/react`): follow the package version; breaking changes show up in the `@timeui/mcp` changelog via a changeset.
+- **Documentation content** (descriptions, examples, new sections): pulled fresh at runtime — once the docs site deploys, an MCP client just needs **a restart** to see it. No reinstall required.
+- For air-gapped environments, set `TIMEUI_MCP_INDEX_URL=off` to always use the bundled snapshot (the legacy behavior).
 
 ## Related
 

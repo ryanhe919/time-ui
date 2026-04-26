@@ -27,6 +27,10 @@ MCP Server 把 TimeUI 的文档做成可调用接口，AI 每次回答时可以�
 
 ## 工具清单
 
+工具按"问的是组件"还是"问的是怎么用"分两组。所有工具都支持 `locale` 参数（`zh` / `en`，默认 `zh`）。
+
+**组件类（针对 packages/components 下 35 个 UI 组件）**
+
 | 工具 | 用途 |
 | --- | --- |
 | `list_categories` | 列出所有组件分类（general / forms / overlays / …）以及每个分类下的组件数。 |
@@ -34,7 +38,14 @@ MCP Server 把 TimeUI 的文档做成可调用接口，AI 每次回答时可以�
 | `get_component` | 按 slug 返回单个组件的完整文档：标题、描述、正文、示例代码、docs URL。 |
 | `search_components` | 全文打分检索标题 / 描述 / 正文，返回带片段的命中列表。 |
 
-所有工具均支持 `locale` 参数（`zh` / `en`），默认 `zh`。
+**指南类（针对安装、接入、Chat API 等非组件文档）**
+
+| 工具 | 用途 |
+| --- | --- |
+| `list_sections` | 列出所有指南 section（getting-started / chat …）以及每个 section 下的页面数。 |
+| `list_guides` | 列出所有指南页（installation / introduction / mcp / overview / api…），可选按 section 过滤。 |
+| `get_guide` | 按 slug 返回单个指南页的完整正文与示例代码。 |
+| `search_guides` | 仅在指南域内打分检索；问"怎么安装"、"如何接入 SSE"、"chat API 在哪" 时用这个，不会召回组件。 |
 
 ## 实战对话示例
 
@@ -153,13 +164,28 @@ Claude Desktop 目前的 MCP 集成仍然走 **stdio**（配置文件为 `claude
 
 ## 原理
 
-- `@timeui/mcp` 在构建时扫描文档站的 MDX 源文件，生成一份静态 `data/index.json`（~340 KB，覆盖 31 个组件 × 两种语言）。
-- stdio 模式下，每个 AI 客户端会话都会 `spawn` 一个 Node 进程，工具调用零网络。
-- HTTP 模式下走 MCP Streamable HTTP 规范，支持多会话与断流重连。
+- 构建期 `scripts/build-index.ts` 扫描 `apps/docs` 下所有 MDX，产出三份索引：包内 bundled 的 `data/index.json`（随 npm 发布）、`apps/docs/public/mcp-index.json`（完整版，部署时随 docs 上线）、`apps/docs/public/assistant-index.json`（精简版，前端 AI 助手用）。
+- 启动期 `runStdio` / `runHttp` 会先尝试从远程 `mcp-index.json` 拉最新索引（默认 `http://aliyun.ryanstone.cn/mcp-index.json`，3 秒超时），失败 / 离线时回退包内 bundled 快照——所以你**不需要重装包**就能拿到最新的文档。
+- stdio 模式下，每个 AI 客户端会话都会 `spawn` 一个 Node 进程，工具调用本地零网络（除启动那次远程刷新外）。
+- HTTP 模式走 MCP Streamable HTTP 规范，支持多会话与断流重连。
+
+### 自定义索引来源
+
+通过环境变量切换索引来源：
+
+```bash
+# 指向自托管的 docs 站
+TIMEUI_MCP_INDEX_URL=https://your-docs.example.com/mcp-index.json npx @timeui/mcp timeui-mcp
+
+# 完全离线（只用包内 bundled 快照）
+TIMEUI_MCP_INDEX_URL=off npx @timeui/mcp timeui-mcp
+```
 
 ## 版本策略
 
-`@timeui/mcp` 与 `@timeui/react` 版本独立：后者每次发版时，前者会同步重建索引再发布。`latest` tag 始终对应当前 `@timeui/react` 最新稳定版的文档。
+- **核心组件 API**（`@timeui/react` 的 props / 行为）：跟随包版本，重大变更会通过 changeset 体现到 `@timeui/mcp` 的 changelog。
+- **文档内容**（描述、示例、新增章节）：默认走运行时远程拉取，docs 站部署后 MCP 客户端**重启即生效**，不需要重新安装包。
+- 完全不需要外网时，把 `TIMEUI_MCP_INDEX_URL` 设为 `off`，永远用包内 bundled 快照（旧版默认行为）。
 
 ## 相关链接
 

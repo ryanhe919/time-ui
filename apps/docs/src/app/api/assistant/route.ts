@@ -21,8 +21,14 @@ import {
   listComponents,
   getComponent,
   searchComponents,
+  listSections,
+  listGuides,
+  getGuide,
+  searchGuides,
   type ComponentSummary,
   type SearchHit,
+  type GuideSummary,
+  type GuideSearchHit,
 } from '@timeui/mcp';
 import type { NextRequest } from 'next/server';
 
@@ -76,6 +82,7 @@ function warmDocsIndex(): void {
 // ---------- Tool schema ----------
 
 // description 故意写英文并明确返回字段结构 —— LLM 更容易挑选正确的工具。
+// 8 件套：组件 4 件 + 指南 4 件，与 @timeui/mcp server.ts 保持完全平行。
 const TOOL_DEFINITIONS: ToolUnion[] = [
   {
     name: 'list_categories',
@@ -127,12 +134,69 @@ const TOOL_DEFINITIONS: ToolUnion[] = [
   {
     name: 'search_components',
     description:
-      'Full-text search across component titles, descriptions, and bodies. Returns ranked hits with snippets. Prefer this over list_components when the user asks a concrete question.',
+      'Full-text search across component titles, descriptions, and bodies. Returns ranked hits with snippets. Prefer this over list_components when the user asks a concrete question about a UI component.',
     input_schema: {
       type: 'object',
       properties: {
         query: { type: 'string', description: 'Search query (natural language, zh or en).' },
         limit: { type: 'integer', minimum: 1, maximum: 20, description: 'Max hits to return.' },
+        locale: { type: 'string', enum: ['zh', 'en'] },
+      },
+      required: ['query'],
+    },
+  },
+  {
+    name: 'list_sections',
+    description:
+      'List all top-level guide sections (e.g. "getting-started", "chat") with the number of guide pages per section. Use this when the user asks how to install / set up / configure the library, or wants an overview of non-component documentation.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        locale: { type: 'string', enum: ['zh', 'en'] },
+      },
+    },
+  },
+  {
+    name: 'list_guides',
+    description:
+      'List all guide pages (installation, introduction, MCP setup, chat overview, etc.) with slug, title, short description, section, and href. Optionally filter by a section slug.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        section: {
+          type: 'string',
+          description: 'Section slug (e.g. "getting-started", "chat"). Omit to list every guide.',
+        },
+        locale: { type: 'string', enum: ['zh', 'en'] },
+      },
+    },
+  },
+  {
+    name: 'get_guide',
+    description:
+      'Fetch the full content (title, description, body, code examples, href) of a single guide page by slug — e.g. "installation" for setup steps, "mcp" for MCP server deployment, "api" for the chat API reference.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        slug: {
+          type: 'string',
+          description:
+            'Guide slug from list_guides or search_guides (e.g. "installation", "mcp", "overview").',
+        },
+        locale: { type: 'string', enum: ['zh', 'en'] },
+      },
+      required: ['slug'],
+    },
+  },
+  {
+    name: 'search_guides',
+    description:
+      'Full-text search across guide pages ONLY (does not return components). Use this when the user asks how to install, configure, integrate, or use the library — e.g. "how do I install", "怎么接入 chat", "SSE streaming". For component-by-name queries use search_components instead.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Search query (natural language, zh or en).' },
+        limit: { type: 'integer', minimum: 1, maximum: 20 },
         locale: { type: 'string', enum: ['zh', 'en'] },
       },
       required: ['query'],
@@ -147,8 +211,11 @@ function buildSystemPrompt(locale: SupportedLocale): string {
       : 'Respond in English unless the user explicitly asks for another language.';
   return [
     'You are the official documentation assistant for the TimeUI React component library.',
-    'Always call the provided tools to fetch real data before answering questions about components, APIs, or categories. Do not fabricate component names or props.',
-    'When you reference a component, format it as a markdown link using the `href` field returned by the tools, e.g. "[Button](/zh/docs/components/button)".',
+    'Always call the provided tools to fetch real data before answering. Do not fabricate component names, props, or installation steps.',
+    'Tool selection rule:',
+    '- For UI COMPONENT questions ("how do I use Button", "is there a date picker", "show me Modal props"): use list_categories / list_components / search_components / get_component.',
+    '- For HOW-TO / SETUP / INTEGRATION questions ("how do I install", "how to wire up MCP", "how to enable chat", "SSE streaming", "API reference"): use list_sections / list_guides / search_guides / get_guide instead — these cover installation, integration, and the chat module.',
+    'When you reference a page, format it as a markdown link using the `href` field returned by the tools, e.g. "[Button](/zh/docs/components/button)" or "[Installation](/zh/docs/getting-started/installation)".',
     'Prefer concise answers with short bullet lists and code fences when showing usage.',
     "If the tools return no hits, tell the user plainly and suggest rewording the question — don't invent an answer.",
     langHint,
@@ -208,6 +275,42 @@ function runTool(
         refs: toRefsFromHits(data),
       };
     }
+    case 'list_sections': {
+      const data = listSections({ locale: lc });
+      return { payload: data, summary: `${data.length} sections`, refs: [] };
+    }
+    case 'list_guides': {
+      const section =
+        typeof input.section === 'string' && input.section.length > 0 ? input.section : undefined;
+      const data = listGuides({ locale: lc, section });
+      return {
+        payload: data,
+        summary: `${data.length} guides${section ? ` in ${section}` : ''}`,
+        refs: toRefsFromGuideSummaries(data),
+      };
+    }
+    case 'get_guide': {
+      const slug = String(input.slug ?? '');
+      const data = getGuide({ locale: lc, slug });
+      return {
+        payload: data ?? { error: `guide not found: ${slug}` },
+        summary: data ? `detail for ${data.slug}` : `not found: ${slug}`,
+        refs: data ? [{ slug: data.slug, title: data.title, href: data.href }] : [],
+      };
+    }
+    case 'search_guides': {
+      const query = String(input.query ?? '');
+      const limit =
+        typeof input.limit === 'number' && Number.isFinite(input.limit)
+          ? Math.max(1, Math.min(20, Math.floor(input.limit)))
+          : 8;
+      const data = searchGuides({ locale: lc, query, limit });
+      return {
+        payload: data,
+        summary: `${data.length} guide hits for "${query}"`,
+        refs: toRefsFromGuideHits(data),
+      };
+    }
     default:
       return {
         payload: { error: `unknown tool: ${name}` },
@@ -224,6 +327,14 @@ function toRefsFromHits(hits: SearchHit[]): RefItem[] {
 function toRefsFromSummaries(list: ComponentSummary[]): RefItem[] {
   // list 接口可能返回全量；限制 refs 数量，避免前端 chip 爆炸。
   return list.slice(0, 8).map((c) => ({ slug: c.slug, title: c.title, href: c.href }));
+}
+
+function toRefsFromGuideSummaries(list: GuideSummary[]): RefItem[] {
+  return list.slice(0, 8).map((g) => ({ slug: g.slug, title: g.title, href: g.href }));
+}
+
+function toRefsFromGuideHits(hits: GuideSearchHit[]): RefItem[] {
+  return hits.slice(0, 6).map((h) => ({ slug: h.slug, title: h.title, href: h.href }));
 }
 
 // ---------- SSE helpers ----------

@@ -18,7 +18,16 @@ import {
 import { z, type ZodTypeAny } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
-import { getComponent, listCategories, listComponents, searchComponents } from './tools';
+import {
+  getComponent,
+  getGuide,
+  listCategories,
+  listComponents,
+  listGuides,
+  listSections,
+  searchComponents,
+  searchGuides,
+} from './tools';
 
 // 从 package.json 动态拿 version，避免硬编码导致与发布态脱钩。
 // IMPORTANT: 延迟到调用时再读盘。顶层副作用会被 webpack 在 bundle 时烘焙
@@ -84,6 +93,45 @@ const SearchComponentsInput = z
   })
   .strict();
 
+// 指南页（getting-started / chat 等顶层 section）专用 schema。结构与 components 几乎一致，
+// 但搜索域、过滤维度都隔离开，避免 LLM 在"安装"类问题上召回组件列表。
+const ListSectionsInput = z.object({ locale: LocaleSchema.optional() }).strict();
+
+const ListGuidesInput = z
+  .object({
+    locale: LocaleSchema.optional(),
+    section: z
+      .string()
+      .optional()
+      .describe(
+        "Optional section slug to filter by (see list_sections). E.g. 'getting-started', 'chat'.",
+      ),
+  })
+  .strict();
+
+const GetGuideInput = z
+  .object({
+    slug: z
+      .string()
+      .min(1)
+      .describe(
+        "Guide slug, kebab-case (e.g. 'installation', 'introduction', 'api', 'overview'). Obtain from list_guides.",
+      ),
+    locale: LocaleSchema.optional(),
+  })
+  .strict();
+
+const SearchGuidesInput = z
+  .object({
+    query: z
+      .string()
+      .min(1)
+      .describe('Free-text search across guide pages only. Tokenized; supports English and CJK.'),
+    locale: LocaleSchema.optional(),
+    limit: z.number().int().min(1).max(50).optional(),
+  })
+  .strict();
+
 interface ToolSpec<S extends ZodTypeAny> {
   name: string;
   description: string;
@@ -98,40 +146,75 @@ function toInputSchema(schema: ZodTypeAny): Tool['inputSchema'] {
   return json as Tool['inputSchema'];
 }
 
-const TOOL_SPECS: [
-  ToolSpec<typeof ListCategoriesInput>,
-  ToolSpec<typeof ListComponentsInput>,
-  ToolSpec<typeof GetComponentInput>,
-  ToolSpec<typeof SearchComponentsInput>,
-] = [
+// 8 件套：组件 4 件 + 指南 4 件。两组完全平行，便于 LLM 在 components vs guides
+// 之间做选择——询问"按钮 / 表格"走 *_components；询问"安装 / 怎么用 / SSE / API"走 *_guides。
+const TOOL_SPECS: ToolSpec<ZodTypeAny>[] = [
   {
     name: 'list_categories',
     description:
       "List all TimeUI component categories (e.g. forms, overlays, feedback) with the number of components in each. Call this FIRST when the user asks 'what components exist' or you need to orient yourself before recommending anything.",
     schema: ListCategoriesInput,
-    handler: (input) => listCategories({ locale: input.locale }),
+    handler: (input: z.infer<typeof ListCategoriesInput>) =>
+      listCategories({ locale: input.locale }),
   },
   {
     name: 'list_components',
     description:
       'List all TimeUI components with slug, title, short description, and category. Optionally filter by a category slug. Use to enumerate candidates before drilling into details with get_component.',
     schema: ListComponentsInput,
-    handler: (input) => listComponents({ locale: input.locale, category: input.category }),
+    handler: (input: z.infer<typeof ListComponentsInput>) =>
+      listComponents({ locale: input.locale, category: input.category }),
   },
   {
     name: 'get_component',
     description:
       'Fetch the full documentation (title, description, prose content, runnable code examples, docs URL) for a single component by slug. Use this once the user identifies a specific component or after search_components narrows down a match.',
     schema: GetComponentInput,
-    handler: (input) => getComponent({ slug: input.slug, locale: input.locale }),
+    handler: (input: z.infer<typeof GetComponentInput>) =>
+      getComponent({ slug: input.slug, locale: input.locale }),
   },
   {
     name: 'search_components',
     description:
       "Full-text search across component titles, descriptions, and docs content, scored and ranked. Use when the user describes behavior or a use case (e.g. 'modal with form') but has NOT named a specific component. Returns slug + snippet so you can decide whether to call get_component.",
     schema: SearchComponentsInput,
-    handler: (input) =>
+    handler: (input: z.infer<typeof SearchComponentsInput>) =>
       searchComponents({
+        query: input.query,
+        locale: input.locale,
+        limit: input.limit,
+      }),
+  },
+  {
+    name: 'list_sections',
+    description:
+      "List the top-level guide sections (e.g. 'getting-started', 'chat') with the number of guide pages in each. Call this when the user asks how to install / set up / configure the library, or wants an overview of non-component documentation.",
+    schema: ListSectionsInput,
+    handler: (input: z.infer<typeof ListSectionsInput>) => listSections({ locale: input.locale }),
+  },
+  {
+    name: 'list_guides',
+    description:
+      'List all guide pages (installation, introduction, MCP setup, chat overview, etc.) with slug, title, short description, and section. Optionally filter by section slug. Use to enumerate non-component documentation before drilling in with get_guide.',
+    schema: ListGuidesInput,
+    handler: (input: z.infer<typeof ListGuidesInput>) =>
+      listGuides({ locale: input.locale, section: input.section }),
+  },
+  {
+    name: 'get_guide',
+    description:
+      "Fetch the full content (title, description, prose, runnable code examples, docs URL) of a single guide page by slug. Use this once you have a specific slug from list_guides or search_guides — e.g. 'installation' for setup steps, 'mcp' for this MCP server's own deployment instructions.",
+    schema: GetGuideInput,
+    handler: (input: z.infer<typeof GetGuideInput>) =>
+      getGuide({ slug: input.slug, locale: input.locale }),
+  },
+  {
+    name: 'search_guides',
+    description:
+      "Full-text search across guide pages ONLY (does not return components). Use when the user asks how to install, configure, integrate, or use the library — e.g. 'how do I install', '怎么接入 chat', 'SSE streaming'. For component-by-name queries use search_components instead.",
+    schema: SearchGuidesInput,
+    handler: (input: z.infer<typeof SearchGuidesInput>) =>
+      searchGuides({
         query: input.query,
         locale: input.locale,
         limit: input.limit,
@@ -154,9 +237,12 @@ export function createServer(): Server {
       capabilities: {
         tools: {},
       },
-      // 写给 LLM 读：让它把"先列目录再给推荐"当默认动作，减少凭印象答题导致的幻觉。
-      instructions:
-        'Serves TimeUI component library documentation. Always call list_categories or list_components before recommending usage patterns. Use search_components when the user describes behavior, and get_component to fetch full docs + examples for a specific slug.',
+      // 写给 LLM 读：让它把"先定向再答题"当默认动作，减少凭印象答题导致的幻觉。
+      instructions: [
+        'Serves TimeUI component library documentation.',
+        'For COMPONENT questions ("how do I use Button", "is there a date picker"): start with list_categories or list_components, search_components for behavior queries, and get_component for full docs + examples.',
+        'For HOW-TO / SETUP questions ("how do I install", "how do I wire up MCP", "chat API reference"): use list_sections / list_guides / search_guides / get_guide instead — these cover installation, integration, and the chat module.',
+      ].join(' '),
     },
   );
 

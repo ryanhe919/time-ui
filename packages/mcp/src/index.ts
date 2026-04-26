@@ -6,12 +6,19 @@
 
 export {
   loadIndex,
+  initIndex,
+  DEFAULT_REMOTE_INDEX_URL,
   __resetIndexCache,
+  __setIndexCacheForTesting,
   type DocsIndex,
   type ComponentEntry,
   type ComponentTranslation,
+  type PageTranslation,
+  type GuideEntry,
   type CategoryEntry,
+  type SectionEntry,
   type ExampleEntry,
+  type InitIndexOptions,
   type Locale,
 } from './data';
 
@@ -20,11 +27,19 @@ export {
   listComponents,
   getComponent,
   searchComponents,
+  listSections,
+  listGuides,
+  getGuide,
+  searchGuides,
   type ToolLocale,
   type CategorySummary,
   type ComponentSummary,
   type ComponentDetail,
   type SearchHit,
+  type SectionSummary,
+  type GuideSummary,
+  type GuideDetail,
+  type GuideSearchHit,
 } from './tools';
 
 export { createServer } from './server';

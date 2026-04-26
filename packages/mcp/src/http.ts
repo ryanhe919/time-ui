@@ -10,6 +10,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import express, { type Request, type Response } from 'express';
 
+import { initIndex } from './data';
 import { createServer } from './server';
 
 export interface RunHttpOptions {
@@ -29,6 +30,9 @@ const MCP_SESSION_HEADER = 'mcp-session-id';
 export async function runHttp(options: RunHttpOptions = {}): Promise<void> {
   const port = options.port ?? 3333;
   const host = options.host ?? '127.0.0.1';
+
+  // 启动前先尝试拉取最新索引；失败会自动回退到 bundled 快照（详见 data.ts initIndex）。
+  await initIndex();
 
   const app = express();
   app.use(express.json({ limit: '4mb' }));

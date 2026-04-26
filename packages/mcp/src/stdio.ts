@@ -6,9 +6,12 @@
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
+import { initIndex } from './data';
 import { createServer } from './server';
 
 export async function runStdio(): Promise<void> {
+  // 启动前先尝试拉取最新索引；失败会自动回退到 bundled 快照（详见 data.ts initIndex）。
+  await initIndex();
   const server = createServer();
   const transport = new StdioServerTransport();
 

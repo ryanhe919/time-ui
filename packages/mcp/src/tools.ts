@@ -4,7 +4,7 @@
  * @description 纯函数工具集：面向 MCP server 与前端 API route 的共享查询接口。无副作用、不依赖 MCP SDK。
  */
 
-import { loadIndex, type ComponentEntry, type ComponentTranslation, type Locale } from './data';
+import { loadIndex, type GuideEntry, type PageTranslation, type Locale } from './data';
 
 export interface ToolLocale {
   locale?: Locale;
@@ -50,7 +50,10 @@ function resolveLocale(opts: ToolLocale | undefined): Locale {
   return opts?.locale ?? DEFAULT_LOCALE;
 }
 
-function translationOf(entry: ComponentEntry, locale: Locale): ComponentTranslation {
+function translationOf(
+  entry: { translations: Record<Locale, PageTranslation> },
+  locale: Locale,
+): PageTranslation {
   // 缺失 locale 时回落到 zh，避免出现 undefined。
   return entry.translations[locale] ?? entry.translations.zh;
 }
@@ -194,6 +197,123 @@ export function searchComponents(
   }
 
   // 分数相同时 title 字典序稳定排序，便于测试。
+  hits.sort((a, b) => b.score - a.score || a.slug.localeCompare(b.slug));
+  return hits.slice(0, limit);
+}
+
+// =============================================================================
+// Guides 工具集（getting-started / chat 等顶层 section 下的指南页）。结构镜像
+// 上面的 components 4 件套；之所以拆开，是为了让 LLM 在用户描述意图时能选择
+// 更窄的工具：问"按钮怎么用"走 search_components，问"怎么安装"走 search_guides。
+// =============================================================================
+
+export interface SectionSummary {
+  slug: string;
+  label: string;
+  guideCount: number;
+}
+
+export interface GuideSummary {
+  slug: string;
+  title: string;
+  description: string;
+  section: string;
+  href: string;
+}
+
+export interface GuideDetail extends GuideSummary {
+  content: string;
+  examples: { code: string }[];
+}
+
+export interface GuideSearchHit extends GuideSummary {
+  snippet: string;
+  score: number;
+}
+
+/** 列出所有指南 section（getting-started / chat / ...）+ 每个 section 下的 guide 数量。 */
+export function listSections(opts?: ToolLocale): SectionSummary[] {
+  const locale = resolveLocale(opts);
+  const index = loadIndex();
+  const counts = new Map<string, number>();
+  for (const g of index.guides) {
+    counts.set(g.section, (counts.get(g.section) ?? 0) + 1);
+  }
+  return index.sections[locale].map((s) => ({
+    slug: s.slug,
+    label: s.label,
+    guideCount: counts.get(s.slug) ?? 0,
+  }));
+}
+
+/** 列出所有指南页；可选按 section 过滤（slug，例如 'getting-started' / 'chat'）。 */
+export function listGuides(opts?: ToolLocale & { section?: string }): GuideSummary[] {
+  const locale = resolveLocale(opts);
+  const index = loadIndex();
+  const filtered: GuideEntry[] = opts?.section
+    ? index.guides.filter((g) => g.section === opts.section)
+    : index.guides;
+  return filtered.map((entry) => {
+    const t = translationOf(entry, locale);
+    return {
+      slug: entry.slug,
+      title: t.title,
+      description: t.description,
+      section: entry.section,
+      href: t.href,
+    };
+  });
+}
+
+/** 读取单个指南页的全文与示例；slug 不命中返回 null。 */
+export function getGuide(opts: ToolLocale & { slug: string }): GuideDetail | null {
+  const locale = resolveLocale(opts);
+  const index = loadIndex();
+  const entry = index.guides.find((g) => g.slug === opts.slug);
+  if (!entry) return null;
+  const t = translationOf(entry, locale);
+  return {
+    slug: entry.slug,
+    section: entry.section,
+    title: t.title,
+    description: t.description,
+    content: t.content,
+    examples: t.examples.map((e) => ({ code: e.code })),
+    href: t.href,
+  };
+}
+
+/** 仅在 guides 集合内做 token 打分；评分模型与 searchComponents 一致。 */
+export function searchGuides(
+  opts: ToolLocale & { query: string; limit?: number },
+): GuideSearchHit[] {
+  const locale = resolveLocale(opts);
+  const index = loadIndex();
+  const tokens = tokenize(opts.query);
+  if (tokens.length === 0) return [];
+  const limit = Math.max(1, Math.min(opts.limit ?? 10, 50));
+
+  const hits: GuideSearchHit[] = [];
+  for (const entry of index.guides) {
+    const t = translationOf(entry, locale);
+    let score = 0;
+    for (const tk of tokens) {
+      score += countOccurrences(t.title, tk) * 10;
+      score += countOccurrences(t.description, tk) * 5;
+      score += countOccurrences(t.content, tk) * 1;
+    }
+    if (score <= 0) continue;
+    hits.push({
+      slug: entry.slug,
+      title: t.title,
+      description: t.description,
+      section: entry.section,
+      snippet: buildSnippet(t.content || t.description, tokens),
+      score,
+      href: t.href,
+    });
+  }
+
   hits.sort((a, b) => b.score - a.score || a.slug.localeCompare(b.slug));
   return hits.slice(0, limit);
 }
