@@ -211,8 +211,33 @@ interface ToolbarLabels {
 }
 
 // Default labels are pulled from `useI18n().richTextEditor` so toolbar follows
-// the surrounding ConfigProvider locale. The shape mirrors `ToolbarLabels`
-// minus i18n-only keys; `labels` prop on RichTextEditor still wins.
+// the surrounding ConfigProvider locale. `labels` prop on RichTextEditor still wins.
+//
+// FALLBACK_LABELS is the safety net for: (a) consumer pinned to an old @timeui/core
+// (< 1.5.0) that lacks the richTextEditor i18n block, (b) stale workspace dist in dev,
+// (c) any environment where the ConfigProvider sits outside the editor. Without it,
+// `i18nLabels.bold` would throw when richTextEditor is undefined.
+const FALLBACK_LABELS: ToolbarLabels & { toolbarLabel: string } = {
+  toolbarLabel: 'Formatting',
+  bold: 'Bold',
+  italic: 'Italic',
+  underline: 'Underline',
+  strike: 'Strikethrough',
+  h1: 'Heading 1',
+  h2: 'Heading 2',
+  h3: 'Heading 3',
+  bulletList: 'Bullet list',
+  orderedList: 'Ordered list',
+  blockquote: 'Blockquote',
+  code: 'Inline code',
+  codeBlock: 'Code block',
+  horizontalRule: 'Horizontal rule',
+  link: 'Link',
+  promptLink: 'Enter URL',
+  clearFormat: 'Clear formatting',
+  undo: 'Undo',
+  redo: 'Redo',
+};
 
 export interface RichTextEditorToolbarProps {
   editor: Editor | null;
@@ -233,7 +258,8 @@ export function RichTextEditorToolbar({
 }: RichTextEditorToolbarProps) {
   const theme = useTheme();
   const i18n = useI18n();
-  const i18nLabels = i18n.richTextEditor;
+  // i18n 字典如果是旧版（无 richTextEditor 段）会是 undefined；fallback 兜住，避免崩溃。
+  const i18nLabels = i18n.richTextEditor ?? FALLBACK_LABELS;
   const labels: ToolbarLabels = useMemo(
     () => ({
       bold: i18nLabels.bold,
