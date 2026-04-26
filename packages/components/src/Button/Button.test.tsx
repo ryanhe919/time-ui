@@ -164,6 +164,34 @@ describe('Button', () => {
     expect(getHeadCss()).toContain('rgba(170, 187, 204, 0.4)');
   });
 
+  it('renders square icon-only layout when isIconOnly is set', () => {
+    renderWithProviders(
+      <Button isIconOnly aria-label="close" size="md">
+        <span data-testid="x">×</span>
+      </Button>,
+    );
+    const btn = screen.getByRole('button', { name: 'close' });
+    expect(btn).toHaveAttribute('data-icon-only', 'true');
+    const styles = getHeadCss();
+    // md token: height = 40, paddingX = 16, minWidth = 80
+    expect(styles).toContain('height:40px');
+    // square: width matches height
+    expect(styles).toContain('width:40px');
+    expect(styles).toContain('min-width:40px');
+    // no inner padding, no gap
+    expect(styles).toContain('padding:0');
+    expect(styles).toContain('gap:0');
+  });
+
+  it('omits data-icon-only and keeps standard padding when isIconOnly is false', () => {
+    renderWithProviders(<Button size="md">Default</Button>);
+    const btn = screen.getByRole('button', { name: 'Default' });
+    expect(btn).not.toHaveAttribute('data-icon-only');
+    const styles = getHeadCss();
+    expect(styles).toContain('min-width:80px');
+    expect(styles).toContain('padding:0 16px');
+  });
+
   it('keeps unsupported 4-digit hex input unchanged in generated styles', () => {
     const theme = {
       ...lightTheme,

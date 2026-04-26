@@ -98,6 +98,22 @@
   <Button color="success" endIcon={<span>→</span>}>继续</Button>
 </LiveDemo>
 
+## 纯图标按钮 Icon-only
+
+设置 `isIconOnly` 后按钮变为正方形（width = height、内边距清零）。把图标作为 `children`
+（或通过 `startIcon` 传入）即可。所有 `variant`/`color`/`size` 以及 `radius="full"` 的
+胶囊形态都支持；务必同时传 `aria-label` 以保证无障碍。
+
+<LiveDemo code={`<Flex gap={8} align="center">
+  <Button isIconOnly color="primary" aria-label="新增"><PlusIcon /></Button>
+  <Button isIconOnly variant="bordered" aria-label="搜索"><SearchIcon /></Button>
+  <Button isIconOnly variant="light" aria-label="菜单"><MenuIcon /></Button>
+  <Button isIconOnly variant="shadow" color="danger" aria-label="删除"><XIcon /></Button>
+  <Button isIconOnly radius="full" variant="shadow" color="primary" size="lg" aria-label="悬浮新增"><PlusIcon /></Button>
+</Flex>`}>
+  <ButtonIconOnlyDemo />
+</LiveDemo>
+
 ## API
 
 <PropsTable props={[
@@ -108,6 +124,7 @@
   { name: 'loading', type: 'boolean', default: 'false', description: '显示加载态并禁用交互。' },
   { name: 'disabled', type: 'boolean', default: 'false', description: '禁用按钮。' },
   { name: 'fullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' },
+  { name: 'isIconOnly', type: 'boolean', default: 'false', description: '渲染为正方形纯图标按钮（width = height，无内边距）。请同时传入 aria-label 以保证无障碍。' },
   { name: 'startIcon', type: 'ReactNode', description: '标签前方渲染的节点。' },
   { name: 'endIcon', type: 'ReactNode', description: '标签后方渲染的节点。' },
   { name: 'as', type: 'ElementType', default: "'button'", description: '以其它元素渲染（例如链接）。' }

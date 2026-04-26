@@ -126,6 +126,7 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
     loading = false,
     disabled = false,
     fullWidth = false,
+    isIconOnly = false,
     startIcon,
     endIcon,
     children,
@@ -221,16 +222,18 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
       data-color={c}
       data-size={size}
       data-loading={loading || undefined}
+      data-icon-only={isIconOnly || undefined}
       css={css`
         position: relative;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: ${sizeTokens.gap};
+        gap: ${isIconOnly ? '0' : sizeTokens.gap};
         box-sizing: border-box;
         height: ${sizeTokens.height};
-        min-width: ${sizeTokens.minWidth};
-        padding: 0 ${sizeTokens.paddingX};
+        min-width: ${isIconOnly ? sizeTokens.height : sizeTokens.minWidth};
+        ${isIconOnly ? `width: ${sizeTokens.height};` : ''}
+        padding: ${isIconOnly ? '0' : `0 ${sizeTokens.paddingX}`};
         font-family: inherit;
         font-size: ${sizeTokens.fontSize};
         line-height: ${sizeTokens.lineHeight};

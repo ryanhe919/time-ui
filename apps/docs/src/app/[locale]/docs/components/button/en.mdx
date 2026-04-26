@@ -102,6 +102,22 @@ Override the default size-derived corner radius with `radius`.
   <Button color="success" endIcon={<span>→</span>}>Continue</Button>
 </LiveDemo>
 
+## Icon-only
+
+Set `isIconOnly` to render a square button (width = height, no inner padding). Pass the
+icon as `children` (or via `startIcon`). All variants, colors, sizes and the `radius="full"`
+pill shape work the same way — pair with `aria-label` to keep it accessible.
+
+<LiveDemo code={`<Flex gap={8} align="center">
+  <Button isIconOnly color="primary" aria-label="Add"><PlusIcon /></Button>
+  <Button isIconOnly variant="bordered" aria-label="Search"><SearchIcon /></Button>
+  <Button isIconOnly variant="light" aria-label="Menu"><MenuIcon /></Button>
+  <Button isIconOnly variant="shadow" color="danger" aria-label="Delete"><XIcon /></Button>
+  <Button isIconOnly radius="full" variant="shadow" color="primary" size="lg" aria-label="FAB"><PlusIcon /></Button>
+</Flex>`}>
+  <ButtonIconOnlyDemo />
+</LiveDemo>
+
 ## API
 
 <PropsTable props={[
@@ -112,6 +128,7 @@ Override the default size-derived corner radius with `radius`.
   { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner and disables interaction.' },
   { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the button.' },
   { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to the width of the container.' },
+  { name: 'isIconOnly', type: 'boolean', default: 'false', description: 'Render as a square icon-only button (width = height, no inner padding). Provide aria-label for accessibility.' },
   { name: 'startIcon', type: 'ReactNode', description: 'Node rendered before the label.' },
   { name: 'endIcon', type: 'ReactNode', description: 'Node rendered after the label.' },
   { name: 'as', type: 'ElementType', default: "'button'", description: 'Render as a different element (e.g. an anchor).' }

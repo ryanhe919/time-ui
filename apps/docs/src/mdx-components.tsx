@@ -94,6 +94,7 @@ import { SliderRangeDemo } from '@/components/mdx/SliderRangeDemo';
 import { SegmentedControlInboxDemo } from '@/components/mdx/SegmentedControlInboxDemo';
 import { SegmentedControlRangeDemo } from '@/components/mdx/SegmentedControlRangeDemo';
 import { SegmentedControlIconOnlyDemo } from '@/components/mdx/SegmentedControlIconOnlyDemo';
+import { ButtonIconOnlyDemo } from '@/components/mdx/ButtonIconOnlyDemo';
 import { ChatOverviewDemo } from '@/components/mdx/ChatOverviewDemo';
 import { ChatComposerDemo } from '@/components/mdx/ChatComposerDemo';
 import { ChatStreamingDemo } from '@/components/mdx/ChatStreamingDemo';
@@ -178,6 +179,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     SegmentedControlInboxDemo,
     SegmentedControlRangeDemo,
     SegmentedControlIconOnlyDemo,
+    ButtonIconOnlyDemo,
     ChatOverviewDemo,
     ChatComposerDemo,
     ChatStreamingDemo,

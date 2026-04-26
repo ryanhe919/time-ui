@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { css } from '@emotion/react';
 import { useEffect, useMemo, useState } from 'react';
-import { Search, SearchDialog, type Locale } from '@timeui/react';
+import { Button, Search, SearchDialog, type Locale } from '@timeui/react';
 import type { Navigation } from '@/lib/navigation';
 import type { DocsMessages } from '@/lib/docs-i18n';
 import { buildDocsSearchIndex, type DocsSearchItem } from '@/lib/docs-search-index';
@@ -101,7 +101,7 @@ export function TopNav({ navigation, messages, locale }: Props) {
           css={css`
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             line-height: 1;
             transition: transform 320ms var(--ease-editorial);
             &:hover {
@@ -116,14 +116,29 @@ export function TopNav({ navigation, messages, locale }: Props) {
             sizes="160px"
             css={css`
               display: block;
-              /* logo 自身有较多透明 padding，渲染高度 80 → 实际可见内容 ~24px。 */
-              height: 80px;
+              /* logo 自身有较多透明 padding，渲染高度 68 → 实际可见内容约 20px。 */
+              height: 68px;
               width: auto;
               object-fit: contain;
               /* 负边距让 link 在布局上仍占 48px 头部高，img 只是"突破"头部上下沿。 */
-              margin-block: -16px;
+              margin-block: -10px;
+              transition: filter 240ms var(--ease-editorial);
+              html[data-theme='dark'] & {
+                filter: invert(1) brightness(1.08);
+              }
             `}
           />
+          <span
+            css={css`
+              font-size: 15px;
+              font-weight: 650;
+              letter-spacing: 0;
+              color: var(--c-text);
+              line-height: 1;
+            `}
+          >
+            TimeUI
+          </span>
           <span
             aria-hidden
             css={css`
@@ -255,78 +270,32 @@ export function TopNav({ navigation, messages, locale }: Props) {
             gap: 2px;
           `}
         >
-          <button
-            type="button"
+          <Button
+            isIconOnly
+            variant="light"
+            color="default"
+            size="xs"
+            radius="full"
             onClick={() => setAssistantOpen(true)}
             aria-label={messages.assistant.openLabel}
             aria-expanded={assistantOpen || undefined}
-            css={css`
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              width: 28px;
-              height: 28px;
-              border-radius: 50%;
-              border: 1px solid transparent;
-              background: transparent;
-              color: var(--c-text-secondary);
-              cursor: pointer;
-              transition:
-                background 240ms var(--ease-editorial),
-                color 240ms var(--ease-editorial),
-                border-color 240ms var(--ease-editorial),
-                transform 240ms var(--ease-editorial);
-              &:hover {
-                background: var(--c-bg-tertiary);
-                border-color: var(--c-hairline-strong);
-                color: var(--c-text);
-              }
-              &:active {
-                transform: scale(0.92);
-              }
-              &:focus-visible {
-                outline: 2px solid var(--c-accent);
-                outline-offset: 2px;
-              }
-            `}
           >
             <AssistantIcon />
-          </button>
-          <a
+          </Button>
+          <Button
+            as="a"
+            isIconOnly
+            variant="light"
+            color="default"
+            size="xs"
+            radius="full"
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer"
             aria-label={messages.nav.github}
-            css={css`
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              width: 28px;
-              height: 28px;
-              border-radius: 50%;
-              border: 1px solid transparent;
-              color: var(--c-text-secondary);
-              transition:
-                background 240ms var(--ease-editorial),
-                color 240ms var(--ease-editorial),
-                border-color 240ms var(--ease-editorial),
-                transform 240ms var(--ease-editorial);
-              &:hover {
-                background: var(--c-bg-tertiary);
-                border-color: var(--c-hairline-strong);
-                color: var(--c-text);
-              }
-              &:active {
-                transform: scale(0.92);
-              }
-              &:focus-visible {
-                outline: 2px solid var(--c-accent);
-                outline-offset: 2px;
-              }
-            `}
           >
             <GithubIcon />
-          </a>
+          </Button>
           <LocaleToggle locale={locale} label={messages.header.toggleLocale} />
           <ThemeToggle
             labelLight={messages.header.toggleThemeLight}

@@ -33,6 +33,12 @@ export interface ButtonOwnProps {
   loading?: boolean;
   disabled?: boolean;
   fullWidth?: boolean;
+  /**
+   * Render as a square icon-only button: width = height, no min-width and no
+   * inner padding. Pass the icon either as `children` or via `startIcon`. When
+   * enabled, `aria-label` (or `aria-labelledby`) is required for accessibility.
+   */
+  isIconOnly?: boolean;
   startIcon?: ReactNode;
   endIcon?: ReactNode;
   children?: ReactNode;
