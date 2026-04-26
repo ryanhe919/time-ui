@@ -44,6 +44,8 @@ import {
   ChatMarkdown,
   RichTextEditor,
   CodeEditor,
+  PdfViewer,
+  MarkdownViewer,
   Popover,
   Tooltip,
   Modal,
@@ -145,6 +147,10 @@ import { CodeEditorBasicDemo } from '@/components/mdx/CodeEditorBasicDemo';
 import { CodeEditorLanguagesDemo } from '@/components/mdx/CodeEditorLanguagesDemo';
 import { CodeEditorVariantsDemo } from '@/components/mdx/CodeEditorVariantsDemo';
 import { CodeEditorStatesDemo } from '@/components/mdx/CodeEditorStatesDemo';
+import { PdfViewerBasicDemo } from '@/components/mdx/PdfViewerBasicDemo';
+import { PdfViewerToolbarDemo } from '@/components/mdx/PdfViewerToolbarDemo';
+import { MarkdownViewerBasicDemo } from '@/components/mdx/MarkdownViewerBasicDemo';
+import { MarkdownViewerTocDemo } from '@/components/mdx/MarkdownViewerTocDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -238,6 +244,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     CodeEditorLanguagesDemo,
     CodeEditorVariantsDemo,
     CodeEditorStatesDemo,
+    PdfViewerBasicDemo,
+    PdfViewerToolbarDemo,
+    MarkdownViewerBasicDemo,
+    MarkdownViewerTocDemo,
 
     Button,
     Box,
@@ -276,6 +286,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ChatMarkdown,
     RichTextEditor,
     CodeEditor,
+    PdfViewer,
+    MarkdownViewer,
     Popover,
     Tooltip,
     Modal,

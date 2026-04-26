@@ -53,5 +53,9 @@ export * from './StatCard';
 export * from './Skeleton';
 export * from './Empty';
 export * from './Steps';
-// 注意：RichTextEditor 走独立 subpath export `@timeui/react/rich-text-editor`，
-// 避免把 TipTap (~100KB) 打进主 bundle。在主 barrel 里有意不导出。
+// 注意：以下组件均故意不在主 barrel 暴露，强制使用 subpath import 以避免把
+// optional peer (TipTap / CodeMirror / pdfjs-dist / react-markdown) 拖进主 bundle：
+//   - RichTextEditor → `@timeui/react/rich-text-editor`
+//   - CodeEditor     → `@timeui/react/code-editor`
+//   - PdfViewer      → `@timeui/react/pdf-viewer`
+//   - MarkdownViewer → `@timeui/react/markdown-viewer`

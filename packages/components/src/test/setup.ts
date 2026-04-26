@@ -19,6 +19,22 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
     ResizeObserverStub;
 }
 
+// jsdom 不实现 IntersectionObserver — MarkdownViewer 的 TOC 滚动监听用到。
+class IntersectionObserverStub {
+  constructor(_cb: unknown, _opts?: unknown) {}
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): unknown[] {
+    return [];
+  }
+}
+if (typeof globalThis.IntersectionObserver === 'undefined') {
+  (
+    globalThis as unknown as { IntersectionObserver: typeof IntersectionObserverStub }
+  ).IntersectionObserver = IntersectionObserverStub;
+}
+
 if (typeof globalThis.matchMedia === 'undefined') {
   Object.defineProperty(globalThis, 'matchMedia', {
     writable: true,

@@ -42,6 +42,16 @@
       "import": "./dist/code-editor.js",
       "require": "./dist/code-editor.cjs"
     },
+    "./pdf-viewer": {
+      "types": "./dist/pdf-viewer.d.ts",
+      "import": "./dist/pdf-viewer.js",
+      "require": "./dist/pdf-viewer.cjs"
+    },
+    "./markdown-viewer": {
+      "types": "./dist/markdown-viewer.d.ts",
+      "import": "./dist/markdown-viewer.js",
+      "require": "./dist/markdown-viewer.cjs"
+    },
     "./test-utils": {
       "types": "./src/test-utils/index.ts",
       "import": "./src/test-utils/index.ts"
@@ -92,7 +102,8 @@
     "@codemirror/lang-css": "^6.0.0",
     "@codemirror/lang-html": "^6.0.0",
     "@codemirror/lang-json": "^6.0.0",
-    "@lezer/highlight": "^1.0.0"
+    "@lezer/highlight": "^1.0.0",
+    "pdfjs-dist": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "shiki": {
@@ -166,6 +177,9 @@
     },
     "@lezer/highlight": {
       "optional": true
+    },
+    "pdfjs-dist": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -194,6 +208,7 @@
     "@codemirror/lang-html": "^6.0.0",
     "@codemirror/lang-json": "^6.0.0",
     "@lezer/highlight": "^1.0.0",
+    "pdfjs-dist": "^4.0.0",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",

@@ -98,6 +98,38 @@ module.exports = [
     ],
   },
   {
+    name: '@timeui/react/pdf-viewer',
+    path: 'packages/components/dist/pdf-viewer.js',
+    import: '*',
+    // pdfjs-dist 是 optional peer，动态 import，调用方各装各的；这里只衡量我们的 wrapper + toolbar。
+    limit: '10 KB',
+    ignore: [
+      'react',
+      'react-dom',
+      '@emotion/react',
+      '@emotion/styled',
+      'pdfjs-dist',
+    ],
+  },
+  {
+    name: '@timeui/react/markdown-viewer',
+    path: 'packages/components/dist/markdown-viewer.js',
+    import: '*',
+    // react-markdown / remark-gfm 是 optional peer；这里只衡量 viewer + toolbar + toc 自身。
+    // CodeBlock 通过 import 链拉进来，但 shiki 已 ignore。比 rich-text-editor / code-editor
+    // 略大，因为额外带了 reading-typography 排版样式 + TOC IntersectionObserver 联动。
+    limit: '14 KB',
+    ignore: [
+      'react',
+      'react-dom',
+      '@emotion/react',
+      '@emotion/styled',
+      'react-markdown',
+      'remark-gfm',
+      'shiki',
+    ],
+  },
+  {
     name: '@timeui/tokens — full import',
     path: 'packages/tokens/dist/index.js',
     import: '*',

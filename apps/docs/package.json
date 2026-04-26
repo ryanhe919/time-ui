@@ -3,13 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/copy-pdf-worker.mjs",
+    "prebuild": "node scripts/copy-pdf-worker.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --config ../../eslint.config.js",
     "typecheck": "tsc --noEmit",
     "test": "echo \"(no docs tests)\" && exit 0",
-    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo"
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo public/pdf.worker.min.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -51,6 +53,7 @@
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
+    "pdfjs-dist": "^4.10.0",
     "rimraf": "^6.0.1",
     "typescript": "^5.6.3"
   }

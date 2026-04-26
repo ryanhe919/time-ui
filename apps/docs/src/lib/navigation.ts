@@ -68,7 +68,17 @@ const SECTIONS: readonly SectionConfig[] = [
       },
       {
         slug: 'data-display',
-        pages: ['table', 'avatar', 'tag', 'badge', 'code-block', 'card', 'stat-card'],
+        pages: [
+          'table',
+          'avatar',
+          'tag',
+          'badge',
+          'code-block',
+          'card',
+          'stat-card',
+          'pdf-viewer',
+          'markdown-viewer',
+        ],
       },
       {
         slug: 'feedback',

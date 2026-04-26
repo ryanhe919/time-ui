@@ -24,6 +24,14 @@ const codeEditorSourceEntry = path.join(
   __dirname,
   '../../packages/components/src/CodeEditor/index.ts',
 );
+const pdfViewerSourceEntry = path.join(
+  __dirname,
+  '../../packages/components/src/PdfViewer/index.ts',
+);
+const markdownViewerSourceEntry = path.join(
+  __dirname,
+  '../../packages/components/src/MarkdownViewer/index.ts',
+);
 
 const withMDX = createMDX({
   options: {
@@ -100,6 +108,8 @@ const nextConfig = {
             '@timeui/react/chat-markdown': chatMarkdownSourceEntry,
             '@timeui/react/rich-text-editor': richTextEditorSourceEntry,
             '@timeui/react/code-editor': codeEditorSourceEntry,
+            '@timeui/react/pdf-viewer': pdfViewerSourceEntry,
+            '@timeui/react/markdown-viewer': markdownViewerSourceEntry,
           },
         },
         webpack(config) {
@@ -111,6 +121,8 @@ const nextConfig = {
             '@timeui/react/chat-markdown$': chatMarkdownSourceEntry,
             '@timeui/react/rich-text-editor$': richTextEditorSourceEntry,
             '@timeui/react/code-editor$': codeEditorSourceEntry,
+            '@timeui/react/pdf-viewer$': pdfViewerSourceEntry,
+            '@timeui/react/markdown-viewer$': markdownViewerSourceEntry,
           };
           return config;
         },

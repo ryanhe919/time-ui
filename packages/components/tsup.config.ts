@@ -13,6 +13,8 @@ export default defineConfig({
     'chat-markdown': 'src/Chat/ChatMarkdown.tsx',
     'rich-text-editor': 'src/RichTextEditor/index.ts',
     'code-editor': 'src/CodeEditor/index.ts',
+    'pdf-viewer': 'src/PdfViewer/index.ts',
+    'markdown-viewer': 'src/MarkdownViewer/index.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,
@@ -33,5 +35,7 @@ export default defineConfig({
     'codemirror',
     /^@codemirror\//,
     /^@lezer\//,
+    'pdfjs-dist',
+    /^pdfjs-dist\//,
   ],
 });

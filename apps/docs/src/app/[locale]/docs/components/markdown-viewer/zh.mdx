@@ -1,0 +1,160 @@
+# Markdown 查看器 MarkdownViewer
+
+基于 `react-markdown` + `remark-gfm` 的文档型 markdown 查看器。面向长文：阅读型排版、可选目录、复制 / 下载 / 刷新工具条，支持内联字符串与远程 URL 两种来源。与 [`ChatMarkdown`](../chat/markdown) 刻意分离 —— 后者面向聊天流式片段，本组件自带滚动容器、布局与 chrome。组件通过 `@timeui/react/markdown-viewer` 独立 subpath 导出，**不渲染长文的页面里 `react-markdown` / `remark-gfm` 不会进主 bundle**。
+
+## 安装
+
+`MarkdownViewer` 是独立 sub-entry。请先安装 optional peers：
+
+```bash
+npm install @timeui/react react-markdown remark-gfm
+```
+
+然后从 sub-entry 导入（推荐）：
+
+```tsx
+import { MarkdownViewer } from '@timeui/react/markdown-viewer';
+```
+
+主入口 `@timeui/react` 同样会再导出 `MarkdownViewer`，方便使用；但**强烈建议**走 subpath —— 这样 bundler 可以把 `react-markdown` 从不渲染长文的页面里 tree-shake 掉。
+
+## 基础用法
+
+通过 `source` 传入 markdown 字符串。`sourceType` 默认 `'content'`，直接渲染入参字符串。Fenced code 会交给 TimeUI 的 [`CodeBlock`](./code-block)，自动启用 shiki 语法高亮。
+
+<MarkdownViewerBasicDemo />
+
+```tsx
+import { MarkdownViewer } from '@timeui/react/markdown-viewer';
+
+const md = `# 欢迎
+你好，**TimeUI**！`;
+
+export function Demo() {
+  return <MarkdownViewer source={md} />;
+}
+```
+
+## 从 URL 加载
+
+将 `sourceType` 切到 `'url'` 并传入可 fetch 的 URL 或路径。加载时显示内置极简 spinner，失败时显示行内错误态。在 URL 模式下，工具条的刷新按钮会被启用——点击会通过内部 nonce 重新拉取文档，适合"重新生成"类交互。
+
+```tsx
+<MarkdownViewer
+  sourceType="url"
+  source="/docs/changelog.md"
+  fetchOptions={{ headers: { 'cache-control': 'no-cache' } }}
+  onLoad={(text) => console.log('loaded', text.length)}
+  onError={(err) => console.error(err)}
+/>
+```
+
+> 注意：`fetchOptions` **不**纳入 effect 依赖。需要从外部触发 re-fetch 时，改 `source` / `sourceType`，或点击工具条上的 Refresh 按钮（内部 nonce 自增）。
+
+## 目录 TOC
+
+传 `showToc` 启用侧栏目录。标题直接从 markdown 源解析，SSR 友好（hydrate 之前 TOC 就已可用）。当前章节高亮使用 `IntersectionObserver`，监听的 root 是查看器自身的滚动容器 —— 不会和外层页面的滚动状态打架。
+
+<MarkdownViewerTocDemo />
+
+```tsx
+<MarkdownViewer
+  source={md}
+  showToc
+  tocPosition="right"  // 或 "left"
+  tocMaxDepth={3}
+/>
+```
+
+## 工具条
+
+默认工具条提供：
+
+- **复制** —— 把 markdown 原文复制到剪贴板。
+- **下载** —— 保存为 `.md` 文件。
+- **刷新** —— 重新拉取文档（仅 URL 模式可见）。
+
+通过 `toolbar` 配置隐藏单个按钮，或传 `showToolbar={false}` 整体关闭：
+
+```tsx
+<MarkdownViewer source={md} toolbar={{ download: false, refresh: false }} />
+<MarkdownViewer source={md} showToolbar={false} />
+```
+
+工具条文案（含"已复制"等）可通过 `toolbarLabels` 覆盖，便于 i18n。
+
+## 链接
+
+站内锚点（`#heading-slug`）在查看器容器内滚动，永不修改 `location.hash`。外链（`http://`、`https://`、`mailto:` 等）按 `linkTarget` 打开（默认 `'_blank'`，自动追加 `rel="noreferrer noopener"`）。需要接 SPA 路由时使用 `onLinkClick` 拦截 —— 调用 `event.preventDefault()` 即跳过默认行为。
+
+```tsx
+<MarkdownViewer
+  source={md}
+  linkTarget="_self"
+  onLinkClick={(href, event) => {
+    if (href.startsWith('/internal/')) {
+      event.preventDefault();
+      router.push(href);
+    }
+  }}
+/>
+```
+
+## 自定义渲染
+
+通过 `components` 覆盖任意 `react-markdown` 节点。用户覆盖优先级高于内置实现，所以你可以替换 heading / 图片 / 列表等任意节点，未涉及的节点仍保留内置 slug-id 行为。
+
+```tsx
+<MarkdownViewer
+  source={md}
+  components={{
+    img: ({ src, alt }) => <img src={src} alt={alt} loading="lazy" />,
+  }}
+/>
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'source', type: 'string', description: '`sourceType="content"` 时是 markdown 原文；`sourceType="url"` 时是可 fetch 的 URL。' },
+  { name: 'sourceType', type: "'content' | 'url'", default: "'content'", description: '如何解释 `source`。' },
+  { name: 'fetchOptions', type: 'RequestInit', description: 'URL 模式透传给 `fetch` 的选项（headers、credentials 等）。**不**纳入依赖；如需 re-fetch，改 `source` 或点击 Refresh。' },
+  { name: 'showToolbar', type: 'boolean', default: 'true', description: '是否显示顶部工具条。' },
+  { name: 'toolbar', type: 'MarkdownViewerToolbarConfig', description: '工具条按钮可见性，省略字段视为 true。' },
+  { name: 'toolbarLabels', type: 'Partial<MarkdownViewerToolbarLabels>', description: '工具条文案覆盖（i18n）。' },
+  { name: 'showToc', type: 'boolean', default: 'false', description: '是否渲染侧栏目录。' },
+  { name: 'tocPosition', type: "'left' | 'right'", default: "'right'", description: '目录摆放位置。' },
+  { name: 'tocMaxDepth', type: 'number', default: '3', description: '目录最大层级（h1–h6）。' },
+  { name: 'gfm', type: 'boolean', default: 'true', description: '是否启用 GFM（表格、任务列表、删除线）。' },
+  { name: 'linkTarget', type: "'_self' | '_blank'", default: "'_blank'", description: '外链默认 target；站内锚点不受此影响。' },
+  { name: 'onLinkClick', type: '(href: string, event: MouseEvent<HTMLAnchorElement>) => void', description: '链接点击拦截器。调用 `event.preventDefault()` 可阻止默认行为，便于接 SPA 路由。' },
+  { name: 'components', type: 'Components', description: '`react-markdown` 节点覆盖映射；用户覆盖优先级高于内置。' },
+  { name: 'onLoad', type: '(markdown: string) => void', description: '文档可用后触发（content 模式立即；URL 模式 fetch 成功后）。' },
+  { name: 'onError', type: '(err: Error) => void', description: 'URL 拉取失败时触发。' },
+  { name: 'loadingFallback', type: 'ReactNode', description: '自定义加载态节点（不指定时用内置极简 spinner）。' },
+  { name: 'errorFallback', type: 'ReactNode | ((err: Error) => ReactNode)', description: '自定义错误态节点或渲染函数。' },
+  { name: 'maxWidth', type: 'number | string', default: "'72ch'", description: '阅读栏 max-width。' },
+  { name: 'aria-label', type: 'string', description: '外层 `role="article"` 容器的无障碍标签。' }
+]} />
+
+### `MarkdownViewerToolbarConfig`
+
+```ts
+interface MarkdownViewerToolbarConfig {
+  copy?: boolean;     // 默认 true
+  download?: boolean; // 默认 true
+  refresh?: boolean;  // 默认 true（仅 URL 模式显示）
+}
+```
+
+<Callout variant="info" title="Bundle 影响">
+  `react-markdown` 和 `remark-gfm` **不会**被打进 `@timeui/react` 主 bundle。请按 optional peer 安装，并从专属 subpath 导入 —— `import { MarkdownViewer } from '@timeui/react/markdown-viewer'` —— 这样不渲染长文的页面就能更轻。MarkdownViewer 故意**不**从主入口导出，以保持核心 barrel 精简。
+</Callout>
+
+<Callout variant="info" title="MarkdownViewer vs ChatMarkdown">
+  `MarkdownViewer` 自带滚动容器、工具条、目录，适合文档页、changelog、README 弹窗、以及"渲染整篇文档"的 UX 场景。如果只是流式聊天片段、要嵌入到 message bubble 里，请用 [`ChatMarkdown`](../chat/markdown)，它刻意保持无 chrome。
+</Callout>
+
+<Callout variant="info" title="可访问性">
+  外层容器为 `role="article"`，转发 `aria-label`，加载中带 `aria-busy`。错误以 `role="alert"` 渲染。每个标题都拥有稳定 slug id；TOC 项是真实的 `<a>` 锚点，激活项带 `aria-current="true"`。开启 `prefers-reduced-motion` 时锚点跳转走立即滚动而非平滑动画。
+</Callout>

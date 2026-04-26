@@ -1,0 +1,160 @@
+# Markdown Viewer
+
+A document-oriented markdown reader built on `react-markdown` + `remark-gfm`. Designed for long-form content: reading-friendly typography, optional table of contents, copy / download / refresh toolbar, and either inline strings or remote URL sources. Distinct from [`ChatMarkdown`](../chat/markdown), which is tuned for streaming chat fragments — `MarkdownViewer` owns its own scroll container, layout, and chrome. Distributed behind the `@timeui/react/markdown-viewer` subpath export so `react-markdown` / `remark-gfm` **stay out of the main bundle** unless the page actually renders the viewer.
+
+## Installation
+
+`MarkdownViewer` is shipped as an independent sub-entry. Install the optional peers first:
+
+```bash
+npm install @timeui/react react-markdown remark-gfm
+```
+
+Then import from the sub-entry (recommended):
+
+```tsx
+import { MarkdownViewer } from '@timeui/react/markdown-viewer';
+```
+
+The viewer is also re-exported from the main `@timeui/react` entry, but importing from the subpath is strongly preferred so bundlers can keep `react-markdown` out of pages that never render long-form markdown.
+
+## Basic usage
+
+Pass a markdown string via `source`. By default, `sourceType` is `'content'`, so the string is rendered as-is. Fenced code blocks are delegated to TimeUI's [`CodeBlock`](./code-block) for shiki-powered syntax highlighting.
+
+<MarkdownViewerBasicDemo />
+
+```tsx
+import { MarkdownViewer } from '@timeui/react/markdown-viewer';
+
+const md = `# Welcome
+Hello, **TimeUI**!`;
+
+export function Demo() {
+  return <MarkdownViewer source={md} />;
+}
+```
+
+## Loading from a URL
+
+Switch `sourceType` to `'url'` and pass a fetch-able URL or path. The viewer shows a built-in spinner while loading and renders an inline error state on failure. The toolbar's refresh button becomes active in URL mode and re-fetches the document via an internal nonce — handy for "regenerate" flows.
+
+```tsx
+<MarkdownViewer
+  sourceType="url"
+  source="/docs/changelog.md"
+  fetchOptions={{ headers: { 'cache-control': 'no-cache' } }}
+  onLoad={(text) => console.log('loaded', text.length)}
+  onError={(err) => console.error(err)}
+/>
+```
+
+> Note: `fetchOptions` is intentionally not part of the effect dependency list. To force a re-fetch from the consumer, change `source` / `sourceType`, or call the toolbar's refresh button (which bumps an internal refresh nonce).
+
+## Table of contents
+
+Pass `showToc` to render a sticky TOC alongside the document. Headings are extracted directly from the markdown source (SSR-friendly — the TOC is available before client hydration). Active section tracking uses `IntersectionObserver` against the viewer's own scroll container, so it never fights the page's scroll position.
+
+<MarkdownViewerTocDemo />
+
+```tsx
+<MarkdownViewer
+  source={md}
+  showToc
+  tocPosition="right"  // or "left"
+  tocMaxDepth={3}
+/>
+```
+
+## Toolbar
+
+The default toolbar exposes:
+
+- **Copy** — copies the raw markdown to the clipboard.
+- **Download** — saves the markdown as a `.md` file.
+- **Refresh** — re-fetches the document (URL mode only; hidden in content mode).
+
+Pass a `toolbar` config to hide individual buttons, or `showToolbar={false}` to drop the header entirely:
+
+```tsx
+<MarkdownViewer source={md} toolbar={{ download: false, refresh: false }} />
+<MarkdownViewer source={md} showToolbar={false} />
+```
+
+Toolbar labels (including the "Copied!" confirmation) can be overridden via `toolbarLabels` for i18n.
+
+## Links
+
+Internal anchors (`#heading-slug`) scroll within the viewer's container and never mutate `location.hash`. External links (`http://`, `https://`, `mailto:`, …) honour `linkTarget` (`'_blank'` by default with `rel="noreferrer noopener"`). Intercept any click via `onLinkClick` to wire up SPA routing — calling `event.preventDefault()` skips the default behaviour.
+
+```tsx
+<MarkdownViewer
+  source={md}
+  linkTarget="_self"
+  onLinkClick={(href, event) => {
+    if (href.startsWith('/internal/')) {
+      event.preventDefault();
+      router.push(href);
+    }
+  }}
+/>
+```
+
+## Custom renderers
+
+Override any `react-markdown` node via `components`. User overrides win over the built-ins, so you can replace headings, anchor handling, lists, etc. without losing the slug-id behaviour for unaffected nodes.
+
+```tsx
+<MarkdownViewer
+  source={md}
+  components={{
+    img: ({ src, alt }) => <img src={src} alt={alt} loading="lazy" />,
+  }}
+/>
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'source', type: 'string', description: 'Markdown string when `sourceType="content"`, or a fetch-able URL when `sourceType="url"`.' },
+  { name: 'sourceType', type: "'content' | 'url'", default: "'content'", description: 'How to interpret `source`.' },
+  { name: 'fetchOptions', type: 'RequestInit', description: '`fetch` options for URL mode (headers, credentials, etc.). Intentionally not a dependency — change `source` or hit refresh to re-run.' },
+  { name: 'showToolbar', type: 'boolean', default: 'true', description: 'Show the header toolbar.' },
+  { name: 'toolbar', type: 'MarkdownViewerToolbarConfig', description: 'Toggle individual toolbar buttons. Omitted fields default to true.' },
+  { name: 'toolbarLabels', type: 'Partial<MarkdownViewerToolbarLabels>', description: 'Override toolbar text (i18n).' },
+  { name: 'showToc', type: 'boolean', default: 'false', description: 'Render a sticky table-of-contents sidebar.' },
+  { name: 'tocPosition', type: "'left' | 'right'", default: "'right'", description: 'Which side the TOC lives on.' },
+  { name: 'tocMaxDepth', type: 'number', default: '3', description: 'Maximum heading depth (h1–h6) included in the TOC.' },
+  { name: 'gfm', type: 'boolean', default: 'true', description: 'Enable GitHub-flavoured markdown (tables, task lists, strikethrough).' },
+  { name: 'linkTarget', type: "'_self' | '_blank'", default: "'_blank'", description: 'Default target for external links. Anchors always navigate inside the viewer.' },
+  { name: 'onLinkClick', type: '(href: string, event: MouseEvent<HTMLAnchorElement>) => void', description: 'Link click interceptor. Call `event.preventDefault()` to take over (SPA routing).' },
+  { name: 'components', type: 'Components', description: '`react-markdown` component overrides. User overrides win over built-ins.' },
+  { name: 'onLoad', type: '(markdown: string) => void', description: 'Fires once the document is available (immediate in content mode; after fetch in URL mode).' },
+  { name: 'onError', type: '(err: Error) => void', description: 'Fires on URL fetch failure.' },
+  { name: 'loadingFallback', type: 'ReactNode', description: 'Custom loading node (defaults to a minimal spinner).' },
+  { name: 'errorFallback', type: 'ReactNode | ((err: Error) => ReactNode)', description: 'Custom error node or render function.' },
+  { name: 'maxWidth', type: 'number | string', default: "'72ch'", description: 'Reading-column max-width.' },
+  { name: 'aria-label', type: 'string', description: 'Accessible label for the outer `role="article"` wrapper.' }
+]} />
+
+### `MarkdownViewerToolbarConfig`
+
+```ts
+interface MarkdownViewerToolbarConfig {
+  copy?: boolean;     // default true
+  download?: boolean; // default true
+  refresh?: boolean;  // default true (only visible in URL mode)
+}
+```
+
+<Callout variant="info" title="Bundle impact">
+  `react-markdown` and `remark-gfm` are **not** bundled with `@timeui/react`. Install them as optional peers and import from the dedicated subpath — `import { MarkdownViewer } from '@timeui/react/markdown-viewer'` — so pages that never render long-form markdown remain lighter. MarkdownViewer is intentionally **not** exported from the main entry to keep the core barrel lean.
+</Callout>
+
+<Callout variant="info" title="MarkdownViewer vs ChatMarkdown">
+  `MarkdownViewer` owns its own scroll container, toolbar, and TOC — use it for documentation pages, changelogs, README dialogs, and any "render the whole document" UX. For streaming chat fragments rendered into a parent message bubble, reach for [`ChatMarkdown`](../chat/markdown) instead, which is intentionally chrome-less.
+</Callout>
+
+<Callout variant="info" title="Accessibility">
+  The wrapper carries `role="article"`, mirrors `aria-label` from props, and toggles `aria-busy` while loading. Errors render with `role="alert"`. Headings get deterministic slug ids, and TOC items are real anchors with `aria-current="true"` on the active section. Reduced-motion users get instant scroll-to-anchor instead of smooth scrolling.
+</Callout>

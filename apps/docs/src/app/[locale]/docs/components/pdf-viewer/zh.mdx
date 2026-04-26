@@ -1,0 +1,150 @@
+# PDF 查看器 PdfViewer
+
+基于 [pdfjs-dist](https://github.com/mozilla/pdf.js) 的 canvas PDF 文档查看器。提供分页阅读、缩放、按页宽 / 按页面适配、可选下载 / 打印，以及完整的键盘导航。组件通过 `@timeui/react/pdf-viewer` 独立 subpath 导出，**不渲染 PDF 的页面里 `pdfjs-dist`（~2 MB）不会进主 bundle**。
+
+## 安装
+
+`PdfViewer` 是独立 sub-entry，避免重 dep `pdfjs-dist` 污染主 bundle。请先安装 optional peer：
+
+```bash
+npm install @timeui/react pdfjs-dist
+```
+
+然后从 sub-entry 导入（推荐）：
+
+```tsx
+import { PdfViewer } from '@timeui/react/pdf-viewer';
+```
+
+主入口 `@timeui/react` 同样会再导出 `PdfViewer`，方便临时使用；但**强烈建议**走 subpath —— 这样 bundler 可以把 `pdfjs-dist` 从不渲染查看器的页面里 tree-shake 掉。
+
+## 基础用法
+
+`source` 接受 URL 字符串、`URL`、`ArrayBuffer`、`Uint8Array` 或 `Blob`。URL 字符串会被 `fetch`（同源，或对端服务器返回宽松 CORS）；缓冲区与 Blob 直接交给 pdfjs。
+
+<PdfViewerBasicDemo />
+
+```tsx
+import { PdfViewer } from '@timeui/react/pdf-viewer';
+
+export function Demo() {
+  return <PdfViewer source="/sample.pdf" aria-label="示例 PDF" height={520} />;
+}
+```
+
+## 工具条
+
+默认工具条提供翻页（上一页 / 下一页 + 页码输入）、缩放与按页宽适配；通过 `toolbar` 开启可选的下载、打印按钮：
+
+<PdfViewerToolbarDemo />
+
+```tsx
+<PdfViewer
+  source="/sample.pdf"
+  toolbar={{ download: true, print: true }}
+/>
+```
+
+| 字段        | 类型      | 默认值  | 描述                                                            |
+| ----------- | --------- | ------- | --------------------------------------------------------------- |
+| `download`  | `boolean` | `false` | 显示下载按钮。仅当 `source` 是 URL 字符串时生效。               |
+| `print`     | `boolean` | `false` | 显示打印按钮（调用 `window.print()`）。                         |
+| `pageInput` | `boolean` | `true`  | 显示页码输入框。                                                |
+
+传 `showToolbar={false}` 可彻底隐藏工具条。
+
+## 受控状态
+
+`page`（1-based）和 `zoom`（1 = 100%）均可受控；提供对应 `onPageChange` / `onZoomChange` 即可监听用户交互。
+
+```tsx
+const [page, setPage] = useState(1);
+const [zoom, setZoom] = useState(1);
+
+<PdfViewer
+  source="/sample.pdf"
+  page={page}
+  onPageChange={setPage}
+  zoom={zoom}
+  onZoomChange={setZoom}
+/>;
+```
+
+非受控可以传 `initialPage` 与 `defaultZoom`。`defaultZoom` 接受 `'page-fit'`、`'page-width'`（默认）或任意数字。
+
+## 自定义 worker
+
+查看器默认通过 `new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url)` 解析 pdfjs worker。Vite 等支持 worker 资产追踪的 bundler 能直接产出同源 worker chunk；**Next.js（App Router）下这条默认路径并不会被打包成可访问的 URL**，需要显式提供 `workerSrc`。
+
+推荐做法：把 `node_modules/pdfjs-dist/build/pdf.worker.min.mjs` 复制到 `public/pdf.worker.min.mjs`，然后：
+
+```tsx
+<PdfViewer source="/sample.pdf" workerSrc="/pdf.worker.min.mjs" />
+```
+
+也可以指向 CDN 上同版本的 worker。**版本号必须与运行时安装的 `pdfjs-dist` 完全一致**——pdfjs 跨 minor 版本会出现协议不兼容，错版本会得到 `Worker was destroyed` 之类的奇怪报错。运行 `node -p "require('pdfjs-dist/package.json').version"` 可获取实际版本：
+
+```tsx
+<PdfViewer
+  source={pdfBytes}
+  workerSrc={`https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSION}/build/pdf.worker.min.mjs`}
+/>
+```
+
+`workerSrc` 是 pdfjs 的**全局单例**（写在 `pdfjs.GlobalWorkerOptions` 上）。同一页面挂多个 PdfViewer 时若各自传入不同 `workerSrc`，后挂载的会覆盖前者；建议在应用层统一一份。
+
+显式传入 `workerSrc` 时永远覆盖；未传时只在尚未配置过时设置默认值。
+
+## 键盘
+
+聚焦到页面区域后：
+
+| 按键                | 行为     |
+| ------------------- | -------- |
+| `←` / `Page Up`     | 上一页   |
+| `→` / `Page Down`   | 下一页   |
+| `+` / `=`           | 放大     |
+| `-` / `_`           | 缩小     |
+| `0`                 | 按页宽   |
+
+## API
+
+<PropsTable props={[
+  { name: 'source', type: 'string | URL | ArrayBuffer | Uint8Array | Blob', description: 'PDF 源。URL 字符串会被 fetch；缓冲区与 Blob 直接交给 pdfjs。' },
+  { name: 'initialPage', type: 'number', default: '1', description: '初始页码（1-based，非受控）。' },
+  { name: 'page', type: 'number', description: '受控当前页（1-based）。' },
+  { name: 'onPageChange', type: '(page: number) => void', description: '当前页变化时触发。' },
+  { name: 'zoom', type: 'number', description: '受控缩放系数（1 = 100%）。' },
+  { name: 'onZoomChange', type: '(zoom: number) => void', description: '缩放系数变化时触发。' },
+  { name: 'defaultZoom', type: "'page-fit' | 'page-width' | number", default: "'page-width'", description: '初始缩放模式或数值。' },
+  { name: 'minZoom', type: 'number', default: '0.25', description: '最小缩放系数。' },
+  { name: 'maxZoom', type: 'number', default: '4', description: '最大缩放系数。' },
+  { name: 'showToolbar', type: 'boolean', default: 'true', description: '是否显示工具条。' },
+  { name: 'toolbar', type: 'PdfViewerToolbarConfig', description: '工具条按钮可见性，省略字段使用默认值。' },
+  { name: 'onLoad', type: '(info: { numPages: number }) => void', description: '文档解析完成后触发。' },
+  { name: 'onError', type: '(err: Error) => void', description: '加载或渲染失败时触发。' },
+  { name: 'loadingFallback', type: 'ReactNode', description: '自定义加载态节点。' },
+  { name: 'errorFallback', type: 'ReactNode | ((err: Error) => ReactNode)', description: '自定义错误态节点或渲染函数。' },
+  { name: 'workerSrc', type: 'string', description: '覆盖 pdfjs-dist worker URL。适用于把 worker 部署在 CDN 的场景。' },
+  { name: 'width', type: 'number | string', default: "'100%'", description: '容器宽度。' },
+  { name: 'height', type: 'number | string', default: "'600px'", description: '容器高度。' },
+  { name: 'aria-label', type: 'string', default: "'PDF document'", description: '外层 region 的无障碍标签。' }
+]} />
+
+### `PdfViewerToolbarConfig`
+
+```ts
+interface PdfViewerToolbarConfig {
+  download?: boolean; // 默认 false —— 需要 `source` 为 URL 字符串
+  print?: boolean;    // 默认 false
+  pageInput?: boolean; // 默认 true
+}
+```
+
+<Callout variant="info" title="Bundle 影响">
+  `pdfjs-dist` **不会**被打进 `@timeui/react` 主 bundle。请按 optional peer 安装，并从专属 subpath 导入 —— `import { PdfViewer } from '@timeui/react/pdf-viewer'` —— 这样不渲染查看器的页面就能少 ~2 MB。PdfViewer 故意**不**从主入口导出，以保持核心 barrel 精简。
+</Callout>
+
+<Callout variant="info" title="可访问性">
+  外层容器为 `role="region"` 并转发 `aria-label`（默认 `"PDF document"`）。页面区域是可聚焦的 `role="group"`，支持完整键盘导航。加载与错误状态通过 `data-loading` / `data-error` 属性以及 `aria-live` 的页码 announcer 暴露；错误以 `role="alert"` 渲染，便于辅助技术朗读。
+</Callout>

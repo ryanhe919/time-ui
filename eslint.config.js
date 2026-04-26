@@ -25,6 +25,9 @@ export default [
       '**/.visual-qa/**',
       '**/next-env.d.ts',
       '**/coverage/**',
+      // Generated / vendored static assets — not source.
+      '**/public/**',
+      '**/pdf.worker*.mjs',
     ],
   },
   js.configs.recommended,

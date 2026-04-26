@@ -1,0 +1,4 @@
+# Generated at predev/prebuild by scripts/copy-pdf-worker.mjs — version-tied
+# to whatever pdfjs-dist resolves under node_modules; keep out of git so it
+# can't drift from the installed peer.
+/public/pdf.worker.min.mjs

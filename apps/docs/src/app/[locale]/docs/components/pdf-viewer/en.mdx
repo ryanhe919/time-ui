@@ -1,0 +1,150 @@
+# PDF Viewer
+
+A canvas-based PDF document viewer built on [pdfjs-dist](https://github.com/mozilla/pdf.js). Ships a paginated reader with zoom, fit-width / fit-page, optional download / print, and full keyboard navigation. Distributed behind the `@timeui/react/pdf-viewer` subpath export so `pdfjs-dist` (~2 MB) **stays out of the main bundle** unless the page actually renders the viewer.
+
+## Installation
+
+`PdfViewer` is shipped as an independent sub-entry to keep the heavy `pdfjs-dist` dependency out of the main bundle. Install the optional peer first:
+
+```bash
+npm install @timeui/react pdfjs-dist
+```
+
+Then import from the sub-entry (recommended):
+
+```tsx
+import { PdfViewer } from '@timeui/react/pdf-viewer';
+```
+
+The viewer is also re-exported from the main `@timeui/react` entry for convenience, but importing from the subpath is strongly preferred — it lets bundlers tree-shake `pdfjs-dist` out of pages that never use the viewer.
+
+## Basic usage
+
+Pass any URL string, `URL`, `ArrayBuffer`, `Uint8Array`, or `Blob` as `source`. URL strings are fetched (so they must be same-origin or served with permissive CORS); buffers and blobs are handed to pdfjs directly.
+
+<PdfViewerBasicDemo />
+
+```tsx
+import { PdfViewer } from '@timeui/react/pdf-viewer';
+
+export function Demo() {
+  return <PdfViewer source="/sample.pdf" aria-label="Sample PDF" height={520} />;
+}
+```
+
+## Toolbar
+
+The default toolbar shows page navigation (Prev / Next + page input), zoom controls, and a fit-width button. Pass a `toolbar` config to opt into the optional Download and Print buttons:
+
+<PdfViewerToolbarDemo />
+
+```tsx
+<PdfViewer
+  source="/sample.pdf"
+  toolbar={{ download: true, print: true }}
+/>
+```
+
+| Field       | Type      | Default | Description                                                   |
+| ----------- | --------- | ------- | ------------------------------------------------------------- |
+| `download`  | `boolean` | `false` | Show a Download button. Only effective when `source` is a URL string. |
+| `print`     | `boolean` | `false` | Show a Print button (delegates to `window.print()`).         |
+| `pageInput` | `boolean` | `true`  | Show the numeric page input field.                            |
+
+Pass `showToolbar={false}` to hide the toolbar entirely.
+
+## Controlled state
+
+Both `page` (1-based) and `zoom` (1 = 100%) can be controlled. Provide the matching `onPageChange` / `onZoomChange` callbacks to react to user interactions.
+
+```tsx
+const [page, setPage] = useState(1);
+const [zoom, setZoom] = useState(1);
+
+<PdfViewer
+  source="/sample.pdf"
+  page={page}
+  onPageChange={setPage}
+  zoom={zoom}
+  onZoomChange={setZoom}
+/>;
+```
+
+For uncontrolled usage, pass `initialPage` and `defaultZoom`. `defaultZoom` accepts `'page-fit'`, `'page-width'` (default), or any number.
+
+## Worker override
+
+The viewer auto-resolves the pdfjs worker via `new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url)`. Bundlers that asset-trace worker URLs (e.g. Vite) emit a fetchable worker chunk automatically. **Next.js (App Router) does NOT, so you must supply `workerSrc` yourself.**
+
+Recommended setup: copy `node_modules/pdfjs-dist/build/pdf.worker.min.mjs` into `public/pdf.worker.min.mjs`, then:
+
+```tsx
+<PdfViewer source="/sample.pdf" workerSrc="/pdf.worker.min.mjs" />
+```
+
+Or point at a CDN. **The version must match the installed `pdfjs-dist` exactly** — minor-version mismatches produce inscrutable errors like `Worker was destroyed`. Read the actual version via `node -p "require('pdfjs-dist/package.json').version"`:
+
+```tsx
+<PdfViewer
+  source={pdfBytes}
+  workerSrc={`https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSION}/build/pdf.worker.min.mjs`}
+/>
+```
+
+`workerSrc` writes to pdfjs's **global singleton** (`pdfjs.GlobalWorkerOptions`). If multiple PdfViewer instances on the same page pass different `workerSrc` values, the last one wins; pick one URL at the app level.
+
+When `workerSrc` is supplied it always wins; when omitted, the auto-resolved value is set only if the global hasn't been configured already.
+
+## Keyboard
+
+Focus the page area, then:
+
+| Key                 | Action                |
+| ------------------- | --------------------- |
+| `←` / `Page Up`     | Previous page         |
+| `→` / `Page Down`   | Next page             |
+| `+` / `=`           | Zoom in               |
+| `-` / `_`           | Zoom out              |
+| `0`                 | Fit width             |
+
+## API
+
+<PropsTable props={[
+  { name: 'source', type: 'string | URL | ArrayBuffer | Uint8Array | Blob', description: 'PDF source. URL strings are fetched; buffers/blobs are handed to pdfjs directly.' },
+  { name: 'initialPage', type: 'number', default: '1', description: 'Initial 1-based page (uncontrolled).' },
+  { name: 'page', type: 'number', description: 'Controlled current page (1-based).' },
+  { name: 'onPageChange', type: '(page: number) => void', description: 'Fires when the active page changes.' },
+  { name: 'zoom', type: 'number', description: 'Controlled zoom factor (1 = 100%).' },
+  { name: 'onZoomChange', type: '(zoom: number) => void', description: 'Fires when the zoom factor changes.' },
+  { name: 'defaultZoom', type: "'page-fit' | 'page-width' | number", default: "'page-width'", description: 'Initial zoom mode or numeric value.' },
+  { name: 'minZoom', type: 'number', default: '0.25', description: 'Minimum zoom factor.' },
+  { name: 'maxZoom', type: 'number', default: '4', description: 'Maximum zoom factor.' },
+  { name: 'showToolbar', type: 'boolean', default: 'true', description: 'Show the toolbar header.' },
+  { name: 'toolbar', type: 'PdfViewerToolbarConfig', description: 'Toolbar feature toggles. Only listed flags are required; omitted flags fall back to defaults.' },
+  { name: 'onLoad', type: '(info: { numPages: number }) => void', description: 'Fired once the document has been parsed.' },
+  { name: 'onError', type: '(err: Error) => void', description: 'Fired when loading or rendering fails.' },
+  { name: 'loadingFallback', type: 'ReactNode', description: 'Custom loading state node.' },
+  { name: 'errorFallback', type: 'ReactNode | ((err: Error) => ReactNode)', description: 'Custom error state node or render function.' },
+  { name: 'workerSrc', type: 'string', description: 'Override the pdfjs-dist worker URL. Useful for CDN-hosted workers.' },
+  { name: 'width', type: 'number | string', default: "'100%'", description: 'Container width.' },
+  { name: 'height', type: 'number | string', default: "'600px'", description: 'Container height.' },
+  { name: 'aria-label', type: 'string', default: "'PDF document'", description: 'Accessible label for the outer region.' }
+]} />
+
+### `PdfViewerToolbarConfig`
+
+```ts
+interface PdfViewerToolbarConfig {
+  download?: boolean; // default false — requires `source` to be a string URL
+  print?: boolean;    // default false
+  pageInput?: boolean; // default true
+}
+```
+
+<Callout variant="info" title="Bundle impact">
+  `pdfjs-dist` is **not** bundled with `@timeui/react`. Install it as an optional peer and import from the dedicated subpath — `import { PdfViewer } from '@timeui/react/pdf-viewer'` — so pages that never render the viewer remain ~2 MB lighter. PdfViewer is intentionally **not** exported from the main entry to keep the core barrel lean.
+</Callout>
+
+<Callout variant="info" title="Accessibility">
+  The outer wrapper carries `role="region"` and forwards `aria-label` (default `"PDF document"`). The page area is a focusable `role="group"` with full keyboard navigation. Loading and error states are exposed via `data-loading` / `data-error` attributes and an `aria-live` page-number announcer. Errors render with `role="alert"` so they're announced by assistive tech.
+</Callout>

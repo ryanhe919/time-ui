@@ -104,6 +104,8 @@ const zh: DocsMessages = {
     'stat-card': '统计卡片',
     'rich-text-editor': '富文本编辑器',
     'code-editor': '代码编辑器',
+    'pdf-viewer': 'PDF 查看器',
+    'markdown-viewer': 'Markdown 查看器',
   },
   nav: {
     onThisPage: '本页目录',
@@ -195,6 +197,8 @@ const en: DocsMessages = {
     'stat-card': 'Stat Card',
     'rich-text-editor': 'Rich Text Editor',
     'code-editor': 'Code Editor',
+    'pdf-viewer': 'PDF Viewer',
+    'markdown-viewer': 'Markdown Viewer',
   },
   nav: {
     onThisPage: 'On this page',

@@ -92,3 +92,22 @@ export { ChatMarkdown } from '@timeui/react/chat-markdown';
 export { RichTextEditor } from '@timeui/react/rich-text-editor';
 export { CodeEditor } from '@timeui/react/code-editor';
 export type { CodeEditorLanguage, AISuggestion, ToolbarConfig } from '@timeui/react/code-editor';
+export { PdfViewer } from '@timeui/react/pdf-viewer';
+export type {
+  PdfViewerProps,
+  PdfViewerSource,
+  PdfViewerDefaultZoom,
+  PdfViewerToolbarConfig,
+  PdfViewerToolbarLabels,
+  PdfViewerLoadInfo,
+} from '@timeui/react/pdf-viewer';
+export { MarkdownViewer } from '@timeui/react/markdown-viewer';
+export type {
+  MarkdownViewerProps,
+  MarkdownViewerToolbarConfig,
+  MarkdownViewerToolbarLabels,
+  MarkdownViewerTocPosition,
+  MarkdownSourceType,
+  MarkdownLinkTarget,
+  MarkdownTocItem,
+} from '@timeui/react/markdown-viewer';
