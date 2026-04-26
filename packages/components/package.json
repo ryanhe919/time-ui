@@ -32,6 +32,11 @@
       "import": "./dist/chat-markdown.js",
       "require": "./dist/chat-markdown.cjs"
     },
+    "./rich-text-editor": {
+      "types": "./dist/rich-text-editor.d.ts",
+      "import": "./dist/rich-text-editor.js",
+      "require": "./dist/rich-text-editor.cjs"
+    },
     "./test-utils": {
       "types": "./src/test-utils/index.ts",
       "import": "./src/test-utils/index.ts"
@@ -61,7 +66,14 @@
     "react-dom": ">=18.0.0",
     "shiki": ">=1.0.0",
     "react-markdown": ">=9.0.0",
-    "remark-gfm": ">=4.0.0"
+    "remark-gfm": ">=4.0.0",
+    "@tiptap/core": ">=2.5.0",
+    "@tiptap/react": ">=2.5.0",
+    "@tiptap/pm": ">=2.5.0",
+    "@tiptap/starter-kit": ">=2.5.0",
+    "@tiptap/extension-underline": ">=2.5.0",
+    "@tiptap/extension-link": ">=2.5.0",
+    "@tiptap/extension-placeholder": ">=2.5.0"
   },
   "peerDependenciesMeta": {
     "shiki": {
@@ -72,6 +84,27 @@
     },
     "remark-gfm": {
       "optional": true
+    },
+    "@tiptap/core": {
+      "optional": true
+    },
+    "@tiptap/react": {
+      "optional": true
+    },
+    "@tiptap/pm": {
+      "optional": true
+    },
+    "@tiptap/starter-kit": {
+      "optional": true
+    },
+    "@tiptap/extension-underline": {
+      "optional": true
+    },
+    "@tiptap/extension-link": {
+      "optional": true
+    },
+    "@tiptap/extension-placeholder": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -79,6 +112,13 @@
     "shiki": "^1.0.0",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.0",
+    "@tiptap/core": "^2.10.0",
+    "@tiptap/react": "^2.10.0",
+    "@tiptap/pm": "^2.10.0",
+    "@tiptap/starter-kit": "^2.10.0",
+    "@tiptap/extension-underline": "^2.10.0",
+    "@tiptap/extension-link": "^2.10.0",
+    "@tiptap/extension-placeholder": "^2.10.0",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",

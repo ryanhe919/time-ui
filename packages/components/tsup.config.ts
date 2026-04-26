@@ -11,6 +11,7 @@ export default defineConfig({
     index: 'src/index.ts',
     'code-block': 'src/CodeBlock/index.ts',
     'chat-markdown': 'src/Chat/ChatMarkdown.tsx',
+    'rich-text-editor': 'src/RichTextEditor/index.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,
@@ -26,6 +27,7 @@ export default defineConfig({
     'shiki',
     'react-markdown',
     'remark-gfm',
+    /^@tiptap\//,
     /^@radix-ui\//,
   ],
 });

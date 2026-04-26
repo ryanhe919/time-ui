@@ -73,6 +73,27 @@ export interface Messages {
     directionDown: string;
     directionFlat: string;
   };
+  richTextEditor: {
+    toolbarLabel: string;
+    bold: string;
+    italic: string;
+    underline: string;
+    strike: string;
+    h1: string;
+    h2: string;
+    h3: string;
+    bulletList: string;
+    orderedList: string;
+    blockquote: string;
+    code: string;
+    codeBlock: string;
+    horizontalRule: string;
+    link: string;
+    promptLink: string;
+    clearFormat: string;
+    undo: string;
+    redo: string;
+  };
 }
 
 export const zh: Messages = {
@@ -142,6 +163,27 @@ export const zh: Messages = {
     directionDown: '下降',
     directionFlat: '持平',
   },
+  richTextEditor: {
+    toolbarLabel: '格式工具栏',
+    bold: '加粗',
+    italic: '斜体',
+    underline: '下划线',
+    strike: '删除线',
+    h1: '一级标题',
+    h2: '二级标题',
+    h3: '三级标题',
+    bulletList: '无序列表',
+    orderedList: '有序列表',
+    blockquote: '引用块',
+    code: '行内代码',
+    codeBlock: '代码块',
+    horizontalRule: '分割线',
+    link: '链接',
+    promptLink: '输入链接 URL',
+    clearFormat: '清除格式',
+    undo: '撤销',
+    redo: '重做',
+  },
 };
 
 export const en: Messages = {
@@ -210,6 +252,27 @@ export const en: Messages = {
     directionUp: 'up',
     directionDown: 'down',
     directionFlat: 'flat',
+  },
+  richTextEditor: {
+    toolbarLabel: 'Formatting',
+    bold: 'Bold',
+    italic: 'Italic',
+    underline: 'Underline',
+    strike: 'Strikethrough',
+    h1: 'Heading 1',
+    h2: 'Heading 2',
+    h3: 'Heading 3',
+    bulletList: 'Bullet list',
+    orderedList: 'Ordered list',
+    blockquote: 'Blockquote',
+    code: 'Inline code',
+    codeBlock: 'Code block',
+    horizontalRule: 'Horizontal rule',
+    link: 'Link',
+    promptLink: 'Enter URL',
+    clearFormat: 'Clear formatting',
+    undo: 'Undo',
+    redo: 'Redo',
   },
 };
 

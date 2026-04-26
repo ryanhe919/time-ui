@@ -1,0 +1,260 @@
+# RichTextEditor
+
+A WYSIWYG editor built on **TipTap** (ProseMirror) that emits HTML and slots into the same `size` / `variant` system as [`Input`](./input) / [`Textarea`](./textarea). The toolbar is fully composable — pick a preset (`'minimal' | 'basic' | 'full'`), pass your own `ToolbarItem[]`, or hide it entirely. Shipped behind the `@timeui/react/rich-text-editor` subpath export so TipTap and ProseMirror **never land in the main bundle** unless you import the editor.
+
+## Basic usage
+
+Controlled HTML state. Every keystroke fires `onChange(html)`; the chip below mirrors the current document length.
+
+<LiveDemo code={`import { useState } from 'react';
+import { RichTextEditor } from '@timeui/react/rich-text-editor';
+
+export function BasicEditor() {
+  const [html, setHtml] = useState(
+    '<p>Welcome to <strong>TimeUI</strong> RichTextEditor — try <em>formatting</em> some text.</p>',
+  );
+  return (
+    <RichTextEditor
+      aria-label="Basic editor"
+      value={html}
+      onChange={setHtml}
+      placeholder="Start writing…"
+    />
+  );
+}`}>
+  <RichTextEditorBasicDemo />
+</LiveDemo>
+
+## Variants & sizes
+
+Three visual recipes (`flat`, `bordered`, `faded`) and three size steps (`sm`, `md`, `lg`). They reuse the same field-style helpers as `Input` / `Textarea`, so spacing, focus ring, and invalid color all stay consistent.
+
+<LiveDemo code={`<Stack spacing={24}>
+  {/* Variants */}
+  <RichTextEditor variant="flat" defaultValue="<p>flat</p>" toolbar="minimal" />
+  <RichTextEditor variant="bordered" defaultValue="<p>bordered (default)</p>" toolbar="minimal" />
+  <RichTextEditor variant="faded" defaultValue="<p>faded</p>" toolbar="minimal" />
+  {/* Sizes */}
+  <RichTextEditor size="sm" defaultValue="<p>sm</p>" toolbar="minimal" />
+  <RichTextEditor size="md" defaultValue="<p>md (default)</p>" toolbar="minimal" />
+  <RichTextEditor size="lg" defaultValue="<p>lg</p>" toolbar="minimal" />
+</Stack>`}>
+  <RichTextEditorVariantsDemo />
+</LiveDemo>
+
+## Toolbar
+
+`toolbar` accepts a preset string, a custom `ToolbarItem[]`, or `false` to hide the bar entirely. Presets at a glance:
+
+- `'minimal'` — `bold` / `italic` / `underline`
+- `'basic'` (default) — inline marks + `h1`–`h3` + lists + `link`
+- `'full'` — everything: inline marks, headings, lists, link, strike, blockquote, code, code block, horizontal rule, clear formatting, undo / redo
+
+A custom array gives you per-button control; insert `'separator'` to draw a vertical divider.
+
+<LiveDemo code={`import { useState } from 'react';
+import { SegmentedControl } from '@timeui/react';
+import { RichTextEditor } from '@timeui/react/rich-text-editor';
+
+export function ToolbarPresets() {
+  const [preset, setPreset] = useState('basic');
+  return (
+    <>
+      <SegmentedControl
+        aria-label="Toolbar preset"
+        value={preset}
+        onChange={setPreset}
+        options={[
+          { value: 'minimal', label: 'minimal' },
+          { value: 'basic', label: 'basic' },
+          { value: 'full', label: 'full' },
+        ]}
+      />
+      <RichTextEditor toolbar={preset} defaultValue="<p>Toolbar presets</p>" />
+      <RichTextEditor
+        toolbar={['bold', 'italic', 'separator', 'h1', 'h2', 'separator', 'link']}
+        defaultValue="<p>Custom toolbar</p>"
+      />
+    </>
+  );
+}`}>
+  <RichTextEditorToolbarDemo />
+</LiveDemo>
+
+## States
+
+`isDisabled` blocks all interaction (and pointer events); `isReadOnly` keeps focus and selection but rejects edits; `isInvalid` surfaces the danger color via the shared field-style helper.
+
+<LiveDemo code={`<Stack spacing={16}>
+  <RichTextEditor
+    aria-label="Disabled editor"
+    isDisabled
+    defaultValue="<p>Can't touch this.</p>"
+    toolbar="minimal"
+  />
+  <RichTextEditor
+    aria-label="Read-only editor"
+    isReadOnly
+    defaultValue="<p>Look, don't type.</p>"
+    toolbar="minimal"
+  />
+  <RichTextEditor
+    aria-label="Invalid editor"
+    isInvalid
+    defaultValue="<p>This document failed validation.</p>"
+    toolbar="minimal"
+  />
+</Stack>`}>
+  <Stack spacing={16}>
+    <RichTextEditor
+      aria-label="Disabled editor"
+      isDisabled
+      defaultValue="<p>Can't touch this.</p>"
+      toolbar="minimal"
+    />
+    <RichTextEditor
+      aria-label="Read-only editor"
+      isReadOnly
+      defaultValue="<p>Look, don't type.</p>"
+      toolbar="minimal"
+    />
+    <RichTextEditor
+      aria-label="Invalid editor"
+      isInvalid
+      defaultValue="<p>This document failed validation.</p>"
+      toolbar="minimal"
+    />
+  </Stack>
+</LiveDemo>
+
+## Placeholder
+
+When the document is empty, `placeholder` is rendered through TipTap's `Placeholder` extension and styled with `theme.colors.text.muted`.
+
+<LiveDemo code={`<RichTextEditor
+  aria-label="Editor with placeholder"
+  placeholder="What's on your mind today?"
+  toolbar="minimal"
+/>`}>
+  <RichTextEditor
+    aria-label="Editor with placeholder"
+    placeholder="What's on your mind today?"
+    toolbar="minimal"
+  />
+</LiveDemo>
+
+## Hiding the toolbar
+
+Pass `toolbar={false}` for a chrome-less editor — useful inside chat composers, comment fields, or anywhere the toolbar would steal focus from surrounding UI. Formatting still works through keyboard shortcuts (`Cmd/Ctrl+B`, `Cmd/Ctrl+I`, etc.).
+
+<LiveDemo code={`<RichTextEditor
+  aria-label="Toolbar-less editor"
+  toolbar={false}
+  placeholder="Type freely — no toolbar."
+/>`}>
+  <RichTextEditor
+    aria-label="Toolbar-less editor"
+    toolbar={false}
+    placeholder="Type freely — no toolbar."
+  />
+</LiveDemo>
+
+## Extending with TipTap
+
+Anything you pass via `extensions` is appended **after** the built-in set (`StarterKit`, `Underline`, `Link`, `Placeholder`). The example below adds a typography extension; toolbar buttons that target your custom node still need to be wired through the consumer (the editor exposes the `Editor` instance via `onCreate` for that).
+
+```tsx
+import { RichTextEditor } from '@timeui/react/rich-text-editor';
+import Typography from '@tiptap/extension-typography';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+
+export function ExtendedEditor() {
+  return (
+    <RichTextEditor
+      placeholder="Smart quotes, ellipses and task lists are now active."
+      extensions={[
+        Typography,
+        TaskList,
+        TaskItem.configure({ nested: true }),
+      ]}
+    />
+  );
+}
+```
+
+## Accessing the Editor instance
+
+`onCreate` fires once the underlying TipTap `Editor` is ready. Stash the reference and call any TipTap command — focus, programmatic insertion, exporting to JSON, registering custom keymaps, etc.
+
+```tsx
+import { useRef } from 'react';
+import type { Editor } from '@tiptap/react';
+import { RichTextEditor } from '@timeui/react/rich-text-editor';
+
+export function ProgrammaticEditor() {
+  const editorRef = useRef<Editor | null>(null);
+
+  return (
+    <>
+      <RichTextEditor
+        defaultValue="<p>Hello there.</p>"
+        onCreate={(editor) => {
+          editorRef.current = editor;
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => {
+          const editor = editorRef.current;
+          if (!editor) return;
+          editor.chain().focus().insertContent(' <strong>👋</strong>').run();
+          // Any other TipTap command works the same way:
+          // editor.getJSON(); editor.commands.setContent('…'); etc.
+        }}
+      >
+        Insert wave
+      </button>
+    </>
+  );
+}
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'value', type: 'string', description: 'Controlled HTML content.' },
+  { name: 'defaultValue', type: 'string', default: "''", description: 'Uncontrolled initial HTML content.' },
+  { name: 'onChange', type: '(html: string) => void', description: 'Fires on every document mutation with the serialized HTML.' },
+  { name: 'placeholder', type: 'string', description: 'Empty-state placeholder, rendered via TipTap’s `Placeholder` extension.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size preset; controls padding, font size, and default min-height.' },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: 'Visual recipe — shared with Input / Textarea.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Block all interaction; pointer events are turned off.' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable & selectable but rejects edits.' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: 'Apply the invalid (danger) color.' },
+  { name: 'minHeight', type: 'number | string', description: 'Editable area min-height. Defaults: sm 120 / md 160 / lg 220.' },
+  { name: 'maxHeight', type: 'number | string | null', default: "'60vh'", description: 'Max height of the scroll viewport. Pass `null` to remove the cap.' },
+  { name: 'toolbar', type: "'minimal' | 'basic' | 'full' | ToolbarItem[] | false", default: "'basic'", description: 'Pick a preset, list explicit items, or pass `false` to hide the toolbar.' },
+  { name: 'extensions', type: 'AnyExtension[]', description: 'Extra TipTap extensions appended after the built-ins (`StarterKit`, `Underline`, `Link`, `Placeholder`).' },
+  { name: 'onCreate', type: '(editor: Editor) => void', description: 'Receives the TipTap `Editor` instance once mounted — your hook for advanced control.' }
+]} />
+
+### `ToolbarItem` values
+
+`'bold' | 'italic' | 'underline' | 'strike' | 'h1' | 'h2' | 'h3' | 'bulletList' | 'orderedList' | 'blockquote' | 'code' | 'codeBlock' | 'horizontalRule' | 'link' | 'clearFormat' | 'undo' | 'redo' | 'separator'`
+
+<Callout variant="info" title="Bundle impact">
+  TipTap is **not** bundled with `@timeui/react`. To use this component install the seven TipTap peers alongside it:
+
+```bash
+pnpm add @tiptap/core @tiptap/react @tiptap/pm \
+  @tiptap/starter-kit @tiptap/extension-underline \
+  @tiptap/extension-link @tiptap/extension-placeholder
+```
+
+Import only from the dedicated subpath — `import { RichTextEditor } from '@timeui/react/rich-text-editor'` — so tree-shaking keeps TipTap out of pages that never render the editor.
+</Callout>
+
+<Callout variant="info" title="Accessibility">
+  The container is `role="textbox"` with `aria-multiline="true"` plus `aria-disabled` / `aria-readonly` / `aria-invalid` mirroring the props. Provide `aria-label` (or wrap in a labelled `FormField`) when there is no visible label. Toolbar buttons are real `<button>` elements with `aria-pressed` for active marks. All keyboard shortcuts are inherited from TipTap (`Cmd/Ctrl+B`, `Cmd/Ctrl+I`, `Cmd/Ctrl+Z`, etc.) and remain available even when the toolbar is hidden.
+</Callout>
