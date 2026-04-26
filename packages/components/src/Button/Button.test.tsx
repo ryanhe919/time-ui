@@ -192,6 +192,33 @@ describe('Button', () => {
     expect(styles).toContain('padding:0 16px');
   });
 
+  it('falls back title to aria-label on icon-only buttons (native hover tooltip)', () => {
+    renderWithProviders(
+      <Button isIconOnly aria-label="Close dialog">
+        <span>×</span>
+      </Button>,
+    );
+    const btn = screen.getByRole('button', { name: 'Close dialog' });
+    expect(btn).toHaveAttribute('title', 'Close dialog');
+  });
+
+  it('honors explicit title over aria-label fallback', () => {
+    renderWithProviders(
+      <Button isIconOnly aria-label="Close" title="Press Esc to close">
+        <span>×</span>
+      </Button>,
+    );
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveAttribute(
+      'title',
+      'Press Esc to close',
+    );
+  });
+
+  it('does not set title on text buttons', () => {
+    renderWithProviders(<Button aria-label="x">Save</Button>);
+    expect(screen.getByRole('button', { name: 'x' })).not.toHaveAttribute('title');
+  });
+
   it('keeps unsupported 4-digit hex input unchanged in generated styles', () => {
     const theme = {
       ...lightTheme,
