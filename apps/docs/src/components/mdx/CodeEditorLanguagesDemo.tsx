@@ -22,10 +22,17 @@ const SAMPLES: Record<CodeEditorLanguage, string> = {
 
 export function CodeEditorLanguagesDemo() {
   const [language, setLanguage] = useState<CodeEditorLanguage>('typescript');
+  const [code, setCode] = useState<string>(SAMPLES.typescript);
+
   return (
     <CodeEditor
-      value={SAMPLES[language]}
+      value={code}
+      onChange={setCode}
       language={language}
+      onLanguageChange={(next) => {
+        setLanguage(next);
+        setCode(SAMPLES[next]);
+      }}
       toolbar={{ showLanguageSelect: true }}
       aria-label="Language demo"
     />

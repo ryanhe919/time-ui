@@ -40,6 +40,7 @@ export interface CodeEditorProps {
   defaultValue?: string;
   onChange?: (value: string) => void;
   language?: CodeEditorLanguage;
+  onLanguageChange?: (language: CodeEditorLanguage) => void;
   size?: CodeEditorSize;
   variant?: CodeEditorVariant;
   placeholder?: string;

@@ -117,6 +117,7 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(function C
     defaultValue,
     onChange,
     language: languageProp = 'javascript',
+    onLanguageChange,
     size = 'md',
     variant = 'bordered',
     placeholder,
@@ -141,14 +142,14 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(function C
   const isDark = theme.mode === 'dark';
 
   // controlled language / lineWrap / lineNumbers state
-  const [language, setLanguage] = useState<CodeEditorLanguage>(languageProp);
+  const [language, setLanguageInternal] = useState<CodeEditorLanguage>(languageProp);
   const [lineWrap, setLineWrap] = useState(lineWrapProp);
   const [showLineNumbers, setShowLineNumbers] = useState(showLineNumbersProp);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Sync from props if they change
   useEffect(() => {
-    setLanguage(languageProp);
+    setLanguageInternal(languageProp);
   }, [languageProp]);
   useEffect(() => {
     setLineWrap(lineWrapProp);
@@ -156,6 +157,15 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(function C
   useEffect(() => {
     setShowLineNumbers(showLineNumbersProp);
   }, [showLineNumbersProp]);
+
+  // Wrap language setter so toolbar selection is observable by the parent.
+  const setLanguage = useCallback(
+    (lang: CodeEditorLanguage) => {
+      setLanguageInternal(lang);
+      onLanguageChange?.(lang);
+    },
+    [onLanguageChange],
+  );
 
   // Compartments for dynamic reconfiguration
   const languageCompartment = useMemo(() => new Compartment(), []);
