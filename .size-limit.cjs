@@ -52,7 +52,8 @@ module.exports = [
     path: 'packages/components/dist/rich-text-editor.js',
     import: '*',
     // 所有 @tiptap/* 都是 optional peer dep，调用方各装各的；这里只衡量我们自己的代码。
-    limit: '8 KB',
+    // 包含 Toolbar（含 Tooltip 包装、useI18n 标签、内联 SVG 图标）以及 Editor wrapper。
+    limit: '12 KB',
     ignore: [
       'react',
       'react-dom',
