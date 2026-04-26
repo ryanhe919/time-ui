@@ -12,6 +12,7 @@ import type {} from '@timeui/themes';
 
 import { Button } from '../Button';
 import type { ButtonSize } from '../Button';
+import { Tooltip } from '../Tooltip';
 import type { RichTextEditorSize, ToolbarItem } from './RichTextEditor.types';
 
 const SIZE_TO_BUTTON: Record<RichTextEditorSize, ButtonSize> = {
@@ -307,27 +308,30 @@ export function RichTextEditorToolbar({
     onClick: () => void,
     disabled = false,
   ) {
+    // Tooltip wrap：toolbar 按钮没有可见文字，hover 时用主题化的 Tooltip 告知功能。
+    // Button 自身的 title 兜底依旧保留（兼容 Tooltip portal 阻挡 / 触屏长按等场景）。
     return (
-      <Button
-        key={key}
-        type="button"
-        variant="light"
-        color="default"
-        size={btnSize}
-        isIconOnly
-        aria-label={label}
-        aria-pressed={active}
-        data-active={active || undefined}
-        disabled={isItemDisabled || disabled}
-        onMouseDown={(e) => {
-          // 防止编辑区失焦
-          e.preventDefault();
-        }}
-        onClick={onClick}
-        css={buttonCss}
-      >
-        {icon}
-      </Button>
+      <Tooltip key={key} content={label} placement="top">
+        <Button
+          type="button"
+          variant="light"
+          color="default"
+          size={btnSize}
+          isIconOnly
+          aria-label={label}
+          aria-pressed={active}
+          data-active={active || undefined}
+          disabled={isItemDisabled || disabled}
+          onMouseDown={(e) => {
+            // 防止编辑区失焦
+            e.preventDefault();
+          }}
+          onClick={onClick}
+          css={buttonCss}
+        >
+          {icon}
+        </Button>
+      </Tooltip>
     );
   }
 

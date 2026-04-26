@@ -102,6 +102,7 @@ const zh: DocsMessages = {
     upload: '文件上传',
     card: '卡片',
     'stat-card': '统计卡片',
+    'rich-text-editor': '富文本编辑器',
   },
   nav: {
     onThisPage: '本页目录',
@@ -191,6 +192,7 @@ const en: DocsMessages = {
     upload: 'Upload',
     card: 'Card',
     'stat-card': 'Stat Card',
+    'rich-text-editor': 'Rich Text Editor',
   },
   nav: {
     onThisPage: 'On this page',
