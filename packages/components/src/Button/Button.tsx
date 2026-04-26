@@ -131,10 +131,16 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
     endIcon,
     children,
     type,
+    title: titleProp,
+    'aria-label': ariaLabel,
     ...rest
   },
   ref,
 ) {
+  // icon-only 按钮不展示文字，sighted user 没法知道按钮是干什么的；
+  // 没传显式 title 时回落到 aria-label，借浏览器原生 hover 延迟 tooltip 兜底。
+  // 普通文字按钮不受影响（保持 undefined → 无 tooltip）。
+  const tooltipTitle = titleProp ?? (isIconOnly ? ariaLabel : undefined);
   const theme = useTheme();
   const Comp = (as || 'button') as ElementType;
   const isButton = Comp === 'button';
@@ -216,8 +222,10 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
       ref={ref as never}
       type={isButton ? (type ?? 'button') : type}
       disabled={isButton ? disabled || loading : undefined}
+      aria-label={ariaLabel}
       aria-disabled={disabled || loading || undefined}
       aria-busy={loading || undefined}
+      title={tooltipTitle}
       data-variant={v}
       data-color={c}
       data-size={size}
