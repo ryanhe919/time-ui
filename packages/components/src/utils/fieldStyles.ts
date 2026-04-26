@@ -135,7 +135,7 @@ export function getFieldVariantStyles({
           &:focus-within {
             outline: none;
             border-color: ${focusBorderColor ?? focusColor};
-            box-shadow: inset 0 0 0 1px ${focusBorderColor ?? focusColor};
+            box-shadow: inset 0 0 0 ${borderThick} ${focusBorderColor ?? focusColor};
             ${focusBackground ? `background-color: ${focusBackground};` : ''}
           }
         `

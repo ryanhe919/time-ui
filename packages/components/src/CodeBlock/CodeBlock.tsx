@@ -87,10 +87,11 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
     }
   }, [code, onCopy]);
 
-  const isDark = theme.mode === 'dark';
-  const bg = isDark ? '#0b0b11' : '#fafafa';
-  const fg = isDark ? theme.colors.text.primary : '#111111';
+  const bg = theme.colors.bg.sunken;
+  const fg = theme.colors.text.primary;
   const border = theme.colors.border.subtle;
+  const fastDuration = theme.motion.duration.fast;
+  const monoFont = theme.typography.fontFamily.mono;
 
   return (
     <div
@@ -103,8 +104,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
         border: 1px solid ${border};
         overflow: hidden;
         background: ${bg};
-        font-family:
-          ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+        font-family: ${monoFont};
 
         .shiki {
           margin: 0 !important;
@@ -178,9 +178,9 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
             border-radius: 6px;
             cursor: pointer;
             transition:
-              background 150ms,
-              color 150ms,
-              border-color 150ms;
+              background ${fastDuration},
+              color ${fastDuration},
+              border-color ${fastDuration};
             @media (prefers-reduced-motion: reduce) {
               transition: none;
             }

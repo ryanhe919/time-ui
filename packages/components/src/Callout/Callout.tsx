@@ -47,6 +47,7 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function Callout
   ref,
 ) {
   const theme = useTheme();
+  const tk = theme.components.callout;
   const key = scaleKey[variant];
   const accent = theme.colors[key].DEFAULT;
   const fg = theme.colors[key][600];
@@ -59,28 +60,28 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function Callout
       data-variant={variant}
       {...rest}
       css={css`
-        margin: 16px 0;
-        padding: 16px 18px;
-        border-left: 2px solid ${accent};
+        margin: ${tk.marginY} 0;
+        padding: ${tk.paddingY} ${tk.paddingX};
+        border-left: ${tk.borderLeftWidth} solid ${accent};
         background: ${theme.colors.bg.surface};
         display: grid;
         grid-template-columns: ${icon === false ? '1fr' : 'auto 1fr'};
-        gap: 10px;
+        gap: ${tk.gap};
         align-items: start;
         color: ${theme.colors.text.primary};
-        border-radius: 2px;
+        border-radius: ${tk.radius};
       `}
     >
       {icon !== false && (
         <div
           aria-hidden
           css={css`
-            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-            font-size: 14px;
+            font-family: ${theme.typography.fontFamily.mono};
+            font-size: ${tk.iconFontSize};
             line-height: 1.5;
             color: ${fg};
-            padding-top: 2px;
-            min-width: 14px;
+            padding-top: ${tk.iconPaddingTop};
+            min-width: ${tk.iconMinWidth};
             text-align: center;
           `}
         >
@@ -91,11 +92,11 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function Callout
         {title && (
           <div
             css={css`
-              font-weight: 600;
-              font-size: 14px;
-              line-height: 1.4;
+              font-weight: ${tk.titleFontWeight};
+              font-size: ${tk.titleFontSize};
+              line-height: ${tk.titleLineHeight};
               color: ${theme.colors.text.primary};
-              margin-bottom: 4px;
+              margin-bottom: ${tk.titleMarginBottom};
             `}
           >
             {title}
@@ -103,8 +104,8 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function Callout
         )}
         <div
           css={css`
-            font-size: 14px;
-            line-height: 1.65;
+            font-size: ${tk.bodyFontSize};
+            line-height: ${tk.bodyLineHeight};
             color: ${theme.colors.text.secondary};
           `}
         >

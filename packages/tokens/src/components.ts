@@ -152,7 +152,7 @@ export const sliderSizes = {
   lg: {
     trackThickness: '10px',
     thumbSize: '24px',
-    fontSize: '15px',
+    fontSize: '16px',
     labelGap: '12px',
     verticalLength: '240px',
   },
@@ -169,7 +169,7 @@ export const segmentedControlSizes = {
     verticalWidth: '120px',
   },
   md: {
-    height: '36px',
+    height: '40px',
     fontSize: '14px',
     paddingX: '16px',
     iconSize: '16px',
@@ -178,8 +178,8 @@ export const segmentedControlSizes = {
     verticalWidth: '160px',
   },
   lg: {
-    height: '44px',
-    fontSize: '15px',
+    height: '48px',
+    fontSize: '16px',
     paddingX: '20px',
     iconSize: '18px',
     gap: '10px',
@@ -191,7 +191,7 @@ export const segmentedControlSizes = {
 export const chatTokens = {
   avatarSize: '32px',
   avatarRadius: '9999px',
-  bubbleRadius: '18px',
+  bubbleRadius: '16px',
   bubbleRadiusSmall: '6px',
   bubbleMaxWidth: '75%',
   bubblePaddingX: '14px',
@@ -245,7 +245,7 @@ export const popoverTokens = {
 export const tooltipTokens = {
   paddingX: '8px',
   paddingY: '5px',
-  radius: '6px',
+  radius: '8px',
   fontSize: '12px',
   lineHeight: 1.4,
   fontWeight: 500,
@@ -274,7 +274,7 @@ export const modalTokens = {
   radius: '16px',
   headerPaddingX: '24px',
   headerPaddingY: '20px',
-  headerFontSize: '17px',
+  headerFontSize: '18px',
   headerFontWeight: 600,
   bodyPaddingX: '24px',
   bodyPaddingY: '20px',
@@ -312,7 +312,7 @@ export const tabsSizes = {
   },
   lg: {
     height: '48px',
-    fontSize: '15px',
+    fontSize: '16px',
     paddingX: '20px',
     gap: '10px',
     iconSize: '18px',
@@ -344,23 +344,23 @@ export const paginationSizes = {
     radius: '8px',
   },
   md: {
-    itemSize: '36px',
+    itemSize: '40px',
     fontSize: '14px',
     gap: '6px',
-    radius: '10px',
+    radius: '12px',
   },
   lg: {
-    itemSize: '44px',
-    fontSize: '15px',
+    itemSize: '48px',
+    fontSize: '16px',
     gap: '8px',
-    radius: '12px',
+    radius: '14px',
   },
 } as const;
 
 export const paginationTokens = {
   jumperWidth: '56px',
-  jumperHeight: '36px',
-  jumperRadius: '10px',
+  jumperHeight: '40px',
+  jumperRadius: '12px',
   sizeSelectorMinWidth: '88px',
   itemBorder: '1px',
   hoverDuration: '120ms',
@@ -424,7 +424,7 @@ export const drawerTokens = {
   radius: '16px',
   headerPaddingX: '24px',
   headerPaddingY: '20px',
-  headerFontSize: '17px',
+  headerFontSize: '18px',
   headerFontWeight: 600,
   bodyPaddingX: '24px',
   bodyPaddingY: '20px',
@@ -558,7 +558,7 @@ export const avatarSizes = {
   xs: { size: '24px', fontSize: '11px', borderWidth: '1px', statusDotSize: '6px' },
   sm: { size: '32px', fontSize: '13px', borderWidth: '2px', statusDotSize: '8px' },
   md: { size: '40px', fontSize: '15px', borderWidth: '2px', statusDotSize: '10px' },
-  lg: { size: '56px', fontSize: '20px', borderWidth: '2px', statusDotSize: '12px' },
+  lg: { size: '48px', fontSize: '18px', borderWidth: '2px', statusDotSize: '12px' },
   xl: { size: '80px', fontSize: '28px', borderWidth: '3px', statusDotSize: '16px' },
 } as const;
 
@@ -579,7 +579,7 @@ export const tagSizes = {
     paddingX: '6px',
     gap: '4px',
     fontSize: '11px',
-    radius: '6px',
+    radius: '8px',
     iconSize: '12px',
     closeSize: '12px',
   },
@@ -588,7 +588,7 @@ export const tagSizes = {
     paddingX: '8px',
     gap: '6px',
     fontSize: '12px',
-    radius: '6px',
+    radius: '8px',
     iconSize: '14px',
     closeSize: '14px',
   },
@@ -619,7 +619,7 @@ export const badgeTokens = {
   standardHeight: '18px',
   standardMinWidth: '18px',
   standardPaddingX: '5px',
-  standardFontSize: '11px',
+  standardFontSize: '12px',
   standardFontWeight: 600,
   standardRadius: '9999px',
   standardBorderWidth: '2px',
@@ -661,7 +661,7 @@ export const emptyTokens = {
   imageSizeSm: '80px',
   imageSizeMd: '120px',
   imageSizeLg: '160px',
-  titleFontSize: '15px',
+  titleFontSize: '16px',
   titleFontWeight: 600,
   titleLineHeight: 1.4,
   descFontSize: '13px',
@@ -696,7 +696,7 @@ export const stepsSizes = {
   lg: {
     iconSize: '36px',
     fontSize: '16px',
-    titleFontSize: '15px',
+    titleFontSize: '16px',
     descFontSize: '13px',
     connectorThickness: '2px',
     itemGap: '16px',
@@ -719,6 +719,24 @@ export const stepsTokens = {
   dotActiveSize: '14px',
   iconTransitionDuration: '200ms',
   connectorFillDuration: '320ms',
+} as const;
+
+export const calloutTokens = {
+  marginY: '16px',
+  paddingX: '18px',
+  paddingY: '16px',
+  borderLeftWidth: '2px',
+  radius: '2px',
+  gap: '10px',
+  iconFontSize: '14px',
+  iconPaddingTop: '2px',
+  iconMinWidth: '14px',
+  titleFontSize: '14px',
+  titleFontWeight: 600,
+  titleLineHeight: 1.4,
+  titleMarginBottom: '4px',
+  bodyFontSize: '14px',
+  bodyLineHeight: 1.65,
 } as const;
 
 export const components = {
@@ -751,6 +769,7 @@ export const components = {
   empty: emptyTokens,
   stepsSize: stepsSizes,
   steps: stepsTokens,
+  callout: calloutTokens,
 } as const;
 
 export type ButtonSizes = typeof buttonSizes;
@@ -782,4 +801,5 @@ export type SkeletonTokens = typeof skeletonTokens;
 export type EmptyTokens = typeof emptyTokens;
 export type StepsSizes = typeof stepsSizes;
 export type StepsTokens = typeof stepsTokens;
+export type CalloutTokens = typeof calloutTokens;
 export type Components = typeof components;

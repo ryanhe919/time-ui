@@ -187,7 +187,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(function For
         display: flex;
         flex-direction: ${isVertical ? 'column' : 'row'};
         gap: ${rootGap};
-        ${isDisabled ? 'opacity: 0.6;' : ''}
+        ${isDisabled ? 'opacity: 0.5;' : ''}
         ${!isVertical ? 'align-items: flex-start;' : ''}
       `}
       {...rest}

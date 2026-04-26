@@ -559,7 +559,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     padding: 14px 12px;
     text-align: center;
     color: ${theme.colors.text.muted};
-    font-size: 12.5px;
+    font-size: 13px;
     margin: 0;
   `;
 
@@ -635,7 +635,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
           {it.description ? (
             <span
               css={css`
-                font-size: 11.5px;
+                font-size: 12px;
                 line-height: 1.35;
                 color: ${isSelected && resolvedColor !== 'default'
                   ? theme.colors[resolvedColor][600]

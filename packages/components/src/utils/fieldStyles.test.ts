@@ -28,7 +28,7 @@ describe('utils/getFieldVariantStyles', () => {
       color: 'primary',
     });
     expect(styles.styles).toContain('outline: none');
-    expect(styles.styles).toContain('box-shadow: inset 0 0 0 1px');
+    expect(styles.styles).toContain(`box-shadow: inset 0 0 0 ${lightTheme.borders.width.thick}`);
     expect(styles.styles).toContain('border-color:');
     expect(styles.styles).toContain('background-color: rgba(');
     expect(styles.styles).toContain('&:focus-visible');
@@ -70,7 +70,7 @@ describe('utils/getFieldVariantStyles', () => {
     );
     expect(styles.styles).toContain(`border-color: ${lightTheme.colors.secondary[500]}`);
     expect(styles.styles).toContain(
-      `box-shadow: inset 0 0 0 1px ${lightTheme.colors.secondary[500]}`,
+      `box-shadow: inset 0 0 0 ${lightTheme.borders.width.thick} ${lightTheme.colors.secondary[500]}`,
     );
   });
 });

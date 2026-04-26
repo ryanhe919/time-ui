@@ -302,7 +302,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(pr
             border-color: ${focusColor};
             box-shadow:
               ${theme.shadows.sm},
-              inset 0 0 0 1px ${focusColor};
+              inset 0 0 0 ${theme.borders.width.thick} ${focusColor};
           }
           @media (prefers-reduced-motion: reduce) {
             transition: none;

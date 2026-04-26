@@ -199,7 +199,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           input:focus-visible ~ & {
             outline: none;
             border-color: ${focusColor};
-            box-shadow: inset 0 0 0 1px ${focusColor};
+            box-shadow: inset 0 0 0 ${theme.borders.width.thick} ${focusColor};
           }
 
           label:hover input:not(:disabled):not(:checked):not(:indeterminate) ~ & {

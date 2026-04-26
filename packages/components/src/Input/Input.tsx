@@ -271,7 +271,7 @@ function InputControl({
     }
     &:focus-visible {
       outline: none;
-      box-shadow: inset 0 0 0 1.5px ${theme.colors.focus};
+      box-shadow: inset 0 0 0 ${theme.borders.width.thick} ${theme.colors.focus};
     }
     &:disabled {
       opacity: 0.5;
