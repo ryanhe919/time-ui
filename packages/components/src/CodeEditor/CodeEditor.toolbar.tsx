@@ -116,15 +116,9 @@ const SparklesIcon = ({ size }: IconProps) => (
   </Icon>
 );
 
-const CodeIcon = ({ size }: IconProps) => (
-  <Icon size={size}>
-    <polyline points="9 8 4 12 9 16" />
-    <polyline points="15 8 20 12 15 16" />
-  </Icon>
-);
-
 export interface CodeEditorToolbarProps {
-  value: string;
+  /** Lazy lookup so the copy button reads the live editor content (uncontrolled mode never re-renders). */
+  getValue: () => string;
   language: CodeEditorLanguage;
   onLanguageChange: (lang: CodeEditorLanguage) => void;
   lineWrap: boolean;
@@ -141,7 +135,7 @@ export interface CodeEditorToolbarProps {
 }
 
 export function CodeEditorToolbar({
-  value,
+  getValue,
   language,
   onLanguageChange,
   lineWrap,
@@ -158,32 +152,26 @@ export function CodeEditorToolbar({
 }: CodeEditorToolbarProps) {
   const theme = useTheme();
   const i18n = useI18n();
-  // 旧版 i18n 包无 codeEditor 块时安全降级
+  // 旧版 i18n 包无 codeEditor 块时安全降级到 FALLBACK_LABELS。
   const i18nLabels = (i18n as { codeEditor?: ToolbarLabels }).codeEditor ?? FALLBACK_LABELS;
-  const labels: ToolbarLabels = {
-    toolbarLabel: i18nLabels.toolbarLabel,
-    copy: i18nLabels.copy,
-    copied: i18nLabels.copied,
-    lineWrap: i18nLabels.lineWrap,
-    lineNumbers: i18nLabels.lineNumbers,
-    fullscreen: i18nLabels.fullscreen,
-    exitFullscreen: i18nLabels.exitFullscreen,
-    language: i18nLabels.language,
-    aiSuggest: i18nLabels.aiSuggest,
-    ...labelOverrides,
-  };
+  const labels: ToolbarLabels = { ...i18nLabels, ...labelOverrides };
 
   const resolvedAriaLabel = ariaLabelProp ?? labels.toolbarLabel;
 
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    if (typeof navigator === 'undefined') return;
-    navigator.clipboard.writeText(value).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [value]);
+    if (typeof navigator === 'undefined' || !navigator.clipboard) return;
+    navigator.clipboard
+      .writeText(getValue())
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        // 剪贴板权限被拒/上下文非 secure context — 静默失败，避免抛 unhandled rejection。
+      });
+  }, [getValue]);
 
   const showCopy = config.showCopy !== false;
   const showLineWrap = config.showLineWrap !== false;
@@ -364,16 +352,6 @@ export function CodeEditorToolbar({
           </Button>
         </Tooltip>
       )}
-
-      {/* Hidden code icon for accessibility / visual identity */}
-      <span
-        aria-hidden
-        css={css`
-          display: none;
-        `}
-      >
-        <CodeIcon size={15} />
-      </span>
     </div>
   );
 }

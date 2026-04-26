@@ -124,7 +124,9 @@ import { EditorView } from '@codemirror/view';
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable & selectable but rejects edits.' },
   { name: 'isInvalid', type: 'boolean', default: 'false', description: 'Apply the invalid (danger) color.' },
   { name: 'showLineNumbers', type: 'boolean', default: 'true', description: 'Show line numbers gutter.' },
+  { name: 'onShowLineNumbersChange', type: '(showLineNumbers: boolean) => void', description: 'Fires when the toolbar line-numbers toggle is clicked.' },
   { name: 'lineWrap', type: 'boolean', default: 'false', description: 'Wrap long lines.' },
+  { name: 'onLineWrapChange', type: '(lineWrap: boolean) => void', description: 'Fires when the toolbar line-wrap toggle is clicked.' },
   { name: 'toolbar', type: 'boolean | ToolbarConfig', default: 'true', description: 'Show toolbar or pass a ToolbarConfig to control individual items. Pass `false` to hide the toolbar.' },
   { name: 'minHeight', type: 'string | number', description: 'Minimum editor height. Defaults to a size-based value.' },
   { name: 'maxHeight', type: 'string | number', description: 'Maximum editor height; the editor scrolls past this point.' },
@@ -159,5 +161,5 @@ interface AISuggestion {
 </Callout>
 
 <Callout variant="info" title="Accessibility">
-  The editor container carries `role="textbox"` with `aria-multiline="true"`, and mirrors `isDisabled` / `isReadOnly` / `isInvalid` to the corresponding ARIA attributes. Provide `aria-label` (or wrap in a labelled `FormField`) when there is no visible label. All CodeMirror default keyboard shortcuts remain active, including full keyboard navigation.
+  The wrapper has `role="group"` and forwards `aria-label` / `aria-labelledby` / `aria-describedby`. CodeMirror's editable layer (`.cm-content`) carries `role="textbox"` and `contenteditable="true"` natively. Disabled / read-only state is mirrored to CodeMirror via `EditorState.readOnly` and `EditorView.editable`. All default keyboard shortcuts remain active, including full keyboard navigation. Provide `aria-label` (or wrap in a labelled `FormField`) when there is no visible label.
 </Callout>

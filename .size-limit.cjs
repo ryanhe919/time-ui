@@ -72,7 +72,10 @@ module.exports = [
     name: '@timeui/react/code-editor',
     path: 'packages/components/dist/code-editor.js',
     import: '*',
-    limit: '10 KB',
+    // 所有 @codemirror/* 都是 optional peer dep，调用方各装各的；这里只衡量我们自己的代码。
+    // 包含 Toolbar（含 Tooltip 包装、useI18n 标签、内联 SVG 图标、language 选择器）+ Editor wrapper（含 Compartment 重配置）。
+    // 与 RichTextEditor 的 12 KB 同量级。
+    limit: '12 KB',
     ignore: [
       'react',
       'react-dom',

@@ -125,7 +125,9 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(function C
     isReadOnly = false,
     isInvalid = false,
     showLineNumbers: showLineNumbersProp = true,
+    onShowLineNumbersChange,
     lineWrap: lineWrapProp = false,
+    onLineWrapChange,
     toolbar,
     minHeight,
     maxHeight,
@@ -158,13 +160,36 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(function C
     setShowLineNumbers(showLineNumbersProp);
   }, [showLineNumbersProp]);
 
-  // Wrap language setter so toolbar selection is observable by the parent.
+  // Wrap setters so toolbar selections are observable by the parent.
   const setLanguage = useCallback(
     (lang: CodeEditorLanguage) => {
       setLanguageInternal(lang);
       onLanguageChange?.(lang);
     },
     [onLanguageChange],
+  );
+
+  const toggleLineWrap = useCallback(() => {
+    setLineWrap((prev) => {
+      const next = !prev;
+      onLineWrapChange?.(next);
+      return next;
+    });
+  }, [onLineWrapChange]);
+
+  const toggleLineNumbers = useCallback(() => {
+    setShowLineNumbers((prev) => {
+      const next = !prev;
+      onShowLineNumbersChange?.(next);
+      return next;
+    });
+  }, [onShowLineNumbersChange]);
+
+  // Provide a fresh value lookup for the toolbar — avoids the stale-value bug
+  // when the editor is uncontrolled (no onChange to drive React re-renders).
+  const getValue = useCallback(
+    () => viewRef.current?.state.doc.toString() ?? value ?? defaultValue ?? '',
+    [value, defaultValue],
   );
 
   // Compartments for dynamic reconfiguration
@@ -417,11 +442,10 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(function C
     }
   `;
 
-  const currentValue = viewRef.current?.state.doc.toString() ?? value ?? defaultValue ?? '';
-
   return (
     <div
       ref={ref}
+      role="group"
       css={containerCss}
       data-variant={variant}
       data-size={size}
@@ -436,13 +460,13 @@ export const CodeEditor = forwardRef<HTMLDivElement, CodeEditorProps>(function C
     >
       {hasToolbar && (
         <CodeEditorToolbar
-          value={currentValue}
+          getValue={getValue}
           language={language}
           onLanguageChange={setLanguage}
           lineWrap={lineWrap}
-          onLineWrapToggle={() => setLineWrap((v) => !v)}
+          onLineWrapToggle={toggleLineWrap}
           showLineNumbers={showLineNumbers}
-          onLineNumbersToggle={() => setShowLineNumbers((v) => !v)}
+          onLineNumbersToggle={toggleLineNumbers}
           isFullscreen={isFullscreen}
           onFullscreenToggle={() => setIsFullscreen((v) => !v)}
           config={toolbarConfig}

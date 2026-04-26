@@ -9,23 +9,16 @@ import { CodeEditor } from '@timeui/react/code-editor';
 import { renderWithProviders, expectA11y } from '@timeui/react/test-utils';
 
 /**
- * Two known axe rule caveats for CodeEditor:
- *
- * 1. `aria-input-field-name`: CodeMirror renders a `.cm-content` div with
- *    `role="textbox"` but no aria-label on the element itself. The accessible name
- *    lives on the outer wrapper div (aria-label="Test editor"), but axe's
- *    `aria-input-field-name` rule does not traverse up the tree for the name.
- *    This is structurally equivalent to the ProseMirror / RichTextEditor case.
- *
- * 2. `aria-prohibited-attr`: The outer wrapper div carries `aria-label` but has
- *    no explicit ARIA role. axe 4.11 flags `aria-label` on plain `<div>` as
- *    `aria-prohibited-attr`. This is an axe strictness issue; the label is still
- *    exposed to AT via the accessible name computation.
+ * One known axe caveat: `aria-input-field-name` flags CodeMirror's internal
+ * `.cm-content` div (role="textbox") for missing an accessible name on the
+ * element itself. The wrapper carries the accessible name, but axe's rule
+ * doesn't traverse upward — same situation as ProseMirror / RichTextEditor.
+ * Disabled here for that reason only; the wrapper now has role="group" so
+ * `aria-prohibited-attr` no longer fires.
  */
 const A11Y_OPTIONS = {
   rules: {
     'aria-input-field-name': { enabled: false },
-    'aria-prohibited-attr': { enabled: false },
   },
 };
 

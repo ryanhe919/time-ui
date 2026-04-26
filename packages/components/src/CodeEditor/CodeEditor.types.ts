@@ -48,7 +48,9 @@ export interface CodeEditorProps {
   isReadOnly?: boolean;
   isInvalid?: boolean;
   showLineNumbers?: boolean;
+  onShowLineNumbersChange?: (showLineNumbers: boolean) => void;
   lineWrap?: boolean;
+  onLineWrapChange?: (lineWrap: boolean) => void;
   toolbar?: boolean | ToolbarConfig;
   minHeight?: string | number;
   maxHeight?: string | number;

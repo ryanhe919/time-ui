@@ -124,7 +124,9 @@ import { EditorView } from '@codemirror/view';
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: '可聚焦、可选中，但拒绝写入。' },
   { name: 'isInvalid', type: 'boolean', default: 'false', description: '应用 invalid（danger）配色。' },
   { name: 'showLineNumbers', type: 'boolean', default: 'true', description: '显示行号侧边栏。' },
+  { name: 'onShowLineNumbersChange', type: '(showLineNumbers: boolean) => void', description: '工具条行号开关点击时触发。' },
   { name: 'lineWrap', type: 'boolean', default: 'false', description: '折行显示超长行。' },
+  { name: 'onLineWrapChange', type: '(lineWrap: boolean) => void', description: '工具条自动换行开关点击时触发。' },
   { name: 'toolbar', type: 'boolean | ToolbarConfig', default: 'true', description: '显示工具条，或传 ToolbarConfig 控制各按钮。传 `false` 隐藏工具条。' },
   { name: 'minHeight', type: 'string | number', description: '编辑器最小高度。默认取决于 size 预设。' },
   { name: 'maxHeight', type: 'string | number', description: '编辑器最大高度；超出后编辑区可滚动。' },
@@ -159,5 +161,5 @@ interface AISuggestion {
 </Callout>
 
 <Callout variant="info" title="可访问性">
-  编辑器容器携带 `role="textbox"` + `aria-multiline="true"`，并把 `isDisabled` / `isReadOnly` / `isInvalid` 同步到对应的 ARIA 属性。没有可见 label 时请提供 `aria-label`（或包到带 label 的 `FormField` 里）。所有 CodeMirror 默认键盘快捷键均保持可用，包括完整的键盘导航。
+  外层容器携带 `role="group"`，转发 `aria-label` / `aria-labelledby` / `aria-describedby`。CodeMirror 内部可编辑层（`.cm-content`）原生具备 `role="textbox"` 与 `contenteditable="true"`。`isDisabled` / `isReadOnly` 通过 `EditorState.readOnly` 与 `EditorView.editable` 同步到 CodeMirror。CodeMirror 全部默认键盘快捷键保持可用，包括完整键盘导航。没有可见 label 时请提供 `aria-label`（或包到带 label 的 `FormField` 里）。
 </Callout>
