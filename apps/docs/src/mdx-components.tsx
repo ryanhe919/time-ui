@@ -42,6 +42,7 @@ import {
   ChatSendButton,
   ChatVoiceWave,
   ChatMarkdown,
+  RichTextEditor,
   Popover,
   Tooltip,
   Modal,
@@ -136,6 +137,9 @@ import { CardPressableDemo } from '@/components/mdx/CardPressableDemo';
 import { StatCardDeltaDemo } from '@/components/mdx/StatCardDeltaDemo';
 import { StatCardLoadingDemo } from '@/components/mdx/StatCardLoadingDemo';
 import { StatCardPressableDemo } from '@/components/mdx/StatCardPressableDemo';
+import { RichTextEditorBasicDemo } from '@/components/mdx/RichTextEditorBasicDemo';
+import { RichTextEditorVariantsDemo } from '@/components/mdx/RichTextEditorVariantsDemo';
+import { RichTextEditorToolbarDemo } from '@/components/mdx/RichTextEditorToolbarDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -222,6 +226,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     StatCardDeltaDemo,
     StatCardLoadingDemo,
     StatCardPressableDemo,
+    RichTextEditorBasicDemo,
+    RichTextEditorVariantsDemo,
+    RichTextEditorToolbarDemo,
 
     Button,
     Box,
@@ -258,6 +265,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ChatSendButton,
     ChatVoiceWave,
     ChatMarkdown,
+    RichTextEditor,
     Popover,
     Tooltip,
     Modal,

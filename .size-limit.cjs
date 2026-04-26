@@ -48,6 +48,26 @@ module.exports = [
     ],
   },
   {
+    name: '@timeui/react/rich-text-editor',
+    path: 'packages/components/dist/rich-text-editor.js',
+    import: '*',
+    // 所有 @tiptap/* 都是 optional peer dep，调用方各装各的；这里只衡量我们自己的代码。
+    limit: '8 KB',
+    ignore: [
+      'react',
+      'react-dom',
+      '@emotion/react',
+      '@emotion/styled',
+      '@tiptap/core',
+      '@tiptap/react',
+      '@tiptap/pm',
+      '@tiptap/starter-kit',
+      '@tiptap/extension-underline',
+      '@tiptap/extension-link',
+      '@tiptap/extension-placeholder',
+    ],
+  },
+  {
     name: '@timeui/tokens — full import',
     path: 'packages/tokens/dist/index.js',
     import: '*',

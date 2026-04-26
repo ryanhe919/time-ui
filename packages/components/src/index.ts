@@ -53,3 +53,5 @@ export * from './StatCard';
 export * from './Skeleton';
 export * from './Empty';
 export * from './Steps';
+// 注意：RichTextEditor 走独立 subpath export `@timeui/react/rich-text-editor`，
+// 避免把 TipTap (~100KB) 打进主 bundle。在主 barrel 里有意不导出。

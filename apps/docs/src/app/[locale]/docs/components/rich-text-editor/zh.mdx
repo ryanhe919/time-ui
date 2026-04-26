@@ -1,0 +1,260 @@
+# 富文本编辑器 RichTextEditor
+
+基于 **TipTap**（ProseMirror）的所见即所得编辑器，输出 HTML，与 [`Input`](./input) / [`Textarea`](./textarea) 共享同一套 `size` / `variant` 体系。Toolbar 完全可配——可直接选 preset（`'minimal' | 'basic' | 'full'`）、自定义 `ToolbarItem[]`，或彻底隐藏。组件通过 `@timeui/react/rich-text-editor` 独立 subpath 导出，**不引入富文本编辑器的页面里 TipTap 与 ProseMirror 不会进主 bundle**。
+
+## 基础用法
+
+受控的 HTML 状态。每次输入都会触发 `onChange(html)`，下方 chip 实时回显当前 HTML 长度。
+
+<LiveDemo code={`import { useState } from 'react';
+import { RichTextEditor } from '@timeui/react/rich-text-editor';
+
+export function BasicEditor() {
+  const [html, setHtml] = useState(
+    '<p>Welcome to <strong>TimeUI</strong> RichTextEditor — try <em>formatting</em> some text.</p>',
+  );
+  return (
+    <RichTextEditor
+      aria-label="基础编辑器"
+      value={html}
+      onChange={setHtml}
+      placeholder="开始书写…"
+    />
+  );
+}`}>
+  <RichTextEditorBasicDemo />
+</LiveDemo>
+
+## 样式 Variants 与尺寸 Sizes
+
+三种视觉样式（`flat`、`bordered`、`faded`）+ 三档尺寸（`sm`、`md`、`lg`）。复用 `Input` / `Textarea` 同一组 field-style 工具，所以间距、聚焦环、invalid 配色完全一致。
+
+<LiveDemo code={`<Stack spacing={24}>
+  {/* Variants */}
+  <RichTextEditor variant="flat" defaultValue="<p>flat</p>" toolbar="minimal" />
+  <RichTextEditor variant="bordered" defaultValue="<p>bordered（默认）</p>" toolbar="minimal" />
+  <RichTextEditor variant="faded" defaultValue="<p>faded</p>" toolbar="minimal" />
+  {/* Sizes */}
+  <RichTextEditor size="sm" defaultValue="<p>sm</p>" toolbar="minimal" />
+  <RichTextEditor size="md" defaultValue="<p>md（默认）</p>" toolbar="minimal" />
+  <RichTextEditor size="lg" defaultValue="<p>lg</p>" toolbar="minimal" />
+</Stack>`}>
+  <RichTextEditorVariantsDemo />
+</LiveDemo>
+
+## 工具条 Toolbar
+
+`toolbar` 接受 preset 字符串、自定义 `ToolbarItem[]`，或 `false` 完全隐藏。预设速览：
+
+- `'minimal'` —— `bold` / `italic` / `underline`
+- `'basic'`（默认）—— inline marks + `h1`–`h3` + 列表 + `link`
+- `'full'` —— 完整集合：inline marks、headings、列表、link、strike、blockquote、code、code block、horizontal rule、清除格式、undo / redo
+
+数组形式让你逐个开关按钮；用 `'separator'` 插入竖向分隔线。
+
+<LiveDemo code={`import { useState } from 'react';
+import { SegmentedControl } from '@timeui/react';
+import { RichTextEditor } from '@timeui/react/rich-text-editor';
+
+export function ToolbarPresets() {
+  const [preset, setPreset] = useState('basic');
+  return (
+    <>
+      <SegmentedControl
+        aria-label="Toolbar preset"
+        value={preset}
+        onChange={setPreset}
+        options={[
+          { value: 'minimal', label: 'minimal' },
+          { value: 'basic', label: 'basic' },
+          { value: 'full', label: 'full' },
+        ]}
+      />
+      <RichTextEditor toolbar={preset} defaultValue="<p>Toolbar presets</p>" />
+      <RichTextEditor
+        toolbar={['bold', 'italic', 'separator', 'h1', 'h2', 'separator', 'link']}
+        defaultValue="<p>自定义 toolbar</p>"
+      />
+    </>
+  );
+}`}>
+  <RichTextEditorToolbarDemo />
+</LiveDemo>
+
+## 状态 States
+
+`isDisabled` 阻断所有交互（同时关闭指针事件）；`isReadOnly` 保留聚焦与选区但拒绝写入；`isInvalid` 通过共享 field-style 工具显示 danger 颜色。
+
+<LiveDemo code={`<Stack spacing={16}>
+  <RichTextEditor
+    aria-label="禁用编辑器"
+    isDisabled
+    defaultValue="<p>不可编辑。</p>"
+    toolbar="minimal"
+  />
+  <RichTextEditor
+    aria-label="只读编辑器"
+    isReadOnly
+    defaultValue="<p>只读，不可写入。</p>"
+    toolbar="minimal"
+  />
+  <RichTextEditor
+    aria-label="错误态编辑器"
+    isInvalid
+    defaultValue="<p>校验未通过。</p>"
+    toolbar="minimal"
+  />
+</Stack>`}>
+  <Stack spacing={16}>
+    <RichTextEditor
+      aria-label="禁用编辑器"
+      isDisabled
+      defaultValue="<p>不可编辑。</p>"
+      toolbar="minimal"
+    />
+    <RichTextEditor
+      aria-label="只读编辑器"
+      isReadOnly
+      defaultValue="<p>只读，不可写入。</p>"
+      toolbar="minimal"
+    />
+    <RichTextEditor
+      aria-label="错误态编辑器"
+      isInvalid
+      defaultValue="<p>校验未通过。</p>"
+      toolbar="minimal"
+    />
+  </Stack>
+</LiveDemo>
+
+## Placeholder
+
+文档为空时通过 TipTap 的 `Placeholder` 扩展渲染 `placeholder`，颜色取自 `theme.colors.text.muted`。
+
+<LiveDemo code={`<RichTextEditor
+  aria-label="带 placeholder 的编辑器"
+  placeholder="今天想写点什么？"
+  toolbar="minimal"
+/>`}>
+  <RichTextEditor
+    aria-label="带 placeholder 的编辑器"
+    placeholder="今天想写点什么？"
+    toolbar="minimal"
+  />
+</LiveDemo>
+
+## 取消 toolbar
+
+传 `toolbar={false}` 即可得到无 chrome 编辑区——适用于聊天 composer、评论框等不希望 toolbar 抢眼的场景。键盘快捷键（`Cmd/Ctrl+B`、`Cmd/Ctrl+I` 等）依然有效。
+
+<LiveDemo code={`<RichTextEditor
+  aria-label="无工具条编辑器"
+  toolbar={false}
+  placeholder="自由书写——没有 toolbar。"
+/>`}>
+  <RichTextEditor
+    aria-label="无工具条编辑器"
+    toolbar={false}
+    placeholder="自由书写——没有 toolbar。"
+  />
+</LiveDemo>
+
+## 用 TipTap 扩展能力
+
+通过 `extensions` 传入的扩展会拼接在内置集合（`StarterKit`、`Underline`、`Link`、`Placeholder`）之后。下方示例追加了 `Typography` 和 `TaskList`；如果自定义扩展需要对应的 toolbar 按钮，需自行通过 `onCreate` 拿到 `Editor` 实例并接管。
+
+```tsx
+import { RichTextEditor } from '@timeui/react/rich-text-editor';
+import Typography from '@tiptap/extension-typography';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+
+export function ExtendedEditor() {
+  return (
+    <RichTextEditor
+      placeholder="智能引号、省略号、任务列表已开启。"
+      extensions={[
+        Typography,
+        TaskList,
+        TaskItem.configure({ nested: true }),
+      ]}
+    />
+  );
+}
+```
+
+## 拿到 Editor 实例
+
+底层 TipTap `Editor` 就绪后会触发 `onCreate`。把它存起来就能调任意 TipTap command——聚焦、程序化插入、导出 JSON、注册自定义 keymap，等等。
+
+```tsx
+import { useRef } from 'react';
+import type { Editor } from '@tiptap/react';
+import { RichTextEditor } from '@timeui/react/rich-text-editor';
+
+export function ProgrammaticEditor() {
+  const editorRef = useRef<Editor | null>(null);
+
+  return (
+    <>
+      <RichTextEditor
+        defaultValue="<p>Hello there.</p>"
+        onCreate={(editor) => {
+          editorRef.current = editor;
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => {
+          const editor = editorRef.current;
+          if (!editor) return;
+          editor.chain().focus().insertContent(' <strong>👋</strong>').run();
+          // 任意 TipTap command 都可以这么用：
+          // editor.getJSON(); editor.commands.setContent('…'); 等。
+        }}
+      >
+        插入挥手
+      </button>
+    </>
+  );
+}
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'value', type: 'string', description: '受控 HTML 内容。' },
+  { name: 'defaultValue', type: 'string', default: "''", description: '非受控初始 HTML 内容。' },
+  { name: 'onChange', type: '(html: string) => void', description: '文档每次变更后触发，回调收到序列化后的 HTML。' },
+  { name: 'placeholder', type: 'string', description: '空状态占位文字，通过 TipTap 的 `Placeholder` 扩展渲染。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '尺寸预设；控制内边距、字号与默认 min-height。' },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: '视觉样式 —— 与 Input / Textarea 共享。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用所有交互；同时关闭 pointer events。' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: '可聚焦、可选中，但拒绝写入。' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: '应用 invalid（danger）配色。' },
+  { name: 'minHeight', type: 'number | string', description: '编辑区 min-height。默认 sm 120 / md 160 / lg 220。' },
+  { name: 'maxHeight', type: 'number | string | null', default: "'60vh'", description: '滚动区域 max-height。传 `null` 取消上限。' },
+  { name: 'toolbar', type: "'minimal' | 'basic' | 'full' | ToolbarItem[] | false", default: "'basic'", description: '选 preset、列出显式 items，或传 `false` 隐藏 toolbar。' },
+  { name: 'extensions', type: 'AnyExtension[]', description: '追加在内置扩展（`StarterKit`、`Underline`、`Link`、`Placeholder`）之后的额外 TipTap 扩展。' },
+  { name: 'onCreate', type: '(editor: Editor) => void', description: '组件挂载完成后接收 TipTap `Editor` 实例 —— 用于做高级操作。' }
+]} />
+
+### `ToolbarItem` 取值
+
+`'bold' | 'italic' | 'underline' | 'strike' | 'h1' | 'h2' | 'h3' | 'bulletList' | 'orderedList' | 'blockquote' | 'code' | 'codeBlock' | 'horizontalRule' | 'link' | 'clearFormat' | 'undo' | 'redo' | 'separator'`
+
+<Callout variant="info" title="Bundle 影响">
+  TipTap **不会**被打进 `@timeui/react` 主 bundle。使用本组件时需自行安装这 7 个 TipTap peer：
+
+```bash
+pnpm add @tiptap/core @tiptap/react @tiptap/pm \
+  @tiptap/starter-kit @tiptap/extension-underline \
+  @tiptap/extension-link @tiptap/extension-placeholder
+```
+
+请只从专属 subpath 导入 —— `import { RichTextEditor } from '@timeui/react/rich-text-editor'` —— tree-shaking 才能确保不渲染编辑器的页面不引入 TipTap。
+</Callout>
+
+<Callout variant="info" title="可访问性">
+  容器为 `role="textbox"` + `aria-multiline="true"`，并把 `isDisabled` / `isReadOnly` / `isInvalid` 同步到 `aria-disabled` / `aria-readonly` / `aria-invalid`。没有可见 label 时请提供 `aria-label`（或包到带 label 的 `FormField` 里）。Toolbar 按钮均为真实 `<button>`，激活的 mark 会带 `aria-pressed`。所有键盘快捷键沿用 TipTap 默认（`Cmd/Ctrl+B`、`Cmd/Ctrl+I`、`Cmd/Ctrl+Z` 等），即使 toolbar 隐藏也仍可用。
+</Callout>
