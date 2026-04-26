@@ -5,10 +5,11 @@
  * @description 实现 RichTextEditor 工具条子组件。
  */
 
-import { useCallback, type ReactElement } from 'react';
+import { useCallback, useMemo, type ReactElement } from 'react';
 import { useTheme, css } from '@emotion/react';
 import type { Editor } from '@tiptap/react';
 import type {} from '@timeui/themes';
+import { useI18n } from '@timeui/core';
 
 import { Button } from '../Button';
 import type { ButtonSize } from '../Button';
@@ -209,26 +210,9 @@ interface ToolbarLabels {
   redo: string;
 }
 
-const DEFAULT_LABELS: ToolbarLabels = {
-  bold: 'Bold',
-  italic: 'Italic',
-  underline: 'Underline',
-  strike: 'Strikethrough',
-  h1: 'Heading 1',
-  h2: 'Heading 2',
-  h3: 'Heading 3',
-  bulletList: 'Bullet list',
-  orderedList: 'Ordered list',
-  blockquote: 'Blockquote',
-  code: 'Inline code',
-  codeBlock: 'Code block',
-  horizontalRule: 'Horizontal rule',
-  link: 'Link',
-  promptLink: 'Enter URL',
-  clearFormat: 'Clear formatting',
-  undo: 'Undo',
-  redo: 'Redo',
-};
+// Default labels are pulled from `useI18n().richTextEditor` so toolbar follows
+// the surrounding ConfigProvider locale. The shape mirrors `ToolbarLabels`
+// minus i18n-only keys; `labels` prop on RichTextEditor still wins.
 
 export interface RichTextEditorToolbarProps {
   editor: Editor | null;
@@ -244,11 +228,37 @@ export function RichTextEditorToolbar({
   items,
   size,
   isDisabled = false,
-  ariaLabel = 'Formatting',
+  ariaLabel,
   labels: labelOverrides,
 }: RichTextEditorToolbarProps) {
   const theme = useTheme();
-  const labels: ToolbarLabels = { ...DEFAULT_LABELS, ...labelOverrides };
+  const i18n = useI18n();
+  const i18nLabels = i18n.richTextEditor;
+  const labels: ToolbarLabels = useMemo(
+    () => ({
+      bold: i18nLabels.bold,
+      italic: i18nLabels.italic,
+      underline: i18nLabels.underline,
+      strike: i18nLabels.strike,
+      h1: i18nLabels.h1,
+      h2: i18nLabels.h2,
+      h3: i18nLabels.h3,
+      bulletList: i18nLabels.bulletList,
+      orderedList: i18nLabels.orderedList,
+      blockquote: i18nLabels.blockquote,
+      code: i18nLabels.code,
+      codeBlock: i18nLabels.codeBlock,
+      horizontalRule: i18nLabels.horizontalRule,
+      link: i18nLabels.link,
+      promptLink: i18nLabels.promptLink,
+      clearFormat: i18nLabels.clearFormat,
+      undo: i18nLabels.undo,
+      redo: i18nLabels.redo,
+      ...labelOverrides,
+    }),
+    [i18nLabels, labelOverrides],
+  );
+  const resolvedAriaLabel = ariaLabel ?? i18nLabels.toolbarLabel;
   const btnSize = SIZE_TO_BUTTON[size];
   const iconPx = SIZE_TO_ICON_PX[size];
   const inputSize = theme.components.input[size];
@@ -290,7 +300,7 @@ export function RichTextEditorToolbar({
   if (!editor) {
     // editor 还没初始化时渲染骨架占位，保留高度避免抖动。
     return (
-      <div role="toolbar" aria-label={ariaLabel} css={containerCss} aria-hidden>
+      <div role="toolbar" aria-label={resolvedAriaLabel} css={containerCss} aria-hidden>
         {items.map((item, i) =>
           item === 'separator' ? <span key={`sep-${i}`} css={separatorCss} aria-hidden /> : null,
         )}
@@ -496,7 +506,7 @@ export function RichTextEditorToolbar({
   });
 
   return (
-    <div role="toolbar" aria-label={ariaLabel} css={containerCss}>
+    <div role="toolbar" aria-label={resolvedAriaLabel} css={containerCss}>
       {buttons}
     </div>
   );

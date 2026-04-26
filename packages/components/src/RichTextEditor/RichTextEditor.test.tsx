@@ -10,7 +10,7 @@ import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Extension, type Editor } from '@tiptap/core';
 
-import { renderWithProviders } from '../test-utils';
+import { renderWithProviders, type RenderWithProvidersOptions } from '../test-utils';
 import { RichTextEditor } from './RichTextEditor';
 
 /**
@@ -23,6 +23,18 @@ async function waitForEditor(getEditor: () => Editor | null): Promise<Editor> {
   const editor = getEditor();
   if (!editor) throw new Error('editor never created');
   return editor;
+}
+
+/**
+ * Toolbar tests assert against English labels (Bold / Italic / ...). The default
+ * locale is `zh`, so for label-asserting tests we explicitly force `en` via
+ * ConfigProvider — covers the label text without coupling the test file to zh strings.
+ */
+function renderEditor(
+  ui: Parameters<typeof renderWithProviders>[0],
+  opts?: RenderWithProvidersOptions,
+) {
+  return renderWithProviders(ui, { ...opts, config: { locale: 'en', ...(opts?.config ?? {}) } });
 }
 
 describe('RichTextEditor — rendering', () => {
@@ -218,13 +230,13 @@ describe('RichTextEditor — size & variant', () => {
 
 describe('RichTextEditor — toolbar', () => {
   it('default (no prop) = basic preset and exposes a Bold button', async () => {
-    renderWithProviders(<RichTextEditor aria-label="Editor" />);
+    renderEditor(<RichTextEditor aria-label="Editor" />);
     expect(await screen.findByRole('toolbar', { name: 'Formatting' })).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: 'Bold' })).toBeInTheDocument();
   });
 
   it('toolbar="minimal" only renders bold/italic/underline (no h1)', async () => {
-    renderWithProviders(<RichTextEditor aria-label="Editor" toolbar="minimal" />);
+    renderEditor(<RichTextEditor aria-label="Editor" toolbar="minimal" />);
     await screen.findByRole('toolbar', { name: 'Formatting' });
     expect(screen.getByRole('button', { name: 'Bold' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Italic' })).toBeInTheDocument();
@@ -233,9 +245,7 @@ describe('RichTextEditor — toolbar', () => {
   });
 
   it('toolbar={false} hides the toolbar entirely', async () => {
-    const { container } = renderWithProviders(
-      <RichTextEditor aria-label="Editor" toolbar={false} />,
-    );
+    const { container } = renderEditor(<RichTextEditor aria-label="Editor" toolbar={false} />);
     await waitFor(() => {
       expect(container.querySelector('.ProseMirror')).not.toBeNull();
     });
@@ -243,9 +253,7 @@ describe('RichTextEditor — toolbar', () => {
   });
 
   it('toolbar={[...]} custom array renders only the specified buttons', async () => {
-    renderWithProviders(
-      <RichTextEditor aria-label="Editor" toolbar={['bold', 'separator', 'italic']} />,
-    );
+    renderEditor(<RichTextEditor aria-label="Editor" toolbar={['bold', 'separator', 'italic']} />);
     await screen.findByRole('toolbar', { name: 'Formatting' });
     expect(screen.getByRole('button', { name: 'Bold' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Italic' })).toBeInTheDocument();
@@ -253,9 +261,16 @@ describe('RichTextEditor — toolbar', () => {
     expect(screen.queryByRole('button', { name: 'Heading 1' })).toBeNull();
   });
 
+  it('toolbar labels follow ConfigProvider locale (zh by default)', async () => {
+    renderWithProviders(<RichTextEditor aria-label="Editor" toolbar="minimal" />);
+    expect(await screen.findByRole('toolbar', { name: '格式工具栏' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '加粗' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '斜体' })).toBeInTheDocument();
+  });
+
   it('clicking Bold toggles bold mark on the current selection', async () => {
     const editorRef: { current: Editor | null } = { current: null };
-    renderWithProviders(
+    renderEditor(
       <RichTextEditor
         aria-label="Editor"
         defaultValue="<p>hello</p>"
