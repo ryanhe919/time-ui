@@ -63,6 +63,7 @@ const SECTIONS: readonly SectionConfig[] = [
           'date-time-picker',
           'upload',
           'rich-text-editor',
+          'code-editor',
         ],
       },
       {

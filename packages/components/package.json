@@ -37,6 +37,11 @@
       "import": "./dist/rich-text-editor.js",
       "require": "./dist/rich-text-editor.cjs"
     },
+    "./code-editor": {
+      "types": "./dist/code-editor.d.ts",
+      "import": "./dist/code-editor.js",
+      "require": "./dist/code-editor.cjs"
+    },
     "./test-utils": {
       "types": "./src/test-utils/index.ts",
       "import": "./src/test-utils/index.ts"
@@ -73,7 +78,21 @@
     "@tiptap/starter-kit": ">=2.5.0",
     "@tiptap/extension-underline": ">=2.5.0",
     "@tiptap/extension-link": ">=2.5.0",
-    "@tiptap/extension-placeholder": ">=2.5.0"
+    "@tiptap/extension-placeholder": ">=2.5.0",
+    "codemirror": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/commands": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
+    "@codemirror/autocomplete": "^6.0.0",
+    "@codemirror/search": "^6.0.0",
+    "@codemirror/lint": "^6.0.0",
+    "@codemirror/lang-javascript": "^6.0.0",
+    "@codemirror/lang-python": "^6.0.0",
+    "@codemirror/lang-css": "^6.0.0",
+    "@codemirror/lang-html": "^6.0.0",
+    "@codemirror/lang-json": "^6.0.0",
+    "@lezer/highlight": "^1.0.0"
   },
   "peerDependenciesMeta": {
     "shiki": {
@@ -105,6 +124,48 @@
     },
     "@tiptap/extension-placeholder": {
       "optional": true
+    },
+    "codemirror": {
+      "optional": true
+    },
+    "@codemirror/view": {
+      "optional": true
+    },
+    "@codemirror/state": {
+      "optional": true
+    },
+    "@codemirror/commands": {
+      "optional": true
+    },
+    "@codemirror/language": {
+      "optional": true
+    },
+    "@codemirror/autocomplete": {
+      "optional": true
+    },
+    "@codemirror/search": {
+      "optional": true
+    },
+    "@codemirror/lint": {
+      "optional": true
+    },
+    "@codemirror/lang-javascript": {
+      "optional": true
+    },
+    "@codemirror/lang-python": {
+      "optional": true
+    },
+    "@codemirror/lang-css": {
+      "optional": true
+    },
+    "@codemirror/lang-html": {
+      "optional": true
+    },
+    "@codemirror/lang-json": {
+      "optional": true
+    },
+    "@lezer/highlight": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -119,6 +180,20 @@
     "@tiptap/extension-underline": "^2.10.0",
     "@tiptap/extension-link": "^2.10.0",
     "@tiptap/extension-placeholder": "^2.10.0",
+    "codemirror": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/commands": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
+    "@codemirror/autocomplete": "^6.0.0",
+    "@codemirror/search": "^6.0.0",
+    "@codemirror/lint": "^6.0.0",
+    "@codemirror/lang-javascript": "^6.0.0",
+    "@codemirror/lang-python": "^6.0.0",
+    "@codemirror/lang-css": "^6.0.0",
+    "@codemirror/lang-html": "^6.0.0",
+    "@codemirror/lang-json": "^6.0.0",
+    "@lezer/highlight": "^1.0.0",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",

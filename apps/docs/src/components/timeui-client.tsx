@@ -90,3 +90,5 @@ export type { UploadFile, UploadHandle } from '@timeui/react';
 export { CodeBlock } from '@timeui/react/code-block';
 export { ChatMarkdown } from '@timeui/react/chat-markdown';
 export { RichTextEditor } from '@timeui/react/rich-text-editor';
+export { CodeEditor } from '@timeui/react/code-editor';
+export type { CodeEditorLanguage, AISuggestion, ToolbarConfig } from '@timeui/react/code-editor';

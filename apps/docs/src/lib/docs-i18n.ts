@@ -103,6 +103,7 @@ const zh: DocsMessages = {
     card: '卡片',
     'stat-card': '统计卡片',
     'rich-text-editor': '富文本编辑器',
+    'code-editor': '代码编辑器',
   },
   nav: {
     onThisPage: '本页目录',
@@ -193,6 +194,7 @@ const en: DocsMessages = {
     card: 'Card',
     'stat-card': 'Stat Card',
     'rich-text-editor': 'Rich Text Editor',
+    'code-editor': 'Code Editor',
   },
   nav: {
     onThisPage: 'On this page',

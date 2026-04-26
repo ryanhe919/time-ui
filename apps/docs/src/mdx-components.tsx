@@ -43,6 +43,7 @@ import {
   ChatVoiceWave,
   ChatMarkdown,
   RichTextEditor,
+  CodeEditor,
   Popover,
   Tooltip,
   Modal,
@@ -140,6 +141,10 @@ import { StatCardPressableDemo } from '@/components/mdx/StatCardPressableDemo';
 import { RichTextEditorBasicDemo } from '@/components/mdx/RichTextEditorBasicDemo';
 import { RichTextEditorVariantsDemo } from '@/components/mdx/RichTextEditorVariantsDemo';
 import { RichTextEditorToolbarDemo } from '@/components/mdx/RichTextEditorToolbarDemo';
+import { CodeEditorBasicDemo } from '@/components/mdx/CodeEditorBasicDemo';
+import { CodeEditorLanguagesDemo } from '@/components/mdx/CodeEditorLanguagesDemo';
+import { CodeEditorVariantsDemo } from '@/components/mdx/CodeEditorVariantsDemo';
+import { CodeEditorStatesDemo } from '@/components/mdx/CodeEditorStatesDemo';
 
 type MDXComponents = Record<string, unknown>;
 
@@ -229,6 +234,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     RichTextEditorBasicDemo,
     RichTextEditorVariantsDemo,
     RichTextEditorToolbarDemo,
+    CodeEditorBasicDemo,
+    CodeEditorLanguagesDemo,
+    CodeEditorVariantsDemo,
+    CodeEditorStatesDemo,
 
     Button,
     Box,
@@ -266,6 +275,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ChatVoiceWave,
     ChatMarkdown,
     RichTextEditor,
+    CodeEditor,
     Popover,
     Tooltip,
     Modal,

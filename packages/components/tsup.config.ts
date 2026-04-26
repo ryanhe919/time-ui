@@ -12,6 +12,7 @@ export default defineConfig({
     'code-block': 'src/CodeBlock/index.ts',
     'chat-markdown': 'src/Chat/ChatMarkdown.tsx',
     'rich-text-editor': 'src/RichTextEditor/index.ts',
+    'code-editor': 'src/CodeEditor/index.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,
@@ -29,5 +30,8 @@ export default defineConfig({
     'remark-gfm',
     /^@tiptap\//,
     /^@radix-ui\//,
+    'codemirror',
+    /^@codemirror\//,
+    /^@lezer\//,
   ],
 });

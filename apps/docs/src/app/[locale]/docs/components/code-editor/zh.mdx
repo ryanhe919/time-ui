@@ -1,0 +1,162 @@
+# 代码编辑器 CodeEditor
+
+基于 [CodeMirror 6](https://codemirror.net/) 构建的语法高亮代码编辑器，内置工具条、语言切换，并提供 AI 编码建议的扩展点。通过 `@timeui/react/code-editor` 独立 subpath 导出，**不引入代码编辑器的页面里 CodeMirror 不会进主 bundle**。
+
+## 安装
+
+`CodeEditor` 是独立 sub-entry，避免 CodeMirror 依赖污染主 bundle。请先安装 peer 依赖：
+
+```bash
+npm install @timeui/react codemirror @codemirror/view @codemirror/state @codemirror/commands @codemirror/language @codemirror/autocomplete @codemirror/lang-javascript @codemirror/lang-python @codemirror/lang-css @codemirror/lang-html @codemirror/lang-json
+```
+
+然后从 subpath 导入：
+
+```tsx
+import { CodeEditor } from '@timeui/react/code-editor';
+```
+
+## 基础用法
+
+受控的字符串状态。每次输入都会触发 `onChange(value)`。
+
+<CodeEditorBasicDemo />
+
+```tsx
+import { useState } from 'react';
+import { CodeEditor } from '@timeui/react/code-editor';
+
+export function Demo() {
+  const [code, setCode] = useState('const x = 42;');
+  return (
+    <CodeEditor
+      value={code}
+      onChange={setCode}
+      language="typescript"
+      aria-label="代码编辑器"
+    />
+  );
+}
+```
+
+## 语言
+
+支持 JavaScript、TypeScript、Python、CSS、HTML 和 JSON。通过 `language` prop 或工具条语言选择器（`toolbar={{ showLanguageSelect: true }}`）切换当前语言。
+
+<CodeEditorLanguagesDemo />
+
+## 样式 Variants
+
+三种视觉样式，与 [`Input`](./input) / [`Textarea`](./textarea) 共享同一套 field-style 体系。
+
+<CodeEditorVariantsDemo />
+
+| Variant | 描述 |
+|---------|------|
+| `bordered` | 显示边框（默认） |
+| `faded` | 细微边框 + 柔和背景 |
+| `flat` | 无边框 |
+
+## 状态
+
+`isDisabled` 阻断所有交互；`isReadOnly` 保留聚焦与选区但拒绝写入；`isInvalid` 通过共享 field-style 工具显示 danger 颜色。
+
+<CodeEditorStatesDemo />
+
+## 工具条配置
+
+传入 `ToolbarConfig` 对象来控制具体显示哪些工具条按钮：
+
+```tsx
+<CodeEditor
+  toolbar={{
+    showCopy: true,
+    showLineWrap: true,
+    showLanguageSelect: true,
+    showLineNumbers: false,
+    showFullscreen: false,
+  }}
+/>
+```
+
+传 `toolbar={false}` 可完全隐藏工具条。
+
+## AI 建议
+
+提供 `onAISuggest` 回调即可在工具条中启用 AI 建议按钮。触发时，回调接收当前代码和光标位置，将第一条建议插入光标处。
+
+```tsx
+<CodeEditor
+  value={code}
+  onChange={setCode}
+  onAISuggest={async (code, position) => {
+    const res = await myAIService.complete(code, position);
+    return [{ text: res.suggestion, label: 'AI 建议' }];
+  }}
+/>
+```
+
+## 自定义扩展
+
+通过 `extensions` prop 传入额外的 CodeMirror 6 扩展，它们会追加在内置扩展集合之后。
+
+```tsx
+import { EditorView } from '@codemirror/view';
+
+<CodeEditor
+  extensions={[
+    EditorView.theme({ '&': { fontSize: '16px' } }),
+  ]}
+/>
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'value', type: 'string', description: '受控编辑器内容。' },
+  { name: 'defaultValue', type: 'string', description: '非受控初始内容。' },
+  { name: 'onChange', type: '(value: string) => void', description: '文档每次变更后触发，回调收到当前编辑器字符串。' },
+  { name: 'language', type: "'javascript' | 'typescript' | 'python' | 'css' | 'html' | 'json'", default: "'javascript'", description: '语法高亮语言。' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '尺寸预设；控制内边距、字号与默认 min-height。' },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: '视觉样式 —— 与 Input / Textarea 共享。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用所有交互。' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: '可聚焦、可选中，但拒绝写入。' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: '应用 invalid（danger）配色。' },
+  { name: 'showLineNumbers', type: 'boolean', default: 'true', description: '显示行号侧边栏。' },
+  { name: 'lineWrap', type: 'boolean', default: 'false', description: '折行显示超长行。' },
+  { name: 'toolbar', type: 'boolean | ToolbarConfig', default: 'true', description: '显示工具条，或传 ToolbarConfig 控制各按钮。传 `false` 隐藏工具条。' },
+  { name: 'minHeight', type: 'string | number', description: '编辑器最小高度。默认取决于 size 预设。' },
+  { name: 'maxHeight', type: 'string | number', description: '编辑器最大高度；超出后编辑区可滚动。' },
+  { name: 'extensions', type: 'Extension[]', description: '追加在内置 CodeMirror 扩展之后的额外 CodeMirror 6 扩展。' },
+  { name: 'onAISuggest', type: '(code: string, position: number) => Promise<AISuggestion[]>', description: 'AI 建议回调。提供后工具条会出现 AI 按钮。返回建议数组，第一条会插入光标处。' },
+  { name: 'aria-label', type: 'string', description: '编辑器的无障碍标签。' },
+  { name: 'aria-labelledby', type: 'string', description: '标注编辑器的元素 ID。' },
+  { name: 'aria-describedby', type: 'string', description: '描述编辑器的元素 ID。' }
+]} />
+
+### `ToolbarConfig` 字段
+
+| 字段 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `showCopy` | `boolean` | `true` | 复制代码按钮 |
+| `showLineWrap` | `boolean` | `true` | 折行开关按钮 |
+| `showLineNumbers` | `boolean` | `true` | 行号开关按钮 |
+| `showLanguageSelect` | `boolean` | `true` | 语言选择下拉框 |
+| `showFullscreen` | `boolean` | `true` | 全屏切换按钮 |
+
+### `AISuggestion` 结构
+
+```ts
+interface AISuggestion {
+  text: string;     // 要插入的代码字符串
+  label?: string;   // 建议 UI 中显示的标签文字
+}
+```
+
+<Callout variant="info" title="Bundle 影响">
+  CodeMirror **不会**被打进 `@timeui/react` 主 bundle。请安装 CodeMirror peer 包，并只从专属 subpath 导入 —— `import { CodeEditor } from '@timeui/react/code-editor'` —— 确保不渲染代码编辑器的页面不引入 CodeMirror。
+</Callout>
+
+<Callout variant="info" title="可访问性">
+  编辑器容器携带 `role="textbox"` + `aria-multiline="true"`，并把 `isDisabled` / `isReadOnly` / `isInvalid` 同步到对应的 ARIA 属性。没有可见 label 时请提供 `aria-label`（或包到带 label 的 `FormField` 里）。所有 CodeMirror 默认键盘快捷键均保持可用，包括完整的键盘导航。
+</Callout>

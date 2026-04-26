@@ -1,0 +1,162 @@
+# Code Editor
+
+A syntax-highlighted code editor built on [CodeMirror 6](https://codemirror.net/), with toolbar, language switching, and an extension point for AI-powered coding suggestions. Shipped behind the `@timeui/react/code-editor` subpath export so CodeMirror dependencies **never land in the main bundle** unless you import the editor.
+
+## Installation
+
+The `CodeEditor` is a separate sub-entry to keep heavy CodeMirror dependencies out of the main bundle. Install peer dependencies first:
+
+```bash
+npm install @timeui/react codemirror @codemirror/view @codemirror/state @codemirror/commands @codemirror/language @codemirror/autocomplete @codemirror/lang-javascript @codemirror/lang-python @codemirror/lang-css @codemirror/lang-html @codemirror/lang-json
+```
+
+Then import from the sub-entry:
+
+```tsx
+import { CodeEditor } from '@timeui/react/code-editor';
+```
+
+## Basic Usage
+
+Controlled string state. Every keystroke fires `onChange(value)`.
+
+<CodeEditorBasicDemo />
+
+```tsx
+import { useState } from 'react';
+import { CodeEditor } from '@timeui/react/code-editor';
+
+export function Demo() {
+  const [code, setCode] = useState('const x = 42;');
+  return (
+    <CodeEditor
+      value={code}
+      onChange={setCode}
+      language="typescript"
+      aria-label="Code editor"
+    />
+  );
+}
+```
+
+## Languages
+
+Supports JavaScript, TypeScript, Python, CSS, HTML, and JSON. Switch the active language via the `language` prop or the toolbar language selector (`toolbar={{ showLanguageSelect: true }}`).
+
+<CodeEditorLanguagesDemo />
+
+## Variants
+
+Three visual recipes share the same field-style system as [`Input`](./input) / [`Textarea`](./textarea).
+
+<CodeEditorVariantsDemo />
+
+| Variant | Description |
+|---------|-------------|
+| `bordered` | Visible border (default) |
+| `faded` | Subtle border + muted background |
+| `flat` | No border |
+
+## States
+
+`isDisabled` blocks all interaction; `isReadOnly` keeps focus and selection but rejects edits; `isInvalid` surfaces the danger color via the shared field-style helper.
+
+<CodeEditorStatesDemo />
+
+## Toolbar Configuration
+
+Pass a `ToolbarConfig` object to show only specific toolbar items:
+
+```tsx
+<CodeEditor
+  toolbar={{
+    showCopy: true,
+    showLineWrap: true,
+    showLanguageSelect: true,
+    showLineNumbers: false,
+    showFullscreen: false,
+  }}
+/>
+```
+
+Pass `toolbar={false}` to hide the toolbar entirely.
+
+## AI Suggestions
+
+Pass an `onAISuggest` callback to enable the AI suggest button in the toolbar. When triggered, it calls your function with the current code and cursor position, then inserts the first suggestion at the cursor.
+
+```tsx
+<CodeEditor
+  value={code}
+  onChange={setCode}
+  onAISuggest={async (code, position) => {
+    const res = await myAIService.complete(code, position);
+    return [{ text: res.suggestion, label: 'AI suggestion' }];
+  }}
+/>
+```
+
+## Custom Extensions
+
+Pass additional CodeMirror 6 extensions via the `extensions` prop. They are appended after the built-in set.
+
+```tsx
+import { EditorView } from '@codemirror/view';
+
+<CodeEditor
+  extensions={[
+    EditorView.theme({ '&': { fontSize: '16px' } }),
+  ]}
+/>
+```
+
+## API
+
+<PropsTable props={[
+  { name: 'value', type: 'string', description: 'Controlled editor value.' },
+  { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: string) => void', description: 'Fires on every document change with the current editor string.' },
+  { name: 'language', type: "'javascript' | 'typescript' | 'python' | 'css' | 'html' | 'json'", default: "'javascript'", description: 'Syntax highlighting language.' },
+  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size preset; controls padding, font size, and default min-height.' },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: 'Visual recipe — shared with Input / Textarea.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Block all interaction.' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable & selectable but rejects edits.' },
+  { name: 'isInvalid', type: 'boolean', default: 'false', description: 'Apply the invalid (danger) color.' },
+  { name: 'showLineNumbers', type: 'boolean', default: 'true', description: 'Show line numbers gutter.' },
+  { name: 'lineWrap', type: 'boolean', default: 'false', description: 'Wrap long lines.' },
+  { name: 'toolbar', type: 'boolean | ToolbarConfig', default: 'true', description: 'Show toolbar or pass a ToolbarConfig to control individual items. Pass `false` to hide the toolbar.' },
+  { name: 'minHeight', type: 'string | number', description: 'Minimum editor height. Defaults to a size-based value.' },
+  { name: 'maxHeight', type: 'string | number', description: 'Maximum editor height; the editor scrolls past this point.' },
+  { name: 'extensions', type: 'Extension[]', description: 'Additional CodeMirror 6 extensions appended after the built-ins.' },
+  { name: 'onAISuggest', type: '(code: string, position: number) => Promise<AISuggestion[]>', description: 'AI suggestion callback. When provided, an AI button appears in the toolbar. Returns an array of suggestions; the first is inserted at the cursor.' },
+  { name: 'aria-label', type: 'string', description: 'Accessible label for the editor.' },
+  { name: 'aria-labelledby', type: 'string', description: 'ID of an element that labels the editor.' },
+  { name: 'aria-describedby', type: 'string', description: 'ID of an element that describes the editor.' }
+]} />
+
+### `ToolbarConfig` fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `showCopy` | `boolean` | `true` | Copy code button |
+| `showLineWrap` | `boolean` | `true` | Toggle line wrap button |
+| `showLineNumbers` | `boolean` | `true` | Toggle line numbers button |
+| `showLanguageSelect` | `boolean` | `true` | Language selector dropdown |
+| `showFullscreen` | `boolean` | `true` | Fullscreen toggle button |
+
+### `AISuggestion` shape
+
+```ts
+interface AISuggestion {
+  text: string;     // code string to insert
+  label?: string;   // display label shown in the suggestion UI
+}
+```
+
+<Callout variant="info" title="Bundle impact">
+  CodeMirror is **not** bundled with `@timeui/react`. Install the CodeMirror peer packages and import only from the dedicated subpath — `import { CodeEditor } from '@timeui/react/code-editor'` — so pages that never render the editor remain unaffected.
+</Callout>
+
+<Callout variant="info" title="Accessibility">
+  The editor container carries `role="textbox"` with `aria-multiline="true"`, and mirrors `isDisabled` / `isReadOnly` / `isInvalid` to the corresponding ARIA attributes. Provide `aria-label` (or wrap in a labelled `FormField`) when there is no visible label. All CodeMirror default keyboard shortcuts remain active, including full keyboard navigation.
+</Callout>

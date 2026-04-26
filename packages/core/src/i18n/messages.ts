@@ -94,6 +94,17 @@ export interface Messages {
     undo: string;
     redo: string;
   };
+  codeEditor?: {
+    toolbarLabel: string;
+    copy: string;
+    copied: string;
+    lineWrap: string;
+    lineNumbers: string;
+    fullscreen: string;
+    exitFullscreen: string;
+    language: string;
+    aiSuggest: string;
+  };
 }
 
 export const zh: Messages = {
@@ -184,6 +195,17 @@ export const zh: Messages = {
     undo: '撤销',
     redo: '重做',
   },
+  codeEditor: {
+    toolbarLabel: '代码编辑器工具栏',
+    copy: '复制',
+    copied: '已复制！',
+    lineWrap: '切换自动换行',
+    lineNumbers: '切换行号',
+    fullscreen: '全屏',
+    exitFullscreen: '退出全屏',
+    language: '语言',
+    aiSuggest: 'AI 建议',
+  },
 };
 
 export const en: Messages = {
@@ -273,6 +295,17 @@ export const en: Messages = {
     clearFormat: 'Clear formatting',
     undo: 'Undo',
     redo: 'Redo',
+  },
+  codeEditor: {
+    toolbarLabel: 'Code editor toolbar',
+    copy: 'Copy',
+    copied: 'Copied!',
+    lineWrap: 'Toggle line wrap',
+    lineNumbers: 'Toggle line numbers',
+    fullscreen: 'Fullscreen',
+    exitFullscreen: 'Exit fullscreen',
+    language: 'Language',
+    aiSuggest: 'AI suggestions',
   },
 };
 
