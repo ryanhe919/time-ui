@@ -9,12 +9,19 @@
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { format, resolveConfig } from 'prettier';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PKG_ROOT = resolve(__dirname, '..');
 const SVG_DIR = resolve(PKG_ROOT, 'svg');
 const OUT_DIR = resolve(PKG_ROOT, 'src/icons');
 const BARREL = resolve(PKG_ROOT, 'src/index.ts');
+
+// 一次性解析 monorepo 根的 .prettierrc，保证生成结果与 `pnpm format` 等价 ——
+// 否则原始 SVG 内联 markup（如 `<line .../>` 紧贴、多 self-closing 同行）会与
+// prettier 期望格式不一致，每次 prebuild 都把这些 .tsx 写出"未 prettier 化"的
+// 内容，造成 git status 永远 dirty。
+const prettierConfig = (await resolveConfig(OUT_DIR)) ?? {};
 
 mkdirSync(OUT_DIR, { recursive: true });
 
@@ -79,7 +86,9 @@ export const ${name} = forwardRef<SVGSVGElement, ${name}Props>(function ${name}(
 ${name}.displayName = '${name}';
 `;
 
-  writeFileSync(resolve(OUT_DIR, `${name}.tsx`), component);
+  const outFile = resolve(OUT_DIR, `${name}.tsx`);
+  const formatted = await format(component, { ...prettierConfig, filepath: outFile });
+  writeFileSync(outFile, formatted);
   components.push(name);
 }
 
@@ -97,6 +106,7 @@ ${components.map((c) => `export { ${c} } from './icons/${c}';`).join('\n')}
 ${components.map((c) => `export type { ${c}Props } from './icons/${c}';`).join('\n')}
 `;
 
-writeFileSync(BARREL, barrel);
+const formattedBarrel = await format(barrel, { ...prettierConfig, filepath: BARREL });
+writeFileSync(BARREL, formattedBarrel);
 console.log(`✓ Generated ${components.length} icons → ${OUT_DIR}`);
 console.log(`✓ Wrote barrel → ${BARREL}`);
