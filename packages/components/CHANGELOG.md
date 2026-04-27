@@ -1,5 +1,21 @@
 # @timeui/react
 
+## 1.13.0
+
+### Minor Changes
+
+- 1b1c04f: Add `PdfViewer` and `MarkdownViewer` components.
+  - **`PdfViewer`** — canvas-based PDF document viewer built on `pdfjs-dist` (lazy dynamic-imported). Paginated reader with zoom (numeric / `page-fit` / `page-width`), optional download / print buttons, full keyboard navigation (`←`/`→`, `Page Up/Down`, `+`/`-`, `0`), and a `workerSrc` override for CDN-hosted workers. `pdfjs-dist` is an **optional peer**; install it alongside `@timeui/react`.
+  - **`MarkdownViewer`** — document-oriented markdown reader built on `react-markdown` + `remark-gfm`. Reading-friendly typography, optional sticky table of contents (`IntersectionObserver`-based active-section tracking), copy / download / refresh toolbar (refresh re-fetches via internal nonce in URL mode), inline string or remote URL sources, fenced code delegated to `CodeBlock`. `react-markdown` and `remark-gfm` remain **optional peers**.
+
+  Both viewers ship as dedicated subpath exports only — `@timeui/react/pdf-viewer` and `@timeui/react/markdown-viewer`. They are intentionally **not** re-exported from the main `@timeui/react` entry so the optional peers (`pdfjs-dist`, `react-markdown`, `remark-gfm`) never leak into the core bundle.
+
+### Patch Changes
+
+- 446d014: fix(select, popover): viewport-aware popper placement — pickers and tooltips no longer get clipped by the viewport edge.
+  - **`Select`** — when the trigger sits near the bottom of the viewport, the listbox now opens **upwards** instead of being cut off. The list height also auto-shrinks to the available space and stays scrollable. Animation `transform-origin` flips to match. This directly fixes the `Pagination` page-size selector being unreachable when a paginator is rendered at the bottom of the page.
+  - **`Popover`** (and everything built on it: `Tooltip`, `Menu`, `DatePicker`, `DateTimePicker`) — `computePopoverPosition` now does **flip** (top↔bottom / left↔right when the requested side has no room and the opposite does) and **shift** (clamps the cross-axis position so the panel stays inside the viewport with an 8 px safety margin). Pure-function callers without a `viewport` argument keep the previous behavior.
+
 ## 1.12.2
 
 ### Patch Changes
