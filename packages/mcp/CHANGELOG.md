@@ -1,5 +1,11 @@
 # @timeui/mcp
 
+## 0.4.1
+
+### Patch Changes
+
+- Use HTTPS for the default remote MCP index URL.
+
 ## 0.4.0
 
 ### Minor Changes

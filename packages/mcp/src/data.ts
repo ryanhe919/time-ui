@@ -75,7 +75,7 @@ const __dirname = path.dirname(__filename);
 const DEFAULT_INDEX_PATH = path.resolve(__dirname, '..', 'data', 'index.json');
 
 /** 默认远程索引 URL（docs 站点的部署位置，与 docs 同步发版后即时生效）。 */
-export const DEFAULT_REMOTE_INDEX_URL = 'http://aliyun.ryanstone.cn/mcp-index.json';
+export const DEFAULT_REMOTE_INDEX_URL = 'https://aliyun.ryanstone.cn/mcp-index.json';
 
 const OFFLINE_SENTINELS = new Set(['off', 'none', 'local', 'bundled', 'false', '0']);
 
