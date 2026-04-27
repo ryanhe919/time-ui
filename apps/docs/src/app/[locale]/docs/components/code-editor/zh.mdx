@@ -120,6 +120,7 @@ import { EditorView } from '@codemirror/view';
   { name: 'onLanguageChange', type: '(language: CodeEditorLanguage) => void', description: '工具条语言选择器变化时触发；父组件想响应工具条选择必须监听此回调。' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设；控制内边距、字号与默认 min-height。' },
   { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: '视觉样式 —— 与 Input / Textarea 共享。' },
+  { name: 'placeholder', type: 'string', description: '编辑器为空时显示的占位文字。' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用所有交互。' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: '可聚焦、可选中，但拒绝写入。' },
   { name: 'isInvalid', type: 'boolean', default: 'false', description: '应用 invalid（danger）配色。' },
@@ -132,6 +133,7 @@ import { EditorView } from '@codemirror/view';
   { name: 'maxHeight', type: 'string | number', description: '编辑器最大高度；超出后编辑区可滚动。' },
   { name: 'extensions', type: 'Extension[]', description: '追加在内置 CodeMirror 扩展之后的额外 CodeMirror 6 扩展。' },
   { name: 'onAISuggest', type: '(code: string, position: number) => Promise<AISuggestion[]>', description: 'AI 建议回调。提供后工具条会出现 AI 按钮。返回建议数组，第一条会插入光标处。' },
+  { name: 'className', type: 'string', description: '附加在根容器上的自定义 class。' },
   { name: 'aria-label', type: 'string', description: '编辑器的无障碍标签。' },
   { name: 'aria-labelledby', type: 'string', description: '标注编辑器的元素 ID。' },
   { name: 'aria-describedby', type: 'string', description: '描述编辑器的元素 ID。' }
@@ -153,6 +155,7 @@ import { EditorView } from '@codemirror/view';
 interface AISuggestion {
   text: string;     // 要插入的代码字符串
   label?: string;   // 建议 UI 中显示的标签文字
+  detail?: string;  // 可选的次级说明文字（如简要解释）
 }
 ```
 

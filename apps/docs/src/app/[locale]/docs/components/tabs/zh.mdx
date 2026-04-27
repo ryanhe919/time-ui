@@ -303,8 +303,8 @@
 ### TabItem（数据驱动）
 
 <PropsTable props={[
-  { name: 'key', type: 'string', description: '唯一 key，用于受控选中。' },
-  { name: 'label', type: 'ReactNode', description: '标签内容。' },
+  { name: 'itemKey', type: 'string', required: true, description: '唯一 key，用于受控选中。' },
+  { name: 'label', type: 'ReactNode', required: true, description: '标签内容。' },
   { name: 'icon', type: 'ReactNode', description: '前置图标。' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },
   { name: 'content', type: 'ReactNode', description: '该 tab 对应的 panel 内容。' }
@@ -313,8 +313,8 @@
 ### TabProps（声明式）
 
 <PropsTable props={[
-  { name: 'itemKey', type: 'string', description: '真正参与选择的 key（避开 React `key` 冲突）。' },
-  { name: 'label', type: 'ReactNode' },
+  { name: 'itemKey', type: 'string', required: true, description: '真正参与选择的 key（避开 React `key` 冲突）。' },
+  { name: 'label', type: 'ReactNode', required: true },
   { name: 'icon', type: 'ReactNode' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },
   { name: 'children', type: 'ReactNode', description: '内嵌 `<TabPanel>` 或直接的 panel 内容（约定式简写）。' }
@@ -323,7 +323,7 @@
 ### TabPanelProps
 
 <PropsTable props={[
-  { name: 'itemKey', type: 'string', description: '与 `<Tab itemKey>` 一致。' },
+  { name: 'itemKey', type: 'string', required: true, description: '与 `<Tab itemKey>` 一致。' },
   { name: 'children', type: 'ReactNode' }
 ]} />
 

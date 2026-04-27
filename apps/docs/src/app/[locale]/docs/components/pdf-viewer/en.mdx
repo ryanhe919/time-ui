@@ -16,7 +16,7 @@ Then import from the sub-entry (recommended):
 import { PdfViewer } from '@timeui/react/pdf-viewer';
 ```
 
-The viewer is also re-exported from the main `@timeui/react` entry for convenience, but importing from the subpath is strongly preferred — it lets bundlers tree-shake `pdfjs-dist` out of pages that never use the viewer.
+PdfViewer is **only** available from the `@timeui/react/pdf-viewer` subpath — it is intentionally not re-exported from the main `@timeui/react` entry so that bundlers can tree-shake `pdfjs-dist` out of pages that never render the viewer.
 
 ## Basic usage
 

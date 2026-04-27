@@ -1,6 +1,6 @@
 # Steps
 
-A linear-flow progress indicator: multi-step forms, wizards, approvals. Three variants (`default` numbered / `dot` minimal / `navigation` clickable), horizontal or vertical orientation, three sizes, and automatic per-step status inferred from `activeIndex` + `status`.
+A linear-flow progress indicator: multi-step forms, wizards, approvals. Three variants (`default` numbered / `dot` minimal / `navigation` clickable), horizontal or vertical orientation, five sizes (`xs` / `sm` / `md` / `lg` / `xl`), and automatic per-step status inferred from `activeIndex` + `status`.
 
 ## Basic usage
 
@@ -133,7 +133,7 @@ Each item can pass `icon` to replace the default indicator with a domain-specifi
 ### StepItem
 
 <PropsTable props={[
-  { name: 'key', type: 'string', description: 'Stable React key; falls back to the index.' },
+  { name: 'itemKey', type: 'string', description: 'Stable key; falls back to the index when omitted.' },
   { name: 'title', type: 'ReactNode', required: true },
   { name: 'description', type: 'ReactNode' },
   { name: 'icon', type: 'ReactNode', description: 'Override the default numeral / dot / check.' },

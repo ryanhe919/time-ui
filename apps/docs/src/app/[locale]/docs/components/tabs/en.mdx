@@ -303,8 +303,8 @@ With `isLazy`, only the active panel is mounted — others mount on first activa
 ### TabItem (data-driven)
 
 <PropsTable props={[
-  { name: 'key', type: 'string', description: 'Unique key for selection.' },
-  { name: 'label', type: 'ReactNode', description: 'Tab label.' },
+  { name: 'itemKey', type: 'string', required: true, description: 'Unique key for selection.' },
+  { name: 'label', type: 'ReactNode', required: true, description: 'Tab label.' },
   { name: 'icon', type: 'ReactNode', description: 'Leading icon.' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },
   { name: 'content', type: 'ReactNode', description: 'Panel content for this tab.' }
@@ -313,8 +313,8 @@ With `isLazy`, only the active panel is mounted — others mount on first activa
 ### TabProps (declarative)
 
 <PropsTable props={[
-  { name: 'itemKey', type: 'string', description: 'The actual selection key (avoid colliding with React `key`).' },
-  { name: 'label', type: 'ReactNode' },
+  { name: 'itemKey', type: 'string', required: true, description: 'The actual selection key (avoid colliding with React `key`).' },
+  { name: 'label', type: 'ReactNode', required: true },
   { name: 'icon', type: 'ReactNode' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },
   { name: 'children', type: 'ReactNode', description: 'Either a nested `<TabPanel>` or panel content directly (shorthand).' }
@@ -323,7 +323,7 @@ With `isLazy`, only the active panel is mounted — others mount on first activa
 ### TabPanelProps
 
 <PropsTable props={[
-  { name: 'itemKey', type: 'string', description: 'Must match its parent `<Tab itemKey>`.' },
+  { name: 'itemKey', type: 'string', required: true, description: 'Must match its parent `<Tab itemKey>`.' },
   { name: 'children', type: 'ReactNode' }
 ]} />
 

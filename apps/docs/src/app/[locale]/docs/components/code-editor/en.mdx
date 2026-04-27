@@ -120,6 +120,7 @@ import { EditorView } from '@codemirror/view';
   { name: 'onLanguageChange', type: '(language: CodeEditorLanguage) => void', description: 'Fires when the toolbar language selector is used. Required to react to internal language changes from the parent.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset; controls padding, font size, and default min-height.' },
   { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: 'Visual recipe — shared with Input / Textarea.' },
+  { name: 'placeholder', type: 'string', description: 'Empty-state placeholder rendered inside the editor.' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Block all interaction.' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable & selectable but rejects edits.' },
   { name: 'isInvalid', type: 'boolean', default: 'false', description: 'Apply the invalid (danger) color.' },
@@ -132,6 +133,7 @@ import { EditorView } from '@codemirror/view';
   { name: 'maxHeight', type: 'string | number', description: 'Maximum editor height; the editor scrolls past this point.' },
   { name: 'extensions', type: 'Extension[]', description: 'Additional CodeMirror 6 extensions appended after the built-ins.' },
   { name: 'onAISuggest', type: '(code: string, position: number) => Promise<AISuggestion[]>', description: 'AI suggestion callback. When provided, an AI button appears in the toolbar. Returns an array of suggestions; the first is inserted at the cursor.' },
+  { name: 'className', type: 'string', description: 'Additional class on the root container.' },
   { name: 'aria-label', type: 'string', description: 'Accessible label for the editor.' },
   { name: 'aria-labelledby', type: 'string', description: 'ID of an element that labels the editor.' },
   { name: 'aria-describedby', type: 'string', description: 'ID of an element that describes the editor.' }
@@ -153,6 +155,7 @@ import { EditorView } from '@codemirror/view';
 interface AISuggestion {
   text: string;     // code string to insert
   label?: string;   // display label shown in the suggestion UI
+  detail?: string;  // optional secondary text (e.g. brief explanation)
 }
 ```
 

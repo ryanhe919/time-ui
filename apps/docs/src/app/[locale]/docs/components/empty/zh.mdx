@@ -75,5 +75,5 @@
 ]} />
 
 <Callout variant="info" title="可访问性">
-  插画作为装饰用 `aria-hidden="true"`；标题渲染为 `<h3>`，描述用 `<p>`。`actions` 内按钮自带键盘可达。
+  外层容器使用 `role="status"` + `aria-live="polite"`，空状态出现时辅助技术会播报。插画为装饰，附加 `aria-hidden`。`actions` 内按钮自带键盘可达。
 </Callout>

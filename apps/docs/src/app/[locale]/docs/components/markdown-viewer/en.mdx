@@ -16,7 +16,7 @@ Then import from the sub-entry (recommended):
 import { MarkdownViewer } from '@timeui/react/markdown-viewer';
 ```
 
-The viewer is also re-exported from the main `@timeui/react` entry, but importing from the subpath is strongly preferred so bundlers can keep `react-markdown` out of pages that never render long-form markdown.
+MarkdownViewer is **only** available from the `@timeui/react/markdown-viewer` subpath — it is intentionally not re-exported from the main `@timeui/react` entry so that bundlers can keep `react-markdown` / `remark-gfm` out of pages that never render long-form markdown.
 
 ## Basic usage
 

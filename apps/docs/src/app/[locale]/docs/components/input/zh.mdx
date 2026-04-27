@@ -206,6 +206,7 @@ export function SignUpForm() {
   { name: 'endContent', type: 'ReactNode', description: '右侧 slot（图标 / 单位 / 按钮）。' },
   { name: 'isClearable', type: 'boolean', default: 'false', description: '有值时显示 ✕ 清除按钮。' },
   { name: 'clearOnEsc', type: 'boolean', default: 'true', description: 'focus 时按 Escape 清空。' },
+  { name: 'clearButtonTabIndex', type: 'number', default: '-1', description: '清除按钮 / 密码显隐按钮的 tabIndex；默认 `-1`，避免污染 Tab 序列。' },
   { name: 'showPasswordToggle', type: 'boolean', description: '是否显示密码显隐切换。默认仅在 `type="password"` 时 true。' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用。' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: '只读。' },

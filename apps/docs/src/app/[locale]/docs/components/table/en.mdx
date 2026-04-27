@@ -8,7 +8,7 @@ A data-driven table: describe the columns via `columns`, pass rows via `data`. B
 
 ## Basic usage
 
-A minimal example: 3 columns × 5 rows. By default, `column.key` resolves to `row[key]`.
+A minimal example: 3 columns × 5 rows. By default, `column.columnKey` resolves to `row[columnKey]`.
 
 <LiveDemo code={`<Table
   aria-label="Members"
@@ -451,7 +451,7 @@ export function Demo() {
 ### TableColumn
 
 <PropsTable props={[
-  { name: 'key', type: 'string', required: true, description: 'Unique column key. Defaults to `row[key]`.' },
+  { name: 'columnKey', type: 'string', required: true, description: 'Unique column key. Defaults to `row[columnKey]`.' },
   { name: 'title', type: 'ReactNode', required: true, description: 'Header content.' },
   { name: 'width', type: 'number | string', description: 'Column width. Numbers are interpreted as px.' },
   { name: 'align', type: "'left' | 'center' | 'right'", default: "'left'" },

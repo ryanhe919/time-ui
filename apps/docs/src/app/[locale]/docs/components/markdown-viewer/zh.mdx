@@ -16,7 +16,7 @@ npm install @timeui/react react-markdown remark-gfm
 import { MarkdownViewer } from '@timeui/react/markdown-viewer';
 ```
 
-主入口 `@timeui/react` 同样会再导出 `MarkdownViewer`，方便使用；但**强烈建议**走 subpath —— 这样 bundler 可以把 `react-markdown` 从不渲染长文的页面里 tree-shake 掉。
+MarkdownViewer **仅**通过 `@timeui/react/markdown-viewer` subpath 导出 —— 主入口 `@timeui/react` 故意不再导出它，以确保 bundler 可以把 `react-markdown` / `remark-gfm` 从不渲染长文的页面里 tree-shake 掉。
 
 ## 基础用法
 

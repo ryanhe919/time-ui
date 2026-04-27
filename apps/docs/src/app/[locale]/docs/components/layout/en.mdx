@@ -174,8 +174,8 @@ These primitives are designed to nest cleanly.
 <PropsTable props={[
   { name: 'direction', type: "'row' | 'column'", default: "'column'", description: 'Stack axis.' },
   { name: 'spacing', type: 'number | string', default: '8', description: 'Gap between children.' },
-  { name: 'align', type: 'CSSProperties["alignItems"]', description: 'Cross-axis alignment.' },
-  { name: 'justify', type: 'CSSProperties["justifyContent"]', description: 'Main-axis distribution.' }
+  { name: 'align', type: 'CSSProperties["alignItems"]', default: "'stretch'", description: 'Cross-axis alignment.' },
+  { name: 'justify', type: 'CSSProperties["justifyContent"]', default: "'flex-start'", description: 'Main-axis distribution.' }
 ]} />
 
 ### Container

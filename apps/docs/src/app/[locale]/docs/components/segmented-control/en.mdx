@@ -176,12 +176,24 @@ export function DateRange() {
 
 <LiveDemo
   code={`<Stack spacing={16}>
+  <SegmentedControl size="xs" aria-label="xs" defaultValue="a" options={SAMPLE} />
   <SegmentedControl size="sm" aria-label="sm" defaultValue="a" options={SAMPLE} />
   <SegmentedControl size="md" aria-label="md" defaultValue="a" options={SAMPLE} />
   <SegmentedControl size="lg" aria-label="lg" defaultValue="a" options={SAMPLE} />
+  <SegmentedControl size="xl" aria-label="xl" defaultValue="a" options={SAMPLE} />
 </Stack>`}
 >
   <Stack spacing={16}>
+    <SegmentedControl
+      size="xs"
+      aria-label="xs"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Day' },
+        { value: 'b', label: 'Week' },
+        { value: 'c', label: 'Month' },
+      ]}
+    />
     <SegmentedControl
       size="sm"
       aria-label="sm"
@@ -205,6 +217,16 @@ export function DateRange() {
     <SegmentedControl
       size="lg"
       aria-label="lg"
+      defaultValue="a"
+      options={[
+        { value: 'a', label: 'Day' },
+        { value: 'b', label: 'Week' },
+        { value: 'c', label: 'Month' },
+      ]}
+    />
+    <SegmentedControl
+      size="xl"
+      aria-label="xl"
       defaultValue="a"
       options={[
         { value: 'a', label: 'Day' },

@@ -173,8 +173,8 @@ TimeUI 内置了一组偏日常产品开发的轻量布局原语：`Box`、`Flex
 <PropsTable props={[
   { name: 'direction', type: "'row' | 'column'", default: "'column'", description: '堆叠方向。' },
   { name: 'spacing', type: 'number | string', default: '8', description: '子元素间距。' },
-  { name: 'align', type: 'CSSProperties["alignItems"]', description: '交叉轴对齐方式。' },
-  { name: 'justify', type: 'CSSProperties["justifyContent"]', description: '主轴分布方式。' }
+  { name: 'align', type: 'CSSProperties["alignItems"]', default: "'stretch'", description: '交叉轴对齐方式。' },
+  { name: 'justify', type: 'CSSProperties["justifyContent"]', default: "'flex-start'", description: '主轴分布方式。' }
 ]} />
 
 ### Container

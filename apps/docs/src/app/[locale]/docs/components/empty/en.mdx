@@ -75,5 +75,5 @@ If the default layout is too rigid, pass `children` to take over the body slot.
 ]} />
 
 <Callout variant="info" title="Accessibility">
-  The illustration is `aria-hidden="true"` (it's decorative); the title renders as `<h3>` and the description as `<p>`. Buttons inside `actions` are keyboard-reachable by default.
+  The wrapper has `role="status"` + `aria-live="polite"` so the empty state is announced when it appears. The illustration is rendered with `aria-hidden` (it's decorative). Buttons inside `actions` are keyboard-reachable by default.
 </Callout>

@@ -208,6 +208,7 @@ export function SignUpForm() {
   { name: 'endContent', type: 'ReactNode', description: 'Right slot (icon / suffix / button).' },
   { name: 'isClearable', type: 'boolean', default: 'false', description: 'Show a ✕ button when non-empty.' },
   { name: 'clearOnEsc', type: 'boolean', default: 'true', description: 'Press Escape while focused to clear.' },
+  { name: 'clearButtonTabIndex', type: 'number', default: '-1', description: 'tabIndex applied to the clear / password-toggle adornment buttons. Defaults to `-1` to keep them out of the Tab order.' },
   { name: 'showPasswordToggle', type: 'boolean', description: 'Show the password visibility toggle. Default `true` when `type="password"`.' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the field.' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable but not editable.' },

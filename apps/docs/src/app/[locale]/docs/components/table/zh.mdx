@@ -8,7 +8,7 @@
 
 ## 基础用法
 
-最小可运行示例：3 列 + 5 行。`column.key` 默认对应 `row[key]`。
+最小可运行示例：3 列 + 5 行。`column.columnKey` 默认对应 `row[columnKey]`。
 
 <LiveDemo code={`<Table
   aria-label="Members"
@@ -451,7 +451,7 @@ export function Demo() {
 ### TableColumn
 
 <PropsTable props={[
-  { name: 'key', type: 'string', required: true, description: '唯一列 key；默认对应 `row[key]`。' },
+  { name: 'columnKey', type: 'string', required: true, description: '唯一列 key；默认对应 `row[columnKey]`。' },
   { name: 'title', type: 'ReactNode', required: true, description: '表头内容。' },
   { name: 'width', type: 'number | string', description: '列宽。数字按 px 处理。' },
   { name: 'align', type: "'left' | 'center' | 'right'", default: "'left'" },

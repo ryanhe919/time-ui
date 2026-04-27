@@ -1,6 +1,6 @@
 # 步骤条 Steps
 
-线性流程的进度指示：表单分步、向导、签收 / 审批流。3 种 variant（`default` 编号 / `dot` 圆点 / `navigation` 可点跳转）、横 / 纵两种方向、3 档 size、按 `activeIndex` 与 `status` 自动推断每步状态。
+线性流程的进度指示：表单分步、向导、签收 / 审批流。3 种 variant（`default` 编号 / `dot` 圆点 / `navigation` 可点跳转）、横 / 纵两种方向、5 档 size（`xs` / `sm` / `md` / `lg` / `xl`）、按 `activeIndex` 与 `status` 自动推断每步状态。
 
 ## 基础用法
 
@@ -133,7 +133,7 @@
 ### StepItem
 
 <PropsTable props={[
-  { name: 'key', type: 'string', description: '唯一 key，缺省时回退到 index。' },
+  { name: 'itemKey', type: 'string', description: '唯一 key，缺省时回退到 index。' },
   { name: 'title', type: 'ReactNode', required: true },
   { name: 'description', type: 'ReactNode' },
   { name: 'icon', type: 'ReactNode', description: '覆盖默认编号 / dot / 勾。' },
