@@ -191,7 +191,7 @@
     "@tiptap/react": "^2.10.0",
     "@tiptap/pm": "^2.10.0",
     "@tiptap/starter-kit": "^2.10.0",
-    "@tiptap/extension-underline": "^2.10.0",
+    "@tiptap/extension-underline": "^3.22.4",
     "@tiptap/extension-link": "^2.10.0",
     "@tiptap/extension-placeholder": "^2.10.0",
     "codemirror": "^6.0.0",
