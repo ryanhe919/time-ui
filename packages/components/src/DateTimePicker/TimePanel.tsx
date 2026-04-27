@@ -122,16 +122,13 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
     const primaryFg = theme.colors.primary.foreground;
     const dividerColor = theme.colors.border.subtle;
 
-    // 列表可见高度固定：7 行 × 每行 timeItemHeight，保证紧凑且滚动流畅。
-    const visibleRows = 7;
-    const itemHeight = tokens.timeItemHeight;
-    const listHeight = `calc(${itemHeight} * ${visibleRows})`;
-
     const wrapperCss = css`
       display: flex;
       flex-direction: column;
       flex: 1;
       min-width: calc(${tokens.timeColumnWidth} * 2);
+      min-height: 0;
+      height: 100%;
       background: ${surfaceBg};
       color: ${textPrimary};
     `;
@@ -142,7 +139,7 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
       align-items: stretch;
       gap: 0;
       flex: 1;
-      min-height: ${listHeight};
+      min-height: 0;
     `;
 
     const columnCss = css`
@@ -150,6 +147,7 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
       flex-direction: column;
       width: ${tokens.timeColumnWidth};
       height: 100%;
+      min-height: 0;
       border-left: 1px solid ${dividerColor};
       &:first-of-type {
         border-left: 0;
@@ -162,6 +160,7 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
 
     const listCss = css`
       flex: 1;
+      min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
       padding: 0 4px;

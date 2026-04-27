@@ -429,11 +429,18 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       margin: -${theme.components.popover.paddingY} -${theme.components.popover.paddingX};
     `;
 
+    // Lock body height to the calendar's natural height so the time columns
+    // can't push the layout taller than the date grid. Calendar = header
+    // (+headerGap margin) + weekdays (+4px margin) + 6 rows × cellSize + 5 gaps.
+    const calendarHeight = `calc(${tokens.headerHeight} + ${tokens.headerGap} + ${tokens.weekdayHeight} + 4px + 6 * ${tokens.cellSize} + 5 * ${tokens.cellGap})`;
+
     const bodyCss = css`
       display: flex;
       flex-direction: row;
       align-items: stretch;
       gap: ${tokens.panelGap};
+      height: ${calendarHeight};
+      min-height: 0;
     `;
 
     const rightPaneCss = css`
