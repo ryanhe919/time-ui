@@ -2,6 +2,26 @@
 
 为操作提供清晰、可访问的入口。TimeUI 的 `Button` 提供 **七种视觉样式**、**六种语义色**、**五档尺寸**（xs / sm / md / lg / xl），以及可控的**圆角** —— 可组合出 42+ 种视觉形态，覆盖从密集控件到行动召唤的各种场景。
 
+## 在线试玩 Try it live
+
+直接在右侧编辑器修改代码，左侧预览会实时更新。试着改 `variant`、`color`、`size`、`radius` 来探索组合效果。
+
+<LivePlayground code={`import { Button, Flex } from '@timeui/react';
+
+export default function Demo() {
+  return (
+    <Flex gap={12} align="center" wrap="wrap">
+      <Button color="primary" variant="solid" size="md">Primary</Button>
+      <Button color="secondary" variant="bordered">Secondary</Button>
+      <Button color="success" variant="flat">Success</Button>
+      <Button color="danger" variant="ghost">Danger</Button>
+      <Button color="primary" variant="solid" isLoading>Loading</Button>
+      <Button color="primary" variant="solid" isDisabled>Disabled</Button>
+    </Flex>
+  );
+}
+`} />
+
 ## 样式 Variants
 
 七种视觉样式，可与任意 `color` 组合使用。
