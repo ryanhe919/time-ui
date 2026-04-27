@@ -73,8 +73,10 @@ const PresetIcon = ({ preset, size, color }: PresetIconProps) => {
 
 function imageBox(size: EmptySize, isInline: boolean): string {
   if (isInline) return 'inlineImageSize';
+  if (size === 'xs') return 'imageSizeXs';
   if (size === 'sm') return 'imageSizeSm';
   if (size === 'lg') return 'imageSizeLg';
+  if (size === 'xl') return 'imageSizeXl';
   return 'imageSizeMd';
 }
 
@@ -102,9 +104,11 @@ export const Empty = forwardRef<HTMLDivElement, EmptyProps>(function Empty(
   const safeAutoId = autoId.replace(/:/g, '');
 
   const imageKey = imageBox(size, isInline) as
+    | 'imageSizeXs'
     | 'imageSizeSm'
     | 'imageSizeMd'
     | 'imageSizeLg'
+    | 'imageSizeXl'
     | 'inlineImageSize';
   const imgPx = parseFloat(tokens[imageKey]);
 

@@ -82,24 +82,6 @@ describe('Radio (inside RadioGroup)', () => {
     expect(bLabel.getAttribute('data-selected')).toBe('true');
   });
 
-  it('onChangeEvent exposes the native ChangeEvent', async () => {
-    const onChangeEvent = vi.fn();
-    renderWithProviders(
-      <RadioGroup label="g">
-        <Radio value="a" onChangeEvent={onChangeEvent}>
-          A
-        </Radio>
-        <Radio value="b">B</Radio>
-      </RadioGroup>,
-    );
-    await userEvent.click(screen.getByRole('radio', { name: 'A' }));
-    expect(onChangeEvent).toHaveBeenCalled();
-    const [event] = onChangeEvent.mock.calls.at(-1) as [Event];
-    expect((event as unknown as { target: HTMLInputElement }).target).toBeInstanceOf(
-      HTMLInputElement,
-    );
-  });
-
   it('group-level isInvalid flows to each Radio (aria-invalid on the input)', () => {
     renderWithProviders(
       <RadioGroup label="g" isInvalid>

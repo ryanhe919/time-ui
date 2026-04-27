@@ -22,9 +22,9 @@ const DATA: Row[] = [
 ];
 
 const COLUMNS: TableColumn<Row>[] = [
-  { key: 'name', title: 'Name' },
+  { columnKey: 'name', title: 'Name' },
   {
-    key: 'status',
+    columnKey: 'status',
     title: 'Status',
     width: 120,
     render: (row) => (
@@ -40,7 +40,7 @@ const COLUMNS: TableColumn<Row>[] = [
     ),
   },
   {
-    key: 'actions',
+    columnKey: 'actions',
     title: '',
     width: 100,
     align: 'right',

@@ -39,9 +39,9 @@ describe('Modal — open state', () => {
     expect(dialog).toHaveAttribute('aria-label', 'my-modal');
   });
 
-  it('uncontrolled: defaultIsOpen opens initially', () => {
+  it('uncontrolled: defaultOpen opens initially', () => {
     renderWithProviders(
-      <Modal defaultIsOpen aria-label="m">
+      <Modal defaultOpen aria-label="m">
         hi
       </Modal>,
     );
@@ -51,7 +51,7 @@ describe('Modal — open state', () => {
   it('uncontrolled: external close (close button) hides the dialog', async () => {
     const user = userEvent.setup();
     renderWithProviders(
-      <Modal defaultIsOpen aria-label="m">
+      <Modal defaultOpen aria-label="m">
         hi
       </Modal>,
     );
@@ -325,7 +325,7 @@ describe('Modal — focus management', () => {
     expect(document.activeElement).toBe(dialog);
   });
 
-  it('returnFocusOnClose=true (default): focus returns to trigger after close', async () => {
+  it('shouldReturnFocus=true (default): focus returns to trigger after close', async () => {
     const Wrapper = () => {
       const [open, setOpen] = useState(false);
       return (
@@ -350,7 +350,7 @@ describe('Modal — focus management', () => {
     expect(document.activeElement).toBe(trigger);
   });
 
-  it('returnFocusOnClose=false: focus does NOT return to trigger', async () => {
+  it('shouldReturnFocus=false: focus does NOT return to trigger', async () => {
     const Wrapper = () => {
       const [open, setOpen] = useState(false);
       return (
@@ -362,7 +362,7 @@ describe('Modal — focus management', () => {
             isOpen={open}
             onOpenChange={setOpen}
             aria-label="m"
-            returnFocusOnClose={false}
+            shouldReturnFocus={false}
             showCloseButton={false}
           >
             <button data-testid="inside">inside</button>
@@ -382,7 +382,7 @@ describe('Modal — focus management', () => {
 });
 
 describe('Modal — scroll lock', () => {
-  it('blockScrollOnMount=true (default): body overflow becomes hidden', () => {
+  it('shouldBlockScroll=true (default): body overflow becomes hidden', () => {
     document.body.style.overflow = '';
     renderWithProviders(
       <Modal isOpen aria-label="m">
@@ -392,10 +392,10 @@ describe('Modal — scroll lock', () => {
     expect(document.body.style.overflow).toBe('hidden');
   });
 
-  it('blockScrollOnMount=false: body overflow is untouched', () => {
+  it('shouldBlockScroll=false: body overflow is untouched', () => {
     document.body.style.overflow = '';
     renderWithProviders(
-      <Modal isOpen aria-label="m" blockScrollOnMount={false}>
+      <Modal isOpen aria-label="m" shouldBlockScroll={false}>
         hi
       </Modal>,
     );

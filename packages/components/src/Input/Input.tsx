@@ -105,7 +105,7 @@ interface InputControlProps {
   isReadOnly: boolean;
   isInvalid: boolean;
   isRequired: boolean;
-  fullWidth: boolean;
+  isFullWidth: boolean;
   startContent?: ReactNode;
   endContent?: ReactNode;
   showClearButton: boolean;
@@ -145,7 +145,7 @@ function InputControl({
   isReadOnly,
   isInvalid,
   isRequired,
-  fullWidth,
+  isFullWidth,
   startContent,
   endContent,
   showClearButton,
@@ -195,7 +195,7 @@ function InputControl({
     display: inline-flex;
     align-items: center;
     box-sizing: border-box;
-    width: ${fullWidth ? '100%' : 'auto'};
+    width: ${isFullWidth ? '100%' : 'auto'};
     min-width: 0;
     height: ${sizeTokens.height};
     padding: 0 ${sizeTokens.paddingX};
@@ -292,7 +292,7 @@ function InputControl({
       data-disabled={isDisabled || undefined}
       data-readonly={isReadOnly || undefined}
       data-invalid={isInvalid || undefined}
-      data-full-width={fullWidth || undefined}
+      data-full-width={isFullWidth || undefined}
       aria-disabled={isDisabled || undefined}
       className={className}
       style={style}
@@ -372,7 +372,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     value,
     defaultValue,
     onChange,
-    onChangeEvent,
     onClear,
     label,
     description,
@@ -380,14 +379,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     startContent,
     endContent,
     isClearable = false,
-    clearOnEscape = true,
+    clearOnEsc = true,
     clearButtonTabIndex = -1,
     isDisabled = false,
     isReadOnly = false,
     isRequired = false,
     isInvalid: isInvalidProp,
-    isPasswordToggleVisible,
-    fullWidth = false,
+    showPasswordToggle: showPasswordToggleProp,
+    isFullWidth = false,
     className,
     style,
     id: idProp,
@@ -418,7 +417,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
   const [showPassword, setShowPassword] = useState(false);
   const isPasswordType = type === 'password';
-  const showPasswordToggle = isPasswordType && (isPasswordToggleVisible ?? true);
+  const showPasswordToggle = isPasswordType && (showPasswordToggleProp ?? true);
   const effectiveType = isPasswordType && showPassword ? 'text' : type;
 
   const showClearButton = isClearable && currentValue.length > 0 && !isDisabled && !isReadOnly;
@@ -426,9 +425,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setValue(e.target.value);
-      onChangeEvent?.(e);
     },
-    [setValue, onChangeEvent],
+    [setValue],
   );
 
   const handleClear = useCallback(() => {
@@ -440,7 +438,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (
-        clearOnEscape &&
+        clearOnEsc &&
         isClearable &&
         e.key === 'Escape' &&
         currentValue.length > 0 &&
@@ -454,7 +452,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       onKeyDown?.(e);
     },
     [
-      clearOnEscape,
+      clearOnEsc,
       isClearable,
       currentValue.length,
       isDisabled,
@@ -495,7 +493,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       isReadOnly={isReadOnly}
       isInvalid={isInvalid}
       isRequired={isRequired}
-      fullWidth={fullWidth}
+      isFullWidth={isFullWidth}
       startContent={startContent}
       endContent={endContent}
       showClearButton={showClearButton}

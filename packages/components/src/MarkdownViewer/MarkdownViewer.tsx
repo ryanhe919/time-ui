@@ -285,7 +285,7 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
               code={codeText}
               language={language}
               data-slot="markdown-codeblock"
-              noHighlight={language === 'text'}
+              disableHighlight={language === 'text'}
             />
           );
         }

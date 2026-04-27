@@ -123,9 +123,9 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
     color,
     size = 'md',
     radius: radiusProp,
-    loading = false,
-    disabled = false,
-    fullWidth = false,
+    isLoading = false,
+    isDisabled = false,
+    isFullWidth = false,
     isIconOnly = false,
     startIcon,
     endIcon,
@@ -221,15 +221,15 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
     <Comp
       ref={ref as never}
       type={isButton ? (type ?? 'button') : type}
-      disabled={isButton ? disabled || loading : undefined}
+      disabled={isButton ? isDisabled || isLoading : undefined}
       aria-label={ariaLabel}
-      aria-disabled={disabled || loading || undefined}
-      aria-busy={loading || undefined}
+      aria-disabled={isDisabled || isLoading || undefined}
+      aria-busy={isLoading || undefined}
       title={tooltipTitle}
       data-variant={v}
       data-color={c}
       data-size={size}
-      data-loading={loading || undefined}
+      data-loading={isLoading || undefined}
       data-icon-only={isIconOnly || undefined}
       css={css`
         position: relative;
@@ -251,7 +251,7 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
         overflow: hidden;
         cursor: pointer;
         user-select: none;
-        width: ${fullWidth ? '100%' : 'auto'};
+        width: ${isFullWidth ? '100%' : 'auto'};
         background-color: ${bg};
         color: ${fg};
         border: ${border};
@@ -300,9 +300,9 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
       `}
       {...rest}
     >
-      {loading ? <Spinner size={spinnerSize[size]} /> : startIcon}
+      {isLoading ? <Spinner size={spinnerSize[size]} /> : startIcon}
       {children}
-      {!loading && endIcon}
+      {!isLoading && endIcon}
     </Comp>
   );
 }) as <C extends ElementType = 'button'>(props: ButtonProps<C>) => ReactElement;

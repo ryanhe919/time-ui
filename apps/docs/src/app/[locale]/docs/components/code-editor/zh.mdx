@@ -118,7 +118,7 @@ import { EditorView } from '@codemirror/view';
   { name: 'onChange', type: '(value: string) => void', description: '文档每次变更后触发，回调收到当前编辑器字符串。' },
   { name: 'language', type: "'javascript' | 'typescript' | 'python' | 'css' | 'html' | 'json'", default: "'javascript'", description: '语法高亮语言。' },
   { name: 'onLanguageChange', type: '(language: CodeEditorLanguage) => void', description: '工具条语言选择器变化时触发；父组件想响应工具条选择必须监听此回调。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '尺寸预设；控制内边距、字号与默认 min-height。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设；控制内边距、字号与默认 min-height。' },
   { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: '视觉样式 —— 与 Input / Textarea 共享。' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用所有交互。' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: '可聚焦、可选中，但拒绝写入。' },

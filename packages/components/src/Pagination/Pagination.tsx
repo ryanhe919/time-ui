@@ -223,9 +223,11 @@ const ellipsisCss = (theme: Theme, size: PaginationSize) => {
 };
 
 const SIZE_TO_ICON: Record<PaginationSize, number> = {
+  xs: 10,
   sm: 12,
   md: 14,
   lg: 16,
+  xl: 18,
 };
 
 export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagination(
@@ -237,7 +239,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
     pageSizeOptions = [10, 20, 50, 100],
     page: pageProp,
     defaultPage,
-    onChange,
+    onPageChange,
     variant = 'default',
     size: sizeProp = 'md',
     siblingCount = 1,
@@ -277,7 +279,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
   const [page, setPage] = useControllableState<number>({
     value: pageProp,
     defaultValue: (pageProp !== undefined ? undefined : (defaultPage ?? 1)) as number,
-    onChange,
+    onChange: onPageChange,
     name: 'Pagination(page)',
   });
 

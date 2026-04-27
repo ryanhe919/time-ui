@@ -107,7 +107,7 @@
     { value: 'in', label: '印度' },
     { value: 'ru', label: '俄罗斯' },
   ]}
-  fullWidth
+  isFullWidth
 />`}>
   <Select
     isSearchable
@@ -128,7 +128,7 @@
       { value: 'in', label: '印度' },
       { value: 'ru', label: '俄罗斯' },
     ]}
-    fullWidth
+    isFullWidth
   />
 </LiveDemo>
 
@@ -145,7 +145,7 @@
     value: 'tz-' + i,
     label: 'GMT' + (i - 12 >= 0 ? '+' : '') + (i - 12) + ':00',
   }))}
-  fullWidth
+  isFullWidth
 />`}>
   <Select
     isSearchable
@@ -156,7 +156,7 @@
       value: 'tz-' + i,
       label: 'GMT' + (i - 12 >= 0 ? '+' : '') + (i - 12) + ':00',
     }))}
-    fullWidth
+    isFullWidth
   />
 </LiveDemo>
 
@@ -172,7 +172,7 @@
     { value: 'team', label: '团队成员', description: '你的团队内可见。' },
     { value: 'public', label: '公开', description: '任何拥有链接的人都能访问。' },
   ]}
-  fullWidth
+  isFullWidth
 />`}>
   <Select
     label="可见范围"
@@ -182,7 +182,7 @@
       { value: 'team', label: '团队成员', description: '你的团队内可见。' },
       { value: 'public', label: '公开', description: '任何拥有链接的人都能访问。' },
     ]}
-    fullWidth
+    isFullWidth
   />
 </LiveDemo>
 
@@ -212,7 +212,7 @@
 
 ## 用法二：`<SelectOption>` children
 
-父组件会读取 SelectOption 的 `value` / `disabled` / `children` 来生成自定义 listbox 的选项——运行时 SelectOption 本身不渲染 DOM。
+父组件会读取 SelectOption 的 `value` / `isDisabled` / `children` 来生成自定义 listbox 的选项——运行时 SelectOption 本身不渲染 DOM。
 
 <LiveDemo code={`<Select label="尺码" defaultValue="m">
   <SelectOption value="s">S</SelectOption>
@@ -249,7 +249,7 @@ export function FrameworkPicker() {
       items={FRAMEWORKS}
       value={value}
       onChange={setValue}
-      fullWidth
+      isFullWidth
     />
   );
 }`}>
@@ -265,7 +265,7 @@ export function FrameworkPicker() {
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '语义色；invalid 时强制 danger。' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设。' },
   { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: '圆角。' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' },
   { name: 'value', type: 'string', description: '受控值。' },
   { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
   { name: 'onChange', type: '(value: string) => void', description: '选中后触发，回调参数为解包后的字符串。' },
@@ -301,8 +301,7 @@ export function FrameworkPicker() {
 <PropsTable props={[
   { name: 'value', type: 'string', required: true, description: '选项值。' },
   { name: 'children', type: 'ReactNode', description: '选项内容。' },
-  { name: 'disabled', type: 'boolean', description: '禁用（与 `isDisabled` 等价，兼容原生写法）。' },
-  { name: 'isDisabled', type: 'boolean', description: '禁用。' },
+  { name: 'isDisabled', type: 'boolean', description: '禁用该选项。' },
   { name: 'description', type: 'ReactNode', description: '选项下方的辅助文字。' }
 ]} />
 

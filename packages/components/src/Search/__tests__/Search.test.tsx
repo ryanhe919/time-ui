@@ -63,8 +63,8 @@ describe('Search', () => {
     expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
   });
 
-  it('supports fullWidth layout hook', () => {
-    const { container } = renderWithProviders(<Search fullWidth placeholder="Wide search" />);
+  it('supports isFullWidth layout hook', () => {
+    const { container } = renderWithProviders(<Search isFullWidth placeholder="Wide search" />);
     const btn = container.querySelector('button');
     expect(btn).toBeInTheDocument();
     expect(document.head.textContent ?? '').toContain('width:100%');

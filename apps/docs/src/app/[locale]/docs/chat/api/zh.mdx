@@ -6,7 +6,7 @@ Chat 组件族的全部 props。共享类型见每个组件 props 表的 `type` 
 
 <PropsTable props={[
   { name: 'children', type: 'ReactNode', description: '通常是若干 `<ChatMessage>`。' },
-  { name: 'autoScrollToBottom', type: 'boolean', default: 'true', description: 'children 变化时自动滚到底部（仅在 `maxHeight` 设定时生效）。' },
+  { name: 'shouldAutoScrollToBottom', type: 'boolean', default: 'true', description: 'children 变化时自动滚到底部（仅在 `maxHeight` 设定时生效）。' },
   { name: 'maxHeight', type: 'string | number', description: '设置后启用 overflow-y 滚动；不设则交给父容器。' },
   { name: 'role', type: "'log' | 'list' | 'region'", default: "'log'" },
   { name: 'isLive', type: 'boolean', default: 'true', description: '`aria-live="polite"`，新消息会被屏幕阅读器朗读。' }
@@ -29,14 +29,14 @@ Chat 组件族的全部 props。共享类型见每个组件 props 表的 `type` 
 
 <PropsTable props={[
   { name: 'source', type: 'ChatAvatarSource', description: '`{ kind: "image", src, alt }` / `{ kind: "text", text }` / `{ kind: "node", node }`。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'sm 24 / md 32 / lg 40。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'xs 20 / sm 24 / md 32 / lg 40 / xl 48。' },
   { name: 'role', type: 'ChatMessageRole', description: '驱动 text/node 模式的背景色调。' }
 ]} />
 
 ## ChatTypingIndicator
 
 <PropsTable props={[
-  { name: 'size', type: "'sm' | 'md'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'label', type: 'string', default: '"AI is typing"', description: '同时作为 `aria-label`。' }
 ]} />
 
@@ -46,7 +46,7 @@ Chat 组件族的全部 props。共享类型见每个组件 props 表的 `type` 
   { name: 'isActive', type: 'boolean', default: 'true', description: 'false 时 bars 静止在最小高度。' },
   { name: 'bars', type: 'number', default: '4' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: '"aria-label"', type: 'string', default: '"Recording"' }
 ]} />
 

@@ -17,15 +17,19 @@ import { Tooltip } from '../Tooltip';
 import type { RichTextEditorSize, ToolbarItem } from './RichTextEditor.types';
 
 const SIZE_TO_BUTTON: Record<RichTextEditorSize, ButtonSize> = {
+  xs: 'xs',
   sm: 'xs',
   md: 'sm',
   lg: 'md',
+  xl: 'lg',
 };
 
 const SIZE_TO_ICON_PX: Record<RichTextEditorSize, number> = {
+  xs: 12,
   sm: 14,
   md: 16,
   lg: 18,
+  xl: 20,
 };
 
 interface IconProps {

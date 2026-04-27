@@ -12,15 +12,15 @@ import { Tabs, Tab, TabPanel } from '../';
 import type { TabItem, TabsSize, TabsVariant } from '../Tabs.types';
 
 const ITEMS: ReadonlyArray<TabItem> = [
-  { key: 'profile', label: 'Profile', content: <p>Profile panel</p> },
-  { key: 'settings', label: 'Settings', content: <p>Settings panel</p> },
-  { key: 'billing', label: 'Billing', content: <p>Billing panel</p> },
+  { itemKey: 'profile', label: 'Profile', content: <p>Profile panel</p> },
+  { itemKey: 'settings', label: 'Settings', content: <p>Settings panel</p> },
+  { itemKey: 'billing', label: 'Billing', content: <p>Billing panel</p> },
 ];
 
 const ITEMS_WITH_DISABLED: ReadonlyArray<TabItem> = [
-  { key: 'a', label: 'A', content: <p>A panel</p> },
-  { key: 'b', label: 'B', content: <p>B panel</p>, isDisabled: true },
-  { key: 'c', label: 'C', content: <p>C panel</p> },
+  { itemKey: 'a', label: 'A', content: <p>A panel</p> },
+  { itemKey: 'b', label: 'B', content: <p>B panel</p>, isDisabled: true },
+  { itemKey: 'c', label: 'C', content: <p>C panel</p> },
 ];
 
 const getTabs = (): HTMLButtonElement[] => screen.getAllByRole('tab') as HTMLButtonElement[];
@@ -448,11 +448,14 @@ describe('Tabs — variants', () => {
 });
 
 describe('Tabs — sizes', () => {
-  it.each(['sm', 'md', 'lg'] as const)('renders size=%s without crashing', (size: TabsSize) => {
-    const { container } = renderWithProviders(<Tabs aria-label="A" items={ITEMS} size={size} />);
-    const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.dataset.size).toBe(size);
-  });
+  it.each(['xs', 'sm', 'md', 'lg', 'xl'] as const)(
+    'renders size=%s without crashing',
+    (size: TabsSize) => {
+      const { container } = renderWithProviders(<Tabs aria-label="A" items={ITEMS} size={size} />);
+      const wrapper = container.firstElementChild as HTMLElement;
+      expect(wrapper.dataset.size).toBe(size);
+    },
+  );
 });
 
 describe('Tabs — aria & ids', () => {
@@ -550,7 +553,7 @@ describe('Tabs — edge cases', () => {
   it('renders an icon next to label when provided', () => {
     const items: TabItem[] = [
       {
-        key: 'home',
+        itemKey: 'home',
         label: 'Home',
         icon: <span data-testid="home-icon">🏠</span>,
         content: <p>Home</p>,

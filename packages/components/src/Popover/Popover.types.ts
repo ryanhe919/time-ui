@@ -43,7 +43,7 @@ export interface PopoverProps {
   /** 受控开关。 */
   isOpen?: boolean;
   /** 非受控初始开关。 */
-  defaultIsOpen?: boolean;
+  defaultOpen?: boolean;
   /** 开关变化回调。 */
   onOpenChange?: (open: boolean) => void;
   /** 触发方式，默认 'click'。 */
@@ -53,7 +53,7 @@ export interface PopoverProps {
   /** anchor 与 popover 之间像素间距，默认读 theme.components.popover.offset。 */
   offset?: number;
   /** 显示箭头，默认 true。 */
-  withArrow?: boolean;
+  hasArrow?: boolean;
   /** 点击外部关闭，默认 true。 */
   closeOnBlur?: boolean;
   /** ESC 关闭，默认 true。 */

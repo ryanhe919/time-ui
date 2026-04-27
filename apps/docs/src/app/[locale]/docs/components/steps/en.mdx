@@ -1,13 +1,13 @@
 # Steps
 
-A linear-flow progress indicator: multi-step forms, wizards, approvals. Three variants (`default` numbered / `dot` minimal / `navigation` clickable), horizontal or vertical orientation, three sizes, and automatic per-step status inferred from `current` + `status`.
+A linear-flow progress indicator: multi-step forms, wizards, approvals. Three variants (`default` numbered / `dot` minimal / `navigation` clickable), horizontal or vertical orientation, three sizes, and automatic per-step status inferred from `activeIndex` + `status`.
 
 ## Basic usage
 
-Pass an `items` array; `current` (0-based) marks the active step. Anything before it is `finish`, the active step is `process`, and anything after is `wait`.
+Pass an `items` array; `activeIndex` (0-based) marks the active step. Anything before it is `finish`, the active step is `process`, and anything after is `wait`.
 
 <LiveDemo code={`<Steps
-  current={1}
+  activeIndex={1}
   items={[
     { title: 'Account',   description: 'Create your account.' },
     { title: 'Profile',   description: 'Tell us about yourself.' },
@@ -16,7 +16,7 @@ Pass an `items` array; `current` (0-based) marks the active step. Anything befor
   ]}
 />`}>
   <Steps
-    current={1}
+    activeIndex={1}
     items={[
       { title: 'Account', description: 'Create your account.' },
       { title: 'Profile', description: 'Tell us about yourself.' },
@@ -31,7 +31,7 @@ Pass an `items` array; `current` (0-based) marks the active step. Anything befor
 `status` describes the current step: `process` (default), `finish`, `wait`, or `error`. Each `item` can also carry its own `status` to override (highest priority) — e.g. paint step 2 red to indicate validation failure.
 
 <LiveDemo code={`<Steps
-  current={1}
+  activeIndex={1}
   status="error"
   items={[
     { title: 'Personal' },
@@ -40,7 +40,7 @@ Pass an `items` array; `current` (0-based) marks the active step. Anything befor
   ]}
 />`}>
   <Steps
-    current={1}
+    activeIndex={1}
     status="error"
     items={[
       { title: 'Personal' },
@@ -54,14 +54,14 @@ Pass an `items` array; `current` (0-based) marks the active step. Anything befor
 
 - `default` — circular indicator with numerals / a check mark.
 - `dot` — minimal dot; the text remains the visual anchor.
-- `navigation` — every step becomes a focusable button; pair with `isClickable` and `onChange` for "back" buttons in multi-step forms.
+- `navigation` — every step becomes a focusable button; pair with `isClickable` and `onActiveIndexChange` for "back" buttons in multi-step forms.
 
-<LiveDemo code={`<Steps variant="dot" current={1} items={[
+<LiveDemo code={`<Steps variant="dot" activeIndex={1} items={[
   { title: 'Connected' }, { title: 'Configuring' }, { title: 'Live' },
 ]} />`}>
   <Steps
     variant="dot"
-    current={1}
+    activeIndex={1}
     items={[
       { title: 'Connected' },
       { title: 'Configuring' },
@@ -76,7 +76,7 @@ Best when each step has a longer description, e.g. an approval timeline.
 
 <LiveDemo code={`<Steps
   direction="vertical"
-  current={1}
+  activeIndex={1}
   items={[
     { title: 'Submitted',  description: 'You filed the request.' },
     { title: 'Reviewing',  description: 'A reviewer is looking at it.' },
@@ -85,7 +85,7 @@ Best when each step has a longer description, e.g. an approval timeline.
 />`}>
   <Steps
     direction="vertical"
-    current={1}
+    activeIndex={1}
     items={[
       { title: 'Submitted', description: 'You filed the request.' },
       { title: 'Reviewing', description: 'A reviewer is looking at it.' },
@@ -100,7 +100,7 @@ Each item can pass `icon` to replace the default indicator with a domain-specifi
 
 ```tsx
 <Steps
-  current={2}
+  activeIndex={2}
   items={[
     { title: 'Pick file', icon: <FileIcon /> },
     { title: 'Upload',    icon: <UploadIcon /> },
@@ -115,13 +115,13 @@ Each item can pass `icon` to replace the default indicator with a domain-specifi
 
 <PropsTable props={[
   { name: 'items', type: 'StepItem[]', required: true, description: 'Step data array.' },
-  { name: 'current', type: 'number', description: 'Controlled active index (0-based).' },
-  { name: 'defaultCurrent', type: 'number', default: '0', description: 'Uncontrolled initial active index.' },
-  { name: 'onChange', type: '(index: number) => void', description: 'Fires on click navigation (gated by `isClickable`).' },
+  { name: 'activeIndex', type: 'number', description: 'Controlled active index (0-based).' },
+  { name: 'defaultActiveIndex', type: 'number', default: '0', description: 'Uncontrolled initial active index.' },
+  { name: 'onActiveIndexChange', type: '(index: number) => void', description: 'Fires on click navigation (gated by `isClickable`).' },
   { name: 'status', type: "'wait' | 'process' | 'finish' | 'error'", default: "'process'", description: 'Overall status of the current step.' },
   { name: 'direction', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
   { name: 'variant', type: "'default' | 'dot' | 'navigation'", default: "'default'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'isClickable', type: 'boolean', default: 'true for navigation; false otherwise', description: 'Allow clicking a step to jump.' },
   { name: 'startContent', type: 'ReactNode', description: 'Custom prefix rendered before the indicator.' },
   { name: 'className', type: 'string' },

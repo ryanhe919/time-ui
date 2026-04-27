@@ -69,9 +69,9 @@ function itemsToResolved(items: ReadonlyArray<MenuItemsEntry>): ResolvedNode[] {
   const out: ResolvedNode[] = [];
   for (const entry of items) {
     if (isSection(entry)) {
-      out.push({ type: 'section-header', key: `section-${entry.key}`, label: entry.label });
+      out.push({ type: 'section-header', key: `section-${entry.sectionKey}`, label: entry.label });
       for (const it of entry.items) {
-        out.push({ type: 'item', item: it, sectionKey: entry.key });
+        out.push({ type: 'item', item: it, sectionKey: entry.sectionKey });
       }
     } else {
       out.push({ type: 'item', item: entry });
@@ -98,7 +98,7 @@ function parseChildren(children: ReactNode): ResolvedNode[] {
     if (kind === 'item') {
       const props = child.props as MenuItemProps;
       const item: MenuItemDescriptor = {
-        key: props.itemKey,
+        itemKey: props.itemKey,
         label: props.children,
         ...(props.icon !== undefined ? { icon: props.icon } : {}),
         ...(props.shortcut !== undefined ? { shortcut: props.shortcut } : {}),
@@ -130,7 +130,7 @@ function parseChildren(children: ReactNode): ResolvedNode[] {
         if (innerCtor?.__timeuiMenuKind !== 'item') return;
         const ip = inner.props as MenuItemProps;
         const item: MenuItemDescriptor = {
-          key: ip.itemKey,
+          itemKey: ip.itemKey,
           label: ip.children,
           ...(ip.icon !== undefined ? { icon: ip.icon } : {}),
           ...(ip.shortcut !== undefined ? { shortcut: ip.shortcut } : {}),
@@ -357,7 +357,7 @@ export const MenuRow = ({
     'aria-disabled': isDisabled || undefined,
     'aria-checked': ariaChecked,
     'data-index': index,
-    'data-key': item.key,
+    'data-key': item.itemKey,
     'data-highlighted': isHighlighted || undefined,
     'data-disabled': isDisabled || undefined,
     'data-danger': isDanger || undefined,
@@ -626,10 +626,10 @@ const MenuPanel = forwardRef<HTMLDivElement, MenuPanelProps>(function MenuPanel(
         }
         runningIdx += 1;
         const idx = runningIdx;
-        const isSelected = selectedKeys.has(node.item.key);
+        const isSelected = selectedKeys.has(node.item.itemKey);
         const isHighlighted = idx === highlight;
         return (
-          <div key={node.item.key} role="presentation" css={itemRowWrapCss}>
+          <div key={node.item.itemKey} role="presentation" css={itemRowWrapCss}>
             <MenuRow
               item={node.item}
               index={idx}
@@ -659,7 +659,7 @@ const MenuImpl = forwardRef<HTMLDivElement, MenuProps>(function Menu(props, forw
     items,
     children,
     isOpen,
-    defaultIsOpen = false,
+    defaultOpen = false,
     onOpenChange,
     placement = 'bottom-start',
     selectionMode = 'none',
@@ -684,7 +684,7 @@ const MenuImpl = forwardRef<HTMLDivElement, MenuProps>(function Menu(props, forw
   // 受控 / 非受控 open
   const [open, setOpen] = useControllableState<boolean>({
     value: isOpen,
-    defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+    defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
     onChange: onOpenChange,
     name: 'Menu',
   });
@@ -769,21 +769,21 @@ const MenuImpl = forwardRef<HTMLDivElement, MenuProps>(function Menu(props, forw
       if (item.isDisabled) return;
 
       // onAction 总是触发（即便有 selection）。
-      onAction?.(item.key);
+      onAction?.(item.itemKey);
       const own = (item as MenuItemDescriptor & { __ownOnAction?: () => void }).__ownOnAction;
       own?.();
 
       let didMutateSelection = false;
 
       if (selectionMode === 'single') {
-        if (!selected.has(item.key) || selected.size !== 1) {
-          commitSelection(new Set([item.key]));
+        if (!selected.has(item.itemKey) || selected.size !== 1) {
+          commitSelection(new Set([item.itemKey]));
           didMutateSelection = true;
         }
       } else if (selectionMode === 'multiple') {
         const next = new Set(selected);
-        if (next.has(item.key)) next.delete(item.key);
-        else next.add(item.key);
+        if (next.has(item.itemKey)) next.delete(item.itemKey);
+        else next.add(item.itemKey);
         commitSelection(next);
         didMutateSelection = true;
       }
@@ -960,7 +960,7 @@ const MenuImpl = forwardRef<HTMLDivElement, MenuProps>(function Menu(props, forw
         setOpen(next);
       }}
       placement={placement}
-      withArrow={false}
+      hasArrow={false}
       closeOnBlur
       closeOnEsc
       aria-label={ariaLabel ?? 'Menu'}

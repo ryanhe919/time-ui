@@ -113,6 +113,11 @@ describe('Avatar', () => {
     expect(screen.getByTestId('avatar-status-dot')).toHaveAttribute('data-status', 'online');
   });
 
+  it('renders xl size variant via data-size attribute', () => {
+    const { getByRole } = renderWithProviders(<Avatar alt="xl" size="xl" />);
+    expect(getByRole('img', { name: 'xl' })).toHaveAttribute('data-size', 'xl');
+  });
+
   it('falls back to Avatar default label when alt is omitted', () => {
     const { getByRole } = renderWithProviders(<Avatar />);
     expect(getByRole('img', { name: 'Avatar' })).toBeInTheDocument();

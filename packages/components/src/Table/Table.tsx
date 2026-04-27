@@ -69,7 +69,7 @@ function nextSortDirection(
 
 function getCellContent<T>(column: TableColumn<T>, row: T, rowIndex: number): ReactNode {
   if (column.render) return column.render(row, rowIndex);
-  const v = (row as Record<string, unknown>)[column.key];
+  const v = (row as Record<string, unknown>)[column.columnKey];
   if (v === undefined || v === null) return null;
   if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
     return String(v);
@@ -188,7 +188,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     rowKey,
     density = 'default',
     variant = 'enclosed',
-    stickyHeader = false,
+    isStickyHeader = false,
     isStriped = false,
     hasBorder = true,
     isLoading = false,
@@ -288,7 +288,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     const map = new Map<string, string>();
     let acc = selectionColumnIsFixed ? selectionColumnWidth : '0px';
     for (const col of leftFixedColumns) {
-      map.set(col.key, acc);
+      map.set(col.columnKey, acc);
       const w = asLength(col.width) ?? '160px';
       acc = `calc(${acc} + ${w})`;
     }
@@ -300,7 +300,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     let acc = '0px';
     for (let i = rightFixedColumns.length - 1; i >= 0; i -= 1) {
       const col = rightFixedColumns[i]!;
-      map.set(col.key, acc);
+      map.set(col.columnKey, acc);
       const w = asLength(col.width) ?? '160px';
       acc = `calc(${acc} + ${w})`;
     }
@@ -368,7 +368,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
   const handleSortClick = useCallback(
     (column: TableColumn<T>) => {
       if (!column.isSortable) return;
-      const next = nextSortDirection(sortDescriptor, column.key);
+      const next = nextSortDirection(sortDescriptor, column.columnKey);
       setSortDescriptor(next);
     },
     [sortDescriptor, setSortDescriptor],
@@ -501,7 +501,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     user-select: none;
     white-space: nowrap;
     ${width ? `width: ${width}; min-width: ${width};` : ''}
-    ${stickyHeader
+    ${isStickyHeader
       ? `position: sticky; top: 0; z-index: ${theme.zIndex.docked + (isSticky ? 1 : 0)}; box-shadow: ${tableTokens.stickyHeaderShadow};`
       : isSticky
         ? `position: sticky; z-index: ${theme.zIndex.docked};`
@@ -584,8 +584,8 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     scrollState.hasOverflow && scrollState.scrolledRight && rightFixedColumns.length > 0;
 
   // 最后一个 left fixed 列与第一个 right fixed 列 → 用于阴影投射。
-  const lastLeftFixedKey = leftFixedColumns[leftFixedColumns.length - 1]?.key;
-  const firstRightFixedKey = rightFixedColumns[0]?.key;
+  const lastLeftFixedKey = leftFixedColumns[leftFixedColumns.length - 1]?.columnKey;
+  const firstRightFixedKey = rightFixedColumns[0]?.columnKey;
 
   const headerSelectionCellCss = thBaseCss(
     'center',
@@ -622,10 +622,10 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
       {columns.map((col) => {
         const align: TableAlign = col.align ?? 'left';
         const isFixed = col.fixed !== undefined;
-        const leftOffset = col.fixed === 'left' ? leftOffsets.get(col.key) : undefined;
-        const rightOffset = col.fixed === 'right' ? rightOffsets.get(col.key) : undefined;
+        const leftOffset = col.fixed === 'left' ? leftOffsets.get(col.columnKey) : undefined;
+        const rightOffset = col.fixed === 'right' ? rightOffsets.get(col.columnKey) : undefined;
         const widthStr = asLength(col.width);
-        const isActiveSort = sortDescriptor?.columnKey === col.key;
+        const isActiveSort = sortDescriptor?.columnKey === col.columnKey;
         const ariaSort: 'ascending' | 'descending' | 'none' | undefined = col.isSortable
           ? isActiveSort
             ? sortDescriptor!.direction === 'asc'
@@ -635,18 +635,22 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
           : undefined;
 
         let extraShadow: string | undefined;
-        if (col.fixed === 'left' && col.key === lastLeftFixedKey && showLeftShadow) {
+        if (col.fixed === 'left' && col.columnKey === lastLeftFixedKey && showLeftShadow) {
           extraShadow = tableTokens.stickyColumnShadowLeft;
-        } else if (col.fixed === 'right' && col.key === firstRightFixedKey && showRightShadow) {
+        } else if (
+          col.fixed === 'right' &&
+          col.columnKey === firstRightFixedKey &&
+          showRightShadow
+        ) {
           extraShadow = tableTokens.stickyColumnShadowRight;
         }
 
         return (
           <th
-            key={col.key}
+            key={col.columnKey}
             role="columnheader"
             scope="col"
-            data-column-key={col.key}
+            data-column-key={col.columnKey}
             data-fixed={col.fixed || undefined}
             data-sticky-cell={isFixed || undefined}
             aria-sort={ariaSort}
@@ -769,22 +773,26 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
           {columns.map((col) => {
             const align: TableAlign = col.align ?? 'left';
             const isFixed = col.fixed !== undefined;
-            const leftOffset = col.fixed === 'left' ? leftOffsets.get(col.key) : undefined;
-            const rightOffset = col.fixed === 'right' ? rightOffsets.get(col.key) : undefined;
+            const leftOffset = col.fixed === 'left' ? leftOffsets.get(col.columnKey) : undefined;
+            const rightOffset = col.fixed === 'right' ? rightOffsets.get(col.columnKey) : undefined;
             const widthStr = asLength(col.width);
 
             let extraShadow: string | undefined;
-            if (col.fixed === 'left' && col.key === lastLeftFixedKey && showLeftShadow) {
+            if (col.fixed === 'left' && col.columnKey === lastLeftFixedKey && showLeftShadow) {
               extraShadow = tableTokens.stickyColumnShadowLeft;
-            } else if (col.fixed === 'right' && col.key === firstRightFixedKey && showRightShadow) {
+            } else if (
+              col.fixed === 'right' &&
+              col.columnKey === firstRightFixedKey &&
+              showRightShadow
+            ) {
               extraShadow = tableTokens.stickyColumnShadowRight;
             }
 
             return (
               <td
-                key={col.key}
+                key={col.columnKey}
                 role="cell"
-                data-column-key={col.key}
+                data-column-key={col.columnKey}
                 data-fixed={col.fixed || undefined}
                 data-interactive={col.isInteractive ? 'true' : undefined}
                 data-sticky-cell={isFixed || undefined}
@@ -835,7 +843,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
       tabIndex={0}
       data-density={density}
       data-variant={variant}
-      data-sticky-header={stickyHeader || undefined}
+      data-sticky-header={isStickyHeader || undefined}
       data-striped={isStriped || undefined}
       data-loading={isLoading || undefined}
       data-has-border={hasBorder || undefined}

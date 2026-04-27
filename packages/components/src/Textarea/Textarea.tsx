@@ -59,7 +59,7 @@ interface TextareaShellProps {
   isReadOnly: boolean;
   isInvalid: boolean;
   isRequired: boolean;
-  fullWidth: boolean;
+  isFullWidth: boolean;
   startContent?: ReactNode;
   endContent?: ReactNode;
   showCount: boolean;
@@ -93,7 +93,7 @@ function TextareaShell({
   isReadOnly,
   isInvalid,
   isRequired,
-  fullWidth,
+  isFullWidth,
   startContent,
   endContent,
   showCount,
@@ -145,7 +145,7 @@ function TextareaShell({
     flex-direction: column;
     align-items: stretch;
     box-sizing: border-box;
-    width: ${fullWidth ? '100%' : 'auto'};
+    width: ${isFullWidth ? '100%' : 'auto'};
     min-width: 0;
     padding: ${theme.spacing['2'] ?? '8px'} ${sizeTokens.paddingX};
     gap: ${sizeTokens.gap};
@@ -221,7 +221,7 @@ function TextareaShell({
       data-disabled={isDisabled || undefined}
       data-readonly={isReadOnly || undefined}
       data-invalid={isInvalid || undefined}
-      data-full-width={fullWidth || undefined}
+      data-full-width={isFullWidth || undefined}
       aria-disabled={isDisabled || undefined}
       className={className}
       style={style}
@@ -282,7 +282,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
     value,
     defaultValue,
     onChange,
-    onChangeEvent,
     label,
     description,
     errorMessage,
@@ -298,7 +297,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
     isReadOnly = false,
     isRequired = false,
     isInvalid: isInvalidProp,
-    fullWidth = false,
+    isFullWidth = false,
     className,
     style,
     id: idProp,
@@ -331,9 +330,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       setValue(e.target.value);
-      onChangeEvent?.(e);
     },
-    [setValue, onChangeEvent],
+    [setValue],
   );
 
   useIsomorphicLayoutEffect(() => {
@@ -383,7 +381,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
       isReadOnly={isReadOnly}
       isInvalid={isInvalid}
       isRequired={isRequired}
-      fullWidth={fullWidth}
+      isFullWidth={isFullWidth}
       startContent={startContent}
       endContent={endContent}
       showCount={showCount}

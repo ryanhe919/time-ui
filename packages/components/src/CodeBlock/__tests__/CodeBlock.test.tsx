@@ -81,8 +81,8 @@ describe('CodeBlock', () => {
     });
   });
 
-  it('hides copy button when copyable=false', () => {
-    renderWithProviders(<CodeBlock code={sample} copyable={false} />);
+  it('hides copy button when isCopyable=false', () => {
+    renderWithProviders(<CodeBlock code={sample} isCopyable={false} />);
     expect(screen.queryByRole('button')).toBeNull();
   });
 

@@ -141,7 +141,7 @@ export function FeedbackForm() {
       maxRows={8}
       maxLength={120}
       showCount
-      fullWidth
+      isFullWidth
     />
   );
 }`}>
@@ -158,7 +158,6 @@ export function FeedbackForm() {
   { name: 'value', type: 'string', description: 'Controlled value.' },
   { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
   { name: 'onChange', type: '(value: string) => void', description: 'Unwrapped string change handler.' },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLTextAreaElement>) => void', description: 'Raw native-event escape hatch.' },
   { name: 'rows', type: 'number', default: '3', description: 'Fixed row count when auto-size is off.' },
   { name: 'minRows', type: 'number', description: 'Lower bound for auto-size.' },
   { name: 'maxRows', type: 'number', description: 'Upper bound; content beyond scrolls.' },
@@ -174,7 +173,7 @@ export function FeedbackForm() {
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable but not editable.' },
   { name: 'isRequired', type: 'boolean', default: 'false', description: 'Mark as required.' },
   { name: 'isInvalid', type: 'boolean', description: 'Explicit invalid.' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to 100% width.' }
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: 'Expand to 100% width.' }
 ]} />
 
 <Callout variant="info" title="Accessibility">

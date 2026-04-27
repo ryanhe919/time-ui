@@ -21,13 +21,13 @@ export interface CodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ti
   code: string;
   language?: string;
   title?: ReactNode;
-  copyable?: boolean;
+  isCopyable?: boolean;
   onCopy?: (code: string) => void;
-  noHighlight?: boolean;
+  disableHighlight?: boolean;
 }
 
 export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function CodeBlock(
-  { code, language = 'tsx', title, copyable = true, noHighlight = false, onCopy, ...rest },
+  { code, language = 'tsx', title, isCopyable = true, disableHighlight = false, onCopy, ...rest },
   ref,
 ) {
   const theme = useTheme();
@@ -36,7 +36,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
   const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
 
   useEffect(() => {
-    if (noHighlight) {
+    if (disableHighlight) {
       setHighlightedHtml(null);
       return;
     }
@@ -73,7 +73,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
     return () => {
       cancelled = true;
     };
-  }, [code, language, theme.mode, noHighlight]);
+  }, [code, language, theme.mode, disableHighlight]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -108,7 +108,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
 
         .shiki {
           margin: 0 !important;
-          padding: 16px ${copyable ? 56 : 16}px 16px 16px;
+          padding: 16px ${isCopyable ? 56 : 16}px 16px 16px;
           font-size: 13px !important;
           line-height: 1.7 !important;
           font-family: inherit !important;
@@ -145,7 +145,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
         <pre
           css={css`
             margin: 0;
-            padding: 16px ${copyable ? 56 : 16}px 16px 16px;
+            padding: 16px ${isCopyable ? 56 : 16}px 16px 16px;
             font-size: 13px;
             line-height: 1.7;
             color: ${fg};
@@ -157,7 +157,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
         </pre>
       )}
 
-      {copyable && (
+      {isCopyable && (
         <button
           type="button"
           onClick={handleCopy}

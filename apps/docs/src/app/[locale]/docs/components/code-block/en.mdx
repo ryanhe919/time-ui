@@ -53,29 +53,29 @@ pnpm add shiki  # optional: enable syntax highlighting`}
 
 ## Hide the copy button
 
-When the snippet is illustrative and shouldn't be copyable, pass `copyable={false}`.
+When the snippet is illustrative and shouldn't be copyable, pass `isCopyable={false}`.
 
-<LiveDemo code={`<CodeBlock copyable={false} code={\`// This is an illustration\nnot real code\`} />`}>
-  <CodeBlock copyable={false} code={`// This is an illustration
+<LiveDemo code={`<CodeBlock isCopyable={false} code={\`// This is an illustration\nnot real code\`} />`}>
+  <CodeBlock isCopyable={false} code={`// This is an illustration
 not real code`} />
 </LiveDemo>
 
 ## Disable syntax highlighting
 
-Pass `noHighlight` to force the plain-text renderer even when `shiki` is installed.
+Pass `disableHighlight` to force the plain-text renderer even when `shiki` is installed.
 This is useful for very large snippets, unknown languages, or environments where you
 want deterministic markup without async highlighting.
 
 <LiveDemo code={`<CodeBlock
   title="raw.txt"
   language="text"
-  noHighlight
+  disableHighlight
   code={\`No highlighting here.\\nJust the raw code surface.\`}
 />`}>
   <CodeBlock
     title="raw.txt"
     language="text"
-    noHighlight
+    disableHighlight
     code={`No highlighting here.
 Just the raw code surface.`}
   />
@@ -98,9 +98,9 @@ Just the raw code surface.`}
   { name: 'code', type: 'string', required: true, description: 'The source to display.' },
   { name: 'language', type: 'string', default: "'tsx'", description: 'Language hint — shown as a label and passed to shiki.' },
   { name: 'title', type: 'ReactNode', description: 'Optional header title (usually a filename).' },
-  { name: 'copyable', type: 'boolean', default: 'true', description: 'Whether to render the copy button.' },
+  { name: 'isCopyable', type: 'boolean', default: 'true', description: 'Whether to render the copy button.' },
   { name: 'onCopy', type: '(code: string) => void', description: 'Fires after a successful copy (copy itself is handled via navigator.clipboard).' },
-  { name: 'noHighlight', type: 'boolean', default: 'false', description: 'Force plain-text rendering and skip the async shiki highlighter.' }
+  { name: 'disableHighlight', type: 'boolean', default: 'false', description: 'Force plain-text rendering and skip the async shiki highlighter.' }
 ]} />
 
 <Callout variant="tip" title="Internationalization">

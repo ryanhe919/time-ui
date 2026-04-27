@@ -264,7 +264,7 @@ export function PdfViewerToolbar({
           size="sm"
           isIconOnly
           aria-label={labels.prevPage}
-          disabled={prevDisabled}
+          isDisabled={prevDisabled}
           onClick={onPrev}
         >
           <ChevronLeftIcon size={15} />
@@ -306,7 +306,7 @@ export function PdfViewerToolbar({
           size="sm"
           isIconOnly
           aria-label={labels.nextPage}
-          disabled={nextDisabled}
+          isDisabled={nextDisabled}
           onClick={onNext}
         >
           <ChevronRightIcon size={15} />
@@ -323,7 +323,7 @@ export function PdfViewerToolbar({
           size="sm"
           isIconOnly
           aria-label={labels.zoomOut}
-          disabled={zoomOutDisabled}
+          isDisabled={zoomOutDisabled}
           onClick={onZoomOut}
         >
           <ZoomOutIcon size={15} />
@@ -342,7 +342,7 @@ export function PdfViewerToolbar({
           size="sm"
           isIconOnly
           aria-label={labels.zoomIn}
-          disabled={zoomInDisabled}
+          isDisabled={zoomInDisabled}
           onClick={onZoomIn}
         >
           <ZoomInIcon size={15} />

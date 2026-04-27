@@ -47,7 +47,7 @@ export interface StatCardProps {
   color?: CardColor;
   size?: CardSize;
   radius?: CardRadius;
-  fullWidth?: boolean;
+  isFullWidth?: boolean;
   isPressable?: boolean;
   isHoverable?: boolean;
   isDisabled?: boolean;
@@ -70,7 +70,7 @@ export interface StatCardProps {
   iconPlacement?: StatCardIconPlacement;
   delta?: StatCardDelta;
   trend?: ReactNode;
-  trendBleed?: boolean;
+  hasTrendBleed?: boolean;
   isLoading?: boolean;
   emphasis?: StatCardEmphasis;
   valueAlign?: StatCardValueAlign;

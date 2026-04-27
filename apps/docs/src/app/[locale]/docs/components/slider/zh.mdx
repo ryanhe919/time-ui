@@ -36,7 +36,7 @@
 
 ## 纵向 Vertical
 
-`orientation="vertical"`：值在上方，标题在下方，符合常见的"音量条"形态。`length` 控制轨道长度（横向是宽，纵向是高）。
+`orientation="vertical"`：值在上方，标题在下方，符合常见的"音量条"形态。`trackLength` 控制轨道长度（横向是宽，纵向是高）。
 
 <LiveDemo code={`<Flex gap={32} align="center" justify="center">
   <Slider
@@ -50,12 +50,12 @@
     color="success"
     defaultValue={[20, 70]}
     showValue
-    length={200}
+    trackLength={200}
   />
 </Flex>`}>
   <Flex gap={32} align="center" justify="center">
     <Slider orientation="vertical" label="Volume" defaultValue={46} showValue />
-    <Slider orientation="vertical" color="success" defaultValue={[20, 70]} showValue length={200} />
+    <Slider orientation="vertical" color="success" defaultValue={[20, 70]} showValue trackLength={200} />
   </Flex>
 </LiveDemo>
 
@@ -84,14 +84,18 @@
 ## 尺寸 Sizes
 
 <LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider size="xs" defaultValue={40} aria-label="xs" />
   <Slider size="sm" defaultValue={40} aria-label="sm" />
   <Slider size="md" defaultValue={40} aria-label="md" />
   <Slider size="lg" defaultValue={40} aria-label="lg" />
+  <Slider size="xl" defaultValue={40} aria-label="xl" />
 </Stack>`}>
   <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider size="xs" defaultValue={40} aria-label="xs" />
     <Slider size="sm" defaultValue={40} aria-label="sm" />
     <Slider size="md" defaultValue={40} aria-label="md" />
     <Slider size="lg" defaultValue={40} aria-label="lg" />
+    <Slider size="xl" defaultValue={40} aria-label="xl" />
   </Stack>
 </LiveDemo>
 
@@ -183,14 +187,14 @@ export function VolumeAndPrice() {
   { name: 'max', type: 'number', default: '100' },
   { name: 'step', type: 'number', default: '1', description: '键盘步进 + 拖拽吸附。' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
   { name: 'label', type: 'ReactNode', description: '标题；横向在顶部，纵向在底部。' },
   { name: 'showValue', type: 'boolean', default: 'false', description: '展示当前值。' },
   { name: 'formatValue', type: '(value: SliderValue) => string', description: '同时影响显示文本和 `aria-valuetext`。' },
   { name: 'startContent', type: 'ReactNode', description: '横向轨道左侧 / 纵向上方插槽。' },
   { name: 'endContent', type: 'ReactNode', description: '横向轨道右侧 / 纵向下方插槽。' },
-  { name: 'length', type: 'string | number', description: '轨道长度（横向 width / 纵向 height）。' },
+  { name: 'trackLength', type: 'string | number', description: '轨道长度（横向 width / 纵向 height）。' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },
   { name: 'isReadOnly', type: 'boolean', default: 'false' },
   { name: 'isInvalid', type: 'boolean', default: 'false', description: '强制 `danger` 配色 + `aria-invalid`。' },

@@ -1,6 +1,6 @@
 # Empty
 
-A placeholder for empty data sets, no-result states, and request errors: illustration + copy + optional action button. Four built-in image presets (`default` / `search` / `error` / `no-data`), three sizes, and `variant="inline"` for compact card-embedded use.
+A placeholder for empty data sets, no-result states, and request errors: illustration + copy + optional action button. Four built-in image presets (`default` / `search` / `error` / `no-data`), five sizes, and `variant="inline"` for compact card-embedded use.
 
 ## Basic usage
 
@@ -34,7 +34,7 @@ Without `image`, you get `default`. The other three presets ship as built-in SVG
 
 ## Sizes
 
-`sm` / `md` (default) / `lg`. `sm` fits cards and drawers; `lg` fills a blank page.
+`xs` / `sm` / `md` (default) / `lg` / `xl`. `xs` and `sm` fit cards and drawers; `lg` and `xl` fill a blank page.
 
 ## variant="inline"
 
@@ -68,7 +68,7 @@ If the default layout is too rigid, pass `children` to take over the body slot.
   { name: 'title', type: 'ReactNode', description: 'Primary heading.' },
   { name: 'description', type: 'ReactNode', description: 'Secondary description copy.' },
   { name: 'actions', type: 'ReactNode', description: 'Primary action area; usually one or two Buttons.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'variant', type: "'default' | 'inline'", default: "'default'", description: '`inline` lays out horizontally on a single row.' },
   { name: 'children', type: 'ReactNode', description: 'When passed, replaces the default `title` / `description` / `actions` body.' },
   { name: 'className', type: 'string' }

@@ -39,7 +39,7 @@ export function SelectDemo() {
         items={FRAMEWORKS}
         value={value}
         onChange={setValue}
-        fullWidth
+        isFullWidth
       />
       <div
         css={css`

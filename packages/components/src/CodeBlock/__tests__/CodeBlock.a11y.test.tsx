@@ -22,14 +22,14 @@ vi.mock('shiki', () => ({
 describe('CodeBlock a11y', () => {
   it('passes axe with default props', async () => {
     const { container } = renderWithProviders(
-      <CodeBlock code="const x = 1;" title="example.ts" noHighlight />,
+      <CodeBlock code="const x = 1;" title="example.ts" disableHighlight />,
     );
     await expectA11y(container);
   });
 
   it('passes axe without copy button', async () => {
     const { container } = renderWithProviders(
-      <CodeBlock code="const x = 1;" copyable={false} noHighlight />,
+      <CodeBlock code="const x = 1;" isCopyable={false} disableHighlight />,
     );
     await expectA11y(container);
   });

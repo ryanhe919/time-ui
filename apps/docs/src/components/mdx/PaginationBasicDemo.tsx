@@ -29,7 +29,7 @@ export function PaginationBasicDemo() {
         font-family: var(--docs-sans);
       `}
     >
-      <Pagination total={total} pageSize={pageSize} page={page} onChange={setPage} />
+      <Pagination total={total} pageSize={pageSize} page={page} onPageChange={setPage} />
       <div
         css={css`
           font-size: 12px;

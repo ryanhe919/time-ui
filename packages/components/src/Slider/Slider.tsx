@@ -70,7 +70,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(pr
     name,
     minName,
     maxName,
-    length,
+    trackLength: trackLengthProp,
     className,
     style,
     id,
@@ -130,7 +130,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(pr
   };
   const easing = motionEasing.emphasized ?? motionEasing.standard ?? motionEasing.easeInOut;
 
-  const trackLength = asLength(length) ?? (isVertical ? verticalLength : '100%');
+  const trackLength = asLength(trackLengthProp) ?? (isVertical ? verticalLength : '100%');
 
   const range = max - min;
   const pctOf = useCallback(
@@ -516,7 +516,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(pr
         display: flex;
         flex-direction: column;
         font-family: inherit;
-        width: ${asLength(length) ?? '100%'};
+        width: ${asLength(trackLengthProp) ?? '100%'};
         ${isDisabled ? 'opacity: 0.5;' : ''}
       `}
     >

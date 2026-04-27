@@ -70,7 +70,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       defaultValue,
       onChange,
       isOpen,
-      defaultIsOpen = false,
+      defaultOpen = false,
       onOpenChange,
       placement = 'bottom-start',
       size = 'md',
@@ -128,7 +128,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     // ── open ──
     const [open, setOpen] = useControllableState<boolean>({
       value: isOpen,
-      defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+      defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
       onChange: onOpenChange,
       name: 'DateRangePicker.isOpen',
     });
@@ -372,7 +372,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         data-readonly={isReadOnly || undefined}
       >
         <Input
-          size={size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'}
+          size={size}
           value={inputText}
           isReadOnly
           onChange={() => {
@@ -459,7 +459,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         anchor={anchorElement}
         isOpen={open}
         placement={placement}
-        withArrow={false}
+        hasArrow={false}
         trigger="manual"
         offset={parseInt(tokens.panelOffset, 10) || 8}
         id={`${baseId}-panel`}
@@ -478,7 +478,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
                 <MenuRow
                   key={i}
                   item={{
-                    key: `preset-${i}`,
+                    itemKey: `preset-${i}`,
                     label: p.label,
                   }}
                   index={i}

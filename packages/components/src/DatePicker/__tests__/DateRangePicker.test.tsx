@@ -339,9 +339,7 @@ describe('DateRangePicker — ESC + click outside', () => {
   it('ESC closes the popover', async () => {
     installRectMocks();
     const onOpenChange = vi.fn();
-    renderWithProviders(
-      <DateRangePicker defaultIsOpen onOpenChange={onOpenChange} aria-label="r" />,
-    );
+    renderWithProviders(<DateRangePicker defaultOpen onOpenChange={onOpenChange} aria-label="r" />);
     expect(screen.getAllByRole('grid').length).toBeGreaterThan(0);
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
@@ -354,7 +352,7 @@ describe('DateRangePicker — ESC + click outside', () => {
     const onOpenChange = vi.fn();
     renderWithProviders(
       <div>
-        <DateRangePicker defaultIsOpen onOpenChange={onOpenChange} aria-label="r" />
+        <DateRangePicker defaultOpen onOpenChange={onOpenChange} aria-label="r" />
         <div data-testid="elsewhere" />
       </div>,
     );

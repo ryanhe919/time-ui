@@ -16,7 +16,7 @@ export interface ModalProps {
   /** 受控打开状态。 */
   isOpen?: boolean;
   /** 非受控初始打开状态。 */
-  defaultIsOpen?: boolean;
+  defaultOpen?: boolean;
   /** 打开 / 关闭回调。 */
   onOpenChange?: (open: boolean) => void;
 
@@ -37,11 +37,11 @@ export interface ModalProps {
   /** 点击 overlay 关闭，默认 true。 */
   closeOnOverlayClick?: boolean;
   /** 锁定 body scroll，默认 true。 */
-  blockScrollOnMount?: boolean;
+  shouldBlockScroll?: boolean;
   /** 自动 focus 第一个可聚焦元素，默认 true。 */
   autoFocus?: boolean;
   /** 关闭后归还焦点到打开前的元素，默认 true。 */
-  returnFocusOnClose?: boolean;
+  shouldReturnFocus?: boolean;
 
   /** Modal 主体内容。 */
   children?: ReactNode;

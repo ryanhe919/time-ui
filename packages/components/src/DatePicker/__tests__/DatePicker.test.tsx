@@ -269,7 +269,7 @@ describe('DatePicker — popover ESC + click outside', () => {
     const onOpenChange = vi.fn();
     renderWithProviders(
       <div>
-        <DatePicker defaultIsOpen onOpenChange={onOpenChange} aria-label="d" />
+        <DatePicker defaultOpen onOpenChange={onOpenChange} aria-label="d" />
         <div data-testid="elsewhere" />
       </div>,
     );

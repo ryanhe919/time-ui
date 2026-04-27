@@ -134,9 +134,9 @@ describe('Select', () => {
     spy.mockRestore();
   });
 
-  it('fullWidth stretches the wrapper width to 100%', () => {
+  it('isFullWidth stretches the wrapper width to 100%', () => {
     const { container } = renderWithProviders(
-      <Select fullWidth items={ITEMS} defaultValue="a" aria-label="x" />,
+      <Select isFullWidth items={ITEMS} defaultValue="a" aria-label="x" />,
     );
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.tagName).toBe('DIV');

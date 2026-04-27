@@ -23,15 +23,15 @@ const PEOPLE: ReadonlyArray<Person> = [
 ];
 
 const BASIC_COLUMNS: ReadonlyArray<TableColumn<Person>> = [
-  { key: 'name', title: 'Name' },
-  { key: 'age', title: 'Age', align: 'right' },
-  { key: 'email', title: 'Email' },
+  { columnKey: 'name', title: 'Name' },
+  { columnKey: 'age', title: 'Age', align: 'right' },
+  { columnKey: 'email', title: 'Email' },
 ];
 
 const SORTABLE_COLUMNS: ReadonlyArray<TableColumn<Person>> = [
-  { key: 'name', title: 'Name', isSortable: true },
-  { key: 'age', title: 'Age', isSortable: true },
-  { key: 'email', title: 'Email' },
+  { columnKey: 'name', title: 'Name', isSortable: true },
+  { columnKey: 'age', title: 'Age', isSortable: true },
+  { columnKey: 'email', title: 'Email' },
 ];
 
 describe('Table — a11y', () => {

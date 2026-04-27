@@ -70,7 +70,7 @@ const [zoom, setZoom] = useState(1);
 />;
 ```
 
-For uncontrolled usage, pass `initialPage` and `defaultZoom`. `defaultZoom` accepts `'page-fit'`, `'page-width'` (default), or any number.
+For uncontrolled usage, pass `defaultPage` and `defaultZoom`. `defaultZoom` accepts `'page-fit'`, `'page-width'` (default), or any number.
 
 ## Worker override
 
@@ -111,7 +111,7 @@ Focus the page area, then:
 
 <PropsTable props={[
   { name: 'source', type: 'string | URL | ArrayBuffer | Uint8Array | Blob', description: 'PDF source. URL strings are fetched; buffers/blobs are handed to pdfjs directly.' },
-  { name: 'initialPage', type: 'number', default: '1', description: 'Initial 1-based page (uncontrolled).' },
+  { name: 'defaultPage', type: 'number', default: '1', description: 'Initial 1-based page (uncontrolled).' },
   { name: 'page', type: 'number', description: 'Controlled current page (1-based).' },
   { name: 'onPageChange', type: '(page: number) => void', description: 'Fires when the active page changes.' },
   { name: 'zoom', type: 'number', description: 'Controlled zoom factor (1 = 100%).' },

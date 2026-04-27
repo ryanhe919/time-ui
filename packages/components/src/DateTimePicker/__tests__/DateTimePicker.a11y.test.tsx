@@ -66,7 +66,7 @@ describe('DateTimePicker — a11y', () => {
   it('open state passes axe', async () => {
     installRectMocks();
     const { container } = renderWithProviders(
-      <DateTimePicker defaultIsOpen aria-label="dt" showSecond isClearable />,
+      <DateTimePicker defaultOpen aria-label="dt" showSecond isClearable />,
     );
     await expectA11y(container);
   });

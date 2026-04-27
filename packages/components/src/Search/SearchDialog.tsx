@@ -156,7 +156,7 @@ export const SearchDialog = forwardRef<HTMLDivElement, SearchDialogProps>(
   function SearchDialog(props, forwardedRef) {
     const {
       isOpen,
-      defaultIsOpen = false,
+      defaultOpen = false,
       onOpenChange,
 
       items,
@@ -201,7 +201,7 @@ export const SearchDialog = forwardRef<HTMLDivElement, SearchDialogProps>(
     // 受控 / 非受控 open
     const [open, setOpen] = useControllableState<boolean>({
       value: isOpen,
-      defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+      defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
       onChange: onOpenChange,
       name: 'SearchDialog',
     });

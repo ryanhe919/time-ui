@@ -98,15 +98,19 @@ function resolveToolbarConfig(toolbar: CodeEditorProps['toolbar']): ToolbarConfi
 }
 
 const SIZE_TO_FONT: Record<CodeEditorSize, string> = {
+  xs: '11px',
   sm: '12px',
   md: '13px',
   lg: '14px',
+  xl: '16px',
 };
 
 const SIZE_TO_MIN_HEIGHT: Record<CodeEditorSize, string> = {
+  xs: '80px',
   sm: '120px',
   md: '200px',
   lg: '280px',
+  xl: '360px',
 };
 
 // ─── component ────────────────────────────────────────────────────────────────

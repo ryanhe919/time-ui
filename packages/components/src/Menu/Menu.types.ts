@@ -15,7 +15,7 @@ import type { PopoverPlacement } from '../Popover';
  */
 export interface MenuItemDescriptor {
   /** 唯一标识。selection / onAction 都基于它。 */
-  key: string;
+  itemKey: string;
   /** 主标签内容。 */
   label: ReactNode;
   /** 左侧图标。 */
@@ -31,7 +31,7 @@ export interface MenuItemDescriptor {
   /** 渲染为 `<a>` 而非 `<button>`。 */
   href?: string;
   /** submenu 子项（占位 — 本轮不渲染浮层）。 */
-  children?: MenuItemDescriptor[];
+  subItems?: MenuItemDescriptor[];
 }
 
 /**
@@ -39,7 +39,7 @@ export interface MenuItemDescriptor {
  */
 export interface MenuSectionDescriptor {
   type: 'section';
-  key: string;
+  sectionKey: string;
   label?: ReactNode;
   items: MenuItemDescriptor[];
 }
@@ -69,7 +69,7 @@ export interface MenuProps {
   /** 受控开关。 */
   isOpen?: boolean;
   /** 非受控初始开关。 */
-  defaultIsOpen?: boolean;
+  defaultOpen?: boolean;
   /** 开关变化回调。 */
   onOpenChange?: (open: boolean) => void;
 

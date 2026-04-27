@@ -40,7 +40,7 @@ export interface PdfViewerProps {
   source: PdfViewerSource;
 
   /** Initial page (uncontrolled). 1-based. */
-  initialPage?: number;
+  defaultPage?: number;
   /** Controlled current page. 1-based. */
   page?: number;
   onPageChange?: (page: number) => void;

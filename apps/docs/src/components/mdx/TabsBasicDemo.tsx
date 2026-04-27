@@ -26,7 +26,7 @@ export function TabsBasicDemo() {
         defaultSelectedKey="profile"
         items={[
           {
-            key: 'profile',
+            itemKey: 'profile',
             label: 'Profile',
             content: (
               <div css={PANEL}>
@@ -36,7 +36,7 @@ export function TabsBasicDemo() {
             ),
           },
           {
-            key: 'security',
+            itemKey: 'security',
             label: 'Security',
             content: (
               <div css={PANEL}>
@@ -45,7 +45,7 @@ export function TabsBasicDemo() {
             ),
           },
           {
-            key: 'billing',
+            itemKey: 'billing',
             label: 'Billing',
             content: (
               <div css={PANEL}>

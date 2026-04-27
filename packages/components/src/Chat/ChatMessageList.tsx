@@ -14,7 +14,7 @@ import type { ChatCommonStyleProps } from './Chat.types';
 
 export interface ChatMessageListProps extends ChatCommonStyleProps {
   /** 子节点变化时自动滚到底部。默认 true。 */
-  autoScrollToBottom?: boolean;
+  shouldAutoScrollToBottom?: boolean;
   /** 最大高度（启用滚动）；默认 'none'，由父级决定。 */
   maxHeight?: string | number;
   /** 子节点：通常是 <ChatMessage>。 */
@@ -33,7 +33,7 @@ function asLength(v: string | number | undefined): string | undefined {
 export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
   function ChatMessageList(props, forwardedRef) {
     const {
-      autoScrollToBottom = true,
+      shouldAutoScrollToBottom = true,
       maxHeight,
       children,
       role = 'log',
@@ -58,10 +58,10 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
     }, []);
 
     useIsomorphicLayoutEffect(() => {
-      if (!autoScrollToBottom) return;
+      if (!shouldAutoScrollToBottom) return;
       if (maxHeight === undefined) return; // 无滚动容器时无需滚到底
       scrollToBottom();
-    }, [autoScrollToBottom, childCount, maxHeight, scrollToBottom]);
+    }, [shouldAutoScrollToBottom, childCount, maxHeight, scrollToBottom]);
 
     const resolvedMaxHeight = asLength(maxHeight);
     const isScrollable = resolvedMaxHeight !== undefined;

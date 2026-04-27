@@ -97,7 +97,7 @@ export interface UploadProps extends Omit<HTMLAttributes<HTMLDivElement>, Stripp
   size?: UploadSize;
   color?: UploadColor;
   radius?: UploadRadius;
-  fullWidth?: boolean;
+  isFullWidth?: boolean;
 
   accept?: string;
   multiple?: boolean;
@@ -108,7 +108,7 @@ export interface UploadProps extends Omit<HTMLAttributes<HTMLDivElement>, Stripp
 
   customRequest?: UploadRequest;
   concurrency?: number;
-  autoUpload?: boolean;
+  isAutoUpload?: boolean;
 
   beforeUpload?: (file: File, fileList: File[]) => boolean | Promise<boolean>;
   onReject?: (rejections: UploadRejection[]) => void;
@@ -128,8 +128,8 @@ export interface UploadProps extends Omit<HTMLAttributes<HTMLDivElement>, Stripp
   onUploadComplete?: (value: UploadFile[]) => void;
 
   dropzoneHeight?: number | string;
-  noClick?: boolean;
-  noDrag?: boolean;
+  disableClickToUpload?: boolean;
+  disableDragAndDrop?: boolean;
 
   'aria-label'?: string;
   'aria-labelledby'?: string;

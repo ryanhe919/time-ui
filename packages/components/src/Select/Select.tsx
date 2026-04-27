@@ -95,7 +95,7 @@ function childrenToItems(children: ReactNode): SelectItem[] {
     out.push({
       value: String(props.value),
       label: props.children as ReactNode,
-      isDisabled: props.isDisabled || props.disabled,
+      isDisabled: props.isDisabled,
       description: props.description,
     });
   });
@@ -127,7 +127,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     color = 'default',
     size = 'md',
     radius: radiusProp,
-    fullWidth = false,
+    isFullWidth = false,
     value,
     defaultValue,
     onChange,
@@ -437,7 +437,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     position: relative;
     display: inline-flex;
     box-sizing: border-box;
-    width: ${fullWidth ? '100%' : 'auto'};
+    width: ${isFullWidth ? '100%' : 'auto'};
     height: ${sizeTokens.height};
     border-radius: ${borderRadius};
     color: ${theme.colors.text.primary};

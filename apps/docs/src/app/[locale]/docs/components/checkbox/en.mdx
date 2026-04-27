@@ -7,12 +7,12 @@ A single check box (with an `indeterminate` tri-state) plus **CheckboxGroup** �
 A `Checkbox` is a `<label>` wrapping the native `<input type="checkbox">`, so clicking the text or the indicator both toggle the value.
 
 <LiveDemo code={`<Stack spacing={12}>
-  <Checkbox defaultSelected>Selected</Checkbox>
+  <Checkbox defaultIsSelected>Selected</Checkbox>
   <Checkbox>Unselected</Checkbox>
   <Checkbox isIndeterminate>Indeterminate (mixed)</Checkbox>
 </Stack>`}>
   <Stack spacing={12}>
-    <Checkbox defaultSelected>Selected</Checkbox>
+    <Checkbox defaultIsSelected>Selected</Checkbox>
     <Checkbox>Unselected</Checkbox>
     <Checkbox isIndeterminate>Indeterminate (mixed)</Checkbox>
   </Stack>
@@ -23,36 +23,40 @@ A `Checkbox` is a `<label>` wrapping the native `<input type="checkbox">`, so cl
 Six semantic colors. `color` drives the selected-state background; default is `primary`.
 
 <LiveDemo code={`<Flex gap={16} align="center" wrap="wrap">
-  <Checkbox defaultSelected color="default">Default</Checkbox>
-  <Checkbox defaultSelected color="primary">Primary</Checkbox>
-  <Checkbox defaultSelected color="secondary">Secondary</Checkbox>
-  <Checkbox defaultSelected color="success">Success</Checkbox>
-  <Checkbox defaultSelected color="warning">Warning</Checkbox>
-  <Checkbox defaultSelected color="danger">Danger</Checkbox>
+  <Checkbox defaultIsSelected color="default">Default</Checkbox>
+  <Checkbox defaultIsSelected color="primary">Primary</Checkbox>
+  <Checkbox defaultIsSelected color="secondary">Secondary</Checkbox>
+  <Checkbox defaultIsSelected color="success">Success</Checkbox>
+  <Checkbox defaultIsSelected color="warning">Warning</Checkbox>
+  <Checkbox defaultIsSelected color="danger">Danger</Checkbox>
 </Flex>`}>
   <Flex gap={16} align="center" wrap="wrap">
-    <Checkbox defaultSelected color="default">Default</Checkbox>
-    <Checkbox defaultSelected color="primary">Primary</Checkbox>
-    <Checkbox defaultSelected color="secondary">Secondary</Checkbox>
-    <Checkbox defaultSelected color="success">Success</Checkbox>
-    <Checkbox defaultSelected color="warning">Warning</Checkbox>
-    <Checkbox defaultSelected color="danger">Danger</Checkbox>
+    <Checkbox defaultIsSelected color="default">Default</Checkbox>
+    <Checkbox defaultIsSelected color="primary">Primary</Checkbox>
+    <Checkbox defaultIsSelected color="secondary">Secondary</Checkbox>
+    <Checkbox defaultIsSelected color="success">Success</Checkbox>
+    <Checkbox defaultIsSelected color="warning">Warning</Checkbox>
+    <Checkbox defaultIsSelected color="danger">Danger</Checkbox>
   </Flex>
 </LiveDemo>
 
 ## Sizes
 
-Three steps `sm` / `md` / `lg` — indicator widths of 16 / 20 / 24 px respectively.
+Five steps `xs` / `sm` / `md` / `lg` / `xl` — indicator widths of 12 / 16 / 20 / 24 / 28 px respectively.
 
 <LiveDemo code={`<Flex gap={16} align="center">
-  <Checkbox size="sm" defaultSelected>Small</Checkbox>
-  <Checkbox size="md" defaultSelected>Medium</Checkbox>
-  <Checkbox size="lg" defaultSelected>Large</Checkbox>
+  <Checkbox size="xs" defaultIsSelected>XS</Checkbox>
+  <Checkbox size="sm" defaultIsSelected>Small</Checkbox>
+  <Checkbox size="md" defaultIsSelected>Medium</Checkbox>
+  <Checkbox size="lg" defaultIsSelected>Large</Checkbox>
+  <Checkbox size="xl" defaultIsSelected>XL</Checkbox>
 </Flex>`}>
   <Flex gap={16} align="center">
-    <Checkbox size="sm" defaultSelected>Small</Checkbox>
-    <Checkbox size="md" defaultSelected>Medium</Checkbox>
-    <Checkbox size="lg" defaultSelected>Large</Checkbox>
+    <Checkbox size="xs" defaultIsSelected>XS</Checkbox>
+    <Checkbox size="sm" defaultIsSelected>Small</Checkbox>
+    <Checkbox size="md" defaultIsSelected>Medium</Checkbox>
+    <Checkbox size="lg" defaultIsSelected>Large</Checkbox>
+    <Checkbox size="xl" defaultIsSelected>XL</Checkbox>
   </Flex>
 </LiveDemo>
 
@@ -60,15 +64,15 @@ Three steps `sm` / `md` / `lg` — indicator widths of 16 / 20 / 24 px respectiv
 
 <LiveDemo code={`<Stack spacing={12}>
   <Checkbox isDisabled>Disabled</Checkbox>
-  <Checkbox isDisabled defaultSelected>Disabled + selected</Checkbox>
-  <Checkbox isReadOnly defaultSelected>Read only</Checkbox>
+  <Checkbox isDisabled defaultIsSelected>Disabled + selected</Checkbox>
+  <Checkbox isReadOnly defaultIsSelected>Read only</Checkbox>
   <Checkbox isRequired>Required</Checkbox>
   <Checkbox isInvalid>Invalid</Checkbox>
 </Stack>`}>
   <Stack spacing={12}>
     <Checkbox isDisabled>Disabled</Checkbox>
-    <Checkbox isDisabled defaultSelected>Disabled + selected</Checkbox>
-    <Checkbox isReadOnly defaultSelected>Read only</Checkbox>
+    <Checkbox isDisabled defaultIsSelected>Disabled + selected</Checkbox>
+    <Checkbox isReadOnly defaultIsSelected>Read only</Checkbox>
     <Checkbox isRequired>Required</Checkbox>
     <Checkbox isInvalid>Invalid</Checkbox>
   </Stack>
@@ -159,14 +163,13 @@ export function SkillPicker() {
 
 <PropsTable props={[
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'", description: 'Selected-state semantic color.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size preset — Checkbox has no xs / xl.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset.' },
   { name: 'radius', type: "'sm' | 'md'", description: 'Indicator corner radius.' },
   { name: 'value', type: 'string', description: 'Option value; required inside CheckboxGroup.' },
   { name: 'isSelected', type: 'boolean', description: 'Controlled selection state.' },
-  { name: 'defaultSelected', type: 'boolean', default: 'false', description: 'Uncontrolled initial state.' },
+  { name: 'defaultIsSelected', type: 'boolean', default: 'false', description: 'Uncontrolled initial state.' },
   { name: 'isIndeterminate', type: 'boolean', default: 'false', description: 'Mixed state (orthogonal to isSelected).' },
   { name: 'onChange', type: '(checked: boolean) => void', description: 'Unwrapped boolean change handler.' },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: 'Raw native event.' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disabled.' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Read only.' },
   { name: 'isRequired', type: 'boolean', default: 'false', description: 'Required.' },
@@ -189,7 +192,7 @@ export function SkillPicker() {
   { name: 'defaultValue', type: 'string[]', default: '[]', description: 'Uncontrolled initial selection.' },
   { name: 'onChange', type: '(value: string[]) => void', description: 'Fires with the next array.' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: 'Default color for descendants (children can override).' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Default size for descendants.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", description: 'Default size for descendants.' },
   { name: 'radius', type: "'sm' | 'md'", description: 'Default radius for descendants.' },
   { name: 'name', type: 'string', description: 'Shared `name` for descendants; defaults to `useId()`.' }
 ]} />

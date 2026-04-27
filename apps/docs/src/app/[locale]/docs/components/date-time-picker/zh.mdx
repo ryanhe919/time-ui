@@ -3,7 +3,7 @@
 `DateTimePicker` 在 `DatePicker` 的基础上横向拼接了时间列，让一个控件同时承担年月日与时分秒。分钟、秒都是**可选择性开放**——被关闭的字段在最终 `Date` 中恒为 `0`，因此调用方拿到的永远是一个完整的 `Date` 对象。
 
 <Callout variant="info" title="左日历、右时间">
-  面板复用共享的 `CalendarPanel`（键盘、min/max、`isDateUnavailable` 完全一致），右侧拼接 `TimePanel` —— 小时 / 分钟 / 秒三列可选 `listbox`，`use12Hours` 打开时再加一列 AM/PM。底部 `[此刻] [清除] [确定]`：面板内所有交互先落入 draft，只有点 **确定** 才会触发 `onChange`，避免你拨动时间列时触发一堆意外回调。
+  面板复用共享的 `CalendarPanel`（键盘、min/max、`isDateUnavailable` 完全一致），右侧拼接 `TimePanel` —— 小时 / 分钟 / 秒三列可选 `listbox`，`is12Hour` 打开时再加一列 AM/PM。底部 `[此刻] [清除] [确定]`：面板内所有交互先落入 draft，只有点 **确定** 才会触发 `onChange`，避免你拨动时间列时触发一堆意外回调。
 </Callout>
 
 ## 基本用法
@@ -44,10 +44,10 @@ export function Demo() {
 
 ## 12 小时制
 
-`use12Hours` 追加一列 AM/PM。对外 `value` 仍是原生 `Date`（内部始终 24 小时制），只是 listbox 渲染与格式化字符串会变。
+`is12Hour` 追加一列 AM/PM。对外 `value` 仍是原生 `Date`（内部始终 24 小时制），只是 listbox 渲染与格式化字符串会变。
 
 ```tsx
-<DateTimePicker use12Hours isClearable />
+<DateTimePicker is12Hour isClearable />
 ```
 
 ## 步长
@@ -70,7 +70,7 @@ export function Demo() {
 ## 本地化与格式
 
 - `locale`：传给 `Intl` 的 BCP-47 标记。
-- `format(d)` / `parse(s)`：自定义输入框的展示与解析。默认格式 `YYYY-MM-DD HH:mm`（`showSecond` 打开时追加 `:ss`，`use12Hours` 打开时追加 ` AM/PM`）；默认解析器同时宽容地接收 ISO-8601。
+- `format(d)` / `parse(s)`：自定义输入框的展示与解析。默认格式 `YYYY-MM-DD HH:mm`（`showSecond` 打开时追加 `:ss`，`is12Hour` 打开时追加 ` AM/PM`）；默认解析器同时宽容地接收 ISO-8601。
 
 ## API
 
@@ -83,7 +83,7 @@ export function Demo() {
   { name: 'hourStep', type: 'number', default: '1' },
   { name: 'minuteStep', type: 'number', default: '1' },
   { name: 'secondStep', type: 'number', default: '1' },
-  { name: 'use12Hours', type: 'boolean', default: 'false', description: '显示 AM/PM 列并按 12 小时制格式化。' },
+  { name: 'is12Hour', type: 'boolean', default: 'false', description: '显示 AM/PM 列并按 12 小时制格式化。' },
   { name: 'showNowButton', type: 'boolean', default: 'true' },
   { name: 'showConfirmButton', type: 'boolean', default: 'true', description: '右下角的"确定"按钮。' },
   { name: 'nowLabel', type: 'string', description: '覆盖"此刻"文案。' },
@@ -100,10 +100,10 @@ export function Demo() {
   { name: 'isDisabled', type: 'boolean', default: 'false' },
   { name: 'isInvalid', type: 'boolean', default: 'false' },
   { name: 'isClearable', type: 'boolean', default: 'false' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
   { name: 'isOpen', type: 'boolean' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'aria-label', type: 'string' }
 ]} />

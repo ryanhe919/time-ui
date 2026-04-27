@@ -7,13 +7,13 @@
 import type { ReactNode, CSSProperties } from 'react';
 
 export type TabsVariant = 'underline' | 'pills' | 'bordered';
-export type TabsSize = 'sm' | 'md' | 'lg';
+export type TabsSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type TabsOrientation = 'horizontal' | 'vertical';
 
 /** 数据驱动模式下单个 Tab 的描述。 */
 export interface TabItem {
   /** 唯一 key，用于受控选中。 */
-  key: string;
+  itemKey: string;
   /** Tab 头显示内容（文本 / ReactNode）。 */
   label: ReactNode;
   /** 文本前的图标。 */

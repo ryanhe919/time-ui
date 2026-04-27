@@ -116,7 +116,7 @@ export function Demo() {
 
 <PropsTable props={[
   { name: 'isOpen', type: 'boolean', description: '受控打开状态。' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: '非受控初始打开状态。' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false', description: '非受控初始打开状态。' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: '宽度档位。对应 420 / 560 / 720 / 960 / `calc(100vw - 32px)`。' },
   { name: 'scrollBehavior', type: "'inside' | 'outside'", default: "'inside'", description: '`inside` body 滚动；`outside` panel 整体滚动。' },
@@ -125,9 +125,9 @@ export function Demo() {
   { name: 'showCloseButton', type: 'boolean', default: 'true' },
   { name: 'closeOnEsc', type: 'boolean', default: 'true' },
   { name: 'closeOnOverlayClick', type: 'boolean', default: 'true' },
-  { name: 'blockScrollOnMount', type: 'boolean', default: 'true', description: '打开时锁定 `body` 滚动。' },
+  { name: 'shouldBlockScroll', type: 'boolean', default: 'true', description: '打开时锁定 `body` 滚动。' },
   { name: 'autoFocus', type: 'boolean', default: 'true', description: '打开后把焦点放到 panel 内第一个可聚焦元素；否则只 focus panel 自身。' },
-  { name: 'returnFocusOnClose', type: 'boolean', default: 'true', description: '关闭时把焦点归还到打开前聚焦的元素。' },
+  { name: 'shouldReturnFocus', type: 'boolean', default: 'true', description: '关闭时把焦点归还到打开前聚焦的元素。' },
   { name: 'children', type: 'ReactNode', description: 'Modal 主体内容。' },
   { name: 'className', type: 'string', description: '透传到 panel。' },
   { name: 'style', type: 'CSSProperties', description: '透传到 panel。' },

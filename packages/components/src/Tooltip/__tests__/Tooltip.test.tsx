@@ -69,11 +69,11 @@ afterEach(() => {
 // ────────────────────────────────────────────────────────────
 
 describe('Tooltip — hover trigger', () => {
-  it('opens after enterDelay on mouseenter', () => {
+  it('opens after openDelay on mouseenter', () => {
     installRectAutoMocks();
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Tooltip content="Hello" enterDelay={150} exitDelay={100} onOpenChange={onOpenChange}>
+      <Tooltip content="Hello" openDelay={150} closeDelay={100} onOpenChange={onOpenChange}>
         <button type="button">Trigger</button>
       </Tooltip>,
     );
@@ -91,11 +91,11 @@ describe('Tooltip — hover trigger', () => {
     expect(screen.getByText('Hello')).toBeInTheDocument();
   });
 
-  it('closes after exitDelay on mouseleave', () => {
+  it('closes after closeDelay on mouseleave', () => {
     installRectAutoMocks();
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Tooltip content="bye" enterDelay={50} exitDelay={120} onOpenChange={onOpenChange}>
+      <Tooltip content="bye" openDelay={50} closeDelay={120} onOpenChange={onOpenChange}>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -120,7 +120,7 @@ describe('Tooltip — hover trigger', () => {
     const userEnter = vi.fn();
     const userLeave = vi.fn();
     renderWithProviders(
-      <Tooltip content="x" enterDelay={10} exitDelay={10}>
+      <Tooltip content="x" openDelay={10} closeDelay={10}>
         <button type="button" onMouseEnter={userEnter} onMouseLeave={userLeave}>
           T
         </button>
@@ -143,7 +143,7 @@ describe('Tooltip — focus trigger', () => {
     installRectAutoMocks();
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Tooltip content="x" enterDelay={0} exitDelay={0} onOpenChange={onOpenChange}>
+      <Tooltip content="x" openDelay={0} closeDelay={0} onOpenChange={onOpenChange}>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -160,7 +160,7 @@ describe('Tooltip — focus trigger', () => {
     const userFocus = vi.fn();
     const userBlur = vi.fn();
     renderWithProviders(
-      <Tooltip content="x" enterDelay={0} exitDelay={0}>
+      <Tooltip content="x" openDelay={0} closeDelay={0}>
         <button type="button" onFocus={userFocus} onBlur={userBlur}>
           T
         </button>
@@ -183,7 +183,7 @@ describe('Tooltip — isDisabled', () => {
     installRectAutoMocks();
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Tooltip content="x" isDisabled enterDelay={0} exitDelay={0} onOpenChange={onOpenChange}>
+      <Tooltip content="x" isDisabled openDelay={0} closeDelay={0} onOpenChange={onOpenChange}>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -197,10 +197,10 @@ describe('Tooltip — isDisabled', () => {
     expect(screen.queryByRole('tooltip')).toBeNull();
   });
 
-  it('isDisabled also blocks portal even when defaultIsOpen=true', () => {
+  it('isDisabled also blocks portal even when defaultOpen=true', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" isDisabled defaultIsOpen>
+      <Tooltip content="x" isDisabled defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -233,7 +233,7 @@ describe('Tooltip — controlled isOpen', () => {
     installRectAutoMocks();
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Tooltip content="x" isOpen={false} enterDelay={0} exitDelay={0} onOpenChange={onOpenChange}>
+      <Tooltip content="x" isOpen={false} openDelay={0} closeDelay={0} onOpenChange={onOpenChange}>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -255,7 +255,7 @@ describe('Tooltip — controlled isOpen', () => {
 // ────────────────────────────────────────────────────────────
 
 describe('Tooltip — warm-up', () => {
-  it('skips enterDelay if a previous tooltip closed within warmThreshold', () => {
+  it('skips openDelay if a previous tooltip closed within warmThreshold', () => {
     installRectAutoMocks();
 
     // Date.now mock —— 我们手动控制时间游标。tooltip 关闭时会写入 lastClosedAt = Date.now()，
@@ -265,12 +265,12 @@ describe('Tooltip — warm-up', () => {
 
     const onOpenChange = vi.fn();
     const { rerender } = renderWithProviders(
-      <Tooltip content="first" enterDelay={200} exitDelay={0} onOpenChange={onOpenChange}>
+      <Tooltip content="first" openDelay={200} closeDelay={0} onOpenChange={onOpenChange}>
         <button type="button">A</button>
       </Tooltip>,
     );
 
-    // 第一次：必须等 enterDelay。
+    // 第一次：必须等 openDelay。
     const btnA = screen.getByRole('button', { name: 'A' });
     fireEvent.mouseEnter(btnA);
     act(() => {
@@ -278,7 +278,7 @@ describe('Tooltip — warm-up', () => {
     });
     expect(onOpenChange).toHaveBeenLastCalledWith(true);
 
-    // 离开 → 立刻关闭 (exitDelay=0)，并写入 lastClosedAt = now。
+    // 离开 → 立刻关闭 (closeDelay=0)，并写入 lastClosedAt = now。
     now += 50;
     fireEvent.mouseLeave(btnA);
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
@@ -288,28 +288,28 @@ describe('Tooltip — warm-up', () => {
     onOpenChange.mockClear();
 
     rerender(
-      <Tooltip content="second" enterDelay={200} exitDelay={0} onOpenChange={onOpenChange}>
+      <Tooltip content="second" openDelay={200} closeDelay={0} onOpenChange={onOpenChange}>
         <button type="button">B</button>
       </Tooltip>,
     );
 
     const btnB = screen.getByRole('button', { name: 'B' });
     fireEvent.mouseEnter(btnB);
-    // 立即就应该 open（enterDelay 被跳过）。
+    // 立即就应该 open（openDelay 被跳过）。
     expect(onOpenChange).toHaveBeenLastCalledWith(true);
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
 
     dateSpy.mockRestore();
   });
 
-  it('does NOT skip enterDelay when more than warmThreshold has passed', () => {
+  it('does NOT skip openDelay when more than warmThreshold has passed', () => {
     installRectAutoMocks();
     let now = 2_000_000;
     const dateSpy = vi.spyOn(Date, 'now').mockImplementation(() => now);
 
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Tooltip content="x" enterDelay={200} exitDelay={0} onOpenChange={onOpenChange}>
+      <Tooltip content="x" openDelay={200} closeDelay={0} onOpenChange={onOpenChange}>
         <button type="button">A</button>
       </Tooltip>,
     );
@@ -325,7 +325,7 @@ describe('Tooltip — warm-up', () => {
     fireEvent.mouseLeave(btn);
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
 
-    // 1000ms 后再 hover：> warmThreshold(500)，正常 enterDelay。
+    // 1000ms 后再 hover：> warmThreshold(500)，正常 openDelay。
     now += 1000;
     onOpenChange.mockClear();
     fireEvent.mouseEnter(btn);
@@ -347,7 +347,7 @@ describe('Tooltip — a11y attributes', () => {
   it('injects aria-describedby on the anchor pointing to tooltip id', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="hint" id="my-tt" defaultIsOpen>
+      <Tooltip content="hint" id="my-tt" defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -363,7 +363,7 @@ describe('Tooltip — a11y attributes', () => {
   it('renders role="tooltip" on the panel', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen>
+      <Tooltip content="x" defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -373,7 +373,7 @@ describe('Tooltip — a11y attributes', () => {
   it('preserves and merges existing aria-describedby on anchor', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" id="tt-id" defaultIsOpen>
+      <Tooltip content="x" id="tt-id" defaultOpen>
         <button type="button" aria-describedby="user-desc">
           T
         </button>
@@ -390,7 +390,7 @@ describe('Tooltip — a11y attributes', () => {
     // 验证 isValidElement 失败时 renderAnchor 返回 null 的分支。
     const props = {
       content: 'x',
-      defaultIsOpen: true,
+      defaultOpen: true,
       children: null,
     } as unknown as ComponentProps<typeof Tooltip>;
     const { container } = renderWithProviders(<Tooltip {...props} />);
@@ -411,7 +411,7 @@ describe('Tooltip — placement & arrow', () => {
       { width: 120, height: 40 },
     );
     const { rerender } = renderWithProviders(
-      <Tooltip content="x" defaultIsOpen placement="top">
+      <Tooltip content="x" defaultOpen placement="top">
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -421,7 +421,7 @@ describe('Tooltip — placement & arrow', () => {
     expect(topPanel).toHaveAttribute('data-side', 'top');
 
     rerender(
-      <Tooltip content="x" defaultIsOpen placement="bottom">
+      <Tooltip content="x" defaultOpen placement="bottom">
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -438,7 +438,7 @@ describe('Tooltip — placement & arrow', () => {
       { width: 120, height: 40 },
     );
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen placement="bottom-start" offset={10}>
+      <Tooltip content="x" defaultOpen placement="bottom-start" offset={10}>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -450,17 +450,17 @@ describe('Tooltip — placement & arrow', () => {
   it('renders arrow element by default', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen>
+      <Tooltip content="x" defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
     );
     expect(screen.getByRole('tooltip').querySelector('[data-tooltip-arrow]')).not.toBeNull();
   });
 
-  it('withArrow=false hides arrow', () => {
+  it('hasArrow=false hides arrow', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen withArrow={false}>
+      <Tooltip content="x" defaultOpen hasArrow={false}>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -479,7 +479,7 @@ describe('Tooltip — placement & arrow', () => {
   ])('arrow style is computed for placement=%s', (placement) => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen placement={placement}>
+      <Tooltip content="x" defaultOpen placement={placement}>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -500,7 +500,7 @@ describe('Tooltip — portal and ref forwarding', () => {
   it('panel is portaled to document.body', () => {
     installRectAutoMocks();
     const { container } = renderWithProviders(
-      <Tooltip content="x" defaultIsOpen>
+      <Tooltip content="x" defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -514,7 +514,7 @@ describe('Tooltip — portal and ref forwarding', () => {
     renderWithProviders(
       <Tooltip
         content="x"
-        defaultIsOpen
+        defaultOpen
         ref={(node) => {
           captured = node;
         }}
@@ -531,7 +531,7 @@ describe('Tooltip — portal and ref forwarding', () => {
     renderWithProviders(
       <Tooltip
         content="x"
-        defaultIsOpen
+        defaultOpen
         id="custom-tt"
         className="extra"
         style={{ background: 'rgb(255, 0, 0)' }}
@@ -548,7 +548,7 @@ describe('Tooltip — portal and ref forwarding', () => {
   it('uses different bg color in dark vs light theme (inverse colors)', () => {
     installRectAutoMocks();
     const { unmount } = renderWithProviders(
-      <Tooltip content="x" defaultIsOpen>
+      <Tooltip content="x" defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
       { theme: 'light' },
@@ -560,7 +560,7 @@ describe('Tooltip — portal and ref forwarding', () => {
     unmount();
 
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen>
+      <Tooltip content="x" defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
       { theme: 'dark' },
@@ -574,7 +574,7 @@ describe('Tooltip — portal and ref forwarding', () => {
   it('emits prefers-reduced-motion override rule', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen>
+      <Tooltip content="x" defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -587,7 +587,7 @@ describe('Tooltip — portal and ref forwarding', () => {
   it('emits hover:none media query so touch devices hide the tooltip', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen>
+      <Tooltip content="x" defaultOpen>
         <button type="button">T</button>
       </Tooltip>,
     );
@@ -606,7 +606,7 @@ describe('Tooltip — repositioning', () => {
   it('updates position on window resize', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Tooltip content="x" defaultIsOpen placement="bottom-start">
+      <Tooltip content="x" defaultOpen placement="bottom-start">
         <button type="button">T</button>
       </Tooltip>,
     );

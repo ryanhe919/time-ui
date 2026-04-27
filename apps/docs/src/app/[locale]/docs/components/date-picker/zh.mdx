@@ -83,10 +83,10 @@ export function Demo() {
 
 <PropsTable props={[
   { name: 'isOpen', type: 'boolean', description: '受控弹层开关。' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '触发器尺寸。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '触发器尺寸。' },
   { name: 'panelSize', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '弹出日历面板尺寸；会同步调整面板宽度、日期格、头部与底部操作区。' },
   { name: 'minValue', type: 'Date', description: '最早可选日期（含）。' },
   { name: 'maxValue', type: 'Date', description: '最晚可选日期（含）。' },

@@ -6,7 +6,7 @@
  * @author Ryan He
  * @date 2026-04-24
  * @description TimePanel —— DateTimePicker 的时间选择内核。
- *              按 showMinute / showSecond / use12Hours 组合渲染 1-4 个纵向 listbox 列：
+ *              按 showMinute / showSecond / is12Hour 组合渲染 1-4 个纵向 listbox 列：
  *              Hour、Minute、Second、AM/PM。每列是可滚动的按钮列表，选中项随 value 滚动居中。
  *              本组件不维护自身 value —— 仅按 props 回调给消费者，保持与 CalendarPanel 一致的受控风格。
  */
@@ -33,7 +33,7 @@ export interface TimePanelProps {
   onSecondChange: (next: number) => void;
   showMinute?: boolean;
   showSecond?: boolean;
-  use12Hours?: boolean;
+  is12Hour?: boolean;
   hourStep?: number;
   minuteStep?: number;
   secondStep?: number;
@@ -59,7 +59,7 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
       onSecondChange,
       showMinute = true,
       showSecond = false,
-      use12Hours = false,
+      is12Hour = false,
       hourStep = 1,
       minuteStep = 1,
       secondStep = 1,
@@ -81,23 +81,23 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
     const panelAriaLabel = ariaLabel ?? (isZh ? '时间' : 'Time');
 
     const hourOptions = useMemo(() => {
-      const max = use12Hours ? 12 : 24;
-      if (use12Hours) {
+      const max = is12Hour ? 12 : 24;
+      if (is12Hour) {
         // 12h：列表为 [12, 1, 2, ..., 11]，与常见 picker 一致。
         const raw = buildTimeOptions(12, hourStep).map((n) => (n === 0 ? 12 : n));
         return raw.sort((a, b) => (a === 12 ? -1 : b === 12 ? 1 : a - b));
       }
       return buildTimeOptions(max, hourStep);
-    }, [use12Hours, hourStep]);
+    }, [is12Hour, hourStep]);
 
     const minuteOptions = useMemo(() => buildTimeOptions(60, minuteStep), [minuteStep]);
     const secondOptions = useMemo(() => buildTimeOptions(60, secondStep), [secondStep]);
 
-    const displayHour = use12Hours ? to12Hour(hour) : hour;
+    const displayHour = is12Hour ? to12Hour(hour) : hour;
     const period: 'am' | 'pm' = isAm(hour) ? 'am' : 'pm';
 
     const handleHourClick = (next: number) => {
-      if (use12Hours) {
+      if (is12Hour) {
         // next 是 12h 数字（1-12）；保持当前 AM/PM。
         const h12 = ((next % 12) + 12) % 12;
         onHourChange(period === 'pm' ? h12 + 12 : h12);
@@ -237,7 +237,7 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
 
     useEffect(() => {
       scrollSelectedIntoView(hourListRef.current);
-    }, [hour, use12Hours]);
+    }, [hour, is12Hour]);
     useEffect(() => {
       scrollSelectedIntoView(minuteListRef.current);
     }, [minute]);
@@ -329,7 +329,7 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
                 onSelect: onSecondChange,
               })
             : null}
-          {use12Hours
+          {is12Hour
             ? (() => {
                 const options: Array<'am' | 'pm'> = ['am', 'pm'];
                 return (

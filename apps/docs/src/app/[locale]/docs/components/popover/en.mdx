@@ -88,17 +88,17 @@ Twelve placements: `top` / `bottom` / `left` / `right` plus their `-start` / `-e
   </Popover>
 </LiveDemo>
 
-## Arrow toggle (`withArrow`)
+## Arrow toggle (`hasArrow`)
 
 Defaults to `true` — an 8 px rotated square is rendered on the side facing the anchor. Set to `false` for card-style popovers without a beak.
 
 <LiveDemo code={`<Flex gap={16}>
-  <Popover withArrow anchor={<Button>With arrow</Button>}>With arrow</Popover>
-  <Popover withArrow={false} anchor={<Button>No arrow</Button>}>No arrow</Popover>
+  <Popover hasArrow anchor={<Button>With arrow</Button>}>With arrow</Popover>
+  <Popover hasArrow={false} anchor={<Button>No arrow</Button>}>No arrow</Popover>
 </Flex>`}>
   <Flex gap={16}>
-    <Popover withArrow anchor={<Button>With arrow</Button>}>With arrow</Popover>
-    <Popover withArrow={false} anchor={<Button>No arrow</Button>}>No arrow</Popover>
+    <Popover hasArrow anchor={<Button>With arrow</Button>}>With arrow</Popover>
+    <Popover hasArrow={false} anchor={<Button>No arrow</Button>}>No arrow</Popover>
   </Flex>
 </LiveDemo>
 
@@ -108,12 +108,12 @@ Defaults to `true` — an 8 px rotated square is rendered on the side facing the
   { name: 'anchor', type: 'ReactElement | ((opts: { isOpen, ref }) => ReactNode)', description: 'Required. A `ReactElement` is cloned with `ref` + events; the render-prop form lets you spread `ref` yourself.' },
   { name: 'children', type: 'ReactNode', description: 'Popover body content.' },
   { name: 'isOpen', type: 'boolean', description: 'Controlled open state.' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: 'Uncontrolled initial open state.' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Uncontrolled initial open state.' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'trigger', type: "'click' | 'hover' | 'focus' | 'manual'", default: "'click'" },
   { name: 'placement', type: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'", default: "'bottom'" },
   { name: 'offset', type: 'number', description: 'Pixel gap between anchor and panel. Defaults to `theme.components.popover.offset` (8).' },
-  { name: 'withArrow', type: 'boolean', default: 'true' },
+  { name: 'hasArrow', type: 'boolean', default: 'true' },
   { name: 'closeOnBlur', type: 'boolean', default: 'true', description: 'Dismiss on outside mousedown.' },
   { name: 'closeOnEsc', type: 'boolean', default: 'true' },
   { name: 'header', type: 'ReactNode', description: 'Top header slot; wires up `aria-labelledby` automatically when provided.' },

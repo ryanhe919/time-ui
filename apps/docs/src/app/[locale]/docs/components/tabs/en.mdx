@@ -44,9 +44,9 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
   aria-label="Account settings"
   defaultSelectedKey="profile"
   items={[
-    { key: 'profile',  label: 'Profile',  content: <p>Profile panel.</p> },
-    { key: 'security', label: 'Security', content: <p>Security panel.</p> },
-    { key: 'billing',  label: 'Billing',  content: <p>Billing panel.</p> },
+    { itemKey: 'profile',  label: 'Profile',  content: <p>Profile panel.</p> },
+    { itemKey: 'security', label: 'Security', content: <p>Security panel.</p> },
+    { itemKey: 'billing',  label: 'Billing',  content: <p>Billing panel.</p> },
   ]}
 />`}>
   <TabsBasicDemo />
@@ -58,11 +58,11 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
 
 <LiveDemo code={`<Stack spacing={24}>
   <Tabs aria-label="underline" variant="underline" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'Overview' }, { key: 'b', label: 'Activity' }, { key: 'c', label: 'Settings' }]} />
+    items={[{ itemKey: 'a', label: 'Overview' }, { itemKey: 'b', label: 'Activity' }, { itemKey: 'c', label: 'Settings' }]} />
   <Tabs aria-label="pills" variant="pills" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'Overview' }, { key: 'b', label: 'Activity' }, { key: 'c', label: 'Settings' }]} />
+    items={[{ itemKey: 'a', label: 'Overview' }, { itemKey: 'b', label: 'Activity' }, { itemKey: 'c', label: 'Settings' }]} />
   <Tabs aria-label="bordered" variant="bordered" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'Overview', content: 'Overview content' }, { key: 'b', label: 'Activity', content: 'Activity content' }, { key: 'c', label: 'Settings', content: 'Settings content' }]} />
+    items={[{ itemKey: 'a', label: 'Overview', content: 'Overview content' }, { itemKey: 'b', label: 'Activity', content: 'Activity content' }, { itemKey: 'c', label: 'Settings', content: 'Settings content' }]} />
 </Stack>`}>
   <Stack spacing={24}>
     <Tabs
@@ -70,9 +70,9 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
       variant="underline"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'Overview' },
-        { key: 'b', label: 'Activity' },
-        { key: 'c', label: 'Settings' },
+        { itemKey: 'a', label: 'Overview' },
+        { itemKey: 'b', label: 'Activity' },
+        { itemKey: 'c', label: 'Settings' },
       ]}
     />
     <Tabs
@@ -80,9 +80,9 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
       variant="pills"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'Overview' },
-        { key: 'b', label: 'Activity' },
-        { key: 'c', label: 'Settings' },
+        { itemKey: 'a', label: 'Overview' },
+        { itemKey: 'b', label: 'Activity' },
+        { itemKey: 'c', label: 'Settings' },
       ]}
     />
     <Tabs
@@ -90,9 +90,9 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
       variant="bordered"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'Overview', content: 'Overview content' },
-        { key: 'b', label: 'Activity', content: 'Activity content' },
-        { key: 'c', label: 'Settings', content: 'Settings content' },
+        { itemKey: 'a', label: 'Overview', content: 'Overview content' },
+        { itemKey: 'b', label: 'Activity', content: 'Activity content' },
+        { itemKey: 'c', label: 'Settings', content: 'Settings content' },
       ]}
     />
   </Stack>
@@ -100,15 +100,15 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
 
 ## Sizes
 
-`sm` / `md` (default) / `lg` adjust font size, tab height, and icon size.
+Five tiers — `xs` / `sm` / `md` (default) / `lg` / `xl` — adjust font size, tab height, and icon size.
 
 <LiveDemo code={`<Stack spacing={20}>
   <Tabs size="sm" aria-label="sm" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+    items={[{ itemKey: 'a', label: 'One' }, { itemKey: 'b', label: 'Two' }, { itemKey: 'c', label: 'Three' }]} />
   <Tabs size="md" aria-label="md" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+    items={[{ itemKey: 'a', label: 'One' }, { itemKey: 'b', label: 'Two' }, { itemKey: 'c', label: 'Three' }]} />
   <Tabs size="lg" aria-label="lg" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+    items={[{ itemKey: 'a', label: 'One' }, { itemKey: 'b', label: 'Two' }, { itemKey: 'c', label: 'Three' }]} />
 </Stack>`}>
   <Stack spacing={20}>
     <Tabs
@@ -116,9 +116,9 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
       aria-label="sm"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'One' },
-        { key: 'b', label: 'Two' },
-        { key: 'c', label: 'Three' },
+        { itemKey: 'a', label: 'One' },
+        { itemKey: 'b', label: 'Two' },
+        { itemKey: 'c', label: 'Three' },
       ]}
     />
     <Tabs
@@ -126,9 +126,9 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
       aria-label="md"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'One' },
-        { key: 'b', label: 'Two' },
-        { key: 'c', label: 'Three' },
+        { itemKey: 'a', label: 'One' },
+        { itemKey: 'b', label: 'Two' },
+        { itemKey: 'c', label: 'Three' },
       ]}
     />
     <Tabs
@@ -136,9 +136,9 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
       aria-label="lg"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'One' },
-        { key: 'b', label: 'Two' },
-        { key: 'c', label: 'Three' },
+        { itemKey: 'a', label: 'One' },
+        { itemKey: 'b', label: 'Two' },
+        { itemKey: 'c', label: 'Three' },
       ]}
     />
   </Stack>
@@ -154,10 +154,10 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
   variant="bordered"
   defaultSelectedKey="profile"
   items={[
-    { key: 'profile',  label: 'Profile',  content: 'Profile panel.' },
-    { key: 'team',     label: 'Team',     content: 'Team management panel.' },
-    { key: 'security', label: 'Security', content: 'Security panel.' },
-    { key: 'billing',  label: 'Billing',  content: 'Billing panel.' },
+    { itemKey: 'profile',  label: 'Profile',  content: 'Profile panel.' },
+    { itemKey: 'team',     label: 'Team',     content: 'Team management panel.' },
+    { itemKey: 'security', label: 'Security', content: 'Security panel.' },
+    { itemKey: 'billing',  label: 'Billing',  content: 'Billing panel.' },
   ]}
 />`}>
   <div style={{ width: '100%', maxWidth: 520 }}>
@@ -167,10 +167,10 @@ Pass an `items` array when the tabs come from data — it wins over `children`.
       variant="bordered"
       defaultSelectedKey="profile"
       items={[
-        { key: 'profile', label: 'Profile', content: 'Profile panel.' },
-        { key: 'team', label: 'Team', content: 'Team management panel.' },
-        { key: 'security', label: 'Security', content: 'Security panel.' },
-        { key: 'billing', label: 'Billing', content: 'Billing panel.' },
+        { itemKey: 'profile', label: 'Profile', content: 'Profile panel.' },
+        { itemKey: 'team', label: 'Team', content: 'Team management panel.' },
+        { itemKey: 'security', label: 'Security', content: 'Security panel.' },
+        { itemKey: 'billing', label: 'Billing', content: 'Billing panel.' },
       ]}
     />
   </div>
@@ -182,9 +182,9 @@ Pass `icon` per tab to render a leading glyph next to the label.
 
 <LiveDemo code={`<Tabs aria-label="View" variant="pills" defaultSelectedKey="grid"
   items={[
-    { key: 'list', label: 'List', icon: <ListIcon /> },
-    { key: 'grid', label: 'Grid', icon: <GridIcon /> },
-    { key: 'kanban', label: 'Kanban', icon: <KanbanIcon /> },
+    { itemKey: 'list', label: 'List', icon: <ListIcon /> },
+    { itemKey: 'grid', label: 'Grid', icon: <GridIcon /> },
+    { itemKey: 'kanban', label: 'Kanban', icon: <KanbanIcon /> },
   ]}
 />`}>
   <Tabs
@@ -193,7 +193,7 @@ Pass `icon` per tab to render a leading glyph next to the label.
     defaultSelectedKey="grid"
     items={[
       {
-        key: 'list',
+        itemKey: 'list',
         label: 'List',
         icon: (
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
@@ -202,7 +202,7 @@ Pass `icon` per tab to render a leading glyph next to the label.
         ),
       },
       {
-        key: 'grid',
+        itemKey: 'grid',
         label: 'Grid',
         icon: (
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -214,7 +214,7 @@ Pass `icon` per tab to render a leading glyph next to the label.
         ),
       },
       {
-        key: 'kanban',
+        itemKey: 'kanban',
         label: 'Kanban',
         icon: (
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -237,9 +237,9 @@ Pass `icon` per tab to render a leading glyph next to the label.
   defaultSelectedKey="free"
   disabledKeys={['team']}
   items={[
-    { key: 'free',  label: 'Free' },
-    { key: 'pro',   label: 'Pro' },
-    { key: 'team',  label: 'Team (coming soon)' },
+    { itemKey: 'free',  label: 'Free' },
+    { itemKey: 'pro',   label: 'Pro' },
+    { itemKey: 'team',  label: 'Team (coming soon)' },
   ]}
 />`}>
   <Tabs
@@ -247,9 +247,9 @@ Pass `icon` per tab to render a leading glyph next to the label.
     defaultSelectedKey="free"
     disabledKeys={['team']}
     items={[
-      { key: 'free', label: 'Free' },
-      { key: 'pro', label: 'Pro' },
-      { key: 'team', label: 'Team (coming soon)' },
+      { itemKey: 'free', label: 'Free' },
+      { itemKey: 'pro', label: 'Pro' },
+      { itemKey: 'team', label: 'Team (coming soon)' },
     ]}
   />
 </LiveDemo>
@@ -263,9 +263,9 @@ With `isLazy`, only the active panel is mounted — others mount on first activa
   isLazy
   defaultSelectedKey="overview"
   items={[
-    { key: 'overview',  label: 'Overview',  content: <Overview /> },
-    { key: 'analytics', label: 'Analytics', content: <Analytics /> },  // mounts only when first selected
-    { key: 'reports',   label: 'Reports',   content: <Reports /> },
+    { itemKey: 'overview',  label: 'Overview',  content: <Overview /> },
+    { itemKey: 'analytics', label: 'Analytics', content: <Analytics /> },  // mounts only when first selected
+    { itemKey: 'reports',   label: 'Reports',   content: <Reports /> },
   ]}
 />`}>
   <Tabs
@@ -273,9 +273,9 @@ With `isLazy`, only the active panel is mounted — others mount on first activa
     isLazy
     defaultSelectedKey="overview"
     items={[
-      { key: 'overview', label: 'Overview', content: 'Overview is mounted.' },
-      { key: 'analytics', label: 'Analytics', content: 'This panel mounts when first selected.' },
-      { key: 'reports', label: 'Reports', content: 'Same — mounted on demand.' },
+      { itemKey: 'overview', label: 'Overview', content: 'Overview is mounted.' },
+      { itemKey: 'analytics', label: 'Analytics', content: 'This panel mounts when first selected.' },
+      { itemKey: 'reports', label: 'Reports', content: 'Same — mounted on demand.' },
     ]}
   />
 </LiveDemo>
@@ -291,7 +291,7 @@ With `isLazy`, only the active panel is mounted — others mount on first activa
   { name: 'defaultSelectedKey', type: 'string', description: 'Uncontrolled initial key. Falls back to the first non-disabled tab.' },
   { name: 'onSelectionChange', type: '(key: string) => void' },
   { name: 'variant', type: "'underline' | 'pills' | 'bordered'", default: "'underline'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
   { name: 'isLazy', type: 'boolean', default: 'false', description: 'Only mount the active panel.' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the entire control.' },

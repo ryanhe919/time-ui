@@ -38,9 +38,13 @@ Set on the group or on each item. Per-item `color` wins.
 
 ## Sizes
 
-Three steps `sm` / `md` / `lg`.
+Five steps `xs` / `sm` / `md` / `lg` / `xl`.
 
 <LiveDemo code={`<Stack spacing={16}>
+  <RadioGroup label="XS" size="xs" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
   <RadioGroup label="Small" size="sm" defaultValue="a" orientation="horizontal">
     <Radio value="a">A</Radio>
     <Radio value="b">B</Radio>
@@ -53,8 +57,16 @@ Three steps `sm` / `md` / `lg`.
     <Radio value="a">A</Radio>
     <Radio value="b">B</Radio>
   </RadioGroup>
+  <RadioGroup label="XL" size="xl" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
 </Stack>`}>
   <Stack spacing={16}>
+    <RadioGroup label="XS" size="xs" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
     <RadioGroup label="Small" size="sm" defaultValue="a" orientation="horizontal">
       <Radio value="a">A</Radio>
       <Radio value="b">B</Radio>
@@ -64,6 +76,10 @@ Three steps `sm` / `md` / `lg`.
       <Radio value="b">B</Radio>
     </RadioGroup>
     <RadioGroup label="Large" size="lg" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+    <RadioGroup label="XL" size="xl" defaultValue="a" orientation="horizontal">
       <Radio value="a">A</Radio>
       <Radio value="b">B</Radio>
     </RadioGroup>
@@ -191,11 +207,10 @@ export function ShippingPicker() {
 <PropsTable props={[
   { name: 'value', type: 'string', required: true, description: 'Option value.' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: "Overrides the group's color for this item." },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", description: "Overrides the group's size for this item." },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", description: "Overrides the group's size for this item." },
   { name: 'children', type: 'ReactNode', description: 'Label text.' },
   { name: 'description', type: 'ReactNode', description: 'Secondary caption below the label.' },
-  { name: 'isDisabled', type: 'boolean', default: 'false', description: "Per-item disable; the group's isDisabled always wins." },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: 'Native event escape hatch (rarely needed).' }
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: "Per-item disable; the group's isDisabled always wins." }
 ]} />
 
 ### RadioGroup
@@ -212,7 +227,7 @@ export function ShippingPicker() {
   { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial selection.' },
   { name: 'onChange', type: '(value: string) => void', description: 'Fires with the newly selected value.' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: 'Default color for descendants.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", description: 'Default size for descendants.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", description: 'Default size for descendants.' },
   { name: 'name', type: 'string', description: 'Shared `name` for descendants; defaults to `useId()`.' }
 ]} />
 

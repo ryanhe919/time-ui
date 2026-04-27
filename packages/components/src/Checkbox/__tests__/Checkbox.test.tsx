@@ -32,10 +32,10 @@ describe('Checkbox', () => {
     expect(onChange).toHaveBeenLastCalledWith(false);
   });
 
-  it('uncontrolled: defaultSelected renders initial checked; clicks update DOM only', async () => {
+  it('uncontrolled: defaultIsSelected renders initial checked; clicks update DOM only', async () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Checkbox defaultSelected onChange={onChange}>
+      <Checkbox defaultIsSelected onChange={onChange}>
         Subscribe
       </Checkbox>,
     );
@@ -49,7 +49,7 @@ describe('Checkbox', () => {
   it('isIndeterminate syncs to DOM and clicking flips indeterminate off (native behavior)', async () => {
     const onChange = vi.fn();
     const { rerender } = renderWithProviders(
-      <Checkbox isIndeterminate onChange={onChange} defaultSelected={false}>
+      <Checkbox isIndeterminate onChange={onChange} defaultIsSelected={false}>
         Some
       </Checkbox>,
     );
@@ -60,7 +60,7 @@ describe('Checkbox', () => {
     expect(onChange).toHaveBeenCalledWith(true);
 
     rerender(
-      <Checkbox isIndeterminate={false} defaultSelected onChange={onChange}>
+      <Checkbox isIndeterminate={false} defaultIsSelected onChange={onChange}>
         Some
       </Checkbox>,
     );
@@ -90,7 +90,7 @@ describe('Checkbox', () => {
   it('Space key toggles via the native input', async () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Checkbox onChange={onChange} defaultSelected={false}>
+      <Checkbox onChange={onChange} defaultIsSelected={false}>
         Toggle
       </Checkbox>,
     );
@@ -103,7 +103,7 @@ describe('Checkbox', () => {
   it('isReadOnly prevents toggling via click (event.preventDefault in the handler)', async () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Checkbox isReadOnly defaultSelected={false} onChange={onChange}>
+      <Checkbox isReadOnly defaultIsSelected={false} onChange={onChange}>
         RO
       </Checkbox>,
     );
@@ -113,24 +113,9 @@ describe('Checkbox', () => {
     expect(input.checked).toBe(false);
   });
 
-  it('onChangeEvent exposes the native ChangeEvent', async () => {
-    const onChangeEvent = vi.fn();
-    renderWithProviders(
-      <Checkbox defaultSelected={false} onChangeEvent={onChangeEvent}>
-        X
-      </Checkbox>,
-    );
-    await userEvent.click(getInput());
-    expect(onChangeEvent).toHaveBeenCalled();
-    const [event] = onChangeEvent.mock.calls.at(-1) as [Event];
-    expect((event as unknown as { target: HTMLInputElement }).target).toBeInstanceOf(
-      HTMLInputElement,
-    );
-  });
-
   it('isInvalid sets aria-invalid="true" on the input', () => {
     renderWithProviders(
-      <Checkbox isInvalid defaultSelected>
+      <Checkbox isInvalid defaultIsSelected>
         Err
       </Checkbox>,
     );

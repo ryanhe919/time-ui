@@ -70,7 +70,7 @@ const [zoom, setZoom] = useState(1);
 />;
 ```
 
-非受控可以传 `initialPage` 与 `defaultZoom`。`defaultZoom` 接受 `'page-fit'`、`'page-width'`（默认）或任意数字。
+非受控可以传 `defaultPage` 与 `defaultZoom`。`defaultZoom` 接受 `'page-fit'`、`'page-width'`（默认）或任意数字。
 
 ## 自定义 worker
 
@@ -111,7 +111,7 @@ const [zoom, setZoom] = useState(1);
 
 <PropsTable props={[
   { name: 'source', type: 'string | URL | ArrayBuffer | Uint8Array | Blob', description: 'PDF 源。URL 字符串会被 fetch；缓冲区与 Blob 直接交给 pdfjs。' },
-  { name: 'initialPage', type: 'number', default: '1', description: '初始页码（1-based，非受控）。' },
+  { name: 'defaultPage', type: 'number', default: '1', description: '初始页码（1-based，非受控）。' },
   { name: 'page', type: 'number', description: '受控当前页（1-based）。' },
   { name: 'onPageChange', type: '(page: number) => void', description: '当前页变化时触发。' },
   { name: 'zoom', type: 'number', description: '受控缩放系数（1 = 100%）。' },

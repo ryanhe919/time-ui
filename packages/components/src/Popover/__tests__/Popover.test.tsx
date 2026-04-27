@@ -216,10 +216,10 @@ describe('Popover — open state', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('uncontrolled: defaultIsOpen renders panel on first paint', () => {
+  it('uncontrolled: defaultOpen renders panel on first paint', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen>
+      <Popover anchor={<button type="button">T</button>} defaultOpen>
         Hello
       </Popover>,
     );
@@ -301,7 +301,7 @@ describe('Popover — trigger=click', () => {
     installRectAutoMocks();
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen onOpenChange={onOpenChange}>
+      <Popover anchor={<button type="button">T</button>} defaultOpen onOpenChange={onOpenChange}>
         c
       </Popover>,
     );
@@ -315,7 +315,7 @@ describe('Popover — trigger=click', () => {
     renderWithProviders(
       <Popover
         anchor={<button type="button">T</button>}
-        defaultIsOpen
+        defaultOpen
         closeOnEsc={false}
         onOpenChange={onOpenChange}
       >
@@ -330,7 +330,7 @@ describe('Popover — trigger=click', () => {
     installRectAutoMocks();
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen onOpenChange={onOpenChange}>
+      <Popover anchor={<button type="button">T</button>} defaultOpen onOpenChange={onOpenChange}>
         body
       </Popover>,
     );
@@ -343,11 +343,7 @@ describe('Popover — trigger=click', () => {
     const onOpenChange = vi.fn();
     renderWithProviders(
       <div>
-        <Popover
-          anchor={<button type="button">T</button>}
-          defaultIsOpen
-          onOpenChange={onOpenChange}
-        >
+        <Popover anchor={<button type="button">T</button>} defaultOpen onOpenChange={onOpenChange}>
           inside
         </Popover>
         <div data-testid="outside">outside</div>
@@ -368,7 +364,7 @@ describe('Popover — trigger=click', () => {
       <div>
         <Popover
           anchor={<button type="button">T</button>}
-          defaultIsOpen
+          defaultOpen
           closeOnBlur={false}
           onOpenChange={onOpenChange}
         >
@@ -434,7 +430,7 @@ describe('Popover — trigger=hover', () => {
   it('uses tooltip role when triggered by hover', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} trigger="hover" defaultIsOpen>
+      <Popover anchor={<button type="button">T</button>} trigger="hover" defaultOpen>
         c
       </Popover>,
     );
@@ -449,7 +445,7 @@ describe('Popover — trigger=hover', () => {
         anchor={<button type="button">T</button>}
         trigger="hover"
         closeDelay={200}
-        defaultIsOpen
+        defaultOpen
         onOpenChange={onOpenChange}
       >
         c
@@ -472,7 +468,7 @@ describe('Popover — trigger=hover', () => {
         anchor={<button type="button">T</button>}
         trigger="hover"
         closeDelay={50}
-        defaultIsOpen
+        defaultOpen
         onOpenChange={onOpenChange}
       >
         c
@@ -570,7 +566,7 @@ describe('Popover — anchor as render prop', () => {
             T
           </button>
         )}
-        defaultIsOpen
+        defaultOpen
       >
         c
       </Popover>,
@@ -588,7 +584,7 @@ describe('Popover — anchor as render prop', () => {
     installRectAutoMocks();
     const { container } = renderWithProviders(
       // @ts-expect-error — intentional invalid anchor for branch coverage
-      <Popover anchor={null} defaultIsOpen>
+      <Popover anchor={null} defaultOpen>
         c
       </Popover>,
     );
@@ -611,7 +607,7 @@ describe('Popover — placement & positioning', () => {
       { width: 200, height: 100 },
     );
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="bottom-start">
+      <Popover anchor={<button type="button">T</button>} defaultOpen placement="bottom-start">
         c
       </Popover>,
     );
@@ -629,13 +625,13 @@ describe('Popover — placement & positioning', () => {
       { width: 200, height: 100 },
     );
     const { rerender } = renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="top">
+      <Popover anchor={<button type="button">T</button>} defaultOpen placement="top">
         c
       </Popover>,
     );
     const topLeft = screen.getByRole('dialog').style.top;
     rerender(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="bottom">
+      <Popover anchor={<button type="button">T</button>} defaultOpen placement="bottom">
         c
       </Popover>,
     );
@@ -646,7 +642,7 @@ describe('Popover — placement & positioning', () => {
   it('right-end positions panel correctly', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="right-end">
+      <Popover anchor={<button type="button">T</button>} defaultOpen placement="right-end">
         c
       </Popover>,
     );
@@ -660,7 +656,7 @@ describe('Popover — placement & positioning', () => {
     renderWithProviders(
       <Popover
         anchor={<button type="button">T</button>}
-        defaultIsOpen
+        defaultOpen
         placement="bottom-start"
         offset={20}
       >
@@ -673,7 +669,7 @@ describe('Popover — placement & positioning', () => {
   it('updates position on window resize', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="bottom-start">
+      <Popover anchor={<button type="button">T</button>} defaultOpen placement="bottom-start">
         c
       </Popover>,
     );
@@ -701,17 +697,17 @@ describe('Popover — arrow / header / footer', () => {
   it('renders arrow by default', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen>
+      <Popover anchor={<button type="button">T</button>} defaultOpen>
         c
       </Popover>,
     );
     expect(screen.getByRole('dialog').querySelector('[data-popover-arrow]')).not.toBeNull();
   });
 
-  it('withArrow=false hides the arrow element', () => {
+  it('hasArrow=false hides the arrow element', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen withArrow={false}>
+      <Popover anchor={<button type="button">T</button>} defaultOpen hasArrow={false}>
         c
       </Popover>,
     );
@@ -723,7 +719,7 @@ describe('Popover — arrow / header / footer', () => {
     renderWithProviders(
       <Popover
         anchor={<button type="button">T</button>}
-        defaultIsOpen
+        defaultOpen
         header={<span>HeaderText</span>}
         footer={<span>FooterText</span>}
       >
@@ -740,7 +736,7 @@ describe('Popover — arrow / header / footer', () => {
     renderWithProviders(
       <Popover
         anchor={<button type="button">T</button>}
-        defaultIsOpen
+        defaultOpen
         header={<span>HeaderText</span>}
       >
         body
@@ -757,7 +753,7 @@ describe('Popover — arrow / header / footer', () => {
     renderWithProviders(
       <Popover
         anchor={<button type="button">T</button>}
-        defaultIsOpen
+        defaultOpen
         header={<span>HeaderText</span>}
         aria-label="explicit-label"
       >
@@ -776,13 +772,13 @@ describe('Popover — arrow / header / footer', () => {
       { width: 100, height: 60 },
     );
     const { rerender } = renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="top">
+      <Popover anchor={<button type="button">T</button>} defaultOpen placement="top">
         c
       </Popover>,
     );
     expect(screen.getByRole('dialog')).toHaveAttribute('data-side', 'top');
     rerender(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="left">
+      <Popover anchor={<button type="button">T</button>} defaultOpen placement="left">
         c
       </Popover>,
     );
@@ -801,7 +797,7 @@ describe('Popover — refs and a11y', () => {
     renderWithProviders(
       <Popover
         anchor={<button type="button">T</button>}
-        defaultIsOpen
+        defaultOpen
         ref={(node) => {
           captured = node;
         }}
@@ -818,7 +814,7 @@ describe('Popover — refs and a11y', () => {
     renderWithProviders(
       <Popover
         anchor={<button type="button">T</button>}
-        defaultIsOpen
+        defaultOpen
         id="my-popover"
         className="extra-class"
         style={{ background: 'red' }}
@@ -835,7 +831,7 @@ describe('Popover — refs and a11y', () => {
   it('role=dialog with aria-modal=false (popover is not modal)', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen>
+      <Popover anchor={<button type="button">T</button>} defaultOpen>
         c
       </Popover>,
     );
@@ -847,7 +843,7 @@ describe('Popover — refs and a11y', () => {
   it('anchor receives aria-expanded / aria-haspopup / aria-controls when click trigger', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen>
+      <Popover anchor={<button type="button">T</button>} defaultOpen>
         c
       </Popover>,
     );
@@ -860,7 +856,7 @@ describe('Popover — refs and a11y', () => {
   it('emits the prefers-reduced-motion override rule', () => {
     installRectAutoMocks();
     renderWithProviders(
-      <Popover anchor={<button type="button">T</button>} defaultIsOpen>
+      <Popover anchor={<button type="button">T</button>} defaultOpen>
         c
       </Popover>,
     );

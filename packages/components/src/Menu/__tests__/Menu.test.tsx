@@ -63,29 +63,29 @@ afterEach(() => {
 });
 
 const ITEMS: ReadonlyArray<MenuItemsEntry> = [
-  { key: 'new', label: 'New File', shortcut: '⌘N' },
-  { key: 'open', label: 'Open…', shortcut: '⌘O' },
-  { key: 'save', label: 'Save', shortcut: '⌘S', isDisabled: true },
-  { key: 'delete', label: 'Delete', isDanger: true },
+  { itemKey: 'new', label: 'New File', shortcut: '⌘N' },
+  { itemKey: 'open', label: 'Open…', shortcut: '⌘O' },
+  { itemKey: 'save', label: 'Save', shortcut: '⌘S', isDisabled: true },
+  { itemKey: 'delete', label: 'Delete', isDanger: true },
 ];
 
 const SECTIONED: ReadonlyArray<MenuItemsEntry> = [
   {
     type: 'section',
-    key: 'file',
+    sectionKey: 'file',
     label: 'File',
     items: [
-      { key: 'new', label: 'New' },
-      { key: 'open', label: 'Open' },
+      { itemKey: 'new', label: 'New' },
+      { itemKey: 'open', label: 'Open' },
     ],
   },
   {
     type: 'section',
-    key: 'edit',
+    sectionKey: 'edit',
     label: 'Edit',
     items: [
-      { key: 'cut', label: 'Cut' },
-      { key: 'paste', label: 'Paste', isDisabled: true },
+      { itemKey: 'cut', label: 'Cut' },
+      { itemKey: 'paste', label: 'Paste', isDisabled: true },
     ],
   },
 ];
@@ -166,9 +166,9 @@ describe('Menu — open/close', () => {
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });
 
-  it('defaultIsOpen renders open on mount', () => {
+  it('defaultOpen renders open on mount', () => {
     installRectMocks();
-    renderBasic({ items: ITEMS, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, defaultOpen: true });
     expect(getMenu()).toBeInTheDocument();
   });
 
@@ -188,7 +188,7 @@ describe('Menu — open/close', () => {
 describe('Menu — items vs children', () => {
   it('renders from data-driven items', () => {
     installRectMocks();
-    renderBasic({ items: ITEMS, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, defaultOpen: true });
     const items = getItems();
     expect(items.map((i) => i.textContent)).toEqual(['New File⌘N', 'Open…⌘O', 'Save⌘S', 'Delete']);
   });
@@ -196,7 +196,7 @@ describe('Menu — items vs children', () => {
   it('renders from declarative children', () => {
     installRectMocks();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m">
+      <Menu trigger={<button type="button">T</button>} defaultOpen aria-label="m">
         <Menu.Item itemKey="copy">Copy</Menu.Item>
         <Menu.Item itemKey="cut">Cut</Menu.Item>
         <Menu.Divider />
@@ -215,9 +215,9 @@ describe('Menu — items vs children', () => {
     renderWithProviders(
       <Menu
         trigger={<button type="button">T</button>}
-        defaultIsOpen
+        defaultOpen
         aria-label="m"
-        items={[{ key: 'a', label: 'FromItems' }]}
+        items={[{ itemKey: 'a', label: 'FromItems' }]}
       >
         <Menu.Item itemKey="ignored">FromChildren</Menu.Item>
       </Menu>,
@@ -228,7 +228,7 @@ describe('Menu — items vs children', () => {
 
   it('renders sections from data-driven items', () => {
     installRectMocks();
-    renderBasic({ items: SECTIONED, defaultIsOpen: true });
+    renderBasic({ items: SECTIONED, defaultOpen: true });
     expect(screen.getByText('File')).toBeInTheDocument();
     expect(screen.getByText('Edit')).toBeInTheDocument();
     expect(getItems()).toHaveLength(4);
@@ -237,7 +237,7 @@ describe('Menu — items vs children', () => {
   it('renders declarative <Menu.Section>', () => {
     installRectMocks();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m">
+      <Menu trigger={<button type="button">T</button>} defaultOpen aria-label="m">
         <Menu.Section label="Group A">
           <Menu.Item itemKey="a1">A1</Menu.Item>
           <Menu.Item itemKey="a2">A2</Menu.Item>
@@ -255,7 +255,7 @@ describe('Menu — items vs children', () => {
   it('uses compact horizontal spacing for short menus', () => {
     installRectMocks();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m">
+      <Menu trigger={<button type="button">T</button>} defaultOpen aria-label="m">
         <Menu.Section label="Account">
           <Menu.Item itemKey="profile" shortcut="⌘P">
             Profile
@@ -296,7 +296,7 @@ describe('Menu — onAction', () => {
     installRectMocks();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const onAction = vi.fn();
-    renderBasic({ items: ITEMS, onAction, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, onAction, defaultOpen: true });
     await user.click(screen.getByText('New File'));
     expect(onAction).toHaveBeenCalledWith('new');
     expect(screen.queryByRole('menu')).toBeNull();
@@ -306,7 +306,7 @@ describe('Menu — onAction', () => {
     installRectMocks();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const onAction = vi.fn();
-    renderBasic({ items: ITEMS, onAction, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, onAction, defaultOpen: true });
     await user.click(screen.getByText('Save'));
     expect(onAction).not.toHaveBeenCalled();
     expect(getMenu()).toBeInTheDocument();
@@ -316,7 +316,7 @@ describe('Menu — onAction', () => {
     installRectMocks();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const onAction = vi.fn();
-    renderBasic({ items: ITEMS, onAction, defaultIsOpen: true, closeOnSelect: false });
+    renderBasic({ items: ITEMS, onAction, defaultOpen: true, closeOnSelect: false });
     await user.click(screen.getByText('New File'));
     expect(onAction).toHaveBeenCalledWith('new');
     expect(getMenu()).toBeInTheDocument();
@@ -328,7 +328,7 @@ describe('Menu — onAction', () => {
     const top = vi.fn();
     const own = vi.fn();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m" onAction={top}>
+      <Menu trigger={<button type="button">T</button>} defaultOpen aria-label="m" onAction={top}>
         <Menu.Item itemKey="x" onAction={own}>
           Hello
         </Menu.Item>
@@ -351,7 +351,7 @@ describe('Menu — selectionMode=single', () => {
     const onSel = vi.fn();
     renderBasic({
       items: ITEMS.filter((i) => ('isDisabled' in i ? !i.isDisabled : true)) as MenuItemsEntry[],
-      defaultIsOpen: true,
+      defaultOpen: true,
       selectionMode: 'single',
       onSelectionChange: onSel,
     });
@@ -365,10 +365,10 @@ describe('Menu — selectionMode=single', () => {
     installRectMocks();
     renderBasic({
       items: [
-        { key: 'a', label: 'A' },
-        { key: 'b', label: 'B' },
+        { itemKey: 'a', label: 'A' },
+        { itemKey: 'b', label: 'B' },
       ],
-      defaultIsOpen: true,
+      defaultOpen: true,
       selectionMode: 'single',
       defaultSelectedKeys: ['b'],
     });
@@ -384,10 +384,10 @@ describe('Menu — selectionMode=single', () => {
       <Menu
         trigger={<button type="button">T</button>}
         items={[
-          { key: 'a', label: 'A' },
-          { key: 'b', label: 'B' },
+          { itemKey: 'a', label: 'A' },
+          { itemKey: 'b', label: 'B' },
         ]}
-        defaultIsOpen
+        defaultOpen
         aria-label="m"
         selectionMode="single"
         selectedKeys={['a']}
@@ -399,10 +399,10 @@ describe('Menu — selectionMode=single', () => {
       <Menu
         trigger={<button type="button">T</button>}
         items={[
-          { key: 'a', label: 'A' },
-          { key: 'b', label: 'B' },
+          { itemKey: 'a', label: 'A' },
+          { itemKey: 'b', label: 'B' },
         ]}
-        defaultIsOpen
+        defaultOpen
         aria-label="m"
         selectionMode="single"
         selectedKeys={['b']}
@@ -420,11 +420,11 @@ describe('Menu — selectionMode=multiple', () => {
     const onSel = vi.fn();
     renderBasic({
       items: [
-        { key: 'a', label: 'A' },
-        { key: 'b', label: 'B' },
-        { key: 'c', label: 'C' },
+        { itemKey: 'a', label: 'A' },
+        { itemKey: 'b', label: 'B' },
+        { itemKey: 'c', label: 'C' },
       ],
-      defaultIsOpen: true,
+      defaultOpen: true,
       selectionMode: 'multiple',
       onSelectionChange: onSel,
     });
@@ -441,8 +441,8 @@ describe('Menu — selectionMode=multiple', () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const onSel = vi.fn();
     renderBasic({
-      items: [{ key: 'a', label: 'A' }],
-      defaultIsOpen: true,
+      items: [{ itemKey: 'a', label: 'A' }],
+      defaultOpen: true,
       selectionMode: 'multiple',
       defaultSelectedKeys: ['a'],
       onSelectionChange: onSel,
@@ -454,8 +454,8 @@ describe('Menu — selectionMode=multiple', () => {
   it('renders role=menuitemcheckbox', () => {
     installRectMocks();
     renderBasic({
-      items: [{ key: 'a', label: 'A' }],
-      defaultIsOpen: true,
+      items: [{ itemKey: 'a', label: 'A' }],
+      defaultOpen: true,
       selectionMode: 'multiple',
     });
     expect(screen.getByRole('menuitemcheckbox')).toBeInTheDocument();
@@ -470,7 +470,7 @@ describe('Menu — keyboard navigation', () => {
   const setupOpen = () => {
     installRectMocks();
     const onAction = vi.fn();
-    renderBasic({ items: ITEMS, defaultIsOpen: true, onAction });
+    renderBasic({ items: ITEMS, defaultOpen: true, onAction });
     return { onAction };
   };
 
@@ -525,7 +525,7 @@ describe('Menu — keyboard navigation', () => {
   it('Escape closes the menu', () => {
     installRectMocks();
     const onOpenChange = vi.fn();
-    renderBasic({ items: ITEMS, defaultIsOpen: true, onOpenChange });
+    renderBasic({ items: ITEMS, defaultOpen: true, onOpenChange });
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
@@ -572,7 +572,7 @@ describe('Menu — keyboard navigation', () => {
   it('does not crash when keyboard pressed with empty items', () => {
     installRectMocks();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} items={[]} defaultIsOpen aria-label="m" />,
+      <Menu trigger={<button type="button">T</button>} items={[]} defaultOpen aria-label="m" />,
     );
     expect(() => fireEvent.keyDown(getMenu(), { key: 'ArrowDown' })).not.toThrow();
     expect(() => fireEvent.keyDown(getMenu(), { key: 'Home' })).not.toThrow();
@@ -588,7 +588,7 @@ describe('Menu — keyboard navigation', () => {
 describe('Menu — danger and href', () => {
   it('isDanger item has data-danger attribute and danger color', () => {
     installRectMocks();
-    renderBasic({ items: ITEMS, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, defaultOpen: true });
     const danger = screen.getByText('Delete').closest('[role="menuitem"]')! as HTMLElement;
     expect(danger).toHaveAttribute('data-danger');
     // theme.colors.danger[500] (light) = rgb(243, 18, 96)
@@ -598,8 +598,10 @@ describe('Menu — danger and href', () => {
   it('href item renders as an anchor', () => {
     installRectMocks();
     renderBasic({
-      items: [{ key: 'docs', label: 'Docs', href: 'https://example.com' } as MenuItemDescriptor],
-      defaultIsOpen: true,
+      items: [
+        { itemKey: 'docs', label: 'Docs', href: 'https://example.com' } as MenuItemDescriptor,
+      ],
+      defaultOpen: true,
     });
     const link = screen.getByRole('menuitem');
     expect(link.tagName).toBe('A');
@@ -611,13 +613,13 @@ describe('Menu — danger and href', () => {
     renderBasic({
       items: [
         {
-          key: 'docs',
+          itemKey: 'docs',
           label: 'Docs',
           href: 'https://example.com',
           isDisabled: true,
         } as MenuItemDescriptor,
       ],
-      defaultIsOpen: true,
+      defaultOpen: true,
     });
     const link = screen.getByRole('menuitem');
     expect(link.tagName).toBe('A');
@@ -632,14 +634,14 @@ describe('Menu — danger and href', () => {
 describe('Menu — a11y', () => {
   it('panel has role=menu and aria-label', () => {
     installRectMocks();
-    renderBasic({ items: ITEMS, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, defaultOpen: true });
     const m = getMenu();
     expect(m).toHaveAttribute('aria-label', 'actions');
   });
 
   it('emits prefers-reduced-motion override styles', () => {
     installRectMocks();
-    renderBasic({ items: ITEMS, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, defaultOpen: true });
     const styles = Array.from(document.querySelectorAll('style'))
       .map((s) => s.textContent ?? '')
       .join('\n');
@@ -648,7 +650,7 @@ describe('Menu — a11y', () => {
 
   it('aria-activedescendant is set on the menu when an item is highlighted', () => {
     installRectMocks();
-    renderBasic({ items: ITEMS, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, defaultOpen: true });
     const m = getMenu();
     expect(m.getAttribute('aria-activedescendant')).toBeTruthy();
   });
@@ -700,7 +702,7 @@ describe('Menu — extra coverage', () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const inner = vi.fn();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m">
+      <Menu trigger={<button type="button">T</button>} defaultOpen aria-label="m">
         <Menu.Section label="G">
           <Menu.Item itemKey="x" onAction={inner}>
             Inner
@@ -715,7 +717,7 @@ describe('Menu — extra coverage', () => {
   it('renders icon, description in items', () => {
     installRectMocks();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m">
+      <Menu trigger={<button type="button">T</button>} defaultOpen aria-label="m">
         <Menu.Item
           itemKey="z"
           icon={<svg data-testid="ico" />}
@@ -734,7 +736,7 @@ describe('Menu — extra coverage', () => {
   it('typeahead works against ReactNode label (array form)', () => {
     installRectMocks();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m">
+      <Menu trigger={<button type="button">T</button>} defaultOpen aria-label="m">
         <Menu.Item itemKey="alpha">
           <>{['Alpha ', 'Bravo']}</>
         </Menu.Item>
@@ -754,13 +756,13 @@ describe('Menu — extra coverage', () => {
     renderBasic({
       items: [
         {
-          key: 'docs',
+          itemKey: 'docs',
           label: 'Docs',
           href: 'https://example.com',
           isDisabled: true,
         } as MenuItemDescriptor,
       ],
-      defaultIsOpen: true,
+      defaultOpen: true,
       onAction,
     });
     const link = screen.getByRole('menuitem');
@@ -775,7 +777,7 @@ describe('Menu — extra coverage', () => {
     const orig = (Element.prototype as unknown as { scrollIntoView?: () => void }).scrollIntoView;
     (Element.prototype as unknown as { scrollIntoView: () => void }).scrollIntoView = scrollSpy;
     try {
-      renderBasic({ items: ITEMS, defaultIsOpen: true });
+      renderBasic({ items: ITEMS, defaultOpen: true });
       fireEvent.keyDown(getMenu(), { key: 'ArrowDown' });
       expect(scrollSpy).toHaveBeenCalled();
     } finally {
@@ -787,7 +789,7 @@ describe('Menu — extra coverage', () => {
 
   it('focuses panel on open (covers focus path)', () => {
     installRectMocks();
-    renderBasic({ items: ITEMS, defaultIsOpen: true });
+    renderBasic({ items: ITEMS, defaultOpen: true });
     act(() => {
       vi.advanceTimersByTime(50);
     });
@@ -834,7 +836,7 @@ describe('Menu — extra coverage', () => {
   it('skips invalid React children silently', () => {
     installRectMocks();
     renderWithProviders(
-      <Menu trigger={<button type="button">T</button>} defaultIsOpen aria-label="m">
+      <Menu trigger={<button type="button">T</button>} defaultOpen aria-label="m">
         text-node-ignored
         {null}
         {false}
@@ -852,7 +854,7 @@ describe('Menu — refs / id / className', () => {
     let captured: HTMLDivElement | null = null;
     renderBasic({
       items: ITEMS,
-      defaultIsOpen: true,
+      defaultOpen: true,
       ref: (node) => {
         captured = node;
       },
@@ -865,7 +867,7 @@ describe('Menu — refs / id / className', () => {
     installRectMocks();
     renderBasic({
       items: ITEMS,
-      defaultIsOpen: true,
+      defaultOpen: true,
       id: 'my-menu',
       className: 'extra',
       style: { background: 'red' },

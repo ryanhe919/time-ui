@@ -29,7 +29,7 @@ describe('Button', () => {
   it('respects disabled', async () => {
     const fn = vi.fn();
     renderWithProviders(
-      <Button disabled onClick={fn}>
+      <Button isDisabled onClick={fn}>
         Nope
       </Button>,
     );
@@ -40,7 +40,7 @@ describe('Button', () => {
   });
 
   it('shows loading state', () => {
-    renderWithProviders(<Button loading>Load</Button>);
+    renderWithProviders(<Button isLoading>Load</Button>);
     const btn = screen.getByRole('button');
     expect(btn).toHaveAttribute('aria-busy', 'true');
     expect(btn).toBeDisabled();
@@ -106,6 +106,17 @@ describe('Button', () => {
     }
   });
 
+  it('supports all 5 size tiers through data-size', () => {
+    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
+    for (const size of sizes) {
+      const label = `s-${size}`;
+      const { unmount } = renderWithProviders(<Button size={size}>{label}</Button>);
+      const btn = screen.getByRole('button', { name: label });
+      expect(btn).toHaveAttribute('data-size', size);
+      unmount();
+    }
+  });
+
   it('uses thin borders for outlined button variants', () => {
     renderWithProviders(
       <>
@@ -130,7 +141,7 @@ describe('Button', () => {
   it('replaces startIcon with spinner and hides endIcon while loading', () => {
     renderWithProviders(
       <Button
-        loading
+        isLoading
         startIcon={<span data-testid="start-icon">S</span>}
         endIcon={<span data-testid="end-icon">E</span>}
       >

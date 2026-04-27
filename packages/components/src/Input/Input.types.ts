@@ -4,7 +4,7 @@
  * @description 定义 Input 模块的 TypeScript 类型约束。
  */
 
-import type { ChangeEvent, CSSProperties, InputHTMLAttributes, ReactNode } from 'react';
+import type { CSSProperties, InputHTMLAttributes, ReactNode } from 'react';
 import type { FieldVariant, FieldColor } from '../utils';
 
 export type InputVariant = FieldVariant;
@@ -37,7 +37,6 @@ export interface InputProps extends Omit<
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
-  onChangeEvent?: (event: ChangeEvent<HTMLInputElement>) => void;
   onClear?: () => void;
 
   label?: ReactNode;
@@ -48,7 +47,7 @@ export interface InputProps extends Omit<
   endContent?: ReactNode;
 
   isClearable?: boolean;
-  clearOnEscape?: boolean;
+  clearOnEsc?: boolean;
   clearButtonTabIndex?: number;
 
   isDisabled?: boolean;
@@ -56,9 +55,9 @@ export interface InputProps extends Omit<
   isRequired?: boolean;
   isInvalid?: boolean;
 
-  isPasswordToggleVisible?: boolean;
+  showPasswordToggle?: boolean;
 
-  fullWidth?: boolean;
+  isFullWidth?: boolean;
 
   className?: string;
   style?: CSSProperties;

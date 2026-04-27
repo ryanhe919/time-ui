@@ -10,7 +10,7 @@ import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { useTheme, css } from '@emotion/react';
 import { useI18n } from '@timeui/core';
 
-export type SearchSize = 'sm' | 'md' | 'lg';
+export type SearchSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type SearchVariant = 'bordered' | 'flat';
 
 export interface SearchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
@@ -19,13 +19,15 @@ export interface SearchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   size?: SearchSize;
   variant?: SearchVariant;
   icon?: ReactNode;
-  fullWidth?: boolean;
+  isFullWidth?: boolean;
 }
 
 const sizeMap: Record<SearchSize, { h: string; fs: string; px: string }> = {
+  xs: { h: '24px', fs: '11px', px: '8px' },
   sm: { h: '28px', fs: '12px', px: '10px' },
   md: { h: '36px', fs: '13px', px: '12px' },
   lg: { h: '44px', fs: '15px', px: '14px' },
+  xl: { h: '52px', fs: '17px', px: '16px' },
 };
 
 const DefaultIcon = () => (
@@ -52,7 +54,7 @@ export const Search = forwardRef<HTMLButtonElement, SearchProps>(function Search
     size = 'md',
     variant = 'bordered',
     icon,
-    fullWidth = false,
+    isFullWidth = false,
     'aria-label': ariaLabelProp,
     type,
     ...rest
@@ -79,7 +81,7 @@ export const Search = forwardRef<HTMLButtonElement, SearchProps>(function Search
         gap: 8px;
         height: ${sz.h};
         padding: 0 ${sz.px};
-        width: ${fullWidth ? '100%' : 'auto'};
+        width: ${isFullWidth ? '100%' : 'auto'};
         min-width: 200px;
         font-family: inherit;
         font-size: ${sz.fs};

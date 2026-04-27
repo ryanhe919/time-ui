@@ -4,9 +4,9 @@
  * @description 定义 Switch 模块的 TypeScript 类型约束。
  */
 
-import type { ReactNode, InputHTMLAttributes, ChangeEvent } from 'react';
+import type { ReactNode, InputHTMLAttributes } from 'react';
 
-export type SwitchSize = 'sm' | 'md' | 'lg';
+export type SwitchSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type SwitchColor = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
@@ -28,9 +28,8 @@ export interface SwitchProps extends InputPassthrough {
   size?: SwitchSize;
 
   isSelected?: boolean;
-  defaultSelected?: boolean;
+  defaultIsSelected?: boolean;
   onChange?: (checked: boolean) => void;
-  onChangeEvent?: (e: ChangeEvent<HTMLInputElement>) => void;
 
   isDisabled?: boolean;
   isReadOnly?: boolean;

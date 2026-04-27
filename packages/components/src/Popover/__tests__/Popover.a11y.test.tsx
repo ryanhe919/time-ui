@@ -66,7 +66,7 @@ describe('Popover — a11y', () => {
     const { baseElement } = renderWithProviders(
       <Popover
         anchor={<button type="button">Trigger</button>}
-        defaultIsOpen
+        defaultOpen
         aria-label="info"
         header={<span>Title</span>}
         footer={<span>Footer</span>}

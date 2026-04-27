@@ -12,7 +12,7 @@ import { forwardRef, useId, useMemo } from 'react';
 import { css, useTheme } from '@emotion/react';
 import type { ChatCommonStyleProps } from './Chat.types';
 
-export type ChatVoiceWaveSize = 'sm' | 'md' | 'lg';
+export type ChatVoiceWaveSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type ChatVoiceWaveColor =
   | 'default'
   | 'primary'
@@ -28,7 +28,7 @@ export interface ChatVoiceWaveProps extends ChatCommonStyleProps {
   bars?: number;
   /** 配色。默认 primary。 */
   color?: ChatVoiceWaveColor;
-  /** 尺寸：sm / md / lg。默认 md。 */
+  /** 尺寸：xs / sm / md / lg / xl。默认 md。 */
   size?: ChatVoiceWaveSize;
   /** 屏幕阅读器朗读文本，默认 "Recording"。 */
   'aria-label'?: string;
@@ -38,9 +38,11 @@ const SIZE_TOKENS: Record<
   ChatVoiceWaveSize,
   { container: string; barWidth: string; barMaxHeight: string; gap: string }
 > = {
+  xs: { container: '12px', barWidth: '1.5px', barMaxHeight: '10px', gap: '1.5px' },
   sm: { container: '14px', barWidth: '2px', barMaxHeight: '12px', gap: '2px' },
   md: { container: '16px', barWidth: '2.5px', barMaxHeight: '14px', gap: '2.5px' },
   lg: { container: '20px', barWidth: '3px', barMaxHeight: '18px', gap: '3px' },
+  xl: { container: '24px', barWidth: '3.5px', barMaxHeight: '22px', gap: '3.5px' },
 };
 
 export const ChatVoiceWave = forwardRef<HTMLDivElement, ChatVoiceWaveProps>(function ChatVoiceWave(

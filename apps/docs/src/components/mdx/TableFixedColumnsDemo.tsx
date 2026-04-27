@@ -35,13 +35,13 @@ export function TableFixedColumnsDemo() {
         aria-label="Quarterly revenue"
         rowKey="id"
         columns={[
-          { key: 'name', title: 'Account', width: 160, fixed: 'left' },
-          { key: 'region', title: 'Region', width: 120 },
-          { key: 'q1', title: 'Q1', align: 'right', width: 100 },
-          { key: 'q2', title: 'Q2', align: 'right', width: 100 },
-          { key: 'q3', title: 'Q3', align: 'right', width: 100 },
-          { key: 'q4', title: 'Q4', align: 'right', width: 100 },
-          { key: 'ytd', title: 'YTD', align: 'right', width: 110, fixed: 'right' },
+          { columnKey: 'name', title: 'Account', width: 160, fixed: 'left' },
+          { columnKey: 'region', title: 'Region', width: 120 },
+          { columnKey: 'q1', title: 'Q1', align: 'right', width: 100 },
+          { columnKey: 'q2', title: 'Q2', align: 'right', width: 100 },
+          { columnKey: 'q3', title: 'Q3', align: 'right', width: 100 },
+          { columnKey: 'q4', title: 'Q4', align: 'right', width: 100 },
+          { columnKey: 'ytd', title: 'YTD', align: 'right', width: 110, fixed: 'right' },
         ]}
         data={ROWS}
       />

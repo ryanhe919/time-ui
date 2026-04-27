@@ -84,7 +84,7 @@ describe('ChatAvatar — base rendering', () => {
 });
 
 describe('ChatAvatar — sizes', () => {
-  it.each([['sm'], ['md'], ['lg']] as const)('renders size=%s', (size) => {
+  it.each([['xs'], ['sm'], ['md'], ['lg'], ['xl']] as const)('renders size=%s', (size) => {
     const { container } = renderWithProviders(
       <ChatAvatar source={{ kind: 'text', text: 'AB' }} size={size} />,
     );

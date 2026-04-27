@@ -31,9 +31,9 @@ describe('Typography', () => {
     expect(screen.getByText('c')).toBeInTheDocument();
   });
 
-  it('supports muted and truncate text styling branches', () => {
+  it('supports isMuted and isTruncated text styling branches', () => {
     renderWithProviders(
-      <Text size="lg" weight="bold" muted truncate data-testid="text">
+      <Text size="lg" weight="bold" isMuted isTruncated data-testid="text">
         long text
       </Text>,
     );
@@ -42,6 +42,17 @@ describe('Typography', () => {
     expect(document.head.textContent ?? '').toContain('white-space:nowrap');
     expect(document.head.textContent ?? '').toContain('display:inline-block');
     expect(document.head.textContent ?? '').toContain('max-width:100%');
+  });
+
+  it('renders all 5 Text size tiers (xs / sm / md / lg / xl)', () => {
+    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
+    for (const s of sizes) {
+      const { unmount } = renderWithProviders(
+        <Text size={s} data-testid={`t-${s}`}>{`s-${s}`}</Text>,
+      );
+      expect(screen.getByTestId(`t-${s}`)).toBeInTheDocument();
+      unmount();
+    }
   });
 
   it('defaults heading level to h2 and maps lower heading sizes', () => {

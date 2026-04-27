@@ -1,6 +1,6 @@
 # 卡片 Card
 
-通用的容器原语：承载一段信息 / 一组控件。三种 variant（flat / bordered / elevated）、六种 color、三档 size、可选的 accent bar、可整卡 hover / pressable / 链接化。`CardHeader` / `CardBody` / `CardFooter` 是可选的结构子组件——只在需要语义化时才用。
+通用的容器原语：承载一段信息 / 一组控件。三种 variant（flat / bordered / elevated）、六种 color、五档 size、可选的 accent bar、可整卡 hover / pressable / 链接化。`CardHeader` / `CardBody` / `CardFooter` 是可选的结构子组件——只在需要语义化时才用。
 
 <Callout variant="info" title="Card 还是 StatCard？">
   - **Card**：开放容器。内部可放任意内容，由你自己决定语义。
@@ -213,9 +213,9 @@
 <PropsTable props={[
   { name: 'variant', type: "'flat' | 'bordered' | 'elevated'", default: "'bordered'", description: '外观档位。' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '配色；只在 accentBar 或交互态下可见。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '内边距与 gap。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '内边距与 gap。' },
   { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'", description: '圆角档位。' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: '占满父容器宽度。' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: '占满父容器宽度。' },
   { name: 'isPressable', type: 'boolean', default: 'false', description: '整卡作为按键目标，`tabIndex=0` 并响应 Enter / Space。' },
   { name: 'isHoverable', type: 'boolean', default: 'false', description: '只启用 hover 视觉反馈，不加键盘语义。' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '视觉降透明 + 屏蔽 onPress。' },

@@ -27,9 +27,11 @@ import type {
 } from './RichTextEditor.types';
 
 const SIZE_TO_MIN_HEIGHT: Record<RichTextEditorSize, string> = {
+  xs: '80px',
   sm: '120px',
   md: '160px',
   lg: '220px',
+  xl: '300px',
 };
 
 const PRESETS: Record<ToolbarPreset, ToolbarItem[]> = {

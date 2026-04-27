@@ -57,6 +57,14 @@ describe('Card — contract', () => {
     unmount();
   });
 
+  it('#3b supports xs and xl size scales (5-tier)', () => {
+    for (const s of ['xs', 'xl'] as const) {
+      const { container, unmount } = renderWithProviders(<Card size={s}>x</Card>);
+      expect(container.querySelector(`[data-size="${s}"]`)).toBeTruthy();
+      unmount();
+    }
+  });
+
   it('#4 renders as an <a> when href is provided and is pressable', () => {
     renderWithProviders(
       <Card href="/about" aria-label="go">
@@ -322,7 +330,7 @@ describe('Card — contract', () => {
         variant="flat"
         color="warning"
         isHoverable
-        fullWidth
+        isFullWidth
         className="card-root"
         classNames={{ root: 'slot-root' }}
         style={{ opacity: 0.9 }}

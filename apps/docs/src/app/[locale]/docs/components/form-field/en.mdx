@@ -25,10 +25,10 @@ Wrap any TimeUI input — `label` / `description` ride on the outer FormField
 while the inner `Input` keeps its own styling and interactions.
 
 <LiveDemo code={`<FormField label="Username" description="2–24 characters.">
-  <Input placeholder="Your handle" fullWidth />
+  <Input placeholder="Your handle" isFullWidth />
 </FormField>`}>
   <FormField label="Username" description="2–24 characters.">
-    <Input placeholder="Your handle" fullWidth />
+    <Input placeholder="Your handle" isFullWidth />
   </FormField>
 </LiveDemo>
 
@@ -42,10 +42,10 @@ and forwards the native `required` attribute down to the control.
   description="We'll send a verification link here."
   isRequired
 >
-  <Input type="email" placeholder="you@example.com" fullWidth />
+  <Input type="email" placeholder="you@example.com" isFullWidth />
 </FormField>`}>
   <FormField label="Email" description="We'll send a verification link here." isRequired>
-    <Input type="email" placeholder="you@example.com" fullWidth />
+    <Input type="email" placeholder="you@example.com" isFullWidth />
   </FormField>
 </LiveDemo>
 
@@ -60,10 +60,10 @@ to the error node. The error container carries `role="alert"` +
   label="Verification code"
   errorMessage="That code doesn't match. Try again."
 >
-  <Input defaultValue="1234" fullWidth />
+  <Input defaultValue="1234" isFullWidth />
 </FormField>`}>
   <FormField label="Verification code" errorMessage="That code doesn't match. Try again.">
-    <Input defaultValue="1234" fullWidth />
+    <Input defaultValue="1234" isFullWidth />
   </FormField>
 </LiveDemo>
 
@@ -77,10 +77,10 @@ native `disabled` on DOM elements) and lowers the opacity of the whole field.
   description="Editable by admins only."
   isDisabled
 >
-  <Textarea defaultValue="This note is read-only." fullWidth />
+  <Textarea defaultValue="This note is read-only." isFullWidth />
 </FormField>`}>
   <FormField label="System note" description="Editable by admins only." isDisabled>
-    <Textarea defaultValue="This note is read-only." fullWidth />
+    <Textarea defaultValue="This note is read-only." isFullWidth />
   </FormField>
 </LiveDemo>
 
@@ -91,10 +91,10 @@ the left — use it for settings pages and dense profile forms.
 
 <LiveDemo code={`<Stack spacing={16}>
   <FormField label="Display name" labelPlacement="top">
-    <Input placeholder="top (default)" fullWidth />
+    <Input placeholder="top (default)" isFullWidth />
   </FormField>
   <FormField label="Country / Region" labelPlacement="start">
-    <Select placeholder="Choose one" fullWidth>
+    <Select placeholder="Choose one" isFullWidth>
       <SelectOption value="cn">China</SelectOption>
       <SelectOption value="us">United States</SelectOption>
       <SelectOption value="jp">Japan</SelectOption>
@@ -103,10 +103,10 @@ the left — use it for settings pages and dense profile forms.
 </Stack>`}>
   <Stack spacing={16}>
     <FormField label="Display name" labelPlacement="top">
-      <Input placeholder="top (default)" fullWidth />
+      <Input placeholder="top (default)" isFullWidth />
     </FormField>
     <FormField label="Country / Region" labelPlacement="start">
-      <Select placeholder="Choose one" fullWidth>
+      <Select placeholder="Choose one" isFullWidth>
         <SelectOption value="cn">China</SelectOption>
         <SelectOption value="us">United States</SelectOption>
         <SelectOption value="jp">Japan</SelectOption>
@@ -122,15 +122,15 @@ A complete form — `FormField` as the common container, combining `Input`,
 
 <LiveDemo code={`<Stack spacing={20} style={{ width: 'min(520px, 100%)' }}>
   <FormField label="Project name" description="Shown in the sidebar and notifications." isRequired>
-    <Input placeholder="e.g. Weekly Ops Recap" fullWidth />
+    <Input placeholder="e.g. Weekly Ops Recap" isFullWidth />
   </FormField>
 
   <FormField label="Description">
-    <Textarea placeholder="Goals, scope, or relevant links." rows={3} fullWidth />
+    <Textarea placeholder="Goals, scope, or relevant links." rows={3} isFullWidth />
   </FormField>
 
   <FormField label="Visibility" labelPlacement="start">
-    <Select defaultValue="team" fullWidth>
+    <Select defaultValue="team" isFullWidth>
       <SelectOption value="private">Only me</SelectOption>
       <SelectOption value="team">Team members</SelectOption>
       <SelectOption value="public">Public</SelectOption>
@@ -138,20 +138,20 @@ A complete form — `FormField` as the common container, combining `Input`,
   </FormField>
 
   <FormField label="Notifications" labelPlacement="start" description="Email me on new comments.">
-    <Switch defaultSelected />
+    <Switch defaultIsSelected />
   </FormField>
 </Stack>`}>
   <Stack spacing={20} style={{ width: 'min(520px, 100%)' }}>
     <FormField label="Project name" description="Shown in the sidebar and notifications." isRequired>
-      <Input placeholder="e.g. Weekly Ops Recap" fullWidth />
+      <Input placeholder="e.g. Weekly Ops Recap" isFullWidth />
     </FormField>
 
     <FormField label="Description">
-      <Textarea placeholder="Goals, scope, or relevant links." rows={3} fullWidth />
+      <Textarea placeholder="Goals, scope, or relevant links." rows={3} isFullWidth />
     </FormField>
 
     <FormField label="Visibility" labelPlacement="start">
-      <Select defaultValue="team" fullWidth>
+      <Select defaultValue="team" isFullWidth>
         <SelectOption value="private">Only me</SelectOption>
         <SelectOption value="team">Team members</SelectOption>
         <SelectOption value="public">Public</SelectOption>
@@ -159,7 +159,7 @@ A complete form — `FormField` as the common container, combining `Input`,
     </FormField>
 
     <FormField label="Notifications" labelPlacement="start" description="Email me on new comments.">
-      <Switch defaultSelected />
+      <Switch defaultIsSelected />
     </FormField>
   </Stack>
 </LiveDemo>

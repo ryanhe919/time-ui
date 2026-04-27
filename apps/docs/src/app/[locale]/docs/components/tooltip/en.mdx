@@ -54,17 +54,17 @@ All twelve placements are inherited from Popover: `top` / `bottom` / `left` / `r
 
 ## Delays & warm-up
 
-`enterDelay` / `exitDelay` control the hover/focus latency before the tooltip appears or disappears (in ms). The component keeps a module-level "last closed at" timestamp — if a new tooltip opens within `warmThreshold` (default 500 ms) of the last close, the **enter delay is skipped**. This mirrors macOS's batched tooltip experience: glide across a row of buttons and the hint snaps from one to the next without latency.
+`openDelay` / `closeDelay` control the hover/focus latency before the tooltip appears or disappears (in ms). The component keeps a module-level "last closed at" timestamp — if a new tooltip opens within `warmThreshold` (default 500 ms) of the last close, the **enter delay is skipped**. This mirrors macOS's batched tooltip experience: glide across a row of buttons and the hint snaps from one to the next without latency.
 
 <LiveDemo code={`<Flex gap={16}>
   <Tooltip content="120 ms (default)"><Button>Default</Button></Tooltip>
-  <Tooltip content="600 ms" enterDelay={600}><Button>Slow</Button></Tooltip>
-  <Tooltip content="Instant" enterDelay={0}><Button>Instant</Button></Tooltip>
+  <Tooltip content="600 ms" openDelay={600}><Button>Slow</Button></Tooltip>
+  <Tooltip content="Instant" openDelay={0}><Button>Instant</Button></Tooltip>
 </Flex>`}>
   <Flex gap={16}>
     <Tooltip content="120 ms (default)"><Button>Default</Button></Tooltip>
-    <Tooltip content="600 ms" enterDelay={600}><Button>Slow</Button></Tooltip>
-    <Tooltip content="Instant" enterDelay={0}><Button>Instant</Button></Tooltip>
+    <Tooltip content="600 ms" openDelay={600}><Button>Slow</Button></Tooltip>
+    <Tooltip content="Instant" openDelay={0}><Button>Instant</Button></Tooltip>
   </Flex>
 </LiveDemo>
 
@@ -87,12 +87,12 @@ Passing `isOpen` switches the component to **fully controlled** mode — every i
   { name: 'children', type: 'ReactElement', description: 'The wrapped anchor (must be a single ReactElement). Cloned to inject `ref` + events + `aria-describedby`.' },
   { name: 'placement', type: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'", default: "'top'" },
   { name: 'offset', type: 'number', description: 'Pixel gap between anchor and tooltip. Defaults to `theme.components.tooltip.offset` (6).' },
-  { name: 'withArrow', type: 'boolean', default: 'true' },
+  { name: 'hasArrow', type: 'boolean', default: 'true' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable entirely — even hovering does not portal anything.' },
-  { name: 'enterDelay', type: 'number', description: 'Open delay in ms. Defaults to `theme.components.tooltip.enterDelay` (120). Skipped while warm.' },
-  { name: 'exitDelay', type: 'number', description: 'Close delay in ms. Defaults to `theme.components.tooltip.exitDelay` (80).' },
+  { name: 'openDelay', type: 'number', description: 'Open delay in ms. Defaults to `theme.components.tooltip.openDelay` (120). Skipped while warm.' },
+  { name: 'closeDelay', type: 'number', description: 'Close delay in ms. Defaults to `theme.components.tooltip.closeDelay` (80).' },
   { name: 'isOpen', type: 'boolean', description: 'Controlled visibility. Once provided, all internal hover/focus logic is ignored.' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'className', type: 'string', description: 'Forwarded to the tooltip panel (not the anchor).' },
   { name: 'style', type: 'CSSProperties', description: 'Forwarded to the tooltip panel; `top`/`left` are computed and injected.' },

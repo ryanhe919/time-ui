@@ -114,7 +114,7 @@ lists or when users can't remember the full option name.
     { value: 'in', label: 'India' },
     { value: 'ru', label: 'Russia' },
   ]}
-  fullWidth
+  isFullWidth
 />`}>
   <Select
     isSearchable
@@ -135,7 +135,7 @@ lists or when users can't remember the full option name.
       { value: 'in', label: 'India' },
       { value: 'ru', label: 'Russia' },
     ]}
-    fullWidth
+    isFullWidth
   />
 </LiveDemo>
 
@@ -153,7 +153,7 @@ default) and a scrollbar appears. Customize with `maxListHeight`.
     value: 'tz-' + i,
     label: 'GMT' + (i - 12 >= 0 ? '+' : '') + (i - 12) + ':00',
   }))}
-  fullWidth
+  isFullWidth
 />`}>
   <Select
     isSearchable
@@ -164,7 +164,7 @@ default) and a scrollbar appears. Customize with `maxListHeight`.
       value: 'tz-' + i,
       label: 'GMT' + (i - 12 >= 0 ? '+' : '') + (i - 12) + ':00',
     }))}
-    fullWidth
+    isFullWidth
   />
 </LiveDemo>
 
@@ -181,7 +181,7 @@ for enums that need a hint (permissions, plans, visibility, etc.).
     { value: 'team', label: 'Team members', description: 'Everyone in your team.' },
     { value: 'public', label: 'Public', description: 'Anyone with the link.' },
   ]}
-  fullWidth
+  isFullWidth
 />`}>
   <Select
     label="Visibility"
@@ -191,7 +191,7 @@ for enums that need a hint (permissions, plans, visibility, etc.).
       { value: 'team', label: 'Team members', description: 'Everyone in your team.' },
       { value: 'public', label: 'Public', description: 'Anyone with the link.' },
     ]}
-    fullWidth
+    isFullWidth
   />
 </LiveDemo>
 
@@ -221,7 +221,7 @@ for enums that need a hint (permissions, plans, visibility, etc.).
 
 ## Form 2: `<SelectOption>` children
 
-The parent reads each SelectOption's `value` / `disabled` / `children` to
+The parent reads each SelectOption's `value` / `isDisabled` / `children` to
 build its custom listbox — at runtime `SelectOption` renders nothing itself.
 
 <LiveDemo code={`<Select label="Size" defaultValue="m">
@@ -259,7 +259,7 @@ export function FrameworkPicker() {
       items={FRAMEWORKS}
       value={value}
       onChange={setValue}
-      fullWidth
+      isFullWidth
     />
   );
 }`}>
@@ -275,7 +275,7 @@ export function FrameworkPicker() {
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Semantic color; forced to `danger` when invalid.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset.' },
   { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: 'Corner radius.' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to 100% width.' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: 'Expand to 100% width.' },
   { name: 'value', type: 'string', description: 'Controlled value.' },
   { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
   { name: 'onChange', type: '(value: string) => void', description: 'Fires with the unwrapped string value when an option is picked.' },
@@ -311,8 +311,7 @@ export function FrameworkPicker() {
 <PropsTable props={[
   { name: 'value', type: 'string', required: true, description: 'Option value.' },
   { name: 'children', type: 'ReactNode', description: 'Option content.' },
-  { name: 'disabled', type: 'boolean', description: 'Disable (equivalent to `isDisabled`; kept for native-alike ergonomics).' },
-  { name: 'isDisabled', type: 'boolean', description: 'Disable.' },
+  { name: 'isDisabled', type: 'boolean', description: 'Disable this option.' },
   { name: 'description', type: 'ReactNode', description: 'Secondary text rendered below the label.' }
 ]} />
 

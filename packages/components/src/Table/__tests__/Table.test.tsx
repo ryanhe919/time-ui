@@ -26,15 +26,15 @@ const PEOPLE: ReadonlyArray<Person> = [
 ];
 
 const BASIC_COLUMNS: ReadonlyArray<TableColumn<Person>> = [
-  { key: 'name', title: 'Name' },
-  { key: 'age', title: 'Age', align: 'right' },
-  { key: 'email', title: 'Email' },
+  { columnKey: 'name', title: 'Name' },
+  { columnKey: 'age', title: 'Age', align: 'right' },
+  { columnKey: 'email', title: 'Email' },
 ];
 
 const SORTABLE_COLUMNS: ReadonlyArray<TableColumn<Person>> = [
-  { key: 'name', title: 'Name', isSortable: true },
-  { key: 'age', title: 'Age', isSortable: true },
-  { key: 'email', title: 'Email' },
+  { columnKey: 'name', title: 'Name', isSortable: true },
+  { columnKey: 'age', title: 'Age', isSortable: true },
+  { columnKey: 'email', title: 'Email' },
 ];
 
 // ────────────────────────────────────────────────────────────
@@ -76,9 +76,9 @@ describe('Table — basic rendering', () => {
 
   it('uses column.render when provided', () => {
     const cols: TableColumn<Person>[] = [
-      { key: 'name', title: 'Name' },
+      { columnKey: 'name', title: 'Name' },
       {
-        key: 'upper',
+        columnKey: 'upper',
         title: 'Upper',
         render: (row) => <span data-testid="upper">{row.name.toUpperCase()}</span>,
       },
@@ -582,9 +582,9 @@ describe('Table — row click', () => {
     const onRowClick = vi.fn();
     const onChange = vi.fn();
     const cols: TableColumn<Person>[] = [
-      { key: 'name', title: 'Name' },
+      { columnKey: 'name', title: 'Name' },
       {
-        key: 'action',
+        columnKey: 'action',
         title: 'Action',
         isInteractive: true,
         render: (row) => (
@@ -691,9 +691,9 @@ describe('Table — visual options', () => {
     expect(region).not.toHaveAttribute('data-has-border');
   });
 
-  it('stickyHeader sets data attribute and sticky styles', () => {
+  it('isStickyHeader sets data attribute and sticky styles', () => {
     const { container } = renderWithProviders(
-      <Table columns={BASIC_COLUMNS} data={PEOPLE} rowKey="id" aria-label="P" stickyHeader />,
+      <Table columns={BASIC_COLUMNS} data={PEOPLE} rowKey="id" aria-label="P" isStickyHeader />,
     );
     const region = container.querySelector('[role="region"]') as HTMLElement;
     expect(region).toHaveAttribute('data-sticky-header');
@@ -717,9 +717,9 @@ describe('Table — visual options', () => {
 // ────────────────────────────────────────────────────────────
 describe('Table — fixed columns', () => {
   const FIXED_COLUMNS: ReadonlyArray<TableColumn<Person>> = [
-    { key: 'name', title: 'Name', fixed: 'left', width: 120 },
-    { key: 'age', title: 'Age' },
-    { key: 'email', title: 'Email', fixed: 'right', width: 200 },
+    { columnKey: 'name', title: 'Name', fixed: 'left', width: 120 },
+    { columnKey: 'age', title: 'Age' },
+    { columnKey: 'email', title: 'Email', fixed: 'right', width: 200 },
   ];
 
   it('fixed=left columns include sticky position', () => {
@@ -754,8 +754,8 @@ describe('Table — fixed columns', () => {
 
   it('column.width as CSS string is accepted', () => {
     const cols: TableColumn<Person>[] = [
-      { key: 'name', title: 'Name', width: '30%' },
-      { key: 'age', title: 'Age' },
+      { columnKey: 'name', title: 'Name', width: '30%' },
+      { columnKey: 'age', title: 'Age' },
     ];
     renderWithProviders(<Table columns={cols} data={PEOPLE} rowKey="id" aria-label="P" />);
     const nameHeader = screen.getByRole('columnheader', { name: /name/i });
@@ -855,9 +855,9 @@ describe('Table — overflow detection', () => {
     const { container } = renderWithProviders(
       <Table
         columns={[
-          { key: 'name', title: 'Name', fixed: 'left', width: 120 },
-          { key: 'age', title: 'Age' },
-          { key: 'email', title: 'Email' },
+          { columnKey: 'name', title: 'Name', fixed: 'left', width: 120 },
+          { columnKey: 'age', title: 'Age' },
+          { columnKey: 'email', title: 'Email' },
         ]}
         data={PEOPLE}
         rowKey="id"
@@ -882,7 +882,7 @@ describe('Table — row key fallbacks', () => {
 
   it('falls back to index when no id or rowKey', () => {
     const data = [{ name: 'X' }, { name: 'Y' }];
-    const cols: TableColumn<{ name: string }>[] = [{ key: 'name', title: 'N' }];
+    const cols: TableColumn<{ name: string }>[] = [{ columnKey: 'name', title: 'N' }];
     renderWithProviders(<Table columns={cols} data={data} aria-label="P" />);
     const rows = screen.getAllByRole('row').filter((r) => r.getAttribute('data-row-key'));
     expect(rows[0]?.getAttribute('data-row-key')).toBe('0');
@@ -894,7 +894,7 @@ describe('Table — row key fallbacks', () => {
       { key: 'k1', name: 'X' },
       { key: 'k2', name: 'Y' },
     ];
-    const cols: TableColumn<{ key: string; name: string }>[] = [{ key: 'name', title: 'N' }];
+    const cols: TableColumn<{ key: string; name: string }>[] = [{ columnKey: 'name', title: 'N' }];
     renderWithProviders(<Table columns={cols} data={data} aria-label="P" />);
     const rows = screen.getAllByRole('row').filter((r) => r.getAttribute('data-row-key'));
     expect(rows[0]?.getAttribute('data-row-key')).toBe('k1');
@@ -906,8 +906,8 @@ describe('Table — default cell rendering', () => {
   it('null/undefined values render as empty', () => {
     const data = [{ id: '1', name: 'Alice', optional: null }];
     const cols: TableColumn<{ id: string; name: string; optional: string | null }>[] = [
-      { key: 'name', title: 'Name' },
-      { key: 'optional', title: 'Optional' },
+      { columnKey: 'name', title: 'Name' },
+      { columnKey: 'optional', title: 'Optional' },
     ];
     renderWithProviders(<Table columns={cols} data={data} rowKey="id" aria-label="P" />);
     const cells = screen.getAllByRole('cell');
@@ -918,7 +918,7 @@ describe('Table — default cell rendering', () => {
   it('boolean values render as string', () => {
     const data = [{ id: '1', active: true }];
     const cols: TableColumn<{ id: string; active: boolean }>[] = [
-      { key: 'active', title: 'Active' },
+      { columnKey: 'active', title: 'Active' },
     ];
     renderWithProviders(<Table columns={cols} data={data} rowKey="id" aria-label="P" />);
     expect(screen.getByText('true')).toBeInTheDocument();
@@ -926,8 +926,8 @@ describe('Table — default cell rendering', () => {
 
   it('right/center alignment is applied', () => {
     const cols: TableColumn<Person>[] = [
-      { key: 'name', title: 'Name', align: 'center' },
-      { key: 'age', title: 'Age', align: 'right' },
+      { columnKey: 'name', title: 'Name', align: 'center' },
+      { columnKey: 'age', title: 'Age', align: 'right' },
     ];
     renderWithProviders(<Table columns={cols} data={PEOPLE} rowKey="id" aria-label="P" />);
     const name = screen.getByRole('columnheader', { name: /name/i });

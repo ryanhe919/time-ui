@@ -11,12 +11,12 @@ import { forwardRef, type ReactNode } from 'react';
 import { css, useTheme } from '@emotion/react';
 import type { ChatAvatarSource, ChatCommonStyleProps, ChatMessageRole } from './Chat.types';
 
-export type ChatAvatarSize = 'sm' | 'md' | 'lg';
+export type ChatAvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface ChatAvatarProps extends ChatCommonStyleProps {
   /** 头像 source：image / text / node。 */
   source: ChatAvatarSource;
-  /** 尺寸：sm 24px、md = tokens.avatarSize、lg 40px。 */
+  /** 尺寸：xs 20px、sm 24px、md = tokens.avatarSize、lg 40px、xl 48px。 */
   size?: ChatAvatarSize;
   /** 角色，用于着色背景 tint。 */
   role?: ChatMessageRole;
@@ -71,8 +71,26 @@ export const ChatAvatar = forwardRef<HTMLSpanElement, ChatAvatarProps>(
     const theme = useTheme();
     const tokens = theme.components.chat;
 
-    const dim = size === 'sm' ? '24px' : size === 'lg' ? '40px' : tokens.avatarSize;
-    const fontSize = size === 'sm' ? '11px' : size === 'lg' ? '16px' : '13px';
+    const dim =
+      size === 'xs'
+        ? '20px'
+        : size === 'sm'
+          ? '24px'
+          : size === 'lg'
+            ? '40px'
+            : size === 'xl'
+              ? '48px'
+              : tokens.avatarSize;
+    const fontSize =
+      size === 'xs'
+        ? '10px'
+        : size === 'sm'
+          ? '11px'
+          : size === 'lg'
+            ? '16px'
+            : size === 'xl'
+              ? '18px'
+              : '13px';
 
     const { bg, fg } = resolveRoleTint(theme, role);
 

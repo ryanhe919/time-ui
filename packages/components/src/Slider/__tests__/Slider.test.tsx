@@ -532,21 +532,21 @@ describe('Slider — color and size variants', () => {
     },
   );
 
-  it.each(['sm', 'md', 'lg'] as const)('renders size=%s without crashing', (size) => {
+  it.each(['xs', 'sm', 'md', 'lg', 'xl'] as const)('renders size=%s without crashing', (size) => {
     renderWithProviders(<Slider aria-label="x" defaultValue={50} size={size} />);
     expect(getThumb()).toBeInTheDocument();
   });
 
-  it('accepts numeric length and converts to px', () => {
-    renderWithProviders(<Slider aria-label="x" defaultValue={50} length={320} />);
+  it('accepts numeric trackLength and converts to px', () => {
+    renderWithProviders(<Slider aria-label="x" defaultValue={50} trackLength={320} />);
     const styles = Array.from(document.querySelectorAll('style'))
       .map((s) => s.textContent ?? '')
       .join('\n');
     expect(styles).toMatch(/width:\s*320px/);
   });
 
-  it('accepts string length verbatim', () => {
-    renderWithProviders(<Slider aria-label="x" defaultValue={50} length="50%" />);
+  it('accepts string trackLength verbatim', () => {
+    renderWithProviders(<Slider aria-label="x" defaultValue={50} trackLength="50%" />);
     const styles = Array.from(document.querySelectorAll('style'))
       .map((s) => s.textContent ?? '')
       .join('\n');

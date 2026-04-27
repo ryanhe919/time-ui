@@ -45,7 +45,7 @@ export function SegmentedControlRangeDemo() {
           { value: 'all', label: 'All' },
         ]}
       />
-      <Text size="sm" muted>
+      <Text size="sm" isMuted>
         Showing {LABELS[range]}.
       </Text>
     </div>

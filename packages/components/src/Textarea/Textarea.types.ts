@@ -4,7 +4,7 @@
  * @description 定义 Textarea 模块的 TypeScript 类型约束。
  */
 
-import type { ChangeEvent, CSSProperties, ReactNode, TextareaHTMLAttributes } from 'react';
+import type { CSSProperties, ReactNode, TextareaHTMLAttributes } from 'react';
 import type { FieldVariant, FieldColor } from '../utils';
 
 export type TextareaVariant = FieldVariant;
@@ -34,7 +34,6 @@ export interface TextareaProps extends Omit<
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
-  onChangeEvent?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
 
   label?: ReactNode;
   description?: ReactNode;
@@ -56,7 +55,7 @@ export interface TextareaProps extends Omit<
   isRequired?: boolean;
   isInvalid?: boolean;
 
-  fullWidth?: boolean;
+  isFullWidth?: boolean;
 
   className?: string;
   style?: CSSProperties;

@@ -22,9 +22,8 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
     color = 'success',
     size = 'md',
     isSelected,
-    defaultSelected = false,
+    defaultIsSelected = false,
     onChange,
-    onChangeEvent,
     isDisabled = false,
     isReadOnly = false,
     isRequired = false,
@@ -49,7 +48,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
 
   const [checked, setChecked] = useControllableState<boolean>({
     value: isSelected,
-    defaultValue: (isSelected !== undefined ? undefined : (defaultSelected ?? false)) as boolean,
+    defaultValue: (isSelected !== undefined ? undefined : (defaultIsSelected ?? false)) as boolean,
     onChange,
     name: 'Switch',
   });
@@ -82,9 +81,8 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
         return;
       }
       setChecked(e.target.checked);
-      onChangeEvent?.(e);
     },
-    [checked, isReadOnly, onChangeEvent, setChecked],
+    [checked, isReadOnly, setChecked],
   );
 
   const handleKeyDown = useCallback(
@@ -251,8 +249,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
       {children ? (
         <span
           css={css`
-            font-size: ${theme.components.input[size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md']
-              .fontSize};
+            font-size: ${theme.components.input[size].fontSize};
             line-height: 1.4;
             color: ${theme.colors.text.primary};
           `}

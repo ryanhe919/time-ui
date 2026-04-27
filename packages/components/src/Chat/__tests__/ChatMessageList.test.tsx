@@ -126,7 +126,7 @@ describe('ChatMessageList — scrolling', () => {
     delete (HTMLElement.prototype as unknown as { scrollHeight?: number }).scrollHeight;
   });
 
-  it('does not auto-scroll when autoScrollToBottom=false', () => {
+  it('does not auto-scroll when shouldAutoScrollToBottom=false', () => {
     Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
       configurable: true,
       get() {
@@ -135,7 +135,7 @@ describe('ChatMessageList — scrolling', () => {
     });
 
     const { container } = renderWithProviders(
-      <ChatMessageList maxHeight={200} autoScrollToBottom={false}>
+      <ChatMessageList maxHeight={200} shouldAutoScrollToBottom={false}>
         <ChatMessage role="user">m1</ChatMessage>
       </ChatMessageList>,
     );

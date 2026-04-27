@@ -180,7 +180,7 @@ const CloseIcon = () => (
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(props, forwardedRef) {
   const {
     isOpen,
-    defaultIsOpen = false,
+    defaultOpen = false,
     onOpenChange,
 
     size = 'md',
@@ -192,9 +192,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(props
 
     closeOnEsc = true,
     closeOnOverlayClick = true,
-    blockScrollOnMount = true,
+    shouldBlockScroll = true,
     autoFocus = true,
-    returnFocusOnClose = true,
+    shouldReturnFocus = true,
 
     children,
     className,
@@ -216,7 +216,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(props
   // 受控 / 非受控 open
   const [open, setOpen] = useControllableState<boolean>({
     value: isOpen,
-    defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+    defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
     onChange: onOpenChange,
     name: 'Modal',
   });
@@ -226,7 +226,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(props
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   // ── body scroll lock（含滚动条宽度补偿，避免内容水平抖动） ──
-  useScrollLock(open && blockScrollOnMount);
+  useScrollLock(open && shouldBlockScroll);
 
   // ── focus 管理：记忆 → autoFocus → 关闭归还 ──
   useEffect(() => {
@@ -251,14 +251,14 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(props
     return () => {
       cancelled = true;
       clearTimeout(t);
-      if (returnFocusOnClose) {
+      if (shouldReturnFocus) {
         const target = previouslyFocusedRef.current;
         if (target && typeof target.focus === 'function') {
           target.focus();
         }
       }
     };
-  }, [open, autoFocus, returnFocusOnClose]);
+  }, [open, autoFocus, shouldReturnFocus]);
 
   // ── ESC 关闭 ──
   useEffect(() => {

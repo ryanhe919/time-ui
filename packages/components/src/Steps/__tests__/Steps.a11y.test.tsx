@@ -10,10 +10,10 @@ import { Steps } from '../';
 import type { StepItem } from '../Steps.types';
 
 const BASE_ITEMS: StepItem[] = [
-  { key: 'a', title: 'Login', description: 'Provide credentials' },
-  { key: 'b', title: 'Verify', description: 'Email verification' },
-  { key: 'c', title: 'Profile', description: 'Set up profile' },
-  { key: 'd', title: 'Done', description: 'All set' },
+  { itemKey: 'a', title: 'Login', description: 'Provide credentials' },
+  { itemKey: 'b', title: 'Verify', description: 'Email verification' },
+  { itemKey: 'c', title: 'Profile', description: 'Set up profile' },
+  { itemKey: 'd', title: 'Done', description: 'All set' },
 ];
 
 describe('Steps — a11y', () => {
@@ -22,11 +22,16 @@ describe('Steps — a11y', () => {
     async (theme) => {
       const { container } = renderWithProviders(
         <div>
-          <Steps aria-label="Flow" items={BASE_ITEMS} current={1} />
-          <Steps aria-label="Vertical flow" items={BASE_ITEMS} current={1} direction="vertical" />
-          <Steps aria-label="Dot flow" items={BASE_ITEMS} current={1} variant="dot" />
-          <Steps aria-label="Nav flow" items={BASE_ITEMS} current={1} variant="navigation" />
-          <Steps aria-label="Clickable flow" items={BASE_ITEMS} current={0} isClickable />
+          <Steps aria-label="Flow" items={BASE_ITEMS} activeIndex={1} />
+          <Steps
+            aria-label="Vertical flow"
+            items={BASE_ITEMS}
+            activeIndex={1}
+            direction="vertical"
+          />
+          <Steps aria-label="Dot flow" items={BASE_ITEMS} activeIndex={1} variant="dot" />
+          <Steps aria-label="Nav flow" items={BASE_ITEMS} activeIndex={1} variant="navigation" />
+          <Steps aria-label="Clickable flow" items={BASE_ITEMS} activeIndex={0} isClickable />
         </div>,
         { theme },
       );

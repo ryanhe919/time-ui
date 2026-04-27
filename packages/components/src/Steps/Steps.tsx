@@ -83,9 +83,9 @@ function statusLabel(s: StepStatus): string {
 export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(props, forwardedRef) {
   const {
     items,
-    current,
-    defaultCurrent,
-    onChange,
+    activeIndex: activeIndexProp,
+    defaultActiveIndex,
+    onActiveIndexChange,
     status: overallStatus = 'process',
     direction = 'horizontal',
     variant = 'default',
@@ -107,9 +107,9 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
 
   // useControllableState 会在同时收到 value + defaultValue 时告警；受控时把 defaultValue 留空。
   const [activeIndex, setActiveIndex] = useControllableState<number>({
-    value: current,
-    defaultValue: (current !== undefined ? undefined : (defaultCurrent ?? 0)) as number,
-    onChange,
+    value: activeIndexProp,
+    defaultValue: (activeIndexProp !== undefined ? undefined : (defaultActiveIndex ?? 0)) as number,
+    onChange: onActiveIndexChange,
     name: 'Steps',
   });
 
@@ -485,7 +485,7 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
         </li>
       ) : null}
       {safeItems.map((item, idx) => {
-        const itemKey = item.key ?? `${idx}`;
+        const itemKey = item.itemKey ?? `${idx}`;
         const itemId = `${baseId}-item-${itemKey}`;
         const s = resolveStatus(item, idx, activeIndex, overallStatus);
         const isCurrent = idx === activeIndex;

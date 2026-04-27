@@ -407,7 +407,7 @@ describe('SegmentedControl — color and size variants', () => {
     },
   );
 
-  it.each(['sm', 'md', 'lg'] as const)(
+  it.each(['xs', 'sm', 'md', 'lg', 'xl'] as const)(
     'renders size=%s without crashing',
     (size: SegmentedControlSize) => {
       renderWithProviders(

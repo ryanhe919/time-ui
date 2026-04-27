@@ -31,7 +31,7 @@ export function PaginationFullDemo() {
         total={total}
         page={page}
         pageSize={pageSize}
-        onChange={setPage}
+        onPageChange={setPage}
         onPageSizeChange={(n) => {
           setPageSize(n);
           setPage(1);
