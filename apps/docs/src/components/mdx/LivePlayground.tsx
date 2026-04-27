@@ -56,7 +56,7 @@ export default function App() {
 }
 `;
 
-const INDEX_TEMPLATE = `import { StrictMode } from 'react';
+const MAIN_TEMPLATE = `import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 
@@ -84,15 +84,17 @@ export function LivePlayground({
 
   const files = useMemo(
     () => ({
-      '/App.tsx': { code: APP_TEMPLATE(locale, mode), hidden: true },
-      '/index.tsx': { code: INDEX_TEMPLATE, hidden: true },
-      '/Demo.tsx': { code: code.trim(), active: true },
+      '/src/App.tsx': { code: APP_TEMPLATE(locale, mode), hidden: true },
+      '/src/main.tsx': { code: MAIN_TEMPLATE, hidden: true },
+      '/src/Demo.tsx': { code: code.trim(), active: true },
     }),
     [code, locale, mode],
   );
 
   const sandpackTheme: SandpackThemeProp = mode === 'dark' ? 'dark' : 'light';
-  const template: SandpackPredefinedTemplate = 'react-ts';
+  // 用 vite-react-ts 而不是 react-ts —— 后者依赖 CodeSandbox 的远程 CRA bundler，
+  // 网络不稳定时常出现 "Couldn't connect to server / TIME_OUT"。Vite 模板走静态运行时，更可靠。
+  const template: SandpackPredefinedTemplate = 'vite-react-ts';
 
   return (
     <div

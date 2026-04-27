@@ -88,6 +88,7 @@ import {
 import { PropsTable } from '@/components/mdx/PropsTable';
 import { LiveDemo } from '@/components/mdx/LiveDemo';
 import { LivePlayground } from '@/components/mdx/LivePlayground';
+import { PlaygroundLink } from '@/components/mdx/PlaygroundLink';
 import { SearchDialogDemo } from '@/components/mdx/SearchDialogDemo';
 import { InputFormDemo } from '@/components/mdx/InputFormDemo';
 import { TextareaDemo } from '@/components/mdx/TextareaDemo';
@@ -185,6 +186,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     CodeBlock,
     LiveDemo,
     LivePlayground,
+    PlaygroundLink,
     SearchDialogDemo,
     InputFormDemo,
     TextareaDemo,
