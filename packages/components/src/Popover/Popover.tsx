@@ -57,10 +57,47 @@ const splitPlacement = (
   return { side, align: alignSuffix ?? 'center' };
 };
 
+const OPPOSITE_SIDE: Record<PopoverSide, PopoverSide> = {
+  top: 'bottom',
+  bottom: 'top',
+  left: 'right',
+  right: 'left',
+};
+
 /**
- * 基础放置定位算法（不做翻转 / 溢出处理）。
+ * 主轴方向上某 side 是否容得下整张 popover（含 offset 与 viewport 安全留白）。
+ */
+const sideHasRoom = (
+  side: PopoverSide,
+  anchorRect: { top: number; left: number; width: number; height: number },
+  popoverSize: { width: number; height: number },
+  offset: number,
+  viewport: { width: number; height: number },
+  padding: number,
+): boolean => {
+  if (side === 'top') return anchorRect.top - offset - padding >= popoverSize.height;
+  if (side === 'bottom')
+    return (
+      viewport.height - (anchorRect.top + anchorRect.height) - offset - padding >=
+      popoverSize.height
+    );
+  if (side === 'left') return anchorRect.left - offset - padding >= popoverSize.width;
+  return (
+    viewport.width - (anchorRect.left + anchorRect.width) - offset - padding >= popoverSize.width
+  );
+};
+
+/**
+ * 基础放置定位算法。
  *
  * 输入：anchor + popover 的 client rect、placement、像素 offset。
+ * 当传入 `viewport` 时，额外做：
+ *   - **Flip**：当前 side 主轴方向放不下且对侧更宽时，翻转到对侧（top↔bottom / left↔right）。
+ *     避免气泡越过视口边缘被遮挡的常见 bug。
+ *   - **Shift**：沿次轴 clamp 到视口内（top/bottom 时是水平 clamp；left/right 时是垂直 clamp），
+ *     防止远离 anchor 的 align（start/end）让气泡飘出可视区域。
+ * 不传 `viewport` 时保持纯定位行为，便于纯函数单测。
+ *
  * 输出：popover 的 viewport top/left（fixed 定位用），以及解析后的 side/align（给 arrow 用）。
  */
 export const computePopoverPosition = (
@@ -68,8 +105,21 @@ export const computePopoverPosition = (
   popoverSize: { width: number; height: number },
   placement: PopoverPlacement,
   offset: number,
+  viewport?: { width: number; height: number },
+  padding = 8,
 ): PositionResult => {
-  const { side, align } = splitPlacement(placement);
+  let { side, align } = splitPlacement(placement);
+
+  // ── Flip primary axis ──
+  if (viewport) {
+    const fits = sideHasRoom(side, anchorRect, popoverSize, offset, viewport, padding);
+    const opposite = OPPOSITE_SIDE[side];
+    const oppositeFits = sideHasRoom(opposite, anchorRect, popoverSize, offset, viewport, padding);
+    if (!fits && oppositeFits) {
+      side = opposite;
+    }
+  }
+
   let top = 0;
   let left = 0;
 
@@ -98,6 +148,23 @@ export const computePopoverPosition = (
       top = anchorRect.top + anchorRect.height - popoverSize.height;
     } else {
       top = anchorRect.top + anchorRect.height / 2 - popoverSize.height / 2;
+    }
+  }
+
+  // ── Shift / clamp 次轴（top/bottom 水平，left/right 垂直）──
+  if (viewport) {
+    if (side === 'top' || side === 'bottom') {
+      const minLeft = padding;
+      const maxLeft = viewport.width - popoverSize.width - padding;
+      if (maxLeft >= minLeft) {
+        left = Math.min(Math.max(left, minLeft), maxLeft);
+      }
+    } else {
+      const minTop = padding;
+      const maxTop = viewport.height - popoverSize.height - padding;
+      if (maxTop >= minTop) {
+        top = Math.min(Math.max(top, minTop), maxTop);
+      }
     }
   }
 
@@ -209,6 +276,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         { width: pRect.width, height: pRect.height },
         placement,
         offsetPx,
+        { width: window.innerWidth, height: window.innerHeight },
       );
       setPosition((prev) => {
         // 浅比较防止无意义重渲染。

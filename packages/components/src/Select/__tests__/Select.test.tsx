@@ -374,4 +374,55 @@ describe('Select', () => {
     expect(hidden).not.toBeNull();
     expect(hidden!.value).toBe('b');
   });
+
+  describe('popover placement (viewport collision)', () => {
+    it('defaults to bottom placement when there is plenty of space below the trigger', async () => {
+      // jsdom 默认 getBoundingClientRect 全 0、innerHeight 768：trigger.bottom=0,
+      // availableBelow≈754 ≥ userMax(280) → 走 bottom 分支。
+      renderWithProviders(<Select aria-label="fruit" items={ITEMS} />);
+      await userEvent.click(screen.getByRole('combobox'));
+      const listbox = await screen.findByRole('listbox');
+      const popover = listbox.closest('[data-timeui-select-popover]') as HTMLElement | null;
+      expect(popover).not.toBeNull();
+      expect(popover!.getAttribute('data-placement')).toBe('bottom');
+      expect(popover!.style.top).not.toBe('');
+      expect(popover!.style.bottom).toBe('');
+    });
+
+    it('flips to top placement when the trigger sits near the viewport bottom', async () => {
+      // 模拟 trigger 贴近视口底部的真实情况：viewport=600, trigger.bottom=590
+      // → availableBelow=600-590-6-8=−4 → 0；availableAbove=570-6-8=556 → flip top。
+      const originalGetRect = Element.prototype.getBoundingClientRect;
+      const originalInnerHeight = window.innerHeight;
+      Object.defineProperty(window, 'innerHeight', { value: 600, configurable: true });
+      Element.prototype.getBoundingClientRect = vi.fn(() => ({
+        x: 100,
+        y: 570,
+        top: 570,
+        bottom: 590,
+        left: 100,
+        right: 200,
+        width: 100,
+        height: 20,
+        toJSON: () => ({}),
+      })) as unknown as typeof Element.prototype.getBoundingClientRect;
+      try {
+        renderWithProviders(<Select aria-label="fruit" items={ITEMS} />);
+        await userEvent.click(screen.getByRole('combobox'));
+        const listbox = await screen.findByRole('listbox');
+        const popover = listbox.closest('[data-timeui-select-popover]') as HTMLElement | null;
+        expect(popover).not.toBeNull();
+        expect(popover!.getAttribute('data-placement')).toBe('top');
+        // top placement 使用 bottom 锚定，不使用 top
+        expect(popover!.style.bottom).not.toBe('');
+        expect(popover!.style.top).toBe('');
+      } finally {
+        Element.prototype.getBoundingClientRect = originalGetRect;
+        Object.defineProperty(window, 'innerHeight', {
+          value: originalInnerHeight,
+          configurable: true,
+        });
+      }
+    });
+  });
 });

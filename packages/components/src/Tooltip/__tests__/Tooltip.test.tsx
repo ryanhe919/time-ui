@@ -405,7 +405,11 @@ describe('Tooltip — a11y attributes', () => {
 
 describe('Tooltip — placement & arrow', () => {
   it('different placements yield different inline top/left', () => {
-    installRectAutoMocks();
+    // anchor 放在 viewport 中央，让 'top' 不被 flip 到 bottom。
+    installRectAutoMocks(
+      { top: 400, left: 400, width: 100, height: 40 },
+      { width: 120, height: 40 },
+    );
     const { rerender } = renderWithProviders(
       <Tooltip content="x" defaultIsOpen placement="top">
         <button type="button">T</button>

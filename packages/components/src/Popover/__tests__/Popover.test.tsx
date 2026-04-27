@@ -111,6 +111,98 @@ describe('computePopoverPosition (pure)', () => {
     expect(r.left).toBe(50 + 100 + 4);
     expect(r.top).toBe(100 + 40 / 2 - 100 / 2); // 70
   });
+
+  describe('viewport collision (flip + shift)', () => {
+    const vp = { width: 1024, height: 768 };
+
+    it('flips top → bottom when there is no room above the anchor', () => {
+      // anchor 紧贴顶部：top=10, panel 高 100 → top 上方放不下；底下 758-50-16=692 容得下
+      const r = computePopoverPosition(
+        { top: 10, left: 400, width: 100, height: 40 },
+        { width: 200, height: 100 },
+        'top',
+        8,
+        vp,
+      );
+      expect(r.side).toBe('bottom');
+      expect(r.top).toBe(10 + 40 + 8); // 锚点底 + offset
+    });
+
+    it('flips bottom → top when there is no room below the anchor', () => {
+      // anchor 紧贴底部：top=720, height=40, panel 高 100 → bottom 下方放不下；上方 720 容得下
+      const r = computePopoverPosition(
+        { top: 720, left: 400, width: 100, height: 40 },
+        { width: 200, height: 100 },
+        'bottom',
+        8,
+        vp,
+      );
+      expect(r.side).toBe('top');
+      expect(r.top).toBe(720 - 100 - 8);
+    });
+
+    it('flips left → right when there is no room on the left', () => {
+      const r = computePopoverPosition(
+        { top: 300, left: 5, width: 100, height: 40 },
+        { width: 200, height: 100 },
+        'left',
+        8,
+        vp,
+      );
+      expect(r.side).toBe('right');
+      expect(r.left).toBe(5 + 100 + 8);
+    });
+
+    it('shifts (clamps) horizontally to keep popover inside viewport on bottom-end', () => {
+      // anchor 紧贴右边：viewport 1024 宽，panel 200 宽，maxLeft=1024-200-8=816
+      // bottom-end 默认 left = 1020 + 100 - 200 = 920 → clamp 到 816
+      const r = computePopoverPosition(
+        { top: 100, left: 1020, width: 100, height: 40 },
+        { width: 200, height: 100 },
+        'bottom-end',
+        8,
+        vp,
+      );
+      expect(r.side).toBe('bottom');
+      expect(r.left).toBe(1024 - 200 - 8); // shifted to maxLeft
+    });
+
+    it('shifts (clamps) horizontally on bottom-start when anchor is near the left edge', () => {
+      // anchor.left=2 → start align 默认 left=2，clamp 到 minLeft=8
+      const r = computePopoverPosition(
+        { top: 100, left: 2, width: 100, height: 40 },
+        { width: 200, height: 100 },
+        'bottom-start',
+        8,
+        vp,
+      );
+      expect(r.left).toBe(8);
+    });
+
+    it('does not flip when both sides have room (keeps requested placement)', () => {
+      const r = computePopoverPosition(
+        { top: 400, left: 400, width: 100, height: 40 },
+        { width: 100, height: 60 },
+        'top',
+        8,
+        vp,
+      );
+      expect(r.side).toBe('top');
+    });
+
+    it('keeps original side when neither opposite side has room either', () => {
+      // viewport 太矮，无论 top/bottom 都放不下 → 维持请求的 side
+      const tinyVp = { width: 1024, height: 100 };
+      const r = computePopoverPosition(
+        { top: 30, left: 400, width: 100, height: 40 },
+        { width: 200, height: 200 },
+        'top',
+        8,
+        tinyVp,
+      );
+      expect(r.side).toBe('top');
+    });
+  });
 });
 
 // ────────────────────────────────────────────────────────────
@@ -531,7 +623,11 @@ describe('Popover — placement & positioning', () => {
   });
 
   it('different placements yield different positions (top vs bottom)', () => {
-    installRectAutoMocks();
+    // anchor 放在 viewport 中央，让 'top' / 'bottom' 都有足够空间不被 flip。
+    installRectAutoMocks(
+      { top: 400, left: 400, width: 100, height: 40 },
+      { width: 200, height: 100 },
+    );
     const { rerender } = renderWithProviders(
       <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="top">
         c
@@ -674,7 +770,11 @@ describe('Popover — arrow / header / footer', () => {
   });
 
   it('arrow position attributes follow placement side', () => {
-    installRectAutoMocks();
+    // anchor 放在 viewport 中央，让 'top' / 'left' 都有足够空间不触发 flip。
+    installRectAutoMocks(
+      { top: 400, left: 400, width: 100, height: 40 },
+      { width: 100, height: 60 },
+    );
     const { rerender } = renderWithProviders(
       <Popover anchor={<button type="button">T</button>} defaultIsOpen placement="top">
         c

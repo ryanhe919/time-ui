@@ -204,6 +204,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
         { width: pRect.width, height: pRect.height },
         placement,
         offsetPx,
+        { width: window.innerWidth, height: window.innerHeight },
       );
       setPosition((prev) => {
         if (

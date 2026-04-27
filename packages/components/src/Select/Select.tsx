@@ -186,9 +186,18 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const [search, setSearch] = useState('');
   const [highlight, setHighlight] = useState(-1);
   const [popoverRect, setPopoverRect] = useState<{
-    top: number;
+    /** bottom: 菜单挂在 trigger 下方；top: 挂在上方（贴 trigger 顶） */
+    placement: 'bottom' | 'top';
+    /**
+     * 锚定坐标：
+     * - bottom 时是 trigger.bottom（距 viewport 顶部），style.top = offset + gap
+     * - top 时是 vh - trigger.top（距 viewport 底部），style.bottom = offset + gap
+     */
+    offset: number;
     left: number;
     width: number;
+    /** 此 placement 下菜单可用的最大高度（避免被视口底/顶截断） */
+    maxHeight: number;
   } | null>(null);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -262,7 +271,27 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       const trigger = wrapperRef.current;
       if (!trigger) return;
       const r = trigger.getBoundingClientRect();
-      setPopoverRect({ top: r.bottom, left: r.left, width: r.width });
+      const vh = window.innerHeight;
+      const gap = 6; // 与 trigger 之间的间距
+      const safeMargin = 8; // 距视口边缘的安全留白
+      const userMaxPx = typeof maxListHeight === 'number' ? maxListHeight : 280;
+
+      const availableBelow = Math.max(0, vh - r.bottom - gap - safeMargin);
+      const availableAbove = Math.max(0, r.top - gap - safeMargin);
+
+      // 优先 bottom；下方放不下用户期望高度且上方更宽，则 flip 到 top。
+      const placement: 'bottom' | 'top' =
+        availableBelow >= userMaxPx || availableBelow >= availableAbove ? 'bottom' : 'top';
+
+      const maxHeight = Math.max(120, placement === 'bottom' ? availableBelow : availableAbove);
+
+      setPopoverRect({
+        placement,
+        offset: placement === 'bottom' ? r.bottom : vh - r.top,
+        left: r.left,
+        width: r.width,
+        maxHeight,
+      });
     };
     updateRect();
     window.addEventListener('scroll', updateRect, true);
@@ -271,7 +300,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       window.removeEventListener('scroll', updateRect, true);
       window.removeEventListener('resize', updateRect);
     };
-  }, [open]);
+  }, [open, maxListHeight]);
 
   const closeAndRefocus = useCallback(() => {
     setOpen(false);
@@ -486,10 +515,26 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     flex-direction: column;
     transform-origin: top center;
     animation: timeui-select-pop 140ms cubic-bezier(0.16, 1, 0.3, 1);
+    /* 当菜单贴在 trigger 上方展开时，把 origin 与位移方向反过来，
+       维持"从 trigger 边缘弹出"的视觉一致性。 */
+    &[data-placement='top'] {
+      transform-origin: bottom center;
+      animation-name: timeui-select-pop-up;
+    }
     @keyframes timeui-select-pop {
       from {
         opacity: 0;
         transform: translateY(-4px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    @keyframes timeui-select-pop-up {
+      from {
+        opacity: 0;
+        transform: translateY(4px) scale(0.98);
       }
       to {
         opacity: 1;
@@ -531,6 +576,10 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     list-style: none;
     margin: 0;
     padding: 4px;
+    /* flex 子项必须解除默认 min-height: auto，否则 flex 容器的 maxHeight 收紧时
+       ul 仍按内容撑开导致整体溢出被 popover 的 overflow:hidden 裁掉。 */
+    flex: 1 1 auto;
+    min-height: 0;
     max-height: ${cssLength(maxListHeight, '280px')};
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -778,11 +827,15 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
               ref={popoverRef}
               css={popoverCss}
               style={{
-                top: popoverRect.top + 6,
+                ...(popoverRect.placement === 'bottom'
+                  ? { top: popoverRect.offset + 6 }
+                  : { bottom: popoverRect.offset + 6 }),
                 left: popoverRect.left,
                 minWidth: popoverRect.width,
+                maxHeight: popoverRect.maxHeight,
               }}
               data-timeui-select-popover=""
+              data-placement={popoverRect.placement}
               data-variant={variant}
               data-color={resolvedColor}
             >
