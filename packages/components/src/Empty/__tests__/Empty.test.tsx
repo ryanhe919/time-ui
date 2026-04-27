@@ -32,7 +32,7 @@ describe('Empty', () => {
   });
 
   it('supports each size', () => {
-    const sizes = ['sm', 'md', 'lg'] as const;
+    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
     for (const s of sizes) {
       const { unmount, container } = renderWithProviders(<Empty size={s} title={`s-${s}`} />);
       expect(container.querySelector(`[data-size="${s}"]`)).toBeTruthy();

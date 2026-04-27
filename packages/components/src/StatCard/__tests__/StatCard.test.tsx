@@ -91,6 +91,18 @@ describe('StatCard — contract & visual', () => {
     expect(styles).toMatch(/translateY\(-4px\)/);
   });
 
+  it('#5b renders xs and xl sizes (5-tier) with corresponding delta translateY', () => {
+    renderWithProviders(
+      <StatCard label="sz-xs" value="1" size="xs" delta={{ value: '+1%', direction: 'up' }} />,
+    );
+    renderWithProviders(
+      <StatCard label="sz-xl" value="1" size="xl" delta={{ value: '+1%', direction: 'up' }} />,
+    );
+    const styles = extractEmittedStyles();
+    expect(styles).toMatch(/translateY\(-1px\)/);
+    expect(styles).toMatch(/translateY\(-5px\)/);
+  });
+
   it('#6 delta direction drives data-direction; auto polarity: up→positive, down→negative, flat→neutral', () => {
     const { container: cup, unmount: uu } = renderWithProviders(
       <StatCard label="n" value="1" delta={{ value: '+1%', direction: 'up' }} />,
@@ -222,7 +234,7 @@ describe('StatCard — contract & visual', () => {
 
   it('#16 trend with bleed uses negative margin pattern', () => {
     const { container } = renderWithProviders(
-      <StatCard label="n" value="1" size="md" trendBleed trend={<div>chart</div>} />,
+      <StatCard label="n" value="1" size="md" hasTrendBleed trend={<div>chart</div>} />,
     );
     const trend = container.querySelector('[data-slot="trend"]');
     expect(trend?.getAttribute('data-bleed')).toBe('true');
@@ -325,12 +337,12 @@ describe('StatCard — contract & visual', () => {
     expect(styles).toMatch(/inset 0 1px 0 rgba\(255,\s*255,\s*255,\s*0\.06\)/);
   });
 
-  it('#26 trendBleed margin adapts by size tokens', () => {
+  it('#26 hasTrendBleed margin adapts by size tokens', () => {
     renderWithProviders(
-      <StatCard label="sm" value="1" size="sm" trendBleed trend={<div>t</div>} />,
+      <StatCard label="sm" value="1" size="sm" hasTrendBleed trend={<div>t</div>} />,
     );
     renderWithProviders(
-      <StatCard label="lg" value="1" size="lg" trendBleed trend={<div>t</div>} />,
+      <StatCard label="lg" value="1" size="lg" hasTrendBleed trend={<div>t</div>} />,
     );
     const styles = extractEmittedStyles();
     expect(styles).toMatch(/margin:\s*12px -12px -12px/);

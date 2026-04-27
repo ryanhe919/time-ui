@@ -1,6 +1,6 @@
 # 空状态 Empty
 
-数据为空 / 查无结果 / 请求出错时的占位插画 + 文案 + 行动按钮。预置 4 个 image preset（`default` / `search` / `error` / `no-data`），3 档尺寸，`variant="inline"` 可压缩成一行用于卡片内嵌。
+数据为空 / 查无结果 / 请求出错时的占位插画 + 文案 + 行动按钮。预置 4 个 image preset（`default` / `search` / `error` / `no-data`），5 档尺寸，`variant="inline"` 可压缩成一行用于卡片内嵌。
 
 ## 基础用法
 
@@ -34,7 +34,7 @@
 
 ## 尺寸 size
 
-`sm` / `md`（默认）/ `lg`。`sm` 适合卡片 / 抽屉内嵌，`lg` 适合空白页占满版心。
+`xs` / `sm` / `md`（默认）/ `lg` / `xl`。`xs`、`sm` 适合卡片 / 抽屉内嵌，`lg`、`xl` 适合空白页占满版心。
 
 ## variant="inline"
 
@@ -68,7 +68,7 @@
   { name: 'title', type: 'ReactNode', description: '一级标题。' },
   { name: 'description', type: 'ReactNode', description: '次级描述。' },
   { name: 'actions', type: 'ReactNode', description: '主操作按钮区，通常 1 ~ 2 个 Button。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'variant', type: "'default' | 'inline'", default: "'default'", description: '`inline` 横向单行布局。' },
   { name: 'children', type: 'ReactNode', description: '当传入时覆盖 `title` / `description` / `actions` 的默认结构。' },
   { name: 'className', type: 'string' }

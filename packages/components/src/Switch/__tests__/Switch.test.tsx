@@ -22,9 +22,9 @@ describe('Switch', () => {
     expect(onChange).toHaveBeenCalledWith(false);
   });
 
-  it('is uncontrolled: defaultSelected starts checked and updates DOM locally', async () => {
+  it('is uncontrolled: defaultIsSelected starts checked and updates DOM locally', async () => {
     const onChange = vi.fn();
-    renderWithProviders(<Switch defaultSelected onChange={onChange} aria-label="wifi" />);
+    renderWithProviders(<Switch defaultIsSelected onChange={onChange} aria-label="wifi" />);
     const input = getSwitchInput();
     expect(input.checked).toBe(true);
     await userEvent.click(input);
@@ -43,7 +43,7 @@ describe('Switch', () => {
 
   it('toggles on Space AND Enter (Enter is a manual binding)', async () => {
     const onChange = vi.fn();
-    renderWithProviders(<Switch defaultSelected={false} onChange={onChange} aria-label="x" />);
+    renderWithProviders(<Switch defaultIsSelected={false} onChange={onChange} aria-label="x" />);
     const input = getSwitchInput();
     input.focus();
     await userEvent.keyboard(' ');
@@ -55,7 +55,7 @@ describe('Switch', () => {
   it('isReadOnly swallows click/keyboard without calling onChange or flipping DOM', async () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Switch defaultSelected={false} isReadOnly onChange={onChange} aria-label="x" />,
+      <Switch defaultIsSelected={false} isReadOnly onChange={onChange} aria-label="x" />,
     );
     const input = getSwitchInput();
     await userEvent.click(input);
@@ -70,7 +70,7 @@ describe('Switch', () => {
   it('submits name + value to the enclosing form when selected', () => {
     const { container } = renderWithProviders(
       <form data-testid="f">
-        <Switch name="notif" value="on" defaultSelected aria-label="x" />
+        <Switch name="notif" value="on" defaultIsSelected aria-label="x" />
       </form>,
     );
     const form = container.querySelector('form') as HTMLFormElement;
@@ -105,7 +105,7 @@ describe('Switch', () => {
   it('isDisabled blocks interaction and flips neither state nor onChange', async () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Switch isDisabled defaultSelected={false} onChange={onChange} aria-label="x" />,
+      <Switch isDisabled defaultIsSelected={false} onChange={onChange} aria-label="x" />,
     );
     const input = getSwitchInput();
     expect(input).toBeDisabled();
@@ -115,7 +115,7 @@ describe('Switch', () => {
   });
 
   it('isInvalid sets aria-invalid="true" on the input', () => {
-    renderWithProviders(<Switch isInvalid defaultSelected aria-label="x" />);
+    renderWithProviders(<Switch isInvalid defaultIsSelected aria-label="x" />);
     expect(getSwitchInput()).toHaveAttribute('aria-invalid', 'true');
   });
 
@@ -128,19 +128,6 @@ describe('Switch', () => {
     expect(input).toHaveAttribute('aria-required', 'true');
     expect(input).toHaveAttribute('aria-describedby', 'help-id');
     expect(input).toHaveAttribute('aria-labelledby', 'label-id');
-  });
-
-  it('fires onChangeEvent with the native event in uncontrolled mode', async () => {
-    const onChange = vi.fn();
-    const onChangeEvent = vi.fn();
-    renderWithProviders(
-      <Switch onChange={onChange} onChangeEvent={onChangeEvent} aria-label="wifi" />,
-    );
-    const input = getSwitchInput();
-    await userEvent.click(input);
-    expect(onChange).toHaveBeenCalledWith(true);
-    expect(onChangeEvent).toHaveBeenCalledTimes(1);
-    expect(onChangeEvent.mock.calls[0]?.[0]?.target).toBe(input);
   });
 
   it('renders startContent / endContent slots that track the selected state', () => {
@@ -171,7 +158,7 @@ describe('Switch', () => {
   });
 
   it('emits the prefers-reduced-motion override rule so the thumb does not animate', () => {
-    renderWithProviders(<Switch defaultSelected aria-label="x" />);
+    renderWithProviders(<Switch defaultIsSelected aria-label="x" />);
     const styles = Array.from(document.querySelectorAll('style'))
       .map((s) => s.textContent ?? '')
       .join('\n');

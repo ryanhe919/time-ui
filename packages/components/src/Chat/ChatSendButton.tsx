@@ -18,7 +18,7 @@ export interface ChatSendButtonProps extends ChatCommonStyleProps {
   isStreaming?: boolean;
   onStop?: () => void;
   'aria-label'?: string;
-  'aria-label-stop'?: string;
+  stopAriaLabel?: string;
 }
 
 const ArrowUpIcon = () => (
@@ -51,7 +51,7 @@ export const ChatSendButton = forwardRef<HTMLButtonElement, ChatSendButtonProps>
       isStreaming = false,
       onStop,
       'aria-label': ariaLabel = 'Send message',
-      'aria-label-stop': ariaLabelStop = 'Stop generation',
+      stopAriaLabel = 'Stop generation',
       className,
       style,
       id,
@@ -144,7 +144,7 @@ export const ChatSendButton = forwardRef<HTMLButtonElement, ChatSendButtonProps>
         css={buttonCss}
         onClick={handleClick}
         disabled={isDisabled && !isStreaming}
-        aria-label={isStreaming ? ariaLabelStop : ariaLabel}
+        aria-label={isStreaming ? stopAriaLabel : ariaLabel}
         aria-disabled={isDisabled && !isStreaming ? true : undefined}
         data-streaming={isStreaming || undefined}
         data-disabled={isDisabled || undefined}

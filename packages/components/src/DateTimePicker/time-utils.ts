@@ -81,26 +81,26 @@ export const isAm = (hour24: number): boolean => {
 };
 
 /**
- * DateTimePicker 的默认格式化。根据 showMinute/showSecond/use12Hours 组合输出：
+ * DateTimePicker 的默认格式化。根据 showMinute/showSecond/is12Hour 组合输出：
  * - 默认 24 小时制 "YYYY-MM-DD HH:mm"。
  * - showSecond=true 时追加 ":ss"。
  * - showMinute=false 时省略 ":mm"（此时也不会有秒）。
- * - use12Hours=true 时后缀 " AM"/" PM"。
+ * - is12Hour=true 时后缀 " AM"/" PM"。
  */
 export const defaultDateTimeFormat = (
   d: Date,
-  opts: { showMinute?: boolean; showSecond?: boolean; use12Hours?: boolean; locale?: string } = {},
+  opts: { showMinute?: boolean; showSecond?: boolean; is12Hour?: boolean; locale?: string } = {},
 ): string => {
-  const { showMinute = true, showSecond = false, use12Hours = false } = opts;
+  const { showMinute = true, showSecond = false, is12Hour = false } = opts;
   const datePart = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
   const h24 = d.getHours();
-  const hourStr = use12Hours ? pad2(to12Hour(h24)) : pad2(h24);
+  const hourStr = is12Hour ? pad2(to12Hour(h24)) : pad2(h24);
   let timePart = hourStr;
   if (showMinute) {
     timePart += `:${pad2(d.getMinutes())}`;
     if (showSecond) timePart += `:${pad2(d.getSeconds())}`;
   }
-  if (use12Hours) timePart += ` ${isAm(h24) ? 'AM' : 'PM'}`;
+  if (is12Hour) timePart += ` ${isAm(h24) ? 'AM' : 'PM'}`;
   return `${datePart} ${timePart}`;
 };
 

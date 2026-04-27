@@ -73,8 +73,8 @@ describe('ChatSendButton — streaming mode', () => {
     expect(container.querySelector('rect')).not.toBeNull();
   });
 
-  it('respects custom aria-label-stop', () => {
-    renderWithProviders(<ChatSendButton isStreaming aria-label-stop="Halt" onStop={() => {}} />);
+  it('respects custom stopAriaLabel', () => {
+    renderWithProviders(<ChatSendButton isStreaming stopAriaLabel="Halt" onStop={() => {}} />);
     expect(screen.getByRole('button', { name: 'Halt' })).toBeInTheDocument();
   });
 

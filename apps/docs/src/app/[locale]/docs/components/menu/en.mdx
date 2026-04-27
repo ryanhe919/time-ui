@@ -58,20 +58,20 @@ Pass a flat `items` array to skip JSX in large menus. The two forms are intercha
   items={[
     {
       type: 'section',
-      key: 'name',
+      sectionKey: 'name',
       label: 'Name',
       items: [
-        { key: 'name-asc', label: 'A → Z' },
-        { key: 'name-desc', label: 'Z → A' },
+        { itemKey: 'name-asc', label: 'A → Z' },
+        { itemKey: 'name-desc', label: 'Z → A' },
       ],
     },
     {
       type: 'section',
-      key: 'date',
+      sectionKey: 'date',
       label: 'Date',
       items: [
-        { key: 'date-newest', label: 'Newest first' },
-        { key: 'date-oldest', label: 'Oldest first' },
+        { itemKey: 'date-newest', label: 'Newest first' },
+        { itemKey: 'date-oldest', label: 'Oldest first' },
       ],
     },
   ]}
@@ -98,7 +98,7 @@ Each `MenuItem` accepts:
   { name: 'items', type: 'ReadonlyArray<MenuItemDescriptor | MenuSectionDescriptor>', description: 'Data-driven mode; takes precedence over children.' },
   { name: 'children', type: 'ReactNode', description: 'Declarative mode: `<MenuItem>` / `<MenuSection>` / `<MenuDivider>`.' },
   { name: 'isOpen', type: 'boolean' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'", description: 'One of 12 placements; reuses Popover semantics.' },
   { name: 'selectionMode', type: "'none' | 'single' | 'multiple'", default: "'none'" },

@@ -69,16 +69,6 @@ describe('Textarea — controlled / uncontrolled', () => {
     expect(ta.value).toBe('seed!');
     expect(onChange).toHaveBeenCalled();
   });
-
-  it('onChangeEvent exposes the native ChangeEvent', async () => {
-    const onChangeEvent = vi.fn();
-    renderWithProviders(<Textarea aria-label="x" onChangeEvent={onChangeEvent} />);
-    await userEvent.type(screen.getByRole('textbox'), 'a');
-    const [event] = onChangeEvent.mock.calls.at(-1) as [Event];
-    expect((event as unknown as { target: HTMLTextAreaElement }).target).toBeInstanceOf(
-      HTMLTextAreaElement,
-    );
-  });
 });
 
 describe('Textarea — auto-size', () => {
@@ -213,11 +203,11 @@ describe('Textarea — disabled / readOnly', () => {
 });
 
 describe('Textarea — layout branches', () => {
-  it('supports fullWidth and renders start/end slots', () => {
+  it('supports isFullWidth and renders start/end slots', () => {
     const { container } = renderWithProviders(
       <Textarea
         aria-label="x"
-        fullWidth
+        isFullWidth
         startContent={<span data-testid="ta-start">S</span>}
         endContent={<span data-testid="ta-end">E</span>}
       />,

@@ -3,7 +3,7 @@
 Page navigation that derives its layout from `total` + `pageSize` and renders the collapsed page list. Three forms — `default`, `simple`, `mini` — plus optional jumper and page-size selector.
 
 <Callout variant="info" title="Controlled vs uncontrolled">
-  Pass `page` + `onChange` for the controlled form, or `defaultPage` for uncontrolled. **Pagination doesn't slice your data** — it tells you the current page and `pageSize`; fetching or slicing the corresponding rows is on you (see "Pairing with Table" below for the canonical pattern).
+  Pass `page` + `onPageChange` for the controlled form, or `defaultPage` for uncontrolled. **Pagination doesn't slice your data** — it tells you the current page and `pageSize`; fetching or slicing the corresponding rows is on you (see "Pairing with Table" below for the canonical pattern).
 </Callout>
 
 ## Interactive demo ← try it
@@ -15,7 +15,7 @@ import { Pagination } from '@timeui/react';
 
 export function Demo() {
   const [page, setPage] = useState(1);
-  return <Pagination total={87} pageSize={10} page={page} onChange={setPage} />;
+  return <Pagination total={87} pageSize={10} page={page} onPageChange={setPage} />;
 }`}>
   <PaginationBasicDemo />
 </LiveDemo>
@@ -38,7 +38,7 @@ export function Demo() {
 
 ## Sizes
 
-`sm` / `md` (default) / `lg` adjust button height and font size. The `mini` variant always uses `sm`.
+Five tiers — `xs` / `sm` / `md` (default) / `lg` / `xl` — adjust button height and font size. The `mini` variant always uses `sm`.
 
 <LiveDemo code={`<Stack spacing={16}>
   <Pagination size="sm" total={120} defaultPage={2} />
@@ -91,7 +91,7 @@ export function Demo() {
       total={248}
       page={page}
       pageSize={pageSize}
-      onChange={setPage}
+      onPageChange={setPage}
       onPageSizeChange={(n) => { setPageSize(n); setPage(1); }}
       showSizeChanger
       showQuickJumper
@@ -122,13 +122,13 @@ export function Demo() {
   { name: 'total', type: 'number', required: true, description: 'Total item count (required). totalPages = `ceil(total / pageSize)`.' },
   { name: 'page', type: 'number', description: 'Controlled current page (1-based).' },
   { name: 'defaultPage', type: 'number', default: '1', description: 'Uncontrolled initial page.' },
-  { name: 'onChange', type: '(page: number) => void' },
+  { name: 'onPageChange', type: '(page: number) => void' },
   { name: 'pageSize', type: 'number', description: 'Controlled page size.' },
   { name: 'defaultPageSize', type: 'number', default: '10' },
   { name: 'onPageSizeChange', type: '(pageSize: number) => void' },
   { name: 'pageSizeOptions', type: 'ReadonlyArray<number>', default: '[10, 20, 50, 100]' },
   { name: 'variant', type: "'default' | 'simple' | 'mini'", default: "'default'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'mini variant forces sm.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'mini variant forces sm.' },
   { name: 'siblingCount', type: 'number', default: '1', description: 'Pages rendered on each side of the current page.' },
   { name: 'showQuickJumper', type: 'boolean', default: 'false' },
   { name: 'showSizeChanger', type: 'boolean', default: 'false' },

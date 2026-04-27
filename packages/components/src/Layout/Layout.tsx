@@ -136,12 +136,12 @@ export const Stack = forwardRef(function Stack<C extends ElementType = 'div'>(
 
 export interface ContainerOwnProps {
   maxWidth?: number | string;
-  padded?: boolean;
+  isPadded?: boolean;
 }
 export type ContainerProps<C extends ElementType = 'div'> = PolyProps<C, ContainerOwnProps>;
 
 export const Container = forwardRef(function Container<C extends ElementType = 'div'>(
-  { as, sx, maxWidth = 1200, padded = true, ...rest }: ContainerProps<C>,
+  { as, sx, maxWidth = 1200, isPadded = true, ...rest }: ContainerProps<C>,
   ref: React.Ref<Element>,
 ) {
   const Comp = (as || 'div') as ElementType;
@@ -155,7 +155,7 @@ export const Container = forwardRef(function Container<C extends ElementType = '
           max-width: ${mw};
           margin-left: auto;
           margin-right: auto;
-          ${padded && 'padding: 0 16px;'}
+          ${isPadded && 'padding: 0 16px;'}
           box-sizing: border-box;
         `,
         sx && css(sx as CSSObject),

@@ -8,7 +8,7 @@ import type { MouseEvent, ReactNode } from 'react';
 
 export type TagColor = 'neutral' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 export type TagVariant = 'solid' | 'soft' | 'outline';
-export type TagSize = 'sm' | 'md' | 'lg';
+export type TagSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type TagShape = 'rounded' | 'pill';
 
 export interface TagProps {

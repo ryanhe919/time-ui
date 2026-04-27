@@ -10,7 +10,7 @@ import { renderWithProviders, expectA11y } from '@timeui/react/test-utils';
 
 describe('Checkbox a11y', () => {
   it.each([['light'], ['dark']] as const)('has zero axe violations in %s theme', async (theme) => {
-    const { container } = renderWithProviders(<Checkbox defaultSelected>Accessible</Checkbox>, {
+    const { container } = renderWithProviders(<Checkbox defaultIsSelected>Accessible</Checkbox>, {
       theme,
     });
     await expectA11y(container);

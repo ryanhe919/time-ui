@@ -88,17 +88,17 @@ export function Demo() {
   </Popover>
 </LiveDemo>
 
-## 箭头开关 withArrow
+## 箭头开关 hasArrow
 
-默认 `withArrow={true}`，会在面板贴近 anchor 的一边渲染一个 8px 旋转方块作为视觉引导。设为 `false` 移除箭头，常用于"卡片式" popover。
+默认 `hasArrow={true}`，会在面板贴近 anchor 的一边渲染一个 8px 旋转方块作为视觉引导。设为 `false` 移除箭头，常用于"卡片式" popover。
 
 <LiveDemo code={`<Flex gap={16}>
-  <Popover withArrow anchor={<Button>With arrow</Button>}>带箭头</Popover>
-  <Popover withArrow={false} anchor={<Button>No arrow</Button>}>无箭头</Popover>
+  <Popover hasArrow anchor={<Button>With arrow</Button>}>带箭头</Popover>
+  <Popover hasArrow={false} anchor={<Button>No arrow</Button>}>无箭头</Popover>
 </Flex>`}>
   <Flex gap={16}>
-    <Popover withArrow anchor={<Button>With arrow</Button>}>带箭头</Popover>
-    <Popover withArrow={false} anchor={<Button>No arrow</Button>}>无箭头</Popover>
+    <Popover hasArrow anchor={<Button>With arrow</Button>}>带箭头</Popover>
+    <Popover hasArrow={false} anchor={<Button>No arrow</Button>}>无箭头</Popover>
   </Flex>
 </LiveDemo>
 
@@ -108,12 +108,12 @@ export function Demo() {
   { name: 'anchor', type: 'ReactElement | ((opts: { isOpen, ref }) => ReactNode)', description: '触发器（必填）。ReactElement 会被 cloneElement 注入 ref + 事件；render-prop 形式则由你自行 spread `ref`。' },
   { name: 'children', type: 'ReactNode', description: 'Popover body 内容。' },
   { name: 'isOpen', type: 'boolean', description: '受控开关。' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: '非受控初始开关。' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false', description: '非受控初始开关。' },
   { name: 'onOpenChange', type: '(open: boolean) => void', description: '开关变化回调。' },
   { name: 'trigger', type: "'click' | 'hover' | 'focus' | 'manual'", default: "'click'" },
   { name: 'placement', type: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'", default: "'bottom'" },
   { name: 'offset', type: 'number', description: 'anchor 与面板之间的像素间距。默认读 `theme.components.popover.offset`（8）。' },
-  { name: 'withArrow', type: 'boolean', default: 'true', description: '是否渲染箭头。' },
+  { name: 'hasArrow', type: 'boolean', default: 'true', description: '是否渲染箭头。' },
   { name: 'closeOnBlur', type: 'boolean', default: 'true', description: '点击 anchor / panel 之外是否关闭。' },
   { name: 'closeOnEsc', type: 'boolean', default: 'true', description: '按 Esc 是否关闭。' },
   { name: 'header', type: 'ReactNode', description: '顶部 header slot；提供时会自动 `aria-labelledby` 关联。' },

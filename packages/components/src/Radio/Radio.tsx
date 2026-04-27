@@ -20,7 +20,6 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
     children,
     description,
     isDisabled: isDisabledProp,
-    onChangeEvent,
     id: idProp,
     className,
     style,
@@ -56,12 +55,11 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      onChangeEvent?.(event);
       if (group !== null && event.target.checked) {
         group.setValue(value);
       }
     },
-    [group, value, onChangeEvent],
+    [group, value],
   );
 
   const sizeTokens = theme.components.checkbox[resolvedSize];

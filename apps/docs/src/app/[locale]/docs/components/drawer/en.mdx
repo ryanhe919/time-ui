@@ -75,7 +75,7 @@ Horizontal placements (`left` / `right`) consume width tokens; vertical placemen
 ## Dismissal behaviour
 
 - `isDismissable` (default `true`) — overlay click closes the panel.
-- `isKeyboardDismissDisabled` (default `false`) — disable Esc dismissal.
+- `disableKeyboardDismiss` (default `false`) — disable Esc dismissal.
 - `hideCloseButton` (default `false`) — hide the corner close icon.
 
 ## Scroll behaviour
@@ -89,12 +89,12 @@ Horizontal placements (`left` / `right`) consume width tokens; vertical placemen
 
 <PropsTable props={[
   { name: 'isOpen', type: 'boolean', description: 'Controlled open state.' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'placement', type: "'left' | 'right' | 'top' | 'bottom'", default: "'right'" },
   { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'" },
   { name: 'isDismissable', type: 'boolean', default: 'true', description: 'Whether overlay click closes the panel.' },
-  { name: 'isKeyboardDismissDisabled', type: 'boolean', default: 'false', description: 'Disable Esc dismissal.' },
+  { name: 'disableKeyboardDismiss', type: 'boolean', default: 'false', description: 'Disable Esc dismissal.' },
   { name: 'hideCloseButton', type: 'boolean', default: 'false' },
   { name: 'scrollBehavior', type: "'inside' | 'outside'", default: "'inside'" },
   { name: 'portalContainer', type: 'HTMLElement', description: 'Custom portal container; defaults to `document.body`.' },

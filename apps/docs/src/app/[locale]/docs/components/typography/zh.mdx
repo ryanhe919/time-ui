@@ -23,22 +23,22 @@ TimeUI 提供的是一组偏产品界面的排版原语，而不是长篇内容�
   </Stack>
 </LiveDemo>
 
-## muted 与 truncate
+## isMuted 与 isTruncated
 
-`muted` 适合元信息、次要说明。`truncate` 会启用单行省略号，因此通常需要父容器提供宽度限制。
+`isMuted` 适合元信息、次要说明。`isTruncated` 会启用单行省略号，因此通常需要父容器提供宽度限制。
 
 <LiveDemo code={`<Stack spacing={12}>
-  <Text muted>这是一段弱化显示的辅助信息</Text>
+  <Text isMuted>这是一段弱化显示的辅助信息</Text>
   <Box sx={{ width: 220 }}>
-    <Text truncate>
+    <Text isTruncated>
       这是一段很长很长的文本，当容器宽度不足时会在单行内自动截断并显示省略号。
     </Text>
   </Box>
 </Stack>`}>
   <Stack spacing={12}>
-    <Text muted>这是一段弱化显示的辅助信息</Text>
+    <Text isMuted>这是一段弱化显示的辅助信息</Text>
     <Box sx={{ width: 220 }}>
-      <Text truncate>
+      <Text isTruncated>
         这是一段很长很长的文本，当容器宽度不足时会在单行内自动截断并显示省略号。
       </Text>
     </Box>
@@ -103,7 +103,7 @@ TimeUI 提供的是一组偏产品界面的排版原语，而不是长篇内容�
   }}
 >
   <Stack spacing={6}>
-    <Text size="sm" muted>项目状态</Text>
+    <Text size="sm" isMuted>项目状态</Text>
     <Heading level={3}>迁移已经完成</Heading>
     <Paragraph>
       所有工作区包都已经接入统一主题 token，文档站内容也同步对齐。
@@ -118,7 +118,7 @@ TimeUI 提供的是一组偏产品界面的排版原语，而不是长篇内容�
     }}
   >
     <Stack spacing={6}>
-      <Text size="sm" muted>项目状态</Text>
+      <Text size="sm" isMuted>项目状态</Text>
       <Heading level={3}>迁移已经完成</Heading>
       <Paragraph>{'所有工作区包都已经接入统一主题 token，文档站内容也同步对齐。'}</Paragraph>
     </Stack>
@@ -132,8 +132,8 @@ TimeUI 提供的是一组偏产品界面的排版原语，而不是长篇内容�
 <PropsTable props={[
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '字号预设。' },
   { name: 'weight', type: "'regular' | 'medium' | 'semibold' | 'bold'", default: "'regular'", description: '字重预设。' },
-  { name: 'muted', type: 'boolean', default: 'false', description: '使用主题中的弱化文本颜色。' },
-  { name: 'truncate', type: 'boolean', default: 'false', description: '启用单行省略号截断。' }
+  { name: 'isMuted', type: 'boolean', default: 'false', description: '使用主题中的弱化文本颜色。' },
+  { name: 'isTruncated', type: 'boolean', default: 'false', description: '启用单行省略号截断。' }
 ]} />
 
 ### Heading

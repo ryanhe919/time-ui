@@ -38,9 +38,13 @@ color 可在 group 级设置，也可以在单个 Radio 上覆盖。
 
 ## 尺寸 Sizes
 
-三档 `sm` / `md` / `lg`。
+五档 `xs` / `sm` / `md` / `lg` / `xl`。
 
 <LiveDemo code={`<Stack spacing={16}>
+  <RadioGroup label="XS" size="xs" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
   <RadioGroup label="Small" size="sm" defaultValue="a" orientation="horizontal">
     <Radio value="a">A</Radio>
     <Radio value="b">B</Radio>
@@ -53,8 +57,16 @@ color 可在 group 级设置，也可以在单个 Radio 上覆盖。
     <Radio value="a">A</Radio>
     <Radio value="b">B</Radio>
   </RadioGroup>
+  <RadioGroup label="XL" size="xl" defaultValue="a" orientation="horizontal">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
 </Stack>`}>
   <Stack spacing={16}>
+    <RadioGroup label="XS" size="xs" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
     <RadioGroup label="Small" size="sm" defaultValue="a" orientation="horizontal">
       <Radio value="a">A</Radio>
       <Radio value="b">B</Radio>
@@ -64,6 +76,10 @@ color 可在 group 级设置，也可以在单个 Radio 上覆盖。
       <Radio value="b">B</Radio>
     </RadioGroup>
     <RadioGroup label="Large" size="lg" defaultValue="a" orientation="horizontal">
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+    </RadioGroup>
+    <RadioGroup label="XL" size="xl" defaultValue="a" orientation="horizontal">
       <Radio value="a">A</Radio>
       <Radio value="b">B</Radio>
     </RadioGroup>
@@ -191,11 +207,10 @@ export function ShippingPicker() {
 <PropsTable props={[
   { name: 'value', type: 'string', required: true, description: '选项值。' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: '覆盖 group 的 color。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", description: '覆盖 group 的 size。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", description: '覆盖 group 的 size。' },
   { name: 'children', type: 'ReactNode', description: 'Label 文本。' },
   { name: 'description', type: 'ReactNode', description: '显示在 label 下方的二级说明。' },
-  { name: 'isDisabled', type: 'boolean', default: 'false', description: '单项禁用；group 的 isDisabled 优先。' },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: '原生事件逃生口（很少用）。' }
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '单项禁用；group 的 isDisabled 优先。' }
 ]} />
 
 ### RadioGroup
@@ -212,7 +227,7 @@ export function ShippingPicker() {
   { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
   { name: 'onChange', type: '(value: string) => void', description: '选中变化时回调。' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", description: '子项默认 color。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", description: '子项默认 size。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", description: '子项默认 size。' },
   { name: 'name', type: 'string', description: '共享给所有子 Radio 的 name；默认 `useId()`。' }
 ]} />
 

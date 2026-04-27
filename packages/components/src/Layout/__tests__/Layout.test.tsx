@@ -86,7 +86,7 @@ describe('Layout primitives', () => {
 
   it('supports custom maxWidth strings and disabling container padding', () => {
     renderWithProviders(
-      <Container as="main" data-testid="container" maxWidth="72rem" padded={false}>
+      <Container as="main" data-testid="container" maxWidth="72rem" isPadded={false}>
         shell
       </Container>,
     );

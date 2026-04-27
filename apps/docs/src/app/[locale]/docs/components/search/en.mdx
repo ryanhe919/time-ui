@@ -50,17 +50,21 @@ export function Demo() {
 
 ## Sizes
 
-`sm` / `md` / `lg` — heights 28 / 36 / 44 px.
+`xs` / `sm` / `md` / `lg` / `xl` — heights 24 / 28 / 36 / 44 / 52 px.
 
 <LiveDemo code={`<Stack spacing={12}>
+  <Search size="xs" placeholder="XS" shortcut="⌘K" />
   <Search size="sm" placeholder="Small" shortcut="⌘K" />
   <Search size="md" placeholder="Medium" shortcut="⌘K" />
   <Search size="lg" placeholder="Large" shortcut="⌘K" />
+  <Search size="xl" placeholder="XL" shortcut="⌘K" />
 </Stack>`}>
   <Stack spacing={12}>
+    <Search size="xs" placeholder="XS" shortcut="⌘K" />
     <Search size="sm" placeholder="Small" shortcut="⌘K" />
     <Search size="md" placeholder="Medium" shortcut="⌘K" />
     <Search size="lg" placeholder="Large" shortcut="⌘K" />
+    <Search size="xl" placeholder="XL" shortcut="⌘K" />
   </Stack>
 </LiveDemo>
 
@@ -80,8 +84,8 @@ export function Demo() {
 
 ## Full width
 
-<LiveDemo code={`<Search fullWidth placeholder="Spans the container" shortcut="⌘K" />`}>
-  <Search fullWidth placeholder="Spans the container" shortcut="⌘K" />
+<LiveDemo code={`<Search isFullWidth placeholder="Spans the container" shortcut="⌘K" />`}>
+  <Search isFullWidth placeholder="Spans the container" shortcut="⌘K" />
 </LiveDemo>
 
 ## Disabled
@@ -95,10 +99,10 @@ export function Demo() {
 <PropsTable props={[
   { name: 'placeholder', type: 'string', description: 'Visible placeholder. Defaults to the i18n value (Chinese 搜索… / English Search…).' },
   { name: 'shortcut', type: 'string', description: 'Right-aligned shortcut hint (e.g. `⌘K`), rendered as `<kbd>`.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size preset.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset.' },
   { name: 'variant', type: "'bordered' | 'flat'", default: "'bordered'", description: 'Visual variant.' },
   { name: 'icon', type: 'ReactNode', description: 'Override the leading search icon.' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to fill its container.' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: 'Expand to fill its container.' },
   { name: 'onClick', type: '(e) => void', description: 'Typically opens a command palette / search dialog.' },
   { name: 'disabled', type: 'boolean', default: 'false', description: 'Disabled state.' }
 ]} />
@@ -159,7 +163,7 @@ export function CommandPalette() {
 
 <PropsTable props={[
   { name: 'isOpen', type: 'boolean', description: 'Controlled open state.' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: 'Uncontrolled initial open state.' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Uncontrolled initial open state.' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'items', type: 'ReadonlyArray<SearchDialogItem>', description: 'Flat result list.' },
   { name: 'sections', type: 'ReadonlyArray<SearchDialogSection>', description: 'Grouped results (wins over `items`).' },

@@ -113,7 +113,7 @@ function parseChildren(children: ReactNode): ResolvedTab[] {
 
 function itemsToResolved(items: ReadonlyArray<TabItem>): ResolvedTab[] {
   return items.map((it) => ({
-    key: it.key,
+    key: it.itemKey,
     label: it.label,
     ...(it.icon !== undefined ? { icon: it.icon } : {}),
     isDisabled: !!it.isDisabled,

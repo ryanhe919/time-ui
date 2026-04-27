@@ -27,7 +27,7 @@ export function BasicEditor() {
 
 ## Variants & sizes
 
-Three visual recipes (`flat`, `bordered`, `faded`) and three size steps (`sm`, `md`, `lg`). They reuse the same field-style helpers as `Input` / `Textarea`, so spacing, focus ring, and invalid color all stay consistent.
+Three visual recipes (`flat`, `bordered`, `faded`) and five size steps (`xs`, `sm`, `md`, `lg`, `xl`). They reuse the same field-style helpers as `Input` / `Textarea`, so spacing, focus ring, and invalid color all stay consistent.
 
 <LiveDemo code={`<Stack spacing={24}>
   {/* Variants */}
@@ -227,7 +227,7 @@ export function ProgrammaticEditor() {
   { name: 'defaultValue', type: 'string', default: "''", description: 'Uncontrolled initial HTML content.' },
   { name: 'onChange', type: '(html: string) => void', description: 'Fires on every document mutation with the serialized HTML.' },
   { name: 'placeholder', type: 'string', description: 'Empty-state placeholder, rendered via TipTap’s `Placeholder` extension.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size preset; controls padding, font size, and default min-height.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset; controls padding, font size, and default min-height.' },
   { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: 'Visual recipe — shared with Input / Textarea.' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Block all interaction; pointer events are turned off.' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable & selectable but rejects edits.' },

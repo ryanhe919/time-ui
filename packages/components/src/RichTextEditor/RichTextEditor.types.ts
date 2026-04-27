@@ -6,7 +6,7 @@
 import type { HTMLAttributes } from 'react';
 import type { Editor, AnyExtension } from '@tiptap/react';
 
-export type RichTextEditorSize = 'sm' | 'md' | 'lg';
+export type RichTextEditorSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type RichTextEditorVariant = 'flat' | 'bordered' | 'faded';
 

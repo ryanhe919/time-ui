@@ -4,10 +4,10 @@
  * @description 定义 Radio 模块的 TypeScript 类型约束。
  */
 
-import type { ChangeEvent, InputHTMLAttributes, ReactNode } from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 import type { ButtonColor } from '../Button/Button.types';
 
-export type RadioSize = 'sm' | 'md' | 'lg';
+export type RadioSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type RadioColor = ButtonColor;
 
@@ -36,7 +36,6 @@ export interface RadioProps extends Omit<
   children?: ReactNode;
   description?: ReactNode;
   isDisabled?: boolean;
-  onChangeEvent?: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export interface RadioGroupProps {

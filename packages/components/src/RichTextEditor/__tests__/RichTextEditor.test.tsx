@@ -209,7 +209,7 @@ describe('RichTextEditor — disabled / readOnly / invalid', () => {
 });
 
 describe('RichTextEditor — size & variant', () => {
-  it.each(['sm', 'md', 'lg'] as const)(
+  it.each(['xs', 'sm', 'md', 'lg', 'xl'] as const)(
     'renders with size="%s" and exposes data-size',
     async (size) => {
       renderWithProviders(<RichTextEditor aria-label="Editor" size={size} />);

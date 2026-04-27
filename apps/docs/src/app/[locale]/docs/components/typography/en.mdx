@@ -26,20 +26,20 @@ tokens, so they stay visually consistent with form controls, buttons, and docs p
 
 ## Muted and truncate
 
-`muted` is useful for secondary UI copy. `truncate` applies single-line ellipsis and expects a width-constrained parent.
+`isMuted` is useful for secondary UI copy. `isTruncated` applies single-line ellipsis and expects a width-constrained parent.
 
 <LiveDemo code={`<Stack spacing={12}>
-  <Text muted>Muted metadata text</Text>
+  <Text isMuted>Muted metadata text</Text>
   <Box sx={{ width: 220 }}>
-    <Text truncate>
+    <Text isTruncated>
       This is a very long line that will truncate when the container is narrower than the content.
     </Text>
   </Box>
 </Stack>`}>
   <Stack spacing={12}>
-    <Text muted>Muted metadata text</Text>
+    <Text isMuted>Muted metadata text</Text>
     <Box sx={{ width: 220 }}>
-      <Text truncate>
+      <Text isTruncated>
         This is a very long line that will truncate when the container is narrower than the content.
       </Text>
     </Box>
@@ -104,7 +104,7 @@ The primitives are intentionally small, so they pair naturally with layout compo
   }}
 >
   <Stack spacing={6}>
-    <Text size="sm" muted>PROJECT STATUS</Text>
+    <Text size="sm" isMuted>PROJECT STATUS</Text>
     <Heading level={3}>Migration complete</Heading>
     <Paragraph>
       All workspace packages now consume the shared theme tokens and docs are aligned.
@@ -119,7 +119,7 @@ The primitives are intentionally small, so they pair naturally with layout compo
     }}
   >
     <Stack spacing={6}>
-      <Text size="sm" muted>PROJECT STATUS</Text>
+      <Text size="sm" isMuted>PROJECT STATUS</Text>
       <Heading level={3}>Migration complete</Heading>
       <Paragraph>{'All workspace packages now consume the shared theme tokens and docs are aligned.'}</Paragraph>
     </Stack>
@@ -133,8 +133,8 @@ The primitives are intentionally small, so they pair naturally with layout compo
 <PropsTable props={[
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Font size preset.' },
   { name: 'weight', type: "'regular' | 'medium' | 'semibold' | 'bold'", default: "'regular'", description: 'Font weight preset.' },
-  { name: 'muted', type: 'boolean', default: 'false', description: 'Use the theme muted text color.' },
-  { name: 'truncate', type: 'boolean', default: 'false', description: 'Apply single-line ellipsis overflow treatment.' }
+  { name: 'isMuted', type: 'boolean', default: 'false', description: 'Use the theme muted text color.' },
+  { name: 'isTruncated', type: 'boolean', default: 'false', description: 'Apply single-line ellipsis overflow treatment.' }
 ]} />
 
 ### Heading

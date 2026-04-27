@@ -44,9 +44,9 @@ describe('Drawer — open state', () => {
     expect(dialog).toHaveAttribute('aria-label', 'my-drawer');
   });
 
-  it('uncontrolled: defaultIsOpen opens initially', () => {
+  it('uncontrolled: defaultOpen opens initially', () => {
     renderWithProviders(
-      <Drawer defaultIsOpen aria-label="d">
+      <Drawer defaultOpen aria-label="d">
         hi
       </Drawer>,
     );
@@ -56,7 +56,7 @@ describe('Drawer — open state', () => {
   it('uncontrolled: external close (close button) hides the dialog', async () => {
     const user = userEvent.setup();
     renderWithProviders(
-      <Drawer defaultIsOpen aria-label="d">
+      <Drawer defaultOpen aria-label="d">
         hi
       </Drawer>,
     );
@@ -93,10 +93,10 @@ describe('Drawer — close triggers', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('isKeyboardDismissDisabled=true: Escape does NOT close', () => {
+  it('disableKeyboardDismiss=true: Escape does NOT close', () => {
     const onOpenChange = vi.fn();
     renderWithProviders(
-      <Drawer isOpen aria-label="d" isKeyboardDismissDisabled onOpenChange={onOpenChange}>
+      <Drawer isOpen aria-label="d" disableKeyboardDismiss onOpenChange={onOpenChange}>
         hi
       </Drawer>,
     );

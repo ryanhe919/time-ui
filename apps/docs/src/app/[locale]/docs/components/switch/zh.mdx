@@ -8,13 +8,13 @@ Apple HIG 风格的开关：圆形滑块、iOS 绿底色、带轻微阴影。**�
 
 <LiveDemo code={`<Flex gap={16} align="center">
   <Switch aria-label="开启通知" />
-  <Switch defaultSelected aria-label="已开启" />
-  <Switch defaultSelected>带文字 Label</Switch>
+  <Switch defaultIsSelected aria-label="已开启" />
+  <Switch defaultIsSelected>带文字 Label</Switch>
 </Flex>`}>
   <Flex gap={16} align="center">
     <Switch aria-label="开启通知" />
-    <Switch defaultSelected aria-label="已开启" />
-    <Switch defaultSelected>带文字 Label</Switch>
+    <Switch defaultIsSelected aria-label="已开启" />
+    <Switch defaultIsSelected>带文字 Label</Switch>
   </Flex>
 </LiveDemo>
 
@@ -23,36 +23,40 @@ Apple HIG 风格的开关：圆形滑块、iOS 绿底色、带轻微阴影。**�
 默认 `success`（对齐 iOS 绿）。
 
 <LiveDemo code={`<Flex gap={16} align="center" wrap="wrap">
-  <Switch defaultSelected color="default">Default</Switch>
-  <Switch defaultSelected color="primary">Primary</Switch>
-  <Switch defaultSelected color="secondary">Secondary</Switch>
-  <Switch defaultSelected color="success">Success</Switch>
-  <Switch defaultSelected color="warning">Warning</Switch>
-  <Switch defaultSelected color="danger">Danger</Switch>
+  <Switch defaultIsSelected color="default">Default</Switch>
+  <Switch defaultIsSelected color="primary">Primary</Switch>
+  <Switch defaultIsSelected color="secondary">Secondary</Switch>
+  <Switch defaultIsSelected color="success">Success</Switch>
+  <Switch defaultIsSelected color="warning">Warning</Switch>
+  <Switch defaultIsSelected color="danger">Danger</Switch>
 </Flex>`}>
   <Flex gap={16} align="center" wrap="wrap">
-    <Switch defaultSelected color="default">Default</Switch>
-    <Switch defaultSelected color="primary">Primary</Switch>
-    <Switch defaultSelected color="secondary">Secondary</Switch>
-    <Switch defaultSelected color="success">Success</Switch>
-    <Switch defaultSelected color="warning">Warning</Switch>
-    <Switch defaultSelected color="danger">Danger</Switch>
+    <Switch defaultIsSelected color="default">Default</Switch>
+    <Switch defaultIsSelected color="primary">Primary</Switch>
+    <Switch defaultIsSelected color="secondary">Secondary</Switch>
+    <Switch defaultIsSelected color="success">Success</Switch>
+    <Switch defaultIsSelected color="warning">Warning</Switch>
+    <Switch defaultIsSelected color="danger">Danger</Switch>
   </Flex>
 </LiveDemo>
 
 ## 尺寸 Sizes
 
-三档 `sm` / `md` / `lg`，轨道宽度 32 / 48 / 56 px。
+五档 `xs` / `sm` / `md` / `lg` / `xl`，轨道宽度 24 / 32 / 48 / 56 / 72 px。
 
 <LiveDemo code={`<Flex gap={16} align="center">
-  <Switch size="sm" defaultSelected>Small</Switch>
-  <Switch size="md" defaultSelected>Medium</Switch>
-  <Switch size="lg" defaultSelected>Large</Switch>
+  <Switch size="xs" defaultIsSelected>XS</Switch>
+  <Switch size="sm" defaultIsSelected>Small</Switch>
+  <Switch size="md" defaultIsSelected>Medium</Switch>
+  <Switch size="lg" defaultIsSelected>Large</Switch>
+  <Switch size="xl" defaultIsSelected>XL</Switch>
 </Flex>`}>
   <Flex gap={16} align="center">
-    <Switch size="sm" defaultSelected>Small</Switch>
-    <Switch size="md" defaultSelected>Medium</Switch>
-    <Switch size="lg" defaultSelected>Large</Switch>
+    <Switch size="xs" defaultIsSelected>XS</Switch>
+    <Switch size="sm" defaultIsSelected>Small</Switch>
+    <Switch size="md" defaultIsSelected>Medium</Switch>
+    <Switch size="lg" defaultIsSelected>Large</Switch>
+    <Switch size="xl" defaultIsSelected>XL</Switch>
   </Flex>
 </LiveDemo>
 
@@ -60,15 +64,15 @@ Apple HIG 风格的开关：圆形滑块、iOS 绿底色、带轻微阴影。**�
 
 <LiveDemo code={`<Stack spacing={12}>
   <Switch isDisabled>Disabled</Switch>
-  <Switch isDisabled defaultSelected>Disabled + on</Switch>
-  <Switch isReadOnly defaultSelected>Read only（点击无效）</Switch>
+  <Switch isDisabled defaultIsSelected>Disabled + on</Switch>
+  <Switch isReadOnly defaultIsSelected>Read only（点击无效）</Switch>
   <Switch isRequired>Required</Switch>
   <Switch isInvalid>Invalid</Switch>
 </Stack>`}>
   <Stack spacing={12}>
     <Switch isDisabled>Disabled</Switch>
-    <Switch isDisabled defaultSelected>Disabled + on</Switch>
-    <Switch isReadOnly defaultSelected>Read only（点击无效）</Switch>
+    <Switch isDisabled defaultIsSelected>Disabled + on</Switch>
+    <Switch isReadOnly defaultIsSelected>Read only（点击无效）</Switch>
     <Switch isRequired>Required</Switch>
     <Switch isInvalid>Invalid</Switch>
   </Stack>
@@ -81,7 +85,7 @@ Apple HIG 风格的开关：圆形滑块、iOS 绿底色、带轻微阴影。**�
 <LiveDemo code={`<Flex gap={16} align="center">
   <Switch
     size="lg"
-    defaultSelected
+    defaultIsSelected
     startContent={<span aria-hidden>☀</span>}
     endContent={<span aria-hidden>🌙</span>}
   >
@@ -91,7 +95,7 @@ Apple HIG 风格的开关：圆形滑块、iOS 绿底色、带轻微阴影。**�
   <Flex gap={16} align="center">
     <Switch
       size="lg"
-      defaultSelected
+      defaultIsSelected
       startContent={<span aria-hidden>☀</span>}
       endContent={<span aria-hidden>🌙</span>}
     >
@@ -134,11 +138,10 @@ export function SettingsList() {
 
 <PropsTable props={[
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'success'", description: '开启态的轨道色；默认 iOS 绿。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '尺寸预设。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设。' },
   { name: 'isSelected', type: 'boolean', description: '受控开关态。' },
-  { name: 'defaultSelected', type: 'boolean', default: 'false', description: '非受控初始状态。' },
+  { name: 'defaultIsSelected', type: 'boolean', default: 'false', description: '非受控初始状态。' },
   { name: 'onChange', type: '(checked: boolean) => void', description: '解包后的布尔回调。' },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: '原生事件逃生口。' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用。' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: '只读：focus 可聚焦但切换无效。' },
   { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },

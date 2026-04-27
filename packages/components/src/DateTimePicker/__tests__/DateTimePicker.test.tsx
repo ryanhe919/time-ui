@@ -126,7 +126,7 @@ describe('DateTimePicker — open / close', () => {
     const onOpenChange = vi.fn();
     renderWithProviders(
       <div>
-        <DateTimePicker defaultIsOpen onOpenChange={onOpenChange} />
+        <DateTimePicker defaultOpen onOpenChange={onOpenChange} />
         <div data-testid="elsewhere" />
       </div>,
     );
@@ -143,7 +143,7 @@ describe('DateTimePicker — open / close', () => {
 describe('DateTimePicker — granularity', () => {
   it('defaults: hour + minute columns, no second column', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderWithProviders(<DateTimePicker defaultIsOpen />);
+    renderWithProviders(<DateTimePicker defaultOpen />);
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByRole('listbox', { name: /hour/i })).toBeInTheDocument();
     expect(within(dialog).getByRole('listbox', { name: /minute/i })).toBeInTheDocument();
@@ -153,14 +153,14 @@ describe('DateTimePicker — granularity', () => {
 
   it('showSecond=true adds a third column', () => {
     installRectMocks();
-    renderWithProviders(<DateTimePicker defaultIsOpen showSecond />);
+    renderWithProviders(<DateTimePicker defaultOpen showSecond />);
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByRole('listbox', { name: /second/i })).toBeInTheDocument();
   });
 
   it('showMinute=false removes minute + second columns', () => {
     installRectMocks();
-    renderWithProviders(<DateTimePicker defaultIsOpen showMinute={false} showSecond />);
+    renderWithProviders(<DateTimePicker defaultOpen showMinute={false} showSecond />);
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByRole('listbox', { name: /hour/i })).toBeInTheDocument();
     expect(within(dialog).queryByRole('listbox', { name: /minute/i })).toBeNull();

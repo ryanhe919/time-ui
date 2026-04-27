@@ -75,7 +75,7 @@ export function Demo() {
 ## 关闭行为
 
 - `isDismissable`（默认 `true`）：点击 overlay 关闭。
-- `isKeyboardDismissDisabled`（默认 `false`）：禁用 Esc 关闭。
+- `disableKeyboardDismiss`（默认 `false`）：禁用 Esc 关闭。
 - `hideCloseButton`（默认 `false`）：隐藏右上角的关闭按钮。
 
 ## 滚动行为 scrollBehavior
@@ -89,12 +89,12 @@ export function Demo() {
 
 <PropsTable props={[
   { name: 'isOpen', type: 'boolean', description: '受控打开状态。' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false', description: '非受控初始打开状态。' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false', description: '非受控初始打开状态。' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'placement', type: "'left' | 'right' | 'top' | 'bottom'", default: "'right'", description: '贴边方向。' },
   { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: '尺寸档位。' },
   { name: 'isDismissable', type: 'boolean', default: 'true', description: '点击 overlay 是否关闭。' },
-  { name: 'isKeyboardDismissDisabled', type: 'boolean', default: 'false', description: '禁用 ESC 关闭。' },
+  { name: 'disableKeyboardDismiss', type: 'boolean', default: 'false', description: '禁用 ESC 关闭。' },
   { name: 'hideCloseButton', type: 'boolean', default: 'false' },
   { name: 'scrollBehavior', type: "'inside' | 'outside'", default: "'inside'" },
   { name: 'portalContainer', type: 'HTMLElement', description: '自定义 Portal 容器，默认 `document.body`。' },

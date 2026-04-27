@@ -3,7 +3,7 @@
 页码导航：根据 `total` + `pageSize` 自动计算总页数，并渲染折叠后的页码列表。提供 `default` / `simple` / `mini` 三种形态，以及可选的页码跳转输入和每页条数切换。
 
 <Callout variant="info" title="受控/非受控">
-  传 `page` + `onChange` 即受控；传 `defaultPage` 即非受控。**Pagination 不会自动从数据源切片**，它只负责告诉你当前页号和 pageSize —— 真实的"取这一页的数据"由消费方完成（典型做法见下方"与 Table 配合"）。
+  传 `page` + `onPageChange` 即受控；传 `defaultPage` 即非受控。**Pagination 不会自动从数据源切片**，它只负责告诉你当前页号和 pageSize —— 真实的"取这一页的数据"由消费方完成（典型做法见下方"与 Table 配合"）。
 </Callout>
 
 ## 交互示例 ← 试试
@@ -15,7 +15,7 @@ import { Pagination } from '@timeui/react';
 
 export function Demo() {
   const [page, setPage] = useState(1);
-  return <Pagination total={87} pageSize={10} page={page} onChange={setPage} />;
+  return <Pagination total={87} pageSize={10} page={page} onPageChange={setPage} />;
 }`}>
   <PaginationBasicDemo />
 </LiveDemo>
@@ -38,7 +38,7 @@ export function Demo() {
 
 ## 尺寸 Sizes
 
-`sm` / `md`（默认）/ `lg`，影响按钮高度与字号。`mini` variant 强制 `sm`。
+五档 `xs` / `sm` / `md`（默认）/ `lg` / `xl`，影响按钮高度与字号。`mini` variant 强制 `sm`。
 
 <LiveDemo code={`<Stack spacing={16}>
   <Pagination size="sm" total={120} defaultPage={2} />
@@ -91,7 +91,7 @@ export function Demo() {
       total={248}
       page={page}
       pageSize={pageSize}
-      onChange={setPage}
+      onPageChange={setPage}
       onPageSizeChange={(n) => { setPageSize(n); setPage(1); }}
       showSizeChanger
       showQuickJumper
@@ -122,13 +122,13 @@ export function Demo() {
   { name: 'total', type: 'number', required: true, description: '数据总条数（必填）。总页数 = `ceil(total / pageSize)`。' },
   { name: 'page', type: 'number', description: '受控当前页（1-based）。' },
   { name: 'defaultPage', type: 'number', default: '1', description: '非受控初始页。' },
-  { name: 'onChange', type: '(page: number) => void' },
+  { name: 'onPageChange', type: '(page: number) => void' },
   { name: 'pageSize', type: 'number', description: '受控每页条数。' },
   { name: 'defaultPageSize', type: 'number', default: '10' },
   { name: 'onPageSizeChange', type: '(pageSize: number) => void' },
   { name: 'pageSizeOptions', type: 'ReadonlyArray<number>', default: '[10, 20, 50, 100]' },
   { name: 'variant', type: "'default' | 'simple' | 'mini'", default: "'default'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'mini variant 强制 sm。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'mini variant 强制 sm。' },
   { name: 'siblingCount', type: 'number', default: '1', description: '当前页两侧显示的页码数。' },
   { name: 'showQuickJumper', type: 'boolean', default: 'false' },
   { name: 'showSizeChanger', type: 'boolean', default: 'false' },

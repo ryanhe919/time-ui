@@ -99,7 +99,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
     size = 'md',
     color = 'default',
     radius,
-    fullWidth = false,
+    isFullWidth = false,
 
     accept,
     multiple = false,
@@ -110,7 +110,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
 
     customRequest,
     concurrency = 3,
-    autoUpload = true,
+    isAutoUpload = true,
 
     beforeUpload,
     onReject,
@@ -128,8 +128,8 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
     onUploadComplete,
 
     dropzoneHeight = 160,
-    noClick = false,
-    noDrag = false,
+    disableClickToUpload = false,
+    disableDragAndDrop = false,
 
     label,
     description,
@@ -403,7 +403,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
       commit(nextValue, { trigger: 'add', file: added[0] });
       announce(interpolate(i18n.upload.liveAdded, { count: added.length }));
 
-      if (autoUpload && customRequest) {
+      if (isAutoUpload && customRequest) {
         for (const item of added) {
           queue.enqueue(item.id);
         }
@@ -417,7 +417,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
       maxSize,
       maxCount,
       allowDuplicates,
-      autoUpload,
+      isAutoUpload,
       customRequest,
       commit,
       queue,
@@ -446,7 +446,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
   const dragDepthRef = useRef(0);
   const handleDragEnter = useCallback(
     (e: DragEvent<HTMLDivElement>) => {
-      if (noDrag || isDisabled || isReadOnly) return;
+      if (disableDragAndDrop || isDisabled || isReadOnly) return;
       e.preventDefault();
       e.stopPropagation();
       dragDepthRef.current += 1;
@@ -464,22 +464,22 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
         setIsRejecting(false);
       }
     },
-    [noDrag, isDisabled, isReadOnly, accept],
+    [disableDragAndDrop, isDisabled, isReadOnly, accept],
   );
 
   const handleDragOver = useCallback(
     (e: DragEvent<HTMLDivElement>) => {
-      if (noDrag || isDisabled || isReadOnly) return;
+      if (disableDragAndDrop || isDisabled || isReadOnly) return;
       e.preventDefault();
       e.stopPropagation();
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
     },
-    [noDrag, isDisabled, isReadOnly],
+    [disableDragAndDrop, isDisabled, isReadOnly],
   );
 
   const handleDragLeave = useCallback(
     (e: DragEvent<HTMLDivElement>) => {
-      if (noDrag || isDisabled || isReadOnly) return;
+      if (disableDragAndDrop || isDisabled || isReadOnly) return;
       e.preventDefault();
       e.stopPropagation();
       dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
@@ -488,12 +488,12 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
         setIsRejecting(false);
       }
     },
-    [noDrag, isDisabled, isReadOnly],
+    [disableDragAndDrop, isDisabled, isReadOnly],
   );
 
   const handleDrop = useCallback(
     (e: DragEvent<HTMLDivElement>) => {
-      if (noDrag || isDisabled || isReadOnly) return;
+      if (disableDragAndDrop || isDisabled || isReadOnly) return;
       e.preventDefault();
       e.stopPropagation();
       dragDepthRef.current = 0;
@@ -502,24 +502,24 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
       const files = Array.from(e.dataTransfer?.files ?? []);
       void ingest(files, 'drop');
     },
-    [noDrag, isDisabled, isReadOnly, ingest],
+    [disableDragAndDrop, isDisabled, isReadOnly, ingest],
   );
 
   const handleDropzoneKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
-      if (noClick) return;
+      if (disableClickToUpload) return;
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault();
         openPicker();
       }
     },
-    [noClick, openPicker],
+    [disableClickToUpload, openPicker],
   );
 
   const handleDropzoneClick = useCallback(() => {
-    if (noClick) return;
+    if (disableClickToUpload) return;
     openPicker();
-  }, [noClick, openPicker]);
+  }, [disableClickToUpload, openPicker]);
 
   // —— 删除 / 重试 ——
   const removeFile = useCallback(
@@ -658,10 +658,10 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
         type="button"
         size={size}
         color={color === 'default' ? undefined : color}
-        disabled={isDisabled}
+        isDisabled={isDisabled}
         onClick={openPicker}
         aria-label={ariaLabel ?? i18n.upload.triggerLabel}
-        fullWidth={fullWidth}
+        isFullWidth={isFullWidth}
         data-slot="trigger"
         className={classNames?.trigger}
       >
@@ -720,7 +720,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
           display: flex;
           align-items: center;
           justify-content: center;
-          width: ${fullWidth ? '100%' : 'auto'};
+          width: ${isFullWidth ? '100%' : 'auto'};
           min-height: ${effectiveHeight};
           padding: 24px 20px;
           border-radius: ${theme.componentRadius[radius ?? 'lg']};
@@ -834,9 +834,9 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
       display: flex;
       flex-direction: column;
       gap: 8px;
-      width: ${fullWidth ? '100%' : 'auto'};
+      width: ${isFullWidth ? '100%' : 'auto'};
     `,
-    [fullWidth],
+    [isFullWidth],
   );
 
   const control = (

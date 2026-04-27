@@ -49,13 +49,13 @@ export function ChatStreamingDemo() {
           gap: 8px;
         `}
       >
-        <Button size="sm" onClick={run} disabled={stream.isStreaming}>
+        <Button size="sm" onClick={run} isDisabled={stream.isStreaming}>
           {stream.isStreaming ? 'Streaming…' : done ? 'Replay' : 'Start'}
         </Button>
-        <Button size="sm" variant="ghost" onClick={stream.cancel} disabled={!stream.isStreaming}>
+        <Button size="sm" variant="ghost" onClick={stream.cancel} isDisabled={!stream.isStreaming}>
           Cancel
         </Button>
-        <Button size="sm" variant="ghost" onClick={stream.reset} disabled={stream.isStreaming}>
+        <Button size="sm" variant="ghost" onClick={stream.reset} isDisabled={stream.isStreaming}>
           Reset
         </Button>
       </div>

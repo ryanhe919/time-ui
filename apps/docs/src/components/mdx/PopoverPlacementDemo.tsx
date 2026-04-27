@@ -42,7 +42,7 @@ export function PopoverPlacementDemo() {
           placement={p}
           trigger="click"
           anchor={
-            <Button variant="bordered" size="sm" fullWidth>
+            <Button variant="bordered" size="sm" isFullWidth>
               {p}
             </Button>
           }

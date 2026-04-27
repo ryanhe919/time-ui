@@ -11,10 +11,10 @@ import { forwardRef } from 'react';
 import { css, keyframes, useTheme } from '@emotion/react';
 import type { ChatCommonStyleProps } from './Chat.types';
 
-export type ChatTypingIndicatorSize = 'sm' | 'md';
+export type ChatTypingIndicatorSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface ChatTypingIndicatorProps extends ChatCommonStyleProps {
-  /** 尺寸：sm 紧凑，md 默认。 */
+  /** 尺寸：xs / sm / md / lg / xl，默认 md。 */
   size?: ChatTypingIndicatorSize;
   /** ARIA-live 公告文本，默认 "AI is typing"。 */
   label?: string;
@@ -43,8 +43,26 @@ export const ChatTypingIndicator = forwardRef<HTMLSpanElement, ChatTypingIndicat
     const theme = useTheme();
     const tokens = theme.components.chat;
 
-    const dotSize = size === 'sm' ? '5px' : tokens.typingDotSize;
-    const dotGap = size === 'sm' ? '3px' : tokens.typingDotGap;
+    const dotSize =
+      size === 'xs'
+        ? '4px'
+        : size === 'sm'
+          ? '5px'
+          : size === 'lg'
+            ? '7px'
+            : size === 'xl'
+              ? '8px'
+              : tokens.typingDotSize;
+    const dotGap =
+      size === 'xs'
+        ? '2px'
+        : size === 'sm'
+          ? '3px'
+          : size === 'lg'
+            ? '5px'
+            : size === 'xl'
+              ? '6px'
+              : tokens.typingDotGap;
     const dotColor = theme.colors.text.muted;
     const duration = '1.2s';
 

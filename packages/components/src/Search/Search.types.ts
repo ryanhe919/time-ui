@@ -43,7 +43,7 @@ export interface SearchDialogProps extends SearchDialogCommonStyleProps {
   /** 受控打开状态。 */
   isOpen?: boolean;
   /** 非受控初始打开状态。 */
-  defaultIsOpen?: boolean;
+  defaultOpen?: boolean;
   /** 打开 / 关闭回调。 */
   onOpenChange?: (open: boolean) => void;
 

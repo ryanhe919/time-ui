@@ -137,7 +137,7 @@ export function FeedbackForm() {
       maxRows={8}
       maxLength={120}
       showCount
-      fullWidth
+      isFullWidth
     />
   );
 }`}>
@@ -154,7 +154,6 @@ export function FeedbackForm() {
   { name: 'value', type: 'string', description: '受控值。' },
   { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
   { name: 'onChange', type: '(value: string) => void', description: '解包后的字符串回调。' },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLTextAreaElement>) => void', description: '原生事件逃生口。' },
   { name: 'rows', type: 'number', default: '3', description: '固定行数（未开启自适应时生效）。' },
   { name: 'minRows', type: 'number', description: '自适应下限。' },
   { name: 'maxRows', type: 'number', description: '自适应上限；达到后滚动。' },
@@ -170,7 +169,7 @@ export function FeedbackForm() {
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: '只读。' },
   { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },
   { name: 'isInvalid', type: 'boolean', description: '显式 invalid。' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' }
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' }
 ]} />
 
 <Callout variant="info" title="可访问性">

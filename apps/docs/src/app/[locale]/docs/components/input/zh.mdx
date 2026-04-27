@@ -46,7 +46,7 @@
 
 ## 尺寸 Sizes
 
-`xs` / `sm` / `md` / `lg` / `xl` 五档，高度 28 / 32 / 40 / 48 / 56 px，与 Button 对齐。
+`xs` / `sm` / `md` / `lg` / `xl` 五档，高度 28 / 32 / 40 / 48 / 56 px。
 
 <LiveDemo code={`<Stack spacing={12}>
   <Input size="xs" placeholder="XS" />
@@ -102,7 +102,7 @@
 
 ## 清除按钮 Clearable
 
-`isClearable` 在有值时显示 ✕ 清除按钮；按 Escape 也会清空（`clearOnEscape={false}` 可关闭）。
+`isClearable` 在有值时显示 ✕ 清除按钮；按 Escape 也会清空（`clearOnEsc={false}` 可关闭）。
 
 <LiveDemo code={`<Input
   isClearable
@@ -198,7 +198,6 @@ export function SignUpForm() {
   { name: 'value', type: 'string', description: '受控值。' },
   { name: 'defaultValue', type: 'string', description: '非受控初始值。' },
   { name: 'onChange', type: '(value: string) => void', description: '解包后的字符串值回调。' },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: '原生事件逃生口。' },
   { name: 'onClear', type: '() => void', description: 'clearable 按钮 / Escape 清空时触发。' },
   { name: 'label', type: 'ReactNode', description: '字段标题；存在时隐式包裹 FormField。' },
   { name: 'description', type: 'ReactNode', description: '辅助文案。' },
@@ -206,13 +205,13 @@ export function SignUpForm() {
   { name: 'startContent', type: 'ReactNode', description: '左侧 slot（图标 / 前缀）。' },
   { name: 'endContent', type: 'ReactNode', description: '右侧 slot（图标 / 单位 / 按钮）。' },
   { name: 'isClearable', type: 'boolean', default: 'false', description: '有值时显示 ✕ 清除按钮。' },
-  { name: 'clearOnEscape', type: 'boolean', default: 'true', description: 'focus 时按 Escape 清空。' },
-  { name: 'isPasswordToggleVisible', type: 'boolean', description: '是否显示密码显隐切换。默认仅在 `type="password"` 时 true。' },
+  { name: 'clearOnEsc', type: 'boolean', default: 'true', description: 'focus 时按 Escape 清空。' },
+  { name: 'showPasswordToggle', type: 'boolean', description: '是否显示密码显隐切换。默认仅在 `type="password"` 时 true。' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用。' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: '只读。' },
   { name: 'isRequired', type: 'boolean', default: 'false', description: '必填。' },
   { name: 'isInvalid', type: 'boolean', description: '显式 invalid，默认从 errorMessage 推导。' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: '根 wrapper 撑满父容器宽度。' }
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: '根 wrapper 撑满父容器宽度。' }
 ]} />
 
 <Callout variant="info" title="可访问性">

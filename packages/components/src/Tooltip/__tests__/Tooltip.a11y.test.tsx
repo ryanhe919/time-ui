@@ -66,7 +66,7 @@ describe('Tooltip — a11y', () => {
   it.each([['light'], ['dark']] as const)('has zero axe violations in %s theme', async (theme) => {
     installRectAutoMocks();
     const { baseElement } = renderWithProviders(
-      <Tooltip content="Helpful tip" defaultIsOpen>
+      <Tooltip content="Helpful tip" defaultOpen>
         <button type="button">Trigger</button>
       </Tooltip>,
       { theme },

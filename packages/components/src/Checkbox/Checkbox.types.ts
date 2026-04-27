@@ -4,10 +4,10 @@
  * @description 定义 Checkbox 模块的 TypeScript 类型约束。
  */
 
-import type { ChangeEvent, InputHTMLAttributes, ReactNode } from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 import type { ButtonColor } from '../Button/Button.types';
 
-export type CheckboxSize = 'sm' | 'md' | 'lg';
+export type CheckboxSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type CheckboxRadius = 'sm' | 'md';
 
@@ -36,10 +36,9 @@ export interface CheckboxProps extends Omit<
   radius?: CheckboxRadius;
   value?: string;
   isSelected?: boolean;
-  defaultSelected?: boolean;
+  defaultIsSelected?: boolean;
   isIndeterminate?: boolean;
   onChange?: (checked: boolean) => void;
-  onChangeEvent?: (event: ChangeEvent<HTMLInputElement>) => void;
   isDisabled?: boolean;
   isReadOnly?: boolean;
   isRequired?: boolean;

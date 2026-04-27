@@ -10,9 +10,9 @@ import { Tabs } from '../';
 import type { TabItem } from '../Tabs.types';
 
 const ITEMS: ReadonlyArray<TabItem> = [
-  { key: 'profile', label: 'Profile', content: <p>Profile panel</p> },
-  { key: 'settings', label: 'Settings', content: <p>Settings panel</p> },
-  { key: 'billing', label: 'Billing', content: <p>Billing panel</p> },
+  { itemKey: 'profile', label: 'Profile', content: <p>Profile panel</p> },
+  { itemKey: 'settings', label: 'Settings', content: <p>Settings panel</p> },
+  { itemKey: 'billing', label: 'Billing', content: <p>Billing panel</p> },
 ];
 
 describe('Tabs — a11y', () => {

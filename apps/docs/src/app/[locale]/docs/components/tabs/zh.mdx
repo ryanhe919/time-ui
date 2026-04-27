@@ -44,9 +44,9 @@
   aria-label="Account settings"
   defaultSelectedKey="profile"
   items={[
-    { key: 'profile',  label: 'Profile',  content: <p>个人资料 panel。</p> },
-    { key: 'security', label: 'Security', content: <p>安全设置 panel。</p> },
-    { key: 'billing',  label: 'Billing',  content: <p>账单与发票 panel。</p> },
+    { itemKey: 'profile',  label: 'Profile',  content: <p>个人资料 panel。</p> },
+    { itemKey: 'security', label: 'Security', content: <p>安全设置 panel。</p> },
+    { itemKey: 'billing',  label: 'Billing',  content: <p>账单与发票 panel。</p> },
   ]}
 />`}>
   <TabsBasicDemo />
@@ -58,11 +58,11 @@
 
 <LiveDemo code={`<Stack spacing={24}>
   <Tabs aria-label="underline" variant="underline" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'Overview' }, { key: 'b', label: 'Activity' }, { key: 'c', label: 'Settings' }]} />
+    items={[{ itemKey: 'a', label: 'Overview' }, { itemKey: 'b', label: 'Activity' }, { itemKey: 'c', label: 'Settings' }]} />
   <Tabs aria-label="pills" variant="pills" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'Overview' }, { key: 'b', label: 'Activity' }, { key: 'c', label: 'Settings' }]} />
+    items={[{ itemKey: 'a', label: 'Overview' }, { itemKey: 'b', label: 'Activity' }, { itemKey: 'c', label: 'Settings' }]} />
   <Tabs aria-label="bordered" variant="bordered" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'Overview', content: 'Overview 内容' }, { key: 'b', label: 'Activity', content: 'Activity 内容' }, { key: 'c', label: 'Settings', content: 'Settings 内容' }]} />
+    items={[{ itemKey: 'a', label: 'Overview', content: 'Overview 内容' }, { itemKey: 'b', label: 'Activity', content: 'Activity 内容' }, { itemKey: 'c', label: 'Settings', content: 'Settings 内容' }]} />
 </Stack>`}>
   <Stack spacing={24}>
     <Tabs
@@ -70,9 +70,9 @@
       variant="underline"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'Overview' },
-        { key: 'b', label: 'Activity' },
-        { key: 'c', label: 'Settings' },
+        { itemKey: 'a', label: 'Overview' },
+        { itemKey: 'b', label: 'Activity' },
+        { itemKey: 'c', label: 'Settings' },
       ]}
     />
     <Tabs
@@ -80,9 +80,9 @@
       variant="pills"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'Overview' },
-        { key: 'b', label: 'Activity' },
-        { key: 'c', label: 'Settings' },
+        { itemKey: 'a', label: 'Overview' },
+        { itemKey: 'b', label: 'Activity' },
+        { itemKey: 'c', label: 'Settings' },
       ]}
     />
     <Tabs
@@ -90,9 +90,9 @@
       variant="bordered"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'Overview', content: 'Overview 内容' },
-        { key: 'b', label: 'Activity', content: 'Activity 内容' },
-        { key: 'c', label: 'Settings', content: 'Settings 内容' },
+        { itemKey: 'a', label: 'Overview', content: 'Overview 内容' },
+        { itemKey: 'b', label: 'Activity', content: 'Activity 内容' },
+        { itemKey: 'c', label: 'Settings', content: 'Settings 内容' },
       ]}
     />
   </Stack>
@@ -100,15 +100,15 @@
 
 ## 尺寸 Sizes
 
-`sm` / `md`（默认）/ `lg`，影响字号、tab 高度与图标大小。
+五档 `xs` / `sm` / `md`（默认）/ `lg` / `xl`，影响字号、tab 高度与图标大小。
 
 <LiveDemo code={`<Stack spacing={20}>
   <Tabs size="sm" aria-label="sm" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+    items={[{ itemKey: 'a', label: 'One' }, { itemKey: 'b', label: 'Two' }, { itemKey: 'c', label: 'Three' }]} />
   <Tabs size="md" aria-label="md" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+    items={[{ itemKey: 'a', label: 'One' }, { itemKey: 'b', label: 'Two' }, { itemKey: 'c', label: 'Three' }]} />
   <Tabs size="lg" aria-label="lg" defaultSelectedKey="a"
-    items={[{ key: 'a', label: 'One' }, { key: 'b', label: 'Two' }, { key: 'c', label: 'Three' }]} />
+    items={[{ itemKey: 'a', label: 'One' }, { itemKey: 'b', label: 'Two' }, { itemKey: 'c', label: 'Three' }]} />
 </Stack>`}>
   <Stack spacing={20}>
     <Tabs
@@ -116,9 +116,9 @@
       aria-label="sm"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'One' },
-        { key: 'b', label: 'Two' },
-        { key: 'c', label: 'Three' },
+        { itemKey: 'a', label: 'One' },
+        { itemKey: 'b', label: 'Two' },
+        { itemKey: 'c', label: 'Three' },
       ]}
     />
     <Tabs
@@ -126,9 +126,9 @@
       aria-label="md"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'One' },
-        { key: 'b', label: 'Two' },
-        { key: 'c', label: 'Three' },
+        { itemKey: 'a', label: 'One' },
+        { itemKey: 'b', label: 'Two' },
+        { itemKey: 'c', label: 'Three' },
       ]}
     />
     <Tabs
@@ -136,9 +136,9 @@
       aria-label="lg"
       defaultSelectedKey="a"
       items={[
-        { key: 'a', label: 'One' },
-        { key: 'b', label: 'Two' },
-        { key: 'c', label: 'Three' },
+        { itemKey: 'a', label: 'One' },
+        { itemKey: 'b', label: 'Two' },
+        { itemKey: 'c', label: 'Three' },
       ]}
     />
   </Stack>
@@ -154,10 +154,10 @@
   variant="bordered"
   defaultSelectedKey="profile"
   items={[
-    { key: 'profile',  label: 'Profile',       content: '个人资料 panel。' },
-    { key: 'team',     label: 'Team',          content: '团队成员管理 panel。' },
-    { key: 'security', label: 'Security',      content: '账户安全 panel。' },
-    { key: 'billing',  label: 'Billing',       content: '账单与发票 panel。' },
+    { itemKey: 'profile',  label: 'Profile',       content: '个人资料 panel。' },
+    { itemKey: 'team',     label: 'Team',          content: '团队成员管理 panel。' },
+    { itemKey: 'security', label: 'Security',      content: '账户安全 panel。' },
+    { itemKey: 'billing',  label: 'Billing',       content: '账单与发票 panel。' },
   ]}
 />`}>
   <div style={{ width: '100%', maxWidth: 520 }}>
@@ -167,10 +167,10 @@
       variant="bordered"
       defaultSelectedKey="profile"
       items={[
-        { key: 'profile', label: 'Profile', content: '个人资料 panel。' },
-        { key: 'team', label: 'Team', content: '团队成员管理 panel。' },
-        { key: 'security', label: 'Security', content: '账户安全 panel。' },
-        { key: 'billing', label: 'Billing', content: '账单与发票 panel。' },
+        { itemKey: 'profile', label: 'Profile', content: '个人资料 panel。' },
+        { itemKey: 'team', label: 'Team', content: '团队成员管理 panel。' },
+        { itemKey: 'security', label: 'Security', content: '账户安全 panel。' },
+        { itemKey: 'billing', label: 'Billing', content: '账单与发票 panel。' },
       ]}
     />
   </div>
@@ -182,9 +182,9 @@
 
 <LiveDemo code={`<Tabs aria-label="View" variant="pills" defaultSelectedKey="grid"
   items={[
-    { key: 'list', label: 'List', icon: <ListIcon /> },
-    { key: 'grid', label: 'Grid', icon: <GridIcon /> },
-    { key: 'kanban', label: 'Kanban', icon: <KanbanIcon /> },
+    { itemKey: 'list', label: 'List', icon: <ListIcon /> },
+    { itemKey: 'grid', label: 'Grid', icon: <GridIcon /> },
+    { itemKey: 'kanban', label: 'Kanban', icon: <KanbanIcon /> },
   ]}
 />`}>
   <Tabs
@@ -193,7 +193,7 @@
     defaultSelectedKey="grid"
     items={[
       {
-        key: 'list',
+        itemKey: 'list',
         label: 'List',
         icon: (
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
@@ -202,7 +202,7 @@
         ),
       },
       {
-        key: 'grid',
+        itemKey: 'grid',
         label: 'Grid',
         icon: (
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -214,7 +214,7 @@
         ),
       },
       {
-        key: 'kanban',
+        itemKey: 'kanban',
         label: 'Kanban',
         icon: (
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -237,9 +237,9 @@
   defaultSelectedKey="free"
   disabledKeys={['team']}
   items={[
-    { key: 'free',  label: 'Free' },
-    { key: 'pro',   label: 'Pro' },
-    { key: 'team',  label: 'Team (即将推出)' },
+    { itemKey: 'free',  label: 'Free' },
+    { itemKey: 'pro',   label: 'Pro' },
+    { itemKey: 'team',  label: 'Team (即将推出)' },
   ]}
 />`}>
   <Tabs
@@ -247,9 +247,9 @@
     defaultSelectedKey="free"
     disabledKeys={['team']}
     items={[
-      { key: 'free', label: 'Free' },
-      { key: 'pro', label: 'Pro' },
-      { key: 'team', label: 'Team (即将推出)' },
+      { itemKey: 'free', label: 'Free' },
+      { itemKey: 'pro', label: 'Pro' },
+      { itemKey: 'team', label: 'Team (即将推出)' },
     ]}
   />
 </LiveDemo>
@@ -263,9 +263,9 @@
   isLazy
   defaultSelectedKey="overview"
   items={[
-    { key: 'overview',  label: 'Overview',  content: <Overview /> },
-    { key: 'analytics', label: 'Analytics', content: <Analytics /> },  // 切到这一项才会挂载
-    { key: 'reports',   label: 'Reports',   content: <Reports /> },
+    { itemKey: 'overview',  label: 'Overview',  content: <Overview /> },
+    { itemKey: 'analytics', label: 'Analytics', content: <Analytics /> },  // 切到这一项才会挂载
+    { itemKey: 'reports',   label: 'Reports',   content: <Reports /> },
   ]}
 />`}>
   <Tabs
@@ -273,9 +273,9 @@
     isLazy
     defaultSelectedKey="overview"
     items={[
-      { key: 'overview', label: 'Overview', content: 'Overview 已挂载。' },
-      { key: 'analytics', label: 'Analytics', content: '切到这一项才挂载。' },
-      { key: 'reports', label: 'Reports', content: '同上 —— 按需挂载。' },
+      { itemKey: 'overview', label: 'Overview', content: 'Overview 已挂载。' },
+      { itemKey: 'analytics', label: 'Analytics', content: '切到这一项才挂载。' },
+      { itemKey: 'reports', label: 'Reports', content: '同上 —— 按需挂载。' },
     ]}
   />
 </LiveDemo>
@@ -291,7 +291,7 @@
   { name: 'defaultSelectedKey', type: 'string', description: '非受控初始 key。未提供时取第一个非 disabled。' },
   { name: 'onSelectionChange', type: '(key: string) => void' },
   { name: 'variant', type: "'underline' | 'pills' | 'bordered'", default: "'underline'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
   { name: 'isLazy', type: 'boolean', default: 'false', description: '只挂载激活的 panel。' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '整体禁用。' },

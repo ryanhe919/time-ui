@@ -37,7 +37,7 @@ export function InputFormDemo() {
         isRequired
         errorMessage={emailInvalid ? '请输入合法的邮箱地址' : undefined}
         startContent={<span aria-hidden>@</span>}
-        fullWidth
+        isFullWidth
       />
       <Input
         type="password"
@@ -47,7 +47,7 @@ export function InputFormDemo() {
         value={password}
         onChange={setPassword}
         isRequired
-        fullWidth
+        isFullWidth
       />
     </Stack>
   );

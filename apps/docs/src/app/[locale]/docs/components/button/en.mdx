@@ -85,11 +85,11 @@ Override the default size-derived corner radius with `radius`.
 ## Loading & disabled
 
 <LiveDemo code={`<Flex gap={12} align="center">
-  <Button color="primary" loading>Saving…</Button>
-  <Button color="primary" disabled>Disabled</Button>
+  <Button color="primary" isLoading>Saving…</Button>
+  <Button color="primary" isDisabled>Disabled</Button>
 </Flex>`}>
-  <Button color="primary" loading>Saving…</Button>
-  <Button color="primary" disabled>Disabled</Button>
+  <Button color="primary" isLoading>Saving…</Button>
+  <Button color="primary" isDisabled>Disabled</Button>
 </LiveDemo>
 
 ## With icons
@@ -125,9 +125,9 @@ pill shape work the same way — pair with `aria-label` to keep it accessible.
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Semantic color applied to the chosen variant.' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset (height / padding / font-size).' },
   { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: 'Corner radius. Defaults to the size-matched value.' },
-  { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner and disables interaction.' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the button.' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand to the width of the container.' },
+  { name: 'isLoading', type: 'boolean', default: 'false', description: 'Shows a spinner and disables interaction.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disables the button.' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: 'Expand to the width of the container.' },
   { name: 'isIconOnly', type: 'boolean', default: 'false', description: 'Render as a square icon-only button (width = height, no inner padding). Provide aria-label for accessibility.' },
   { name: 'startIcon', type: 'ReactNode', description: 'Node rendered before the label.' },
   { name: 'endIcon', type: 'ReactNode', description: 'Node rendered after the label.' },
@@ -143,5 +143,5 @@ pill shape work the same way — pair with `aria-label` to keep it accessible.
 <Callout variant="info" title="Accessibility">
   Renders a native `<button>`. Keyboard focus is visible (`outline` + `outline-offset`),
   press uses `transform: scale(0.97)`, and animations respect `prefers-reduced-motion`.
-  `loading` sets `aria-busy="true"` and keeps the label alongside the spinner.
+  `isLoading` sets `aria-busy="true"` and keeps the label alongside the spinner.
 </Callout>

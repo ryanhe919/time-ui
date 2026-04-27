@@ -53,7 +53,7 @@ describe('ChatVoiceWave — variants', () => {
     },
   );
 
-  it.each(['sm', 'md', 'lg'] as const)('renders size=%s without crashing', (size) => {
+  it.each(['xs', 'sm', 'md', 'lg', 'xl'] as const)('renders size=%s without crashing', (size) => {
     const { container } = renderWithProviders(<ChatVoiceWave aria-label="x" size={size} />);
     expect(container.firstElementChild!.children).toHaveLength(4);
   });

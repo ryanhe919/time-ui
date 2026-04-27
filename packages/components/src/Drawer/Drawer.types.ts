@@ -19,7 +19,7 @@ export interface DrawerProps {
   /** 受控打开状态。 */
   isOpen?: boolean;
   /** 非受控初始打开状态。 */
-  defaultIsOpen?: boolean;
+  defaultOpen?: boolean;
   /** 打开 / 关闭回调。 */
   onOpenChange?: (open: boolean) => void;
 
@@ -31,7 +31,7 @@ export interface DrawerProps {
   /** 点击 overlay 是否关闭，默认 true。 */
   isDismissable?: boolean;
   /** 禁用 ESC 关闭，默认 false。 */
-  isKeyboardDismissDisabled?: boolean;
+  disableKeyboardDismiss?: boolean;
   /** 隐藏右上角关闭按钮，默认 false。 */
   hideCloseButton?: boolean;
 

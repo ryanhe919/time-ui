@@ -65,7 +65,7 @@ KPI 场景专用卡片。固定 label + value 布局、delta pill 带 arrow tick
 
 ## Trend 迷你图
 
-`trend` 是一个插槽——传一段裸 SVG 即可；不引任何图表依赖。`trendBleed` 让趋势区域紧贴卡片底边（左右 margin 取负内边距、顶部加细分割线）。
+`trend` 是一个插槽——传一段裸 SVG 即可；不引任何图表依赖。`hasTrendBleed` 让趋势区域紧贴卡片底边（左右 margin 取负内边距、顶部加细分割线）。
 
 <LiveDemo code={`<StatCard
   label="过去 30 天访问量"
@@ -82,7 +82,7 @@ KPI 场景专用卡片。固定 label + value 布局、delta pill 带 arrow tick
   label="请求成功率"
   value="99.82%"
   delta={{ value: '+0.03pp', direction: 'up' }}
-  trendBleed
+  hasTrendBleed
   trend={
     <svg width="100%" height="28" viewBox="0 0 160 28" preserveAspectRatio="none">
       <polyline fill="none" stroke="currentColor" strokeWidth="1.5"
@@ -113,7 +113,7 @@ KPI 场景专用卡片。固定 label + value 布局、delta pill 带 arrow tick
         label="请求成功率"
         value="99.82%"
         delta={{ value: '+0.03pp', direction: 'up' }}
-        trendBleed
+        hasTrendBleed
         trend={
           <svg width="100%" height="28" viewBox="0 0 160 28" preserveAspectRatio="none">
             <polyline
@@ -238,9 +238,9 @@ StatCard 透传 `isPressable` / `isHoverable` / `href` 等，整卡可跳转或�
 <PropsTable props={[
   { name: 'variant', type: "'flat' | 'bordered' | 'elevated'", default: "'bordered'", description: '透传到内部 Card。' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '同 Card；同时驱动 icon 容器的 tint。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '影响 padding / label / value / icon 尺寸。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '影响 padding / label / value / icon 尺寸。' },
   { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'" },
-  { name: 'fullWidth', type: 'boolean', default: 'false' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false' },
   { name: 'isPressable', type: 'boolean', default: 'false' },
   { name: 'isHoverable', type: 'boolean', default: 'false' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },
@@ -265,7 +265,7 @@ StatCard 透传 `isPressable` / `isHoverable` / `href` 等，整卡可跳转或�
   { name: 'iconPlacement', type: "'start' | 'end'", default: "'start'" },
   { name: 'delta', type: '{ value: ReactNode; direction?: \'up\' | \'down\' | \'flat\'; polarity?: \'positive\' | \'negative\' | \'neutral\' | \'auto\' }', description: '变化率 pill；polarity=auto 时 up 为正向、down 为负向。' },
   { name: 'trend', type: 'ReactNode', description: '底部插槽（通常是 inline SVG 迷你图）。' },
-  { name: 'trendBleed', type: 'boolean', default: 'false', description: 'trend 紧贴卡片下沿，顶部加细分割线。' },
+  { name: 'hasTrendBleed', type: 'boolean', default: 'false', description: 'trend 紧贴卡片下沿，顶部加细分割线。' },
   { name: 'isLoading', type: 'boolean', default: 'false', description: '切换到骨架态；各项按对应尺寸渲染灰块。' },
   { name: 'emphasis', type: "'subtle' | 'default' | 'strong'", default: "'default'", description: 'value 的字号 / 字重 / 行高档位。' },
   { name: 'valueAlign', type: "'start' | 'center'", default: "'start'" },

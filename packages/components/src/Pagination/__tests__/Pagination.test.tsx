@@ -9,6 +9,7 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test-utils';
 import { Pagination, buildPaginationItems } from '../';
+import type { PaginationSize } from '../Pagination.types';
 
 const getNav = () => screen.getByRole('navigation');
 
@@ -174,7 +175,7 @@ describe('Pagination — controlled / uncontrolled', () => {
 
   it('controlled: onChange fires with the next page; ignored without parent update', async () => {
     const onChange = vi.fn();
-    renderWithProviders(<Pagination total={50} page={1} onChange={onChange} />);
+    renderWithProviders(<Pagination total={50} page={1} onPageChange={onChange} />);
     await userEvent.click(getPageButton(3));
     expect(onChange).toHaveBeenCalledWith(3);
     // 无父级更新 → 仍停留在 page=1
@@ -200,19 +201,19 @@ describe('Pagination — prev/next controls', () => {
   it('prev is disabled at page 1, next is disabled at last page', () => {
     // 用受控 props 触发 prev/next 边界态——非受控状态下 rerender 不会重置内部 page。
     const { rerender } = renderWithProviders(
-      <Pagination total={30} page={1} onChange={() => {}} />,
+      <Pagination total={30} page={1} onPageChange={() => {}} />,
     );
     expect(screen.getByRole('button', { name: PREV_PAGE_RE })).toBeDisabled();
     expect(screen.getByRole('button', { name: NEXT_PAGE_RE })).not.toBeDisabled();
 
-    rerender(<Pagination total={30} page={3} onChange={() => {}} />);
+    rerender(<Pagination total={30} page={3} onPageChange={() => {}} />);
     expect(screen.getByRole('button', { name: PREV_PAGE_RE })).not.toBeDisabled();
     expect(screen.getByRole('button', { name: NEXT_PAGE_RE })).toBeDisabled();
   });
 
   it('prev decrements page; next increments page', async () => {
     const onChange = vi.fn();
-    renderWithProviders(<Pagination total={50} defaultPage={3} onChange={onChange} />);
+    renderWithProviders(<Pagination total={50} defaultPage={3} onPageChange={onChange} />);
     await userEvent.click(screen.getByRole('button', { name: NEXT_PAGE_RE }));
     expect(onChange).toHaveBeenLastCalledWith(4);
     await userEvent.click(screen.getByRole('button', { name: PREV_PAGE_RE }));
@@ -221,7 +222,7 @@ describe('Pagination — prev/next controls', () => {
 
   it('clicking the active page is a no-op (no onChange)', async () => {
     const onChange = vi.fn();
-    renderWithProviders(<Pagination total={50} defaultPage={3} onChange={onChange} />);
+    renderWithProviders(<Pagination total={50} defaultPage={3} onPageChange={onChange} />);
     await userEvent.click(getPageButton(3));
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -296,6 +297,14 @@ describe('Pagination — variant', () => {
     // mini 同样使用 simple 布局
     expect(queryPageButton(2)).toBeNull();
   });
+
+  it.each(['xs', 'sm', 'md', 'lg', 'xl'] as const)(
+    'renders size=%s without crashing',
+    (size: PaginationSize) => {
+      renderWithProviders(<Pagination total={120} defaultPage={2} size={size} />);
+      expect(getNav()).toHaveAttribute('data-size', size);
+    },
+  );
 });
 
 describe('Pagination — isDisabled', () => {
@@ -308,7 +317,9 @@ describe('Pagination — isDisabled', () => {
 
   it('isDisabled blocks page change attempts', async () => {
     const onChange = vi.fn();
-    renderWithProviders(<Pagination total={50} defaultPage={3} onChange={onChange} isDisabled />);
+    renderWithProviders(
+      <Pagination total={50} defaultPage={3} onPageChange={onChange} isDisabled />,
+    );
     const target = getPageButton(4);
     await userEvent.click(target, { pointerEventsCheck: 0 });
     expect(onChange).not.toHaveBeenCalled();
@@ -319,7 +330,7 @@ describe('Pagination — quickJumper', () => {
   it('renders a numeric input with a label and jumps on Enter', async () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Pagination total={100} defaultPage={1} showQuickJumper onChange={onChange} />,
+      <Pagination total={100} defaultPage={1} showQuickJumper onPageChange={onChange} />,
     );
     const input = screen.getByLabelText(JUMPER_RE);
     expect(input).toBeInTheDocument();
@@ -331,7 +342,7 @@ describe('Pagination — quickJumper', () => {
   it('clamps over-range positive value to totalPages', () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Pagination total={100} defaultPage={1} showQuickJumper onChange={onChange} />,
+      <Pagination total={100} defaultPage={1} showQuickJumper onPageChange={onChange} />,
     );
     const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     fireEvent.change(input, { target: { value: '999' } });
@@ -342,7 +353,7 @@ describe('Pagination — quickJumper', () => {
   it('clamps negative input to 1', () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Pagination total={100} defaultPage={5} showQuickJumper onChange={onChange} />,
+      <Pagination total={100} defaultPage={5} showQuickJumper onPageChange={onChange} />,
     );
     const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     fireEvent.change(input, { target: { value: '-5' } });
@@ -353,7 +364,7 @@ describe('Pagination — quickJumper', () => {
   it('Enter on empty / non-numeric value does nothing', () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Pagination total={100} defaultPage={3} showQuickJumper onChange={onChange} />,
+      <Pagination total={100} defaultPage={3} showQuickJumper onPageChange={onChange} />,
     );
     const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     // 空
@@ -372,7 +383,7 @@ describe('Pagination — quickJumper', () => {
   it('non-Enter key presses do not jump', () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Pagination total={100} defaultPage={3} showQuickJumper onChange={onChange} />,
+      <Pagination total={100} defaultPage={3} showQuickJumper onPageChange={onChange} />,
     );
     const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     fireEvent.change(input, { target: { value: '5' } });
@@ -383,7 +394,7 @@ describe('Pagination — quickJumper', () => {
   it('Enter to the same page is a no-op (no onChange)', () => {
     const onChange = vi.fn();
     renderWithProviders(
-      <Pagination total={100} defaultPage={5} showQuickJumper onChange={onChange} />,
+      <Pagination total={100} defaultPage={5} showQuickJumper onPageChange={onChange} />,
     );
     const input = screen.getByLabelText(JUMPER_RE) as HTMLInputElement;
     fireEvent.change(input, { target: { value: '5' } });
@@ -422,7 +433,7 @@ describe('Pagination — sizeChanger', () => {
         defaultPage={5}
         showSizeChanger
         onPageSizeChange={onPageSizeChange}
-        onChange={onChange}
+        onPageChange={onChange}
       />,
     );
     await userEvent.click(screen.getByRole('combobox', { name: SIZE_CHANGER_RE }));

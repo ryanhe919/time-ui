@@ -11,7 +11,7 @@ import { Switch } from '../';
 describe('Switch a11y', () => {
   it.each([['light'], ['dark']] as const)('has zero axe violations in %s theme', async (theme) => {
     const { container } = renderWithProviders(
-      <Switch defaultSelected aria-label="notifications" />,
+      <Switch defaultIsSelected aria-label="notifications" />,
       { theme },
     );
     await expectA11y(container);

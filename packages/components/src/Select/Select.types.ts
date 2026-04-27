@@ -28,7 +28,7 @@ export interface SelectProps extends SelectPassthrough {
   color?: FieldColor;
   size?: SelectSize;
   radius?: SelectRadius;
-  fullWidth?: boolean;
+  isFullWidth?: boolean;
 
   value?: string;
   defaultValue?: string;
@@ -64,7 +64,6 @@ export interface SelectProps extends SelectPassthrough {
 export interface SelectOptionProps {
   value: string;
   children?: ReactNode;
-  disabled?: boolean;
   isDisabled?: boolean;
   description?: ReactNode;
 }

@@ -96,6 +96,11 @@ export const inputSizes = {
 } as const;
 
 export const checkboxSizes = {
+  xs: {
+    indicator: '12px',
+    fontSize: '11px',
+    gap: '6px',
+  },
   sm: {
     indicator: '16px',
     fontSize: '13px',
@@ -111,9 +116,20 @@ export const checkboxSizes = {
     fontSize: '16px',
     gap: '8px',
   },
+  xl: {
+    indicator: '28px',
+    fontSize: '18px',
+    gap: '10px',
+  },
 } as const;
 
 export const switchSizes = {
+  xs: {
+    trackWidth: '24px',
+    trackHeight: '14px',
+    thumbSize: '10px',
+    padding: '2px',
+  },
   sm: {
     trackWidth: '32px',
     trackHeight: '20px',
@@ -132,9 +148,22 @@ export const switchSizes = {
     thumbSize: '28px',
     padding: '2px',
   },
+  xl: {
+    trackWidth: '72px',
+    trackHeight: '40px',
+    thumbSize: '36px',
+    padding: '2px',
+  },
 } as const;
 
 export const sliderSizes = {
+  xs: {
+    trackThickness: '4px',
+    thumbSize: '12px',
+    fontSize: '11px',
+    labelGap: '6px',
+    verticalLength: '120px',
+  },
   sm: {
     trackThickness: '6px',
     thumbSize: '16px',
@@ -156,9 +185,25 @@ export const sliderSizes = {
     labelGap: '12px',
     verticalLength: '240px',
   },
+  xl: {
+    trackThickness: '12px',
+    thumbSize: '28px',
+    fontSize: '18px',
+    labelGap: '14px',
+    verticalLength: '280px',
+  },
 } as const;
 
 export const segmentedControlSizes = {
+  xs: {
+    height: '24px',
+    fontSize: '11px',
+    paddingX: '8px',
+    iconSize: '12px',
+    gap: '4px',
+    innerPadding: '2px',
+    verticalWidth: '100px',
+  },
   sm: {
     height: '28px',
     fontSize: '12px',
@@ -185,6 +230,15 @@ export const segmentedControlSizes = {
     gap: '10px',
     innerPadding: '5px',
     verticalWidth: '180px',
+  },
+  xl: {
+    height: '56px',
+    fontSize: '18px',
+    paddingX: '24px',
+    iconSize: '20px',
+    gap: '12px',
+    innerPadding: '6px',
+    verticalWidth: '200px',
   },
 } as const;
 
@@ -296,6 +350,13 @@ export const modalTokens = {
 } as const;
 
 export const tabsSizes = {
+  xs: {
+    height: '28px',
+    fontSize: '12px',
+    paddingX: '10px',
+    gap: '4px',
+    iconSize: '13px',
+  },
   sm: {
     height: '32px',
     fontSize: '13px',
@@ -317,6 +378,13 @@ export const tabsSizes = {
     gap: '10px',
     iconSize: '18px',
   },
+  xl: {
+    height: '56px',
+    fontSize: '18px',
+    paddingX: '24px',
+    gap: '12px',
+    iconSize: '20px',
+  },
 } as const;
 
 export const tabsTokens = {
@@ -337,6 +405,12 @@ export const tabsTokens = {
 } as const;
 
 export const paginationSizes = {
+  xs: {
+    itemSize: '24px',
+    fontSize: '11px',
+    gap: '3px',
+    radius: '6px',
+  },
   sm: {
     itemSize: '28px',
     fontSize: '12px',
@@ -354,6 +428,12 @@ export const paginationSizes = {
     fontSize: '16px',
     gap: '8px',
     radius: '14px',
+  },
+  xl: {
+    itemSize: '56px',
+    fontSize: '18px',
+    gap: '10px',
+    radius: '16px',
   },
 } as const;
 
@@ -574,6 +654,15 @@ export const avatarTokens = {
 } as const;
 
 export const tagSizes = {
+  xs: {
+    height: '16px',
+    paddingX: '4px',
+    gap: '3px',
+    fontSize: '10px',
+    radius: '6px',
+    iconSize: '10px',
+    closeSize: '10px',
+  },
   sm: {
     height: '20px',
     paddingX: '6px',
@@ -600,6 +689,15 @@ export const tagSizes = {
     radius: '8px',
     iconSize: '16px',
     closeSize: '16px',
+  },
+  xl: {
+    height: '32px',
+    paddingX: '12px',
+    gap: '8px',
+    fontSize: '14px',
+    radius: '10px',
+    iconSize: '18px',
+    closeSize: '18px',
   },
 } as const;
 
@@ -658,9 +756,11 @@ export const emptyTokens = {
   paddingX: '24px',
   paddingY: '40px',
   gap: '16px',
+  imageSizeXs: '56px',
   imageSizeSm: '80px',
   imageSizeMd: '120px',
   imageSizeLg: '160px',
+  imageSizeXl: '200px',
   titleFontSize: '16px',
   titleFontWeight: 600,
   titleLineHeight: 1.4,
@@ -677,6 +777,14 @@ export const emptyTokens = {
 } as const;
 
 export const stepsSizes = {
+  xs: {
+    iconSize: '16px',
+    fontSize: '11px',
+    titleFontSize: '12px',
+    descFontSize: '10px',
+    connectorThickness: '1px',
+    itemGap: '6px',
+  },
   sm: {
     iconSize: '20px',
     fontSize: '12px',
@@ -700,6 +808,14 @@ export const stepsSizes = {
     descFontSize: '13px',
     connectorThickness: '2px',
     itemGap: '16px',
+  },
+  xl: {
+    iconSize: '44px',
+    fontSize: '18px',
+    titleFontSize: '18px',
+    descFontSize: '14px',
+    connectorThickness: '3px',
+    itemGap: '20px',
   },
 } as const;
 

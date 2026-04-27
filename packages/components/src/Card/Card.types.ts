@@ -15,7 +15,7 @@ import type {
 
 export type CardVariant = 'flat' | 'bordered' | 'elevated';
 export type CardColor = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
-export type CardSize = 'sm' | 'md' | 'lg';
+export type CardSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type CardRadius = 'none' | 'sm' | 'md' | 'lg';
 export type CardAccentBar = 'start' | 'top' | 'none';
 
@@ -38,7 +38,7 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, Stripped
   color?: CardColor;
   size?: CardSize;
   radius?: CardRadius;
-  fullWidth?: boolean;
+  isFullWidth?: boolean;
   isPressable?: boolean;
   isHoverable?: boolean;
   isDisabled?: boolean;

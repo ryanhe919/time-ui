@@ -39,8 +39,8 @@ describe('SearchDialog — open state', () => {
     expect(dialog).toHaveAttribute('aria-label', 'search');
   });
 
-  it('uncontrolled: defaultIsOpen opens initially', () => {
-    renderWithProviders(<SearchDialog items={ITEMS} defaultIsOpen />);
+  it('uncontrolled: defaultOpen opens initially', () => {
+    renderWithProviders(<SearchDialog items={ITEMS} defaultOpen />);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 

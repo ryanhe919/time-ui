@@ -54,17 +54,17 @@
 
 ## 延迟与 warm-up
 
-`enterDelay` / `exitDelay` 控制 hover/focus 进入与离开到 tooltip 显隐之间的等待时间（ms）。组件内部维护一个模块级"上次关闭时间戳"——若距上次关闭不到 `warmThreshold`（默认 500ms），下一次打开会**跳过 enterDelay** 立即显示。这模拟了 macOS 系统级 tooltip 的"批处理"体验：在一组按钮间快速划过时，提示无延迟连续切换。
+`openDelay` / `closeDelay` 控制 hover/focus 进入与离开到 tooltip 显隐之间的等待时间（ms）。组件内部维护一个模块级"上次关闭时间戳"——若距上次关闭不到 `warmThreshold`（默认 500ms），下一次打开会**跳过 openDelay** 立即显示。这模拟了 macOS 系统级 tooltip 的"批处理"体验：在一组按钮间快速划过时，提示无延迟连续切换。
 
 <LiveDemo code={`<Flex gap={16}>
   <Tooltip content="120ms 延迟（默认）"><Button>Default</Button></Tooltip>
-  <Tooltip content="600ms 延迟" enterDelay={600}><Button>Slow</Button></Tooltip>
-  <Tooltip content="瞬时显示" enterDelay={0}><Button>Instant</Button></Tooltip>
+  <Tooltip content="600ms 延迟" openDelay={600}><Button>Slow</Button></Tooltip>
+  <Tooltip content="瞬时显示" openDelay={0}><Button>Instant</Button></Tooltip>
 </Flex>`}>
   <Flex gap={16}>
     <Tooltip content="120ms 延迟（默认）"><Button>Default</Button></Tooltip>
-    <Tooltip content="600ms 延迟" enterDelay={600}><Button>Slow</Button></Tooltip>
-    <Tooltip content="瞬时显示" enterDelay={0}><Button>Instant</Button></Tooltip>
+    <Tooltip content="600ms 延迟" openDelay={600}><Button>Slow</Button></Tooltip>
+    <Tooltip content="瞬时显示" openDelay={0}><Button>Instant</Button></Tooltip>
   </Flex>
 </LiveDemo>
 
@@ -87,12 +87,12 @@
   { name: 'children', type: 'ReactElement', description: '被包裹的 anchor，必须是单个 ReactElement；会被 cloneElement 注入 ref + 事件 + `aria-describedby`。' },
   { name: 'placement', type: "'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'", default: "'top'" },
   { name: 'offset', type: 'number', description: 'anchor 与 tooltip 的像素间距。默认读 `theme.components.tooltip.offset`（6）。' },
-  { name: 'withArrow', type: 'boolean', default: 'true' },
+  { name: 'hasArrow', type: 'boolean', default: 'true' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用整个 tooltip：即使 hover 也不会渲染 portal。' },
-  { name: 'enterDelay', type: 'number', description: '进入延迟（ms）。默认读 `theme.components.tooltip.enterDelay`（120）。warm 状态下被跳过。' },
-  { name: 'exitDelay', type: 'number', description: '离开延迟（ms）。默认读 `theme.components.tooltip.exitDelay`（80）。' },
+  { name: 'openDelay', type: 'number', description: '进入延迟（ms）。默认读 `theme.components.tooltip.openDelay`（120）。warm 状态下被跳过。' },
+  { name: 'closeDelay', type: 'number', description: '离开延迟（ms）。默认读 `theme.components.tooltip.closeDelay`（80）。' },
   { name: 'isOpen', type: 'boolean', description: '受控显隐。一旦提供，所有内部 hover/focus 逻辑被忽略。' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'className', type: 'string', description: '透传到 tooltip panel（不是 anchor）。' },
   { name: 'style', type: 'CSSProperties', description: '透传到 tooltip panel；定位 top/left 由组件计算后注入。' },

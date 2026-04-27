@@ -21,7 +21,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ChangeEvent,
   type FocusEvent,
   type ReactNode,
 } from 'react';
@@ -71,7 +70,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       defaultValue,
       onChange,
       isOpen,
-      defaultIsOpen = false,
+      defaultOpen = false,
       onOpenChange,
       placement = 'bottom-start',
       size = 'md',
@@ -123,7 +122,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
     // ── open 受控/非受控 ──
     const [open, setOpen] = useControllableState<boolean>({
       value: isOpen,
-      defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+      defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
       onChange: onOpenChange,
       name: 'DatePicker.isOpen',
     });
@@ -307,13 +306,9 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         data-readonly={isReadOnly || undefined}
       >
         <Input
-          size={size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'}
+          size={size}
           value={inputText}
           onChange={handleInputChange}
-          onChangeEvent={(e: ChangeEvent<HTMLInputElement>) => {
-            // value-only 的 onChange 已经处理；保留以供消费者扩展。
-            void e;
-          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -365,7 +360,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         anchor={anchorElement}
         isOpen={open}
         placement={placement}
-        withArrow={false}
+        hasArrow={false}
         trigger="manual"
         offset={parseInt(tokens.panelOffset, 10) || 8}
         id={`${baseId}-panel`}

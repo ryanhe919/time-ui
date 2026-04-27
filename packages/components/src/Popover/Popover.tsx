@@ -192,12 +192,12 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
       anchor,
       children,
       isOpen,
-      defaultIsOpen = false,
+      defaultOpen = false,
       onOpenChange,
       trigger = 'click',
       placement = 'bottom',
       offset,
-      withArrow = true,
+      hasArrow = true,
       closeOnBlur = true,
       closeOnEsc = true,
       header,
@@ -221,7 +221,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
     // 受控 / 非受控
     const [open, setOpen] = useControllableState<boolean>({
       value: isOpen,
-      defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+      defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
       onChange: onOpenChange,
       name: 'Popover',
     });
@@ -631,7 +631,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         ) : null}
         <div css={bodyCss}>{children}</div>
         {footer ? <div css={footerCss}>{footer}</div> : null}
-        {withArrow ? <span aria-hidden data-popover-arrow="" style={arrowSidePos} /> : null}
+        {hasArrow ? <span aria-hidden data-popover-arrow="" style={arrowSidePos} /> : null}
       </div>
     );
 

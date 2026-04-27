@@ -26,17 +26,17 @@ export interface TooltipProps {
   /** anchor 与 tooltip 的间距，默认读 theme.components.tooltip.offset。 */
   offset?: number;
   /** 显示箭头，默认 true。 */
-  withArrow?: boolean;
+  hasArrow?: boolean;
   /** 整体禁用（不显示 portal）。 */
   isDisabled?: boolean;
-  /** hover/focus 进入到 tooltip 显示的延迟（ms），默认读 enterDelay；warm 状态时跳过。 */
-  enterDelay?: number;
-  /** hover/focus 离开到 tooltip 关闭的延迟（ms），默认读 exitDelay。 */
-  exitDelay?: number;
+  /** hover/focus 进入到 tooltip 显示的延迟（ms），默认读 openDelay；warm 状态时跳过。 */
+  openDelay?: number;
+  /** hover/focus 离开到 tooltip 关闭的延迟（ms），默认读 closeDelay。 */
+  closeDelay?: number;
   /** 受控显隐（仅用于程序控制场景，可选）。一旦提供则忽略所有内部 hover/focus 触发逻辑。 */
   isOpen?: boolean;
   /** 非受控初始显隐。 */
-  defaultIsOpen?: boolean;
+  defaultOpen?: boolean;
   /** 开关变化回调。 */
   onOpenChange?: (open: boolean) => void;
   /** 透传到 tooltip panel 的 className（不是 anchor）。 */

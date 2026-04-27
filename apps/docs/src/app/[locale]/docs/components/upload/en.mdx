@@ -369,7 +369,7 @@ export function Demo() {
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'" },
   { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'" },
-  { name: 'fullWidth', type: 'boolean', default: 'false' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false' },
   { name: 'accept', type: 'string', description: 'Matches the native `<input>` attribute (MIME globs or extension list).' },
   { name: 'multiple', type: 'boolean', default: 'false' },
   { name: 'maxSize', type: 'number', description: 'Max bytes per file.' },
@@ -378,7 +378,7 @@ export function Demo() {
   { name: 'isReadOnly', type: 'boolean', default: 'false' },
   { name: 'customRequest', type: 'UploadRequest', description: 'Custom upload implementation; without it the component only manages the list.' },
   { name: 'concurrency', type: 'number', default: '3', description: 'Concurrent uploads.' },
-  { name: 'autoUpload', type: 'boolean', default: 'true', description: 'When false, requires `handle.submit()` to start uploading.' },
+  { name: 'isAutoUpload', type: 'boolean', default: 'true', description: 'When false, requires `handle.submit()` to start uploading.' },
   { name: 'beforeUpload', type: '(file: File, fileList: File[]) => boolean | Promise<boolean>', description: 'Pre-check; return false to block.' },
   { name: 'onReject', type: '(rejections: UploadRejection[]) => void', description: 'Batch rejection callback.' },
   { name: 'onRemove', type: '(file: UploadFile) => boolean | Promise<boolean> | void', description: 'Return false / Promise<false> to prevent removal.' },
@@ -392,8 +392,8 @@ export function Demo() {
   { name: 'onUploadProgress', type: '(file: UploadFile, percent: number) => void' },
   { name: 'onUploadComplete', type: '(value: UploadFile[]) => void', description: 'Fires once when the queue goes idle.' },
   { name: 'dropzoneHeight', type: 'number | string', default: '160' },
-  { name: 'noClick', type: 'boolean', default: 'false', description: 'Disable click-to-open (drag only).' },
-  { name: 'noDrag', type: 'boolean', default: 'false', description: 'Disable drag (click only).' },
+  { name: 'disableClickToUpload', type: 'boolean', default: 'false', description: 'Disable click-to-open (drag only).' },
+  { name: 'disableDragAndDrop', type: 'boolean', default: 'false', description: 'Disable drag (click only).' },
   { name: 'label', type: 'ReactNode', description: 'Triggers implicit FormField wrapping.' },
   { name: 'description', type: 'ReactNode' },
   { name: 'errorMessage', type: 'ReactNode' },
@@ -406,7 +406,7 @@ export function Demo() {
 
 <PropsTable props={[
   { name: 'open', type: '() => void', description: 'Open the system file picker.' },
-  { name: 'submit', type: '(ids?: string[]) => void', description: 'Manually start uploading (pair with `autoUpload={false}`).' },
+  { name: 'submit', type: '(ids?: string[]) => void', description: 'Manually start uploading (pair with `isAutoUpload={false}`).' },
   { name: 'retry', type: '(id: string) => void', description: 'Retry a failed file.' },
   { name: 'abort', type: '(id: string) => void', description: 'Abort an in-flight file.' },
   { name: 'clear', type: '() => void', description: 'Clear the list.' }

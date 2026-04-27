@@ -6,7 +6,7 @@
 
 import type { ReactNode, CSSProperties } from 'react';
 
-export type SegmentedControlSize = 'sm' | 'md' | 'lg';
+export type SegmentedControlSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type SegmentedControlColor =
   | 'default'

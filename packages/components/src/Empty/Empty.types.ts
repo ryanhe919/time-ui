@@ -6,7 +6,7 @@
 
 import type { ReactNode } from 'react';
 
-export type EmptySize = 'sm' | 'md' | 'lg';
+export type EmptySize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type EmptyImagePreset = 'default' | 'search' | 'error' | 'no-data';
 
 export interface EmptyProps {

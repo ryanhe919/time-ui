@@ -6,7 +6,7 @@
 import type { Extension } from '@codemirror/state';
 
 export type CodeEditorLanguage = 'javascript' | 'typescript' | 'python' | 'css' | 'html' | 'json';
-export type CodeEditorSize = 'sm' | 'md' | 'lg';
+export type CodeEditorSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type CodeEditorVariant = 'flat' | 'bordered' | 'faded';
 
 export interface AISuggestion {

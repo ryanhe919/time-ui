@@ -7,7 +7,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 
 export type PaginationVariant = 'default' | 'simple' | 'mini';
-export type PaginationSize = 'sm' | 'md' | 'lg';
+export type PaginationSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface PaginationLabels {
   prev?: string;
@@ -31,7 +31,7 @@ export interface PaginationProps {
   /** 当前页（1-based） */
   page?: number;
   defaultPage?: number;
-  onChange?: (page: number) => void;
+  onPageChange?: (page: number) => void;
 
   /** 默认 'default' */
   variant?: PaginationVariant;

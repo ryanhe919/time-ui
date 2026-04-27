@@ -36,7 +36,7 @@ Pass `value` / `defaultValue` as a `[min, max]` tuple to switch into two-thumb m
 
 ## Vertical
 
-`orientation="vertical"` puts the value above the track and the label below it — the traditional volume-bar shape. Use `length` to control the track length (width when horizontal, height when vertical).
+`orientation="vertical"` puts the value above the track and the label below it — the traditional volume-bar shape. Use `trackLength` to control the track length (width when horizontal, height when vertical).
 
 <LiveDemo code={`<Flex gap={32} align="center" justify="center">
   <Slider
@@ -50,12 +50,12 @@ Pass `value` / `defaultValue` as a `[min, max]` tuple to switch into two-thumb m
     color="success"
     defaultValue={[20, 70]}
     showValue
-    length={200}
+    trackLength={200}
   />
 </Flex>`}>
   <Flex gap={32} align="center" justify="center">
     <Slider orientation="vertical" label="Volume" defaultValue={46} showValue />
-    <Slider orientation="vertical" color="success" defaultValue={[20, 70]} showValue length={200} />
+    <Slider orientation="vertical" color="success" defaultValue={[20, 70]} showValue trackLength={200} />
   </Flex>
 </LiveDemo>
 
@@ -84,14 +84,18 @@ Defaults to `primary`. `isInvalid` overrides the color to `danger`.
 ## Sizes
 
 <LiveDemo code={`<Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+  <Slider size="xs" defaultValue={40} aria-label="xs" />
   <Slider size="sm" defaultValue={40} aria-label="sm" />
   <Slider size="md" defaultValue={40} aria-label="md" />
   <Slider size="lg" defaultValue={40} aria-label="lg" />
+  <Slider size="xl" defaultValue={40} aria-label="xl" />
 </Stack>`}>
   <Stack spacing={20} sx={{ width: 'min(420px, 100%)' }}>
+    <Slider size="xs" defaultValue={40} aria-label="xs" />
     <Slider size="sm" defaultValue={40} aria-label="sm" />
     <Slider size="md" defaultValue={40} aria-label="md" />
     <Slider size="lg" defaultValue={40} aria-label="lg" />
+    <Slider size="xl" defaultValue={40} aria-label="xl" />
   </Stack>
 </LiveDemo>
 
@@ -183,14 +187,14 @@ export function VolumeAndPrice() {
   { name: 'max', type: 'number', default: '100' },
   { name: 'step', type: 'number', default: '1', description: 'Keyboard step + pointer-drag snap.' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'" },
   { name: 'label', type: 'ReactNode', description: 'Title; on top in horizontal mode, below the track in vertical mode.' },
   { name: 'showValue', type: 'boolean', default: 'false', description: 'Display the current value.' },
   { name: 'formatValue', type: '(value: SliderValue) => string', description: 'Drives both the visible text and `aria-valuetext`.' },
   { name: 'startContent', type: 'ReactNode', description: 'Slot before the track (left when horizontal, top when vertical).' },
   { name: 'endContent', type: 'ReactNode', description: 'Slot after the track (right when horizontal, bottom when vertical).' },
-  { name: 'length', type: 'string | number', description: 'Track length (width when horizontal, height when vertical).' },
+  { name: 'trackLength', type: 'string | number', description: 'Track length (width when horizontal, height when vertical).' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },
   { name: 'isReadOnly', type: 'boolean', default: 'false' },
   { name: 'isInvalid', type: 'boolean', default: 'false', description: 'Forces `danger` palette + `aria-invalid`.' },

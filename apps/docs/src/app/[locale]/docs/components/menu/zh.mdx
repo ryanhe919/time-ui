@@ -58,20 +58,20 @@
   items={[
     {
       type: 'section',
-      key: 'name',
+      sectionKey: 'name',
       label: 'Name',
       items: [
-        { key: 'name-asc', label: 'A → Z' },
-        { key: 'name-desc', label: 'Z → A' },
+        { itemKey: 'name-asc', label: 'A → Z' },
+        { itemKey: 'name-desc', label: 'Z → A' },
       ],
     },
     {
       type: 'section',
-      key: 'date',
+      sectionKey: 'date',
       label: 'Date',
       items: [
-        { key: 'date-newest', label: 'Newest first' },
-        { key: 'date-oldest', label: 'Oldest first' },
+        { itemKey: 'date-newest', label: 'Newest first' },
+        { itemKey: 'date-oldest', label: 'Oldest first' },
       ],
     },
   ]}
@@ -98,7 +98,7 @@
   { name: 'items', type: 'ReadonlyArray<MenuItemDescriptor | MenuSectionDescriptor>', description: '数据驱动写法；优先级高于 children。' },
   { name: 'children', type: 'ReactNode', description: '声明式：<MenuItem> / <MenuSection> / <MenuDivider>。' },
   { name: 'isOpen', type: 'boolean', description: '受控开关。' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'", description: '12 种 placement，复用 Popover。' },
   { name: 'selectionMode', type: "'none' | 'single' | 'multiple'", default: "'none'" },

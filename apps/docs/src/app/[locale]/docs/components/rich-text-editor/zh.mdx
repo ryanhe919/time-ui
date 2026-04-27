@@ -27,7 +27,7 @@ export function BasicEditor() {
 
 ## 样式 Variants 与尺寸 Sizes
 
-三种视觉样式（`flat`、`bordered`、`faded`）+ 三档尺寸（`sm`、`md`、`lg`）。复用 `Input` / `Textarea` 同一组 field-style 工具，所以间距、聚焦环、invalid 配色完全一致。
+三种视觉样式（`flat`、`bordered`、`faded`）+ 五档尺寸（`xs`、`sm`、`md`、`lg`、`xl`）。复用 `Input` / `Textarea` 同一组 field-style 工具，所以间距、聚焦环、invalid 配色完全一致。
 
 <LiveDemo code={`<Stack spacing={24}>
   {/* Variants */}
@@ -227,7 +227,7 @@ export function ProgrammaticEditor() {
   { name: 'defaultValue', type: 'string', default: "''", description: '非受控初始 HTML 内容。' },
   { name: 'onChange', type: '(html: string) => void', description: '文档每次变更后触发，回调收到序列化后的 HTML。' },
   { name: 'placeholder', type: 'string', description: '空状态占位文字，通过 TipTap 的 `Placeholder` 扩展渲染。' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '尺寸预设；控制内边距、字号与默认 min-height。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设；控制内边距、字号与默认 min-height。' },
   { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: '视觉样式 —— 与 Input / Textarea 共享。' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用所有交互；同时关闭 pointer events。' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: '可聚焦、可选中，但拒绝写入。' },

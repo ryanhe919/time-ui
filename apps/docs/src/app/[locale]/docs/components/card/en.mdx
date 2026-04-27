@@ -1,6 +1,6 @@
 # Card
 
-A generic container primitive: wrap one piece of information or a small cluster of controls. Three variants (flat / bordered / elevated), six colours, three sizes, an optional accent bar, and opt-in hover / pressable / link behaviour. `CardHeader` / `CardBody` / `CardFooter` are opt-in structural subcomponents — use them when semantics matter.
+A generic container primitive: wrap one piece of information or a small cluster of controls. Three variants (flat / bordered / elevated), six colours, five sizes, an optional accent bar, and opt-in hover / pressable / link behaviour. `CardHeader` / `CardBody` / `CardFooter` are opt-in structural subcomponents — use them when semantics matter.
 
 <Callout variant="info" title="Card vs. StatCard">
   - **Card** — an open container. Put whatever you want inside; you decide the semantics.
@@ -213,9 +213,9 @@ Passing `href` renders the root as an `<a>` (unless `as` overrides it) and impli
 <PropsTable props={[
   { name: 'variant', type: "'flat' | 'bordered' | 'elevated'", default: "'bordered'", description: 'Surface treatment.' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Palette token; only visible with accentBar or in hover / pressable states.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and gap scale.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding and gap scale.' },
   { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Corner radius token.' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Stretch to fill the parent width.' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: 'Stretch to fill the parent width.' },
   { name: 'isPressable', type: 'boolean', default: 'false', description: 'Make the whole card a focusable target (tabIndex=0 + Enter / Space).' },
   { name: 'isHoverable', type: 'boolean', default: 'false', description: 'Visual hover feedback only; no keyboard semantics.' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Dim the surface and block onPress.' },

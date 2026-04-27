@@ -13,9 +13,9 @@
 <LiveDemo code={`<Table
   aria-label="Members"
   columns={[
-    { key: 'name', title: 'Name' },
-    { key: 'role', title: 'Role' },
-    { key: 'email', title: 'Email' },
+    { columnKey: 'name', title: 'Name' },
+    { columnKey: 'role', title: 'Role' },
+    { columnKey: 'email', title: 'Email' },
   ]}
   data={[
     { id: 1, name: 'Ada Lovelace', role: 'Engineer', email: 'ada@timeui.dev' },
@@ -29,9 +29,9 @@
     <Table
       aria-label="Members"
       columns={[
-        { key: 'name', title: 'Name' },
-        { key: 'role', title: 'Role' },
-        { key: 'email', title: 'Email' },
+        { columnKey: 'name', title: 'Name' },
+        { columnKey: 'role', title: 'Role' },
+        { columnKey: 'email', title: 'Email' },
       ]}
       data={[
         { id: 1, name: 'Ada Lovelace', role: 'Engineer', email: 'ada@timeui.dev' },
@@ -66,9 +66,9 @@ export function Demo() {
   return (
     <Table
       columns={[
-        { key: 'name', title: 'Name', isSortable: true },
-        { key: 'role', title: 'Role', isSortable: true },
-        { key: 'signups', title: 'Sign-ups', align: 'right', isSortable: true },
+        { columnKey: 'name', title: 'Name', isSortable: true },
+        { columnKey: 'role', title: 'Role', isSortable: true },
+        { columnKey: 'signups', title: 'Sign-ups', align: 'right', isSortable: true },
       ]}
       data={sorted}
       sortDescriptor={sort}
@@ -91,8 +91,8 @@ export function Demo() {
   selectedKeys={keys}
   onSelectionChange={setKeys}
   columns={[
-    { key: 'file', title: 'File' },
-    { key: 'size', title: 'Size', align: 'right' },
+    { columnKey: 'file', title: 'File' },
+    { columnKey: 'size', title: 'Size', align: 'right' },
   ]}
   data={ROWS}
 />`}>
@@ -105,7 +105,7 @@ export function Demo() {
   selectionMode="single"
   rowKey="id"
   defaultSelectedKeys={['2']}
-  columns={[{ key: 'name', title: 'Name' }, { key: 'role', title: 'Role' }]}
+  columns={[{ columnKey: 'name', title: 'Name' }, { columnKey: 'role', title: 'Role' }]}
   data={[
     { id: '1', name: 'Ada', role: 'Engineer' },
     { id: '2', name: 'Grace', role: 'Architect' },
@@ -119,8 +119,8 @@ export function Demo() {
       rowKey="id"
       defaultSelectedKeys={['2']}
       columns={[
-        { key: 'name', title: 'Name' },
-        { key: 'role', title: 'Role' },
+        { columnKey: 'name', title: 'Name' },
+        { columnKey: 'role', title: 'Role' },
       ]}
       data={[
         { id: '1', name: 'Ada', role: 'Engineer' },
@@ -145,8 +145,8 @@ export function Demo() {
       aria-label="compact"
       density="compact"
       columns={[
-        { key: 'name', title: 'Name' },
-        { key: 'role', title: 'Role' },
+        { columnKey: 'name', title: 'Name' },
+        { columnKey: 'role', title: 'Role' },
       ]}
       data={[
         { id: 1, name: 'Ada', role: 'Engineer' },
@@ -157,8 +157,8 @@ export function Demo() {
       aria-label="default"
       density="default"
       columns={[
-        { key: 'name', title: 'Name' },
-        { key: 'role', title: 'Role' },
+        { columnKey: 'name', title: 'Name' },
+        { columnKey: 'role', title: 'Role' },
       ]}
       data={[
         { id: 1, name: 'Ada', role: 'Engineer' },
@@ -169,8 +169,8 @@ export function Demo() {
       aria-label="comfortable"
       density="comfortable"
       columns={[
-        { key: 'name', title: 'Name' },
-        { key: 'role', title: 'Role' },
+        { columnKey: 'name', title: 'Name' },
+        { columnKey: 'role', title: 'Role' },
       ]}
       data={[
         { id: 1, name: 'Ada', role: 'Engineer' },
@@ -200,9 +200,9 @@ export function Demo() {
       aria-label="enclosed"
       variant="enclosed"
       columns={[
-        { key: 'project', title: 'Project' },
-        { key: 'owner', title: 'Owner' },
-        { key: 'updated', title: 'Updated', align: 'right' },
+        { columnKey: 'project', title: 'Project' },
+        { columnKey: 'owner', title: 'Owner' },
+        { columnKey: 'updated', title: 'Updated', align: 'right' },
       ]}
       data={[
         { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
@@ -214,9 +214,9 @@ export function Demo() {
       aria-label="divided"
       variant="divided"
       columns={[
-        { key: 'project', title: 'Project' },
-        { key: 'owner', title: 'Owner' },
-        { key: 'updated', title: 'Updated', align: 'right' },
+        { columnKey: 'project', title: 'Project' },
+        { columnKey: 'owner', title: 'Owner' },
+        { columnKey: 'updated', title: 'Updated', align: 'right' },
       ]}
       data={[
         { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
@@ -228,9 +228,9 @@ export function Demo() {
       aria-label="grid"
       variant="grid"
       columns={[
-        { key: 'project', title: 'Project' },
-        { key: 'owner', title: 'Owner' },
-        { key: 'updated', title: 'Updated', align: 'right' },
+        { columnKey: 'project', title: 'Project' },
+        { columnKey: 'owner', title: 'Owner' },
+        { columnKey: 'updated', title: 'Updated', align: 'right' },
       ]}
       data={[
         { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
@@ -242,9 +242,9 @@ export function Demo() {
       aria-label="quiet"
       variant="quiet"
       columns={[
-        { key: 'project', title: 'Project' },
-        { key: 'owner', title: 'Owner' },
-        { key: 'updated', title: 'Updated', align: 'right' },
+        { columnKey: 'project', title: 'Project' },
+        { columnKey: 'owner', title: 'Owner' },
+        { columnKey: 'updated', title: 'Updated', align: 'right' },
       ]}
       data={[
         { id: 1, project: 'Aurora Labs', owner: 'Ada', updated: '2 min ago' },
@@ -257,7 +257,7 @@ export function Demo() {
 
 <Callout variant="info" title="variant 与其他视觉开关的关系">
   - `hasBorder` 仅对 `variant="enclosed"` 生效；其它 variant 强制忽略容器边框。
-  - `isStriped` / `stickyHeader` / `fixed` 列在四种 variant 下都按预期工作。
+  - `isStriped` / `isStickyHeader` / `fixed` 列在四种 variant 下都按预期工作。
   - 数据行较多时，`quiet` 建议搭配更大的 `density="comfortable"` 让行间留白替代分隔线。
 </Callout>
 
@@ -271,9 +271,9 @@ export function Demo() {
       aria-label="Striped"
       isStriped
       columns={[
-        { key: 'item', title: 'Item' },
-        { key: 'qty', title: 'Qty', align: 'right', width: 80 },
-        { key: 'price', title: 'Price', align: 'right', width: 100 },
+        { columnKey: 'item', title: 'Item' },
+        { columnKey: 'qty', title: 'Qty', align: 'right', width: 80 },
+        { columnKey: 'price', title: 'Price', align: 'right', width: 100 },
       ]}
       data={[
         { id: 1, item: 'Pencil', qty: 12, price: '$1.20' },
@@ -292,13 +292,13 @@ export function Demo() {
 
 <LiveDemo code={`<Table
   columns={[
-    { key: 'name',   title: 'Account', width: 160, fixed: 'left' },
-    { key: 'region', title: 'Region',  width: 120 },
-    { key: 'q1',     title: 'Q1',      align: 'right', width: 100 },
-    { key: 'q2',     title: 'Q2',      align: 'right', width: 100 },
-    { key: 'q3',     title: 'Q3',      align: 'right', width: 100 },
-    { key: 'q4',     title: 'Q4',      align: 'right', width: 100 },
-    { key: 'ytd',    title: 'YTD',     align: 'right', width: 110, fixed: 'right' },
+    { columnKey: 'name',   title: 'Account', width: 160, fixed: 'left' },
+    { columnKey: 'region', title: 'Region',  width: 120 },
+    { columnKey: 'q1',     title: 'Q1',      align: 'right', width: 100 },
+    { columnKey: 'q2',     title: 'Q2',      align: 'right', width: 100 },
+    { columnKey: 'q3',     title: 'Q3',      align: 'right', width: 100 },
+    { columnKey: 'q4',     title: 'Q4',      align: 'right', width: 100 },
+    { columnKey: 'ytd',    title: 'YTD',     align: 'right', width: 110, fixed: 'right' },
   ]}
   data={ROWS}
 />`}>
@@ -307,22 +307,22 @@ export function Demo() {
 
 ## sticky 表头
 
-设置 `maxHeight` 启用纵向滚动，再加 `stickyHeader` 让表头钉住容器顶部。
+设置 `maxHeight` 启用纵向滚动，再加 `isStickyHeader` 让表头钉住容器顶部。
 
 <LiveDemo code={`<Table
-  stickyHeader
+  isStickyHeader
   maxHeight={240}
-  columns={[{ key: 'index', title: '#', width: 60 }, { key: 'value', title: 'Value' }]}
+  columns={[{ columnKey: 'index', title: '#', width: 60 }, { columnKey: 'value', title: 'Value' }]}
   data={Array.from({ length: 30 }, (_, i) => ({ id: i, index: i + 1, value: \`Row \${i + 1}\` }))}
 />`}>
   <div style={{ width: '100%', maxWidth: 480 }}>
     <Table
       aria-label="Sticky header"
-      stickyHeader
+      isStickyHeader
       maxHeight={240}
       columns={[
-        { key: 'index', title: '#', width: 60 },
-        { key: 'value', title: 'Value' },
+        { columnKey: 'index', title: '#', width: 60 },
+        { columnKey: 'value', title: 'Value' },
       ]}
       data={Array.from({ length: 30 }, (_, i) => ({
         id: i,
@@ -347,8 +347,8 @@ export function Demo() {
       isLoading
       loadingMessage="正在加载…"
       columns={[
-        { key: 'name', title: 'Name' },
-        { key: 'role', title: 'Role' },
+        { columnKey: 'name', title: 'Name' },
+        { columnKey: 'role', title: 'Role' },
       ]}
       data={[]}
     />
@@ -356,8 +356,8 @@ export function Demo() {
       aria-label="Empty"
       emptyMessage="还没有任何记录"
       columns={[
-        { key: 'name', title: 'Name' },
-        { key: 'role', title: 'Role' },
+        { columnKey: 'name', title: 'Name' },
+        { columnKey: 'role', title: 'Role' },
       ]}
       data={[]}
     />
@@ -369,14 +369,14 @@ export function Demo() {
 `render(row, index)` 完全接管该单元格的渲染——可以塞 Tag、Avatar、Button、链接、富文本。带 `isInteractive` 的列其点击不会冒泡到行 `onRowClick`。
 
 <LiveDemo code={`const COLUMNS = [
-  { key: 'name', title: 'Name' },
+  { columnKey: 'name', title: 'Name' },
   {
-    key: 'status',
+    columnKey: 'status',
     title: 'Status',
     render: (row) => <Tag color={row.status === 'active' ? 'success' : 'muted'}>{row.status}</Tag>,
   },
   {
-    key: 'actions',
+    columnKey: 'actions',
     title: '',
     isInteractive: true,
     render: (row) => <Button size="sm" onClick={() => alert(row.name)}>Edit</Button>,
@@ -428,7 +428,7 @@ export function Demo() {
   { name: 'data', type: 'ReadonlyArray<T>', required: true, description: '行数据。' },
   { name: 'rowKey', type: 'keyof T | (row, index) => string', description: '行 key：字段名 / 函数 / 兜底 `row.id` / `row.key` / 索引。' },
   { name: 'density', type: "'compact' | 'default' | 'comfortable'", default: "'default'" },
-  { name: 'stickyHeader', type: 'boolean', default: 'false', description: '配合 maxHeight 让表头钉住顶部。' },
+  { name: 'isStickyHeader', type: 'boolean', default: 'false', description: '配合 maxHeight 让表头钉住顶部。' },
   { name: 'variant', type: "'enclosed' | 'divided' | 'grid' | 'quiet'", default: "'enclosed'", description: '视觉风格：enclosed 卡片、divided 列表、grid 网格、quiet 极简。' },
   { name: 'isStriped', type: 'boolean', default: 'false', description: '斑马纹。' },
   { name: 'hasBorder', type: 'boolean', default: 'true', description: '容器外边框。**仅对 variant="enclosed" 生效**。' },

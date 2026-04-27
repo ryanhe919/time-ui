@@ -65,7 +65,7 @@ A KPI-shaped card. Fixed label + value layout, delta pill with an arrow-tick ani
 
 ## Trend sparkline
 
-`trend` is a slot — pass a raw inline `<svg>`; no chart dependency is pulled in. `trendBleed` makes the trend zone bleed to the card's bottom edge (negative inline margins + a subtle top divider).
+`trend` is a slot — pass a raw inline `<svg>`; no chart dependency is pulled in. `hasTrendBleed` makes the trend zone bleed to the card's bottom edge (negative inline margins + a subtle top divider).
 
 <LiveDemo code={`<StatCard
   label="VIEWS · LAST 30 DAYS"
@@ -82,7 +82,7 @@ A KPI-shaped card. Fixed label + value layout, delta pill with an arrow-tick ani
   label="SUCCESS RATE"
   value="99.82%"
   delta={{ value: '+0.03pp', direction: 'up' }}
-  trendBleed
+  hasTrendBleed
   trend={
     <svg width="100%" height="28" viewBox="0 0 160 28" preserveAspectRatio="none">
       <polyline fill="none" stroke="currentColor" strokeWidth="1.5"
@@ -113,7 +113,7 @@ A KPI-shaped card. Fixed label + value layout, delta pill with an arrow-tick ani
         label="SUCCESS RATE"
         value="99.82%"
         delta={{ value: '+0.03pp', direction: 'up' }}
-        trendBleed
+        hasTrendBleed
         trend={
           <svg width="100%" height="28" viewBox="0 0 160 28" preserveAspectRatio="none">
             <polyline
@@ -238,9 +238,9 @@ These pass straight through to the underlying Card and behave identically to the
 <PropsTable props={[
   { name: 'variant', type: "'flat' | 'bordered' | 'elevated'", default: "'bordered'", description: 'Passes through to the underlying Card.' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Same as Card; also tints the icon container.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Drives padding / label / value / icon sizing.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Drives padding / label / value / icon sizing.' },
   { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg'", default: "'md'" },
-  { name: 'fullWidth', type: 'boolean', default: 'false' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false' },
   { name: 'isPressable', type: 'boolean', default: 'false' },
   { name: 'isHoverable', type: 'boolean', default: 'false' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },
@@ -265,7 +265,7 @@ These pass straight through to the underlying Card and behave identically to the
   { name: 'iconPlacement', type: "'start' | 'end'", default: "'start'" },
   { name: 'delta', type: '{ value: ReactNode; direction?: \'up\' | \'down\' | \'flat\'; polarity?: \'positive\' | \'negative\' | \'neutral\' | \'auto\' }', description: 'Change pill. With polarity=auto: up maps to positive, down to negative.' },
   { name: 'trend', type: 'ReactNode', description: 'Bottom slot (typically an inline SVG sparkline).' },
-  { name: 'trendBleed', type: 'boolean', default: 'false', description: 'Let the trend bleed to the card edge; adds a subtle top divider.' },
+  { name: 'hasTrendBleed', type: 'boolean', default: 'false', description: 'Let the trend bleed to the card edge; adds a subtle top divider.' },
   { name: 'isLoading', type: 'boolean', default: 'false', description: 'Switch to the skeleton state.' },
   { name: 'emphasis', type: "'subtle' | 'default' | 'strong'", default: "'default'", description: 'Size / weight / leading for the value.' },
   { name: 'valueAlign', type: "'start' | 'center'", default: "'start'" },

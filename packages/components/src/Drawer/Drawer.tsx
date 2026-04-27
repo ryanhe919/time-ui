@@ -228,14 +228,14 @@ const CloseIcon = () => (
 export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(props, forwardedRef) {
   const {
     isOpen,
-    defaultIsOpen = false,
+    defaultOpen = false,
     onOpenChange,
 
     placement = 'right',
     size = 'md',
 
     isDismissable = true,
-    isKeyboardDismissDisabled = false,
+    disableKeyboardDismiss = false,
     hideCloseButton = false,
     scrollBehavior = 'inside',
     portalContainer,
@@ -261,7 +261,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
   // 受控 / 非受控 open
   const [open, setOpen] = useControllableState<boolean>({
     value: isOpen,
-    defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+    defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
     onChange: onOpenChange,
     name: 'Drawer',
   });
@@ -300,7 +300,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
 
   // ── ESC 关闭 ──
   useEffect(() => {
-    if (!open || isKeyboardDismissDisabled) return;
+    if (!open || disableKeyboardDismiss) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
@@ -309,7 +309,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, isKeyboardDismissDisabled, setOpen]);
+  }, [open, disableKeyboardDismiss, setOpen]);
 
   // ── overlay click 关闭 ──
   const onOverlayMouseDown = useCallback(

@@ -81,11 +81,11 @@
 ## 加载与禁用
 
 <LiveDemo code={`<Flex gap={12} align="center">
-  <Button color="primary" loading>保存中…</Button>
-  <Button color="primary" disabled>已禁用</Button>
+  <Button color="primary" isLoading>保存中…</Button>
+  <Button color="primary" isDisabled>已禁用</Button>
 </Flex>`}>
-  <Button color="primary" loading>保存中…</Button>
-  <Button color="primary" disabled>已禁用</Button>
+  <Button color="primary" isLoading>保存中…</Button>
+  <Button color="primary" isDisabled>已禁用</Button>
 </LiveDemo>
 
 ## 带图标
@@ -121,9 +121,9 @@
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '作用于所选样式的语义色。' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设（高度 / 内边距 / 字号）。' },
   { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: '圆角大小。默认匹配 size。' },
-  { name: 'loading', type: 'boolean', default: 'false', description: '显示加载态并禁用交互。' },
-  { name: 'disabled', type: 'boolean', default: 'false', description: '禁用按钮。' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' },
+  { name: 'isLoading', type: 'boolean', default: 'false', description: '显示加载态并禁用交互。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用按钮。' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: '撑满父容器宽度。' },
   { name: 'isIconOnly', type: 'boolean', default: 'false', description: '渲染为正方形纯图标按钮（width = height，无内边距）。请同时传入 aria-label 以保证无障碍。' },
   { name: 'startIcon', type: 'ReactNode', description: '标签前方渲染的节点。' },
   { name: 'endIcon', type: 'ReactNode', description: '标签后方渲染的节点。' },
@@ -135,5 +135,5 @@
 </Callout>
 
 <Callout variant="info" title="可访问性">
-  渲染为原生 `<button>` 元素。键盘焦点有明显 outline，按压使用 `transform: scale(0.97)`，所有动画都遵循 `prefers-reduced-motion`。`loading` 会设置 `aria-busy="true"`，并在 spinner 旁保留标签文本。
+  渲染为原生 `<button>` 元素。键盘焦点有明显 outline，按压使用 `transform: scale(0.97)`，所有动画都遵循 `prefers-reduced-motion`。`isLoading` 会设置 `aria-busy="true"`，并在 spinner 旁保留标签文本。
 </Callout>

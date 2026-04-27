@@ -329,7 +329,7 @@ export function Demo() {
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'" },
   { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'" },
-  { name: 'fullWidth', type: 'boolean', default: 'false' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false' },
   { name: 'accept', type: 'string', description: '与原生 input 一致（MIME 通配或后缀列表）。' },
   { name: 'multiple', type: 'boolean', default: 'false' },
   { name: 'maxSize', type: 'number', description: '单文件最大字节数。' },
@@ -338,7 +338,7 @@ export function Demo() {
   { name: 'isReadOnly', type: 'boolean', default: 'false' },
   { name: 'customRequest', type: 'UploadRequest', description: '自定义上传实现；未传时组件只维护列表不发请求。' },
   { name: 'concurrency', type: 'number', default: '3', description: '并发上传数。' },
-  { name: 'autoUpload', type: 'boolean', default: 'true', description: 'false 时需要手动 `handle.submit()` 才发起上传。' },
+  { name: 'isAutoUpload', type: 'boolean', default: 'true', description: 'false 时需要手动 `handle.submit()` 才发起上传。' },
   { name: 'beforeUpload', type: '(file: File, fileList: File[]) => boolean | Promise<boolean>', description: '预校验；返回 false 拒收。' },
   { name: 'onReject', type: '(rejections: UploadRejection[]) => void', description: '批量拒收回调。' },
   { name: 'onRemove', type: '(file: UploadFile) => boolean | Promise<boolean> | void', description: '返回 false / Promise<false> 可阻止删除。' },
@@ -352,8 +352,8 @@ export function Demo() {
   { name: 'onUploadProgress', type: '(file: UploadFile, percent: number) => void' },
   { name: 'onUploadComplete', type: '(value: UploadFile[]) => void', description: '整个队列空闲后触发一次。' },
   { name: 'dropzoneHeight', type: 'number | string', default: '160' },
-  { name: 'noClick', type: 'boolean', default: 'false', description: '禁用点击打开（仅拖拽）。' },
-  { name: 'noDrag', type: 'boolean', default: 'false', description: '禁用拖拽（仅点击）。' },
+  { name: 'disableClickToUpload', type: 'boolean', default: 'false', description: '禁用点击打开（仅拖拽）。' },
+  { name: 'disableDragAndDrop', type: 'boolean', default: 'false', description: '禁用拖拽（仅点击）。' },
   { name: 'label', type: 'ReactNode', description: '触发隐式 FormField 包装。' },
   { name: 'description', type: 'ReactNode' },
   { name: 'errorMessage', type: 'ReactNode' },
@@ -366,7 +366,7 @@ export function Demo() {
 
 <PropsTable props={[
   { name: 'open', type: '() => void', description: '打开系统文件选择器。' },
-  { name: 'submit', type: '(ids?: string[]) => void', description: '手动触发上传（配合 `autoUpload={false}`）。' },
+  { name: 'submit', type: '(ids?: string[]) => void', description: '手动触发上传（配合 `isAutoUpload={false}`）。' },
   { name: 'retry', type: '(id: string) => void', description: '重试一个失败的文件。' },
   { name: 'abort', type: '(id: string) => void', description: '中断一个进行中的文件。' },
   { name: 'clear', type: '() => void', description: '清空列表。' }

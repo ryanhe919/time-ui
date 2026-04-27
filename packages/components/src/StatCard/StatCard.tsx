@@ -36,8 +36,8 @@ function interpolate(template: string, params: Record<string, string | number>):
 // 尺寸维度表
 // ────────────────────────────────────────────────────────────
 
-const LABEL_SIZE: Record<CardSize, number> = { sm: 11, md: 12, lg: 13 };
-const LABEL_SIZE_CJK: Record<CardSize, number> = { sm: 12, md: 13, lg: 14 };
+const LABEL_SIZE: Record<CardSize, number> = { xs: 10, sm: 11, md: 12, lg: 13, xl: 14 };
+const LABEL_SIZE_CJK: Record<CardSize, number> = { xs: 11, sm: 12, md: 13, lg: 14, xl: 15 };
 const VALUE_FONT_SIZE: Record<StatCardEmphasis, number> = {
   subtle: 20,
   default: 28,
@@ -58,16 +58,16 @@ const VALUE_LINE_HEIGHT: Record<StatCardEmphasis, number> = {
   default: 1.2,
   strong: 1.1,
 };
-const DELTA_HEIGHT: Record<CardSize, number> = { sm: 16, md: 18, lg: 20 };
-const DELTA_FONT_SIZE: Record<CardSize, number> = { sm: 10, md: 11, lg: 12 };
-const DELTA_TRANSLATE_Y: Record<CardSize, number> = { sm: -2, md: -3, lg: -4 };
-const ICON_SIZE: Record<CardSize, number> = { sm: 28, md: 32, lg: 40 };
+const DELTA_HEIGHT: Record<CardSize, number> = { xs: 14, sm: 16, md: 18, lg: 20, xl: 22 };
+const DELTA_FONT_SIZE: Record<CardSize, number> = { xs: 9, sm: 10, md: 11, lg: 12, xl: 13 };
+const DELTA_TRANSLATE_Y: Record<CardSize, number> = { xs: -1, sm: -2, md: -3, lg: -4, xl: -5 };
+const ICON_SIZE: Record<CardSize, number> = { xs: 24, sm: 28, md: 32, lg: 40, xl: 48 };
 const SKELETON_VALUE_HEIGHT: Record<StatCardEmphasis, number> = {
   subtle: 20,
   default: 28,
   strong: 36,
 };
-const CONTAINER_PADDING: Record<CardSize, number> = { sm: 12, md: 16, lg: 24 };
+const CONTAINER_PADDING: Record<CardSize, number> = { xs: 8, sm: 12, md: 16, lg: 24, xl: 32 };
 
 // ────────────────────────────────────────────────────────────
 // 辅助
@@ -99,7 +99,7 @@ export const StatCard = forwardRef<HTMLElement, StatCardProps>(function StatCard
     color = 'default',
     size = 'md',
     radius,
-    fullWidth,
+    isFullWidth,
     isPressable,
     isHoverable,
     isDisabled,
@@ -122,7 +122,7 @@ export const StatCard = forwardRef<HTMLElement, StatCardProps>(function StatCard
     iconPlacement = 'start',
     delta,
     trend,
-    trendBleed = false,
+    hasTrendBleed = false,
     isLoading = false,
     emphasis = 'default',
     valueAlign = 'start',
@@ -204,7 +204,7 @@ export const StatCard = forwardRef<HTMLElement, StatCardProps>(function StatCard
         color={color}
         size={size}
         radius={radius}
-        fullWidth={fullWidth}
+        isFullWidth={isFullWidth}
         isPressable={isPressable}
         isHoverable={isHoverable}
         isDisabled={isDisabled}
@@ -522,10 +522,10 @@ export const StatCard = forwardRef<HTMLElement, StatCardProps>(function StatCard
     trend !== undefined ? (
       <div
         data-slot="trend"
-        data-bleed={trendBleed || undefined}
+        data-bleed={hasTrendBleed || undefined}
         className={classNames?.trend}
         css={
-          trendBleed
+          hasTrendBleed
             ? css`
                 margin: 12px -${pad}px -${pad}px;
                 padding: 12px ${pad}px;
@@ -552,7 +552,7 @@ export const StatCard = forwardRef<HTMLElement, StatCardProps>(function StatCard
       color={color}
       size={size}
       radius={radius}
-      fullWidth={fullWidth}
+      isFullWidth={isFullWidth}
       isPressable={isPressable}
       isHoverable={isHoverable}
       isDisabled={isDisabled}

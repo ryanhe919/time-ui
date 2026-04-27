@@ -63,20 +63,20 @@ afterEach(() => {
 const SECTIONED: ReadonlyArray<MenuItemsEntry> = [
   {
     type: 'section',
-    key: 'file',
+    sectionKey: 'file',
     label: 'File',
     items: [
-      { key: 'new', label: 'New' },
-      { key: 'open', label: 'Open' },
+      { itemKey: 'new', label: 'New' },
+      { itemKey: 'open', label: 'Open' },
     ],
   },
   {
     type: 'section',
-    key: 'edit',
+    sectionKey: 'edit',
     label: 'Edit',
     items: [
-      { key: 'cut', label: 'Cut' },
-      { key: 'paste', label: 'Paste', isDisabled: true },
+      { itemKey: 'cut', label: 'Cut' },
+      { itemKey: 'paste', label: 'Paste', isDisabled: true },
     ],
   },
 ];
@@ -88,7 +88,7 @@ describe('Menu — a11y', () => {
       <Menu
         trigger={<button type="button">Open</button>}
         items={SECTIONED}
-        defaultIsOpen
+        defaultOpen
         aria-label="actions"
       />,
       { theme },

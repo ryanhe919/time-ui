@@ -9,11 +9,11 @@ import type { CSSProperties, ReactNode } from 'react';
 export type StepStatus = 'wait' | 'process' | 'finish' | 'error';
 export type StepsDirection = 'horizontal' | 'vertical';
 export type StepsVariant = 'default' | 'dot' | 'navigation';
-export type StepsSize = 'sm' | 'md' | 'lg';
+export type StepsSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface StepItem {
   /** 唯一 key（缺省时回退到 index）。 */
-  key?: string;
+  itemKey?: string;
   /** 标题，必需。 */
   title: ReactNode;
   /** 描述，可选。 */
@@ -31,11 +31,11 @@ export interface StepsProps {
   items: StepItem[];
 
   /** 受控当前 step 索引（0-based）。 */
-  current?: number;
+  activeIndex?: number;
   /** 非受控初始当前 step 索引（0-based），默认 0。 */
-  defaultCurrent?: number;
+  defaultActiveIndex?: number;
   /** 当前 step 变更回调。 */
-  onChange?: (index: number) => void;
+  onActiveIndexChange?: (index: number) => void;
 
   /** 当前 step 的整体状态，默认 'process'。仅影响 current step 的视觉。 */
   status?: StepStatus;

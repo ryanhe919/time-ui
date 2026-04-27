@@ -16,12 +16,12 @@ export type TextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
 export interface TextProps extends HTMLAttributes<HTMLSpanElement> {
   size?: TextSize;
   weight?: TextWeight;
-  muted?: boolean;
-  truncate?: boolean;
+  isMuted?: boolean;
+  isTruncated?: boolean;
 }
 
 export const Text = forwardRef<HTMLSpanElement, TextProps>(function Text(
-  { size = 'md', weight = 'regular', muted, truncate, ...rest },
+  { size = 'md', weight = 'regular', isMuted, isTruncated, ...rest },
   ref,
 ) {
   const theme = useTheme();
@@ -34,8 +34,8 @@ export const Text = forwardRef<HTMLSpanElement, TextProps>(function Text(
         font-family: ${tt.font};
         font-size: ${tt.fs(size)};
         font-weight: ${tt.fw(weight)};
-        color: ${muted ? tt.color.textMuted : tt.color.text};
-        ${truncate &&
+        color: ${isMuted ? tt.color.textMuted : tt.color.text};
+        ${isTruncated &&
         css`
           overflow: hidden;
           text-overflow: ellipsis;

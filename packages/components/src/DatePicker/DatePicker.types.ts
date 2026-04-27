@@ -8,7 +8,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { PopoverPlacement } from '../Popover/Popover.types';
 import type { WeekStartsOn } from './date-utils';
 
-export type DatePickerSize = 'sm' | 'md' | 'lg';
+export type DatePickerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type DatePickerPanelSize = 'sm' | 'md' | 'lg';
 
 export type DateValue = Date;
@@ -26,7 +26,7 @@ export interface DateRangeWorking {
 
 export interface DatePickerCommonProps {
   isOpen?: boolean;
-  defaultIsOpen?: boolean;
+  defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   /** Popover placement，默认 'bottom-start'。 */
   placement?: PopoverPlacement;

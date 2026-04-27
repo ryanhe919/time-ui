@@ -11,7 +11,7 @@
  *                - 配色硬编码反色：light 模式深底白字 / dark 模式浅底深字，不走 theme.colors。
  *                - 无 hairline border / 无 elevation 阴影，仅使用 token 内简短 shadow。
  *                - 无 header / footer / closeButton 支持。
- *                - 实现 warm-up：上一个 tooltip 关闭后 warmThreshold 内打开下一个则跳过 enterDelay。
+ *                - 实现 warm-up：上一个 tooltip 关闭后 warmThreshold 内打开下一个则跳过 openDelay。
  *                - role="tooltip"，通过 aria-describedby 与 anchor 关联。
  *                - 复用 Popover 的纯函数 computePopoverPosition 完成定位算法。
  */
@@ -44,7 +44,7 @@ import type { TooltipPlacement, TooltipProps } from './Tooltip.types';
 // ────────────────────────────────────────────────────────────
 // 仅在本模块内可见的可变变量；用于跨实例追踪"最近一个 tooltip 关闭于何时"。
 // 当一个 tooltip 关闭时写入 Date.now()；下一次 enter 时若 (Date.now() - lastClosedAt) < warmThreshold
-// 则跳过 enterDelay，立即显示。这个全局状态范围已经被刻意限制在模块内，
+// 则跳过 openDelay，立即显示。这个全局状态范围已经被刻意限制在模块内，
 // 不会污染 window / globalThis。
 
 let lastClosedAt = 0;
@@ -101,12 +101,12 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
       children,
       placement = 'top',
       offset,
-      withArrow = true,
+      hasArrow = true,
       isDisabled = false,
-      enterDelay,
-      exitDelay,
+      openDelay,
+      closeDelay,
       isOpen,
-      defaultIsOpen = false,
+      defaultOpen = false,
       onOpenChange,
       className,
       style,
@@ -120,7 +120,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
     // ── 受控 / 非受控 ──
     const [open, setOpen] = useControllableState<boolean>({
       value: isOpen,
-      defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+      defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
       onChange: onOpenChange,
       name: 'Tooltip',
     });
@@ -167,13 +167,13 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
       () => parseToken(offset, parseToken(tooltipTokens.offset, 6)),
       [offset, tooltipTokens.offset],
     );
-    const enterDelayMs = useMemo(
-      () => parseToken(enterDelay, parseToken(tooltipTokens.enterDelay, 120)),
-      [enterDelay, tooltipTokens.enterDelay],
+    const openDelayMs = useMemo(
+      () => parseToken(openDelay, parseToken(tooltipTokens.enterDelay, 120)),
+      [openDelay, tooltipTokens.enterDelay],
     );
-    const exitDelayMs = useMemo(
-      () => parseToken(exitDelay, parseToken(tooltipTokens.exitDelay, 80)),
-      [exitDelay, tooltipTokens.exitDelay],
+    const closeDelayMs = useMemo(
+      () => parseToken(closeDelay, parseToken(tooltipTokens.exitDelay, 80)),
+      [closeDelay, tooltipTokens.exitDelay],
     );
     const warmThresholdMs = useMemo(
       () => parseToken(undefined, parseToken(tooltipTokens.warmThreshold, 500)),
@@ -237,14 +237,14 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
 
     // ── enter / leave handlers ──
 
-    /** 计算实际生效的 enterDelay：处于 warm 窗口期则跳过延迟。 */
+    /** 计算实际生效的 openDelay：处于 warm 窗口期则跳过延迟。 */
     const computeEffectiveEnterDelay = useCallback((): number => {
       const now = Date.now();
       if (lastClosedAt > 0 && now - lastClosedAt < warmThresholdMs) {
         return 0;
       }
-      return enterDelayMs;
-    }, [enterDelayMs, warmThresholdMs]);
+      return openDelayMs;
+    }, [openDelayMs, warmThresholdMs]);
 
     const scheduleOpen = useCallback(() => {
       // 若已开启 / 受控 / 禁用 / 已有定时器：跳过。
@@ -277,15 +277,15 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
         lastClosedAt = Date.now();
         setOpen(false);
       };
-      if (exitDelayMs <= 0) {
+      if (closeDelayMs <= 0) {
         doClose();
         return;
       }
       exitTimerRef.current = setTimeout(() => {
         exitTimerRef.current = null;
         doClose();
-      }, exitDelayMs);
-    }, [isControlled, isDisabled, clearEnterTimer, clearExitTimer, exitDelayMs, setOpen]);
+      }, closeDelayMs);
+    }, [isControlled, isDisabled, clearEnterTimer, clearExitTimer, closeDelayMs, setOpen]);
 
     // ── anchor 渲染 ──
     const renderAnchor = (): ReactElement | null => {
@@ -451,7 +451,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
         css={panelCss}
       >
         {content}
-        {withArrow ? <span aria-hidden data-tooltip-arrow="" style={arrowStyle} /> : null}
+        {hasArrow ? <span aria-hidden data-tooltip-arrow="" style={arrowStyle} /> : null}
       </div>
     );
 

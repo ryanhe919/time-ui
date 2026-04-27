@@ -8,13 +8,13 @@ Internally it renders a hidden native `<input type="checkbox" role="switch">` so
 
 <LiveDemo code={`<Flex gap={16} align="center">
   <Switch aria-label="Enable notifications" />
-  <Switch defaultSelected aria-label="Currently on" />
-  <Switch defaultSelected>With a label</Switch>
+  <Switch defaultIsSelected aria-label="Currently on" />
+  <Switch defaultIsSelected>With a label</Switch>
 </Flex>`}>
   <Flex gap={16} align="center">
     <Switch aria-label="Enable notifications" />
-    <Switch defaultSelected aria-label="Currently on" />
-    <Switch defaultSelected>With a label</Switch>
+    <Switch defaultIsSelected aria-label="Currently on" />
+    <Switch defaultIsSelected>With a label</Switch>
   </Flex>
 </LiveDemo>
 
@@ -23,36 +23,40 @@ Internally it renders a hidden native `<input type="checkbox" role="switch">` so
 Defaults to `success` (iOS green).
 
 <LiveDemo code={`<Flex gap={16} align="center" wrap="wrap">
-  <Switch defaultSelected color="default">Default</Switch>
-  <Switch defaultSelected color="primary">Primary</Switch>
-  <Switch defaultSelected color="secondary">Secondary</Switch>
-  <Switch defaultSelected color="success">Success</Switch>
-  <Switch defaultSelected color="warning">Warning</Switch>
-  <Switch defaultSelected color="danger">Danger</Switch>
+  <Switch defaultIsSelected color="default">Default</Switch>
+  <Switch defaultIsSelected color="primary">Primary</Switch>
+  <Switch defaultIsSelected color="secondary">Secondary</Switch>
+  <Switch defaultIsSelected color="success">Success</Switch>
+  <Switch defaultIsSelected color="warning">Warning</Switch>
+  <Switch defaultIsSelected color="danger">Danger</Switch>
 </Flex>`}>
   <Flex gap={16} align="center" wrap="wrap">
-    <Switch defaultSelected color="default">Default</Switch>
-    <Switch defaultSelected color="primary">Primary</Switch>
-    <Switch defaultSelected color="secondary">Secondary</Switch>
-    <Switch defaultSelected color="success">Success</Switch>
-    <Switch defaultSelected color="warning">Warning</Switch>
-    <Switch defaultSelected color="danger">Danger</Switch>
+    <Switch defaultIsSelected color="default">Default</Switch>
+    <Switch defaultIsSelected color="primary">Primary</Switch>
+    <Switch defaultIsSelected color="secondary">Secondary</Switch>
+    <Switch defaultIsSelected color="success">Success</Switch>
+    <Switch defaultIsSelected color="warning">Warning</Switch>
+    <Switch defaultIsSelected color="danger">Danger</Switch>
   </Flex>
 </LiveDemo>
 
 ## Sizes
 
-Three steps `sm` / `md` / `lg` — track widths 32 / 48 / 56 px.
+Five steps `xs` / `sm` / `md` / `lg` / `xl` — track widths 24 / 32 / 48 / 56 / 72 px.
 
 <LiveDemo code={`<Flex gap={16} align="center">
-  <Switch size="sm" defaultSelected>Small</Switch>
-  <Switch size="md" defaultSelected>Medium</Switch>
-  <Switch size="lg" defaultSelected>Large</Switch>
+  <Switch size="xs" defaultIsSelected>XS</Switch>
+  <Switch size="sm" defaultIsSelected>Small</Switch>
+  <Switch size="md" defaultIsSelected>Medium</Switch>
+  <Switch size="lg" defaultIsSelected>Large</Switch>
+  <Switch size="xl" defaultIsSelected>XL</Switch>
 </Flex>`}>
   <Flex gap={16} align="center">
-    <Switch size="sm" defaultSelected>Small</Switch>
-    <Switch size="md" defaultSelected>Medium</Switch>
-    <Switch size="lg" defaultSelected>Large</Switch>
+    <Switch size="xs" defaultIsSelected>XS</Switch>
+    <Switch size="sm" defaultIsSelected>Small</Switch>
+    <Switch size="md" defaultIsSelected>Medium</Switch>
+    <Switch size="lg" defaultIsSelected>Large</Switch>
+    <Switch size="xl" defaultIsSelected>XL</Switch>
   </Flex>
 </LiveDemo>
 
@@ -60,15 +64,15 @@ Three steps `sm` / `md` / `lg` — track widths 32 / 48 / 56 px.
 
 <LiveDemo code={`<Stack spacing={12}>
   <Switch isDisabled>Disabled</Switch>
-  <Switch isDisabled defaultSelected>Disabled + on</Switch>
-  <Switch isReadOnly defaultSelected>Read only (click is a no-op)</Switch>
+  <Switch isDisabled defaultIsSelected>Disabled + on</Switch>
+  <Switch isReadOnly defaultIsSelected>Read only (click is a no-op)</Switch>
   <Switch isRequired>Required</Switch>
   <Switch isInvalid>Invalid</Switch>
 </Stack>`}>
   <Stack spacing={12}>
     <Switch isDisabled>Disabled</Switch>
-    <Switch isDisabled defaultSelected>Disabled + on</Switch>
-    <Switch isReadOnly defaultSelected>Read only (click is a no-op)</Switch>
+    <Switch isDisabled defaultIsSelected>Disabled + on</Switch>
+    <Switch isReadOnly defaultIsSelected>Read only (click is a no-op)</Switch>
     <Switch isRequired>Required</Switch>
     <Switch isInvalid>Invalid</Switch>
   </Stack>
@@ -81,7 +85,7 @@ Three steps `sm` / `md` / `lg` — track widths 32 / 48 / 56 px.
 <LiveDemo code={`<Flex gap={16} align="center">
   <Switch
     size="lg"
-    defaultSelected
+    defaultIsSelected
     startContent={<span aria-hidden>☀</span>}
     endContent={<span aria-hidden>🌙</span>}
   >
@@ -91,7 +95,7 @@ Three steps `sm` / `md` / `lg` — track widths 32 / 48 / 56 px.
   <Flex gap={16} align="center">
     <Switch
       size="lg"
-      defaultSelected
+      defaultIsSelected
       startContent={<span aria-hidden>☀</span>}
       endContent={<span aria-hidden>🌙</span>}
     >
@@ -134,11 +138,10 @@ export function SettingsList() {
 
 <PropsTable props={[
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'success'", description: 'On-state track color; defaults to iOS green.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size preset.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset.' },
   { name: 'isSelected', type: 'boolean', description: 'Controlled on-state.' },
-  { name: 'defaultSelected', type: 'boolean', default: 'false', description: 'Uncontrolled initial state.' },
+  { name: 'defaultIsSelected', type: 'boolean', default: 'false', description: 'Uncontrolled initial state.' },
   { name: 'onChange', type: '(checked: boolean) => void', description: 'Unwrapped boolean change handler.' },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: 'Raw native-event escape hatch.' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disabled.' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable but toggles are no-ops.' },
   { name: 'isRequired', type: 'boolean', default: 'false', description: 'Required.' },

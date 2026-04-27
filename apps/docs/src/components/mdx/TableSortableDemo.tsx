@@ -50,9 +50,9 @@ export function TableSortableDemo() {
       <Table<Row>
         aria-label="Sortable users"
         columns={[
-          { key: 'name', title: 'Name', isSortable: true },
-          { key: 'role', title: 'Role', isSortable: true },
-          { key: 'signups', title: 'Sign-ups', align: 'right', isSortable: true, width: 120 },
+          { columnKey: 'name', title: 'Name', isSortable: true },
+          { columnKey: 'role', title: 'Role', isSortable: true },
+          { columnKey: 'signups', title: 'Sign-ups', align: 'right', isSortable: true, width: 120 },
         ]}
         data={sortedData}
         sortDescriptor={sort}

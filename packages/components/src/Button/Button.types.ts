@@ -30,9 +30,9 @@ export interface ButtonOwnProps {
   color?: ButtonColor;
   size?: ButtonSize;
   radius?: ButtonRadius;
-  loading?: boolean;
-  disabled?: boolean;
-  fullWidth?: boolean;
+  isLoading?: boolean;
+  isDisabled?: boolean;
+  isFullWidth?: boolean;
   /**
    * Render as a square icon-only button: width = height, no min-width and no
    * inner padding. Pass the icon either as `children` or via `startIcon`. When

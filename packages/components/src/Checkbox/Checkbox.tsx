@@ -21,9 +21,11 @@ import { useCheckboxGroupContext } from './context';
 import type { CheckboxProps, CheckboxRadius, CheckboxSize } from './Checkbox.types';
 
 const sizeToRadius: Record<CheckboxSize, CheckboxRadius> = {
+  xs: 'sm',
   sm: 'sm',
   md: 'sm',
   lg: 'md',
+  xl: 'md',
 };
 
 const radiusPx: Record<CheckboxRadius, string> = {
@@ -38,10 +40,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
     radius: radiusProp,
     value,
     isSelected,
-    defaultSelected = false,
+    defaultIsSelected = false,
     isIndeterminate = false,
     onChange,
-    onChangeEvent,
     isDisabled: isDisabledProp,
     isReadOnly = false,
     isRequired = false,
@@ -70,7 +71,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 
   const [standaloneSelected, setStandaloneSelected] = useControllableState<boolean>({
     value: isSelected,
-    defaultValue: (isSelected !== undefined ? undefined : (defaultSelected ?? false)) as boolean,
+    defaultValue: (isSelected !== undefined ? undefined : (defaultIsSelected ?? false)) as boolean,
     onChange,
     name: 'Checkbox',
   });
@@ -93,7 +94,6 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         return;
       }
       const next = event.target.checked;
-      onChangeEvent?.(event);
       if (inGroup) {
         if (value !== undefined) group!.toggle(value, next);
         onChange?.(next);
@@ -101,7 +101,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         setStandaloneSelected(next);
       }
     },
-    [inGroup, group, value, onChange, onChangeEvent, setStandaloneSelected, isReadOnly, selected],
+    [inGroup, group, value, onChange, setStandaloneSelected, isReadOnly, selected],
   );
 
   const sizeTokens = theme.components.checkbox[resolvedSize];

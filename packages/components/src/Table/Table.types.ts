@@ -28,7 +28,7 @@ export interface SortDescriptor {
 
 export interface TableColumn<T = unknown> {
   /** 唯一列 key */
-  key: string;
+  columnKey: string;
   /** 表头显示内容 */
   title: ReactNode;
   /** 列宽（数字 px 或 CSS 字符串） */
@@ -37,7 +37,7 @@ export interface TableColumn<T = unknown> {
   align?: TableAlign;
   /** 是否可排序 */
   isSortable?: boolean;
-  /** 自定义渲染单元格内容；默认显示 row[key] */
+  /** 自定义渲染单元格内容；默认显示 row[columnKey] */
   render?: (row: T, rowIndex: number) => ReactNode;
   /** 固定列；默认不固定 */
   fixed?: TableFixed;
@@ -57,7 +57,7 @@ export interface TableProps<T = unknown> {
   /** 视觉风格，默认 `'enclosed'`。 */
   variant?: TableVariant;
   /** sticky 表头，默认 false */
-  stickyHeader?: boolean;
+  isStickyHeader?: boolean;
   /** 斑马纹，默认 false */
   isStriped?: boolean;
   /** 容器边框，**仅对 `variant="enclosed"` 生效**，默认 true */

@@ -1,6 +1,6 @@
 # 标签 Tag
 
-紧凑的标记控件：标注分类、状态、属性。3 种 variant（solid / soft / outline）、6 种 color、3 档 size、可关闭、可点击、可加 start/end 内容。
+紧凑的标记控件：标注分类、状态、属性。3 种 variant（solid / soft / outline）、6 种 color、5 档 size、可关闭、可点击、可加 start/end 内容。
 
 <Callout variant="info" title="Tag 还是 Badge？">
   - **Tag**：用户可见、表达**内容属性**（"React"、"Bug"、"已完成"），可关闭 / 点击。
@@ -43,15 +43,19 @@
 
 ## 尺寸 size
 
-`sm` / `md`（默认）/ `lg`，分别对应 20 / 24 / 28 px 高度。
+`xs` / `sm` / `md`（默认）/ `lg` / `xl`，分别对应 16 / 20 / 24 / 28 / 32 px 高度。
 
-<LiveDemo code={`<Tag size="sm">Small</Tag>
+<LiveDemo code={`<Tag size="xs">XS</Tag>
+<Tag size="sm">Small</Tag>
 <Tag size="md">Medium</Tag>
-<Tag size="lg">Large</Tag>`}>
+<Tag size="lg">Large</Tag>
+<Tag size="xl">XL</Tag>`}>
   <Flex gap={8} align="center">
+    <Tag size="xs" color="primary">XS</Tag>
     <Tag size="sm" color="primary">Small</Tag>
     <Tag size="md" color="primary">Medium</Tag>
     <Tag size="lg" color="primary">Large</Tag>
+    <Tag size="xl" color="primary">XL</Tag>
   </Flex>
 </LiveDemo>
 
@@ -96,7 +100,7 @@
 <PropsTable props={[
   { name: 'color', type: "'neutral' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'neutral'" },
   { name: 'variant', type: "'solid' | 'soft' | 'outline'", default: "'soft'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'shape', type: "'rounded' | 'pill'", default: "'rounded'" },
   { name: 'isClosable', type: 'boolean', default: 'false', description: '尾部渲染 `×` 按钮。' },
   { name: 'isDisabled', type: 'boolean', default: 'false' },

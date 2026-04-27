@@ -128,7 +128,7 @@ function resolveDefaultWorkerSrc(): string | null {
 export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function PdfViewer(props, ref) {
   const {
     source,
-    initialPage = 1,
+    defaultPage = 1,
     page: pageProp,
     onPageChange,
     zoom: zoomProp,
@@ -156,7 +156,7 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
 
   // ─── state ────────────────────────────────────────────────────────────────
   const [numPages, setNumPages] = useState(0);
-  const [internalPage, setInternalPage] = useState(Math.max(1, initialPage));
+  const [internalPage, setInternalPage] = useState(Math.max(1, defaultPage));
   const currentPage = pageProp ?? internalPage;
 
   const [zoomMode, setZoomMode] = useState<'fit' | 'width' | 'custom'>(() =>

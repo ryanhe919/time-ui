@@ -59,17 +59,17 @@ export function TableWithPaginationDemo() {
         aria-label="Recent orders"
         rowKey="id"
         columns={[
-          { key: 'id', title: 'Order', width: 140 },
-          { key: 'customer', title: 'Customer' },
+          { columnKey: 'id', title: 'Order', width: 140 },
+          { columnKey: 'customer', title: 'Customer' },
           {
-            key: 'amount',
+            columnKey: 'amount',
             title: 'Amount',
             align: 'right',
             width: 120,
             render: (row) => `$${row.amount.toFixed(2)}`,
           },
           {
-            key: 'status',
+            columnKey: 'status',
             title: 'Status',
             width: 120,
             render: (row) => (
@@ -98,7 +98,7 @@ export function TableWithPaginationDemo() {
           total={ALL_ORDERS.length}
           page={page}
           pageSize={pageSize}
-          onChange={setPage}
+          onPageChange={setPage}
           onPageSizeChange={(n) => {
             setPageSize(n);
             setPage(1);

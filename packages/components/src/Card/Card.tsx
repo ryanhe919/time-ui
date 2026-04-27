@@ -52,9 +52,11 @@ export const DURATIONS = {
 // ────────────────────────────────────────────────────────────
 
 const SIZE_PADDING: Record<CardSize, number> = {
+  xs: 8,
   sm: 12,
   md: 16,
   lg: 24,
+  xl: 32,
 };
 
 const RADIUS_KEY: Record<CardRadius, 'none' | 'sm' | 'md' | 'lg'> = {
@@ -106,7 +108,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(props, ref)
     color = 'default' as CardColor,
     size = 'md' as CardSize,
     radius = 'md' as CardRadius,
-    fullWidth = false,
+    isFullWidth = false,
     isPressable: isPressableProp = false,
     isHoverable = false,
     isDisabled = false,
@@ -303,7 +305,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(props, ref)
       data-pressable={isPressable || undefined}
       data-hoverable={isHoverable || undefined}
       data-disabled={isDisabled || undefined}
-      data-fullwidth={fullWidth || undefined}
+      data-fullwidth={isFullWidth || undefined}
       onClick={handleClick}
       onKeyDown={isPressable ? handleKeyDown : undefined}
       css={[
@@ -313,7 +315,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(props, ref)
           flex-direction: column;
           gap: ${padding}px;
           box-sizing: border-box;
-          width: ${fullWidth ? '100%' : 'auto'};
+          width: ${isFullWidth ? '100%' : 'auto'};
           padding: ${padding}px;
           background: ${baseBackground};
           color: ${theme.colors.text.primary};

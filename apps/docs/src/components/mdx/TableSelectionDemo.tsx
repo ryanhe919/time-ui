@@ -46,9 +46,9 @@ export function TableSelectionDemo() {
         selectedKeys={keys}
         onSelectionChange={setKeys}
         columns={[
-          { key: 'file', title: 'File' },
-          { key: 'size', title: 'Size', align: 'right', width: 100 },
-          { key: 'updatedAt', title: 'Updated', width: 140 },
+          { columnKey: 'file', title: 'File' },
+          { columnKey: 'size', title: 'Size', align: 'right', width: 100 },
+          { columnKey: 'updatedAt', title: 'Updated', width: 140 },
         ]}
         data={ROWS}
       />

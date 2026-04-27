@@ -67,17 +67,6 @@ describe('Input — controlled / uncontrolled', () => {
     expect(input).toHaveValue('ab');
   });
 
-  it('onChangeEvent exposes the native ChangeEvent', async () => {
-    const onChangeEvent = vi.fn();
-    renderWithProviders(<Input aria-label="x" defaultValue="" onChangeEvent={onChangeEvent} />);
-    await userEvent.type(screen.getByRole('textbox'), 'a');
-    const [event] = onChangeEvent.mock.calls.at(-1) as [Event];
-    expect(event).toBeTruthy();
-    expect((event as unknown as { target: HTMLInputElement }).target).toBeInstanceOf(
-      HTMLInputElement,
-    );
-  });
-
   it('uncontrolled: defaultValue is used and DOM updates on input, external state untouched', async () => {
     const onChange = vi.fn();
     renderWithProviders(<Input aria-label="x" defaultValue="foo" onChange={onChange} />);
@@ -116,7 +105,7 @@ describe('Input — clearable & Escape', () => {
     expect(document.activeElement).toBe(input);
   });
 
-  it('Escape clears value when isClearable and clearOnEscape are enabled', async () => {
+  it('Escape clears value when isClearable and clearOnEsc are enabled', async () => {
     const onClear = vi.fn();
     function Harness() {
       const [v, setV] = useState('abc');
@@ -130,10 +119,10 @@ describe('Input — clearable & Escape', () => {
     expect(onClear).toHaveBeenCalled();
   });
 
-  it('Escape does NOT clear when clearOnEscape={false}', async () => {
+  it('Escape does NOT clear when clearOnEsc={false}', async () => {
     function Harness() {
       const [v, setV] = useState('abc');
-      return <Input aria-label="x" value={v} onChange={setV} isClearable clearOnEscape={false} />;
+      return <Input aria-label="x" value={v} onChange={setV} isClearable clearOnEsc={false} />;
     }
     renderWithProviders(<Harness />);
     const input = screen.getByRole('textbox') as HTMLInputElement;
@@ -155,8 +144,8 @@ describe('Input — password toggle', () => {
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('password toggle is hidden when isPasswordToggleVisible={false}', () => {
-    renderWithProviders(<Input aria-label="pw" type="password" isPasswordToggleVisible={false} />);
+  it('password toggle is hidden when showPasswordToggle={false}', () => {
+    renderWithProviders(<Input aria-label="pw" type="password" showPasswordToggle={false} />);
     expect(screen.queryByRole('button')).toBeNull();
   });
 });

@@ -31,7 +31,7 @@ export function TextareaDemo() {
         maxRows={8}
         maxLength={120}
         showCount
-        fullWidth
+        isFullWidth
       />
     </div>
   );

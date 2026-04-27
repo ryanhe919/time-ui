@@ -6,7 +6,7 @@
 
 import type { ReactNode, CSSProperties } from 'react';
 
-export type SliderSize = 'sm' | 'md' | 'lg';
+export type SliderSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type SliderColor = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
@@ -55,7 +55,7 @@ export interface SliderProps {
   maxName?: string;
 
   /** 显式覆盖轨道长度，横向是 width，纵向是 height。 */
-  length?: string | number;
+  trackLength?: string | number;
 
   className?: string;
   style?: CSSProperties;

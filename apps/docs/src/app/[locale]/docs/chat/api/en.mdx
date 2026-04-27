@@ -6,7 +6,7 @@ All props for the Chat family. Shared types are listed inline in each `type` col
 
 <PropsTable props={[
   { name: 'children', type: 'ReactNode', description: 'Typically a list of `<ChatMessage>`.' },
-  { name: 'autoScrollToBottom', type: 'boolean', default: 'true', description: 'Scroll to bottom on children change (only when `maxHeight` is set).' },
+  { name: 'shouldAutoScrollToBottom', type: 'boolean', default: 'true', description: 'Scroll to bottom on children change (only when `maxHeight` is set).' },
   { name: 'maxHeight', type: 'string | number', description: 'Sets up internal overflow-y scrolling; otherwise defers to parent.' },
   { name: 'role', type: "'log' | 'list' | 'region'", default: "'log'" },
   { name: 'isLive', type: 'boolean', default: 'true', description: '`aria-live="polite"` — screen readers announce new messages.' }
@@ -29,14 +29,14 @@ All props for the Chat family. Shared types are listed inline in each `type` col
 
 <PropsTable props={[
   { name: 'source', type: 'ChatAvatarSource', description: '`{ kind: "image", src, alt }` / `{ kind: "text", text }` / `{ kind: "node", node }`.' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'sm 24 / md 32 / lg 40.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'xs 20 / sm 24 / md 32 / lg 40 / xl 48.' },
   { name: 'role', type: 'ChatMessageRole', description: 'Drives the tinted background for text/node sources.' }
 ]} />
 
 ## ChatTypingIndicator
 
 <PropsTable props={[
-  { name: 'size', type: "'sm' | 'md'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'label', type: 'string', default: '"AI is typing"', description: 'Also serves as `aria-label`.' }
 ]} />
 
@@ -46,7 +46,7 @@ All props for the Chat family. Shared types are listed inline in each `type` col
   { name: 'isActive', type: 'boolean', default: 'true', description: 'When false, bars freeze at their minimum height.' },
   { name: 'bars', type: 'number', default: '4' },
   { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'primary'" },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: '"aria-label"', type: 'string', default: '"Recording"' }
 ]} />
 

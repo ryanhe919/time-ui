@@ -23,7 +23,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ChangeEvent,
   type FocusEvent,
   type ReactNode,
 } from 'react';
@@ -69,7 +68,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       defaultValue,
       onChange,
       isOpen,
-      defaultIsOpen = false,
+      defaultOpen = false,
       onOpenChange,
       placement = 'bottom-start',
       size = 'md',
@@ -98,7 +97,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       hourStep = 1,
       minuteStep = 1,
       secondStep = 1,
-      use12Hours = false,
+      is12Hour = false,
       showNowButton = true,
       showConfirmButton = true,
       nowLabel,
@@ -131,7 +130,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     // ── open 受控/非受控 ──
     const [open, setOpen] = useControllableState<boolean>({
       value: isOpen,
-      defaultValue: (isOpen !== undefined ? undefined : defaultIsOpen) as boolean,
+      defaultValue: (isOpen !== undefined ? undefined : defaultOpen) as boolean,
       onChange: onOpenChange,
       name: 'DateTimePicker.isOpen',
     });
@@ -179,8 +178,8 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     const formatter = useMemo(
       () =>
         format ??
-        ((d: Date) => defaultDateTimeFormat(d, { showMinute, showSecond, use12Hours, locale })),
-      [format, showMinute, showSecond, use12Hours, locale],
+        ((d: Date) => defaultDateTimeFormat(d, { showMinute, showSecond, is12Hour, locale })),
+      [format, showMinute, showSecond, is12Hour, locale],
     );
     const parser = useMemo(() => parse ?? defaultDateTimeParse, [parse]);
 
@@ -389,12 +388,9 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         data-readonly={isReadOnly || undefined}
       >
         <Input
-          size={size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'}
+          size={size}
           value={inputText}
           onChange={handleInputChange}
-          onChangeEvent={(e: ChangeEvent<HTMLInputElement>) => {
-            void e;
-          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -542,7 +538,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         anchor={anchorElement}
         isOpen={open}
         placement={placement}
-        withArrow={false}
+        hasArrow={false}
         trigger="manual"
         offset={parseInt(tokens.panelOffset, 10) || 8}
         id={`${baseId}-panel`}
@@ -574,7 +570,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                 onSecondChange={handleSecondChange}
                 showMinute={showMinute}
                 showSecond={showSecond}
-                use12Hours={use12Hours}
+                is12Hour={is12Hour}
                 hourStep={hourStep}
                 minuteStep={minuteStep}
                 secondStep={secondStep}

@@ -306,7 +306,7 @@ describe('CodeEditor — AI suggestion button', () => {
 // ─── 8. Size and variant combinations ─────────────────────────────────────────
 
 describe('CodeEditor — size combinations', () => {
-  it.each(['sm', 'md', 'lg'] as const)('renders size="%s" without error', (size) => {
+  it.each(['xs', 'sm', 'md', 'lg', 'xl'] as const)('renders size="%s" without error', (size) => {
     const { container } = renderEditor(<CodeEditor aria-label="Test editor" size={size} />);
     const wrapper = container.firstElementChild as HTMLElement;
     expect(wrapper.getAttribute('data-size')).toBe(size);

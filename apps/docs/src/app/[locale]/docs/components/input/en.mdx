@@ -48,7 +48,7 @@ reveal it on focus. `isInvalid` always forces `danger`.
 
 ## Sizes
 
-`xs` / `sm` / `md` / `lg` / `xl` — 28 / 32 / 40 / 48 / 56 px heights. Matches the Button scale.
+`xs` / `sm` / `md` / `lg` / `xl` — 28 / 32 / 40 / 48 / 56 px heights.
 
 <LiveDemo code={`<Stack spacing={12}>
   <Input size="xs" placeholder="XS" />
@@ -104,7 +104,7 @@ Override the size-derived default.
 
 ## Clearable
 
-`isClearable` reveals a ✕ button whenever the field has a value. Escape also clears (opt out with `clearOnEscape={false}`).
+`isClearable` reveals a ✕ button whenever the field has a value. Escape also clears (opt out with `clearOnEsc={false}`).
 
 <LiveDemo code={`<Input
   isClearable
@@ -200,7 +200,6 @@ export function SignUpForm() {
   { name: 'value', type: 'string', description: 'Controlled value.' },
   { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
   { name: 'onChange', type: '(value: string) => void', description: 'Unwrapped string change handler.' },
-  { name: 'onChangeEvent', type: '(e: ChangeEvent<HTMLInputElement>) => void', description: 'Raw native-event escape hatch.' },
   { name: 'onClear', type: '() => void', description: 'Fires when the clear button or Escape empties the input.' },
   { name: 'label', type: 'ReactNode', description: 'Field title; presence triggers implicit FormField wrapping.' },
   { name: 'description', type: 'ReactNode', description: 'Helper text.' },
@@ -208,13 +207,13 @@ export function SignUpForm() {
   { name: 'startContent', type: 'ReactNode', description: 'Left slot (icon / prefix).' },
   { name: 'endContent', type: 'ReactNode', description: 'Right slot (icon / suffix / button).' },
   { name: 'isClearable', type: 'boolean', default: 'false', description: 'Show a ✕ button when non-empty.' },
-  { name: 'clearOnEscape', type: 'boolean', default: 'true', description: 'Press Escape while focused to clear.' },
-  { name: 'isPasswordToggleVisible', type: 'boolean', description: 'Show the password visibility toggle. Default `true` when `type="password"`.' },
+  { name: 'clearOnEsc', type: 'boolean', default: 'true', description: 'Press Escape while focused to clear.' },
+  { name: 'showPasswordToggle', type: 'boolean', description: 'Show the password visibility toggle. Default `true` when `type="password"`.' },
   { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disable the field.' },
   { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable but not editable.' },
   { name: 'isRequired', type: 'boolean', default: 'false', description: 'Mark as required.' },
   { name: 'isInvalid', type: 'boolean', description: 'Explicit invalid; auto-derived from errorMessage.' },
-  { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Expand the root wrapper to 100% width.' }
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: 'Expand the root wrapper to 100% width.' }
 ]} />
 
 <Callout variant="info" title="Accessibility">

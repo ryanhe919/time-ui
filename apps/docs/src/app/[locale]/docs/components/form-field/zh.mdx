@@ -14,10 +14,10 @@
 显式 `<FormField>` 包裹 `<Input>`——label/description 走外层，Input 保留自己的样式与交互。
 
 <LiveDemo code={`<FormField label="用户名" description="2 到 24 个字符。">
-  <Input placeholder="请输入" fullWidth />
+  <Input placeholder="请输入" isFullWidth />
 </FormField>`}>
   <FormField label="用户名" description="2 到 24 个字符。">
-    <Input placeholder="请输入" fullWidth />
+    <Input placeholder="请输入" isFullWidth />
   </FormField>
 </LiveDemo>
 
@@ -30,10 +30,10 @@
   description="我们会向这个地址发送验证邮件。"
   isRequired
 >
-  <Input type="email" placeholder="you@example.com" fullWidth />
+  <Input type="email" placeholder="you@example.com" isFullWidth />
 </FormField>`}>
   <FormField label="邮箱" description="我们会向这个地址发送验证邮件。" isRequired>
-    <Input type="email" placeholder="you@example.com" fullWidth />
+    <Input type="email" placeholder="you@example.com" isFullWidth />
   </FormField>
 </LiveDemo>
 
@@ -45,10 +45,10 @@
   label="验证码"
   errorMessage="验证码不正确，请重试。"
 >
-  <Input defaultValue="1234" fullWidth />
+  <Input defaultValue="1234" isFullWidth />
 </FormField>`}>
   <FormField label="验证码" errorMessage="验证码不正确，请重试。">
-    <Input defaultValue="1234" fullWidth />
+    <Input defaultValue="1234" isFullWidth />
   </FormField>
 </LiveDemo>
 
@@ -61,10 +61,10 @@
   description="管理员才能修改。"
   isDisabled
 >
-  <Textarea defaultValue="这是一段只读的系统备注。" fullWidth />
+  <Textarea defaultValue="这是一段只读的系统备注。" isFullWidth />
 </FormField>`}>
   <FormField label="系统备注" description="管理员才能修改。" isDisabled>
-    <Textarea defaultValue="这是一段只读的系统备注。" fullWidth />
+    <Textarea defaultValue="这是一段只读的系统备注。" isFullWidth />
   </FormField>
 </LiveDemo>
 
@@ -74,10 +74,10 @@
 
 <LiveDemo code={`<Stack spacing={16}>
   <FormField label="昵称" labelPlacement="top">
-    <Input placeholder="top（默认）" fullWidth />
+    <Input placeholder="top（默认）" isFullWidth />
   </FormField>
   <FormField label="国家 / 地区" labelPlacement="start">
-    <Select placeholder="请选择" fullWidth>
+    <Select placeholder="请选择" isFullWidth>
       <SelectOption value="cn">中国</SelectOption>
       <SelectOption value="us">美国</SelectOption>
       <SelectOption value="jp">日本</SelectOption>
@@ -86,10 +86,10 @@
 </Stack>`}>
   <Stack spacing={16}>
     <FormField label="昵称" labelPlacement="top">
-      <Input placeholder="top（默认）" fullWidth />
+      <Input placeholder="top（默认）" isFullWidth />
     </FormField>
     <FormField label="国家 / 地区" labelPlacement="start">
-      <Select placeholder="请选择" fullWidth>
+      <Select placeholder="请选择" isFullWidth>
         <SelectOption value="cn">中国</SelectOption>
         <SelectOption value="us">美国</SelectOption>
         <SelectOption value="jp">日本</SelectOption>
@@ -104,15 +104,15 @@
 
 <LiveDemo code={`<Stack spacing={20} style={{ width: 'min(520px, 100%)' }}>
   <FormField label="项目名称" description="会显示在侧边栏和通知中。" isRequired>
-    <Input placeholder="例如：月度运营周报" fullWidth />
+    <Input placeholder="例如：月度运营周报" isFullWidth />
   </FormField>
 
   <FormField label="项目描述">
-    <Textarea placeholder="一句话描述目标、范围或相关链接。" rows={3} fullWidth />
+    <Textarea placeholder="一句话描述目标、范围或相关链接。" rows={3} isFullWidth />
   </FormField>
 
   <FormField label="可见范围" labelPlacement="start">
-    <Select defaultValue="team" fullWidth>
+    <Select defaultValue="team" isFullWidth>
       <SelectOption value="private">仅自己</SelectOption>
       <SelectOption value="team">团队成员</SelectOption>
       <SelectOption value="public">公开</SelectOption>
@@ -120,20 +120,20 @@
   </FormField>
 
   <FormField label="启用通知" labelPlacement="start" description="在有新评论时通过邮件提醒。">
-    <Switch defaultSelected />
+    <Switch defaultIsSelected />
   </FormField>
 </Stack>`}>
   <Stack spacing={20} style={{ width: 'min(520px, 100%)' }}>
     <FormField label="项目名称" description="会显示在侧边栏和通知中。" isRequired>
-      <Input placeholder="例如：月度运营周报" fullWidth />
+      <Input placeholder="例如：月度运营周报" isFullWidth />
     </FormField>
 
     <FormField label="项目描述">
-      <Textarea placeholder="一句话描述目标、范围或相关链接。" rows={3} fullWidth />
+      <Textarea placeholder="一句话描述目标、范围或相关链接。" rows={3} isFullWidth />
     </FormField>
 
     <FormField label="可见范围" labelPlacement="start">
-      <Select defaultValue="team" fullWidth>
+      <Select defaultValue="team" isFullWidth>
         <SelectOption value="private">仅自己</SelectOption>
         <SelectOption value="team">团队成员</SelectOption>
         <SelectOption value="public">公开</SelectOption>
@@ -141,7 +141,7 @@
     </FormField>
 
     <FormField label="启用通知" labelPlacement="start" description="在有新评论时通过邮件提醒。">
-      <Switch defaultSelected />
+      <Switch defaultIsSelected />
     </FormField>
   </Stack>
 </LiveDemo>

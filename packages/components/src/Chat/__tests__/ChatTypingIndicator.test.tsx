@@ -33,7 +33,7 @@ describe('ChatTypingIndicator — base rendering', () => {
 });
 
 describe('ChatTypingIndicator — sizes', () => {
-  it.each([['sm'], ['md']] as const)('renders size=%s', (size) => {
+  it.each([['xs'], ['sm'], ['md'], ['lg'], ['xl']] as const)('renders size=%s', (size) => {
     const { container } = renderWithProviders(<ChatTypingIndicator size={size} />);
     const node = container.firstElementChild as HTMLElement;
     expect(node.dataset.size).toBe(size);

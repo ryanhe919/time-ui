@@ -3,7 +3,7 @@
 `DateTimePicker` extends `DatePicker` with a side-by-side time column so a single control covers year-month-day **and** hour-minute-second. Minute and second columns are opt-in — fields you hide stay fixed at `0` in the emitted `Date`, so downstream consumers always receive a complete `Date` object.
 
 <Callout variant="info" title="Calendar on the left, time on the right">
-  The panel reuses the shared `CalendarPanel` (same keyboard shortcuts, min/max, `isDateUnavailable`) and pairs it with a `TimePanel` — three optional listboxes for Hour / Minute / Second, plus an AM/PM column when `use12Hours` is on. A `[Now] [Clear] [OK]` footer lets you stage changes as a draft; the value only commits on **OK**, which avoids accidental onChange storms while you spin the time columns.
+  The panel reuses the shared `CalendarPanel` (same keyboard shortcuts, min/max, `isDateUnavailable`) and pairs it with a `TimePanel` — three optional listboxes for Hour / Minute / Second, plus an AM/PM column when `is12Hour` is on. A `[Now] [Clear] [OK]` footer lets you stage changes as a draft; the value only commits on **OK**, which avoids accidental onChange storms while you spin the time columns.
 </Callout>
 
 ## Basic usage
@@ -44,10 +44,10 @@ Toggle the time columns via `showMinute` (default `true`) and `showSecond` (defa
 
 ## 12-hour mode
 
-`use12Hours` adds a fourth AM/PM column. The value is still a native `Date` (24-hour internally); only the formatting and the listbox change.
+`is12Hour` adds a fourth AM/PM column. The value is still a native `Date` (24-hour internally); only the formatting and the listbox change.
 
 ```tsx
-<DateTimePicker use12Hours isClearable />
+<DateTimePicker is12Hour isClearable />
 ```
 
 ## Stepping through time
@@ -83,7 +83,7 @@ Footer buttons:
   { name: 'hourStep', type: 'number', default: '1' },
   { name: 'minuteStep', type: 'number', default: '1' },
   { name: 'secondStep', type: 'number', default: '1' },
-  { name: 'use12Hours', type: 'boolean', default: 'false', description: 'Show AM/PM column and format hour in 12h.' },
+  { name: 'is12Hour', type: 'boolean', default: 'false', description: 'Show AM/PM column and format hour in 12h.' },
   { name: 'showNowButton', type: 'boolean', default: 'true' },
   { name: 'showConfirmButton', type: 'boolean', default: 'true', description: 'The OK button at the bottom-right.' },
   { name: 'nowLabel', type: 'string', description: 'Override the Now button text.' },
@@ -100,10 +100,10 @@ Footer buttons:
   { name: 'isDisabled', type: 'boolean', default: 'false' },
   { name: 'isInvalid', type: 'boolean', default: 'false' },
   { name: 'isClearable', type: 'boolean', default: 'false' },
-  { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'" },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
   { name: 'isOpen', type: 'boolean' },
-  { name: 'defaultIsOpen', type: 'boolean', default: 'false' },
+  { name: 'defaultOpen', type: 'boolean', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'aria-label', type: 'string' }
 ]} />
