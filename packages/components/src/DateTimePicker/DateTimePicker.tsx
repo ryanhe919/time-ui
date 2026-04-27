@@ -449,6 +449,9 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       padding-left: ${tokens.panelGap};
       border-left: 1px solid ${theme.colors.border.subtle};
       align-self: stretch;
+      min-height: 0;
+      min-width: 0;
+      overflow: hidden;
     `;
 
     const footerCss = css`
