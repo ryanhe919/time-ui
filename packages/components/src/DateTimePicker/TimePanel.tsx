@@ -130,6 +130,7 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
     const wrapperCss = css`
       display: flex;
       flex-direction: column;
+      flex: 1;
       min-width: calc(${tokens.timeColumnWidth} * 2);
       background: ${surfaceBg};
       color: ${textPrimary};
@@ -140,7 +141,8 @@ export const TimePanel = forwardRef<HTMLDivElement, TimePanelProps>(
       flex-direction: row;
       align-items: stretch;
       gap: 0;
-      height: ${listHeight};
+      flex: 1;
+      min-height: ${listHeight};
     `;
 
     const columnCss = css`
