@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import { css } from '@emotion/react';
 import { SegmentedControl } from '@timeui/react';
-import { SunIcon, MoonIcon } from '@/components/icons/theme';
+import { SunIcon, MoonIcon } from '@timeui/icons';
 
 const ListIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -70,8 +70,8 @@ export function SegmentedControlIconOnlyDemo() {
         value={mode}
         onChange={(v: ThemeMode) => setMode(v)}
         options={[
-          { value: 'light', label: <SunIcon />, 'aria-label': 'Light' },
-          { value: 'dark', label: <MoonIcon />, 'aria-label': 'Dark' },
+          { value: 'light', label: <SunIcon size={14} />, 'aria-label': 'Light' },
+          { value: 'dark', label: <MoonIcon size={14} />, 'aria-label': 'Dark' },
         ]}
       />
       <SegmentedControl<View>

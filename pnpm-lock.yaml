@@ -134,6 +134,9 @@ importers:
       '@next/mdx':
         specifier: ^15.5.15
         version: 15.5.15(@mdx-js/loader@3.1.1(webpack@5.106.2))(@mdx-js/react@3.1.1(@types/react@18.3.28)(react@18.3.1))
+      '@timeui/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
       '@timeui/mcp':
         specifier: workspace:*
         version: link:../../packages/mcp

@@ -10,8 +10,8 @@
 
 import { useEffect, useState } from 'react';
 import { SegmentedControl } from '@timeui/react';
+import { SunIcon, MoonIcon } from '@timeui/icons';
 import { useThemeMode } from '@/app/providers';
-import { SunIcon, MoonIcon } from '@/components/icons/theme';
 
 interface Props {
   labelLight: string;
@@ -35,8 +35,8 @@ export function ThemeToggle({ labelLight, labelDark }: Props) {
       value={value}
       onChange={setMode}
       options={[
-        { value: 'light', label: <SunIcon />, 'aria-label': labelLight },
-        { value: 'dark', label: <MoonIcon />, 'aria-label': labelDark },
+        { value: 'light', label: <SunIcon size={14} />, 'aria-label': labelLight },
+        { value: 'dark', label: <MoonIcon size={14} />, 'aria-label': labelDark },
       ]}
     />
   );
