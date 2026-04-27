@@ -5,7 +5,7 @@
  */
 
 import { describe, it } from 'vitest';
-import { CodeEditor } from '@timeui/react/code-editor';
+import { CodeEditor } from '../';
 import { renderWithProviders, expectA11y } from '@timeui/react/test-utils';
 
 /**

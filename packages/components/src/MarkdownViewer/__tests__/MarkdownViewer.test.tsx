@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { MarkdownViewer } from '@timeui/react/markdown-viewer';
+import { MarkdownViewer } from '../';
 import { renderWithProviders } from '@timeui/react/test-utils';
 
 /**

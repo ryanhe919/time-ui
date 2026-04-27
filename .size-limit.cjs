@@ -37,7 +37,9 @@ module.exports = [
     name: '@timeui/react/chat-markdown',
     path: 'packages/components/dist/chat-markdown.js',
     import: '*',
-    limit: '5 KB',
+    // 初始 5 KB 是只跑 markdown 渲染时的预算；现在已包含内嵌 fenced code
+    // block 高亮 + 复制按钮（见 CodeBlockInline），shiki 仍走动态 import 不计入。
+    limit: '6 KB',
     ignore: [
       'react',
       'react-dom',

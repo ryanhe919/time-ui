@@ -9,7 +9,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { CodeEditor } from '@timeui/react/code-editor';
+import { CodeEditor } from '../';
 import { renderWithProviders } from '@timeui/react/test-utils';
 
 /**

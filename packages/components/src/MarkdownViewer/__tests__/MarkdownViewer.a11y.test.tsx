@@ -4,7 +4,7 @@
  */
 
 import { describe, it } from 'vitest';
-import { MarkdownViewer } from '@timeui/react/markdown-viewer';
+import { MarkdownViewer } from '../';
 import { renderWithProviders, expectA11y } from '@timeui/react/test-utils';
 
 const SAMPLE_MD = [

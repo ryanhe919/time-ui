@@ -5,7 +5,7 @@
  */
 
 import { describe, it, vi, beforeEach } from 'vitest';
-import { PdfViewer } from '@timeui/react/pdf-viewer';
+import { PdfViewer } from '../';
 import { renderWithProviders, expectA11y } from '@timeui/react/test-utils';
 
 // Match the unit-test mock so the canvas page slot doesn't blow up axe.

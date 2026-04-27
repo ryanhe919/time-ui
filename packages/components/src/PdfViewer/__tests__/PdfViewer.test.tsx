@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { PdfViewer } from '@timeui/react/pdf-viewer';
+import { PdfViewer } from '../';
 import { renderWithProviders } from '@timeui/react/test-utils';
 
 // ─── pdfjs-dist mock ──────────────────────────────────────────────────────────
