@@ -223,8 +223,8 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       pdfjs-dist:
-        specifier: ^4.10.0
-        version: 4.10.38
+        specifier: ^5.7.284
+        version: 5.7.284
       rimraf:
         specifier: ^6.0.1
         version: 6.1.3
@@ -417,8 +417,8 @@ importers:
         specifier: ^25.0.1
         version: 25.0.1
       pdfjs-dist:
-        specifier: ^4.0.0
-        version: 4.10.38
+        specifier: ^5.7.284
+        version: 5.7.284
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -4756,9 +4756,9 @@ packages:
     resolution: {integrity: sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ==}
     engines: {node: '>= 14.16'}
 
-  pdfjs-dist@4.10.38:
-    resolution: {integrity: sha512-/Y3fcFrXEAsMjJXeL9J8+ZG9U01LbuWaYypvDW2ycW1jL269L3js3DVBjDJ0Up9Np1uqDXsDrRihHANhZOlwdQ==}
-    engines: {node: '>=20'}
+  pdfjs-dist@5.7.284:
+    resolution: {integrity: sha512-h4EdYQczmGhbOlqc3PPZwxevn7ApdWPbovAuWXOB/DjIyigSnwfy2oze7c6mRcSr9XgLp3eN3EeL4DyySTPMFw==}
+    engines: {node: '>=22.13.0 || >=24'}
 
   pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
@@ -10817,7 +10817,7 @@ snapshots:
 
   pathval@2.0.1: {}
 
-  pdfjs-dist@4.10.38:
+  pdfjs-dist@5.7.284:
     optionalDependencies:
       '@napi-rs/canvas': 0.1.100
 
