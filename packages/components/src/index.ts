@@ -54,8 +54,10 @@ export * from './Skeleton';
 export * from './Empty';
 export * from './Steps';
 // 注意：以下组件均故意不在主 barrel 暴露，强制使用 subpath import 以避免把
-// optional peer (TipTap / CodeMirror / pdfjs-dist / react-markdown) 拖进主 bundle：
-//   - RichTextEditor → `@timeui/react/rich-text-editor`
-//   - CodeEditor     → `@timeui/react/code-editor`
-//   - PdfViewer      → `@timeui/react/pdf-viewer`
-//   - MarkdownViewer → `@timeui/react/markdown-viewer`
+// optional peer (TipTap / CodeMirror / pdfjs-dist / react-markdown / shiki) 拖进主 bundle：
+//   - RichTextEditor → `@timeui/react/rich-text-editor`     (TipTap)
+//   - CodeEditor     → `@timeui/react/code-editor`           (CodeMirror)
+//   - PdfViewer      → `@timeui/react/pdf-viewer`            (pdfjs-dist)
+//   - MarkdownViewer → `@timeui/react/markdown-viewer`       (react-markdown + remark-gfm)
+//   - CodeBlock      → `@timeui/react/code-block`            (shiki)
+//   - ChatMarkdown   → `@timeui/react/chat-markdown`         (react-markdown，给 Chat 消息流式渲染)

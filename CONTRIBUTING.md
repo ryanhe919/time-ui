@@ -38,9 +38,12 @@
   - [ ] 可键盘操作，`focus-visible` 有可见焦点样式
   - [ ] 至少跑过一次屏幕阅读器手测
   - [ ] axe-core 零违规（`expectA11y()`）
-- [ ] Vitest 测试覆盖：渲染、variant、交互、a11y 基线。
-- [ ] 组件从 `@timeui/react` barrel 导出。
-- [ ] 文档站的 MDX 页面同步更新（`apps/docs/src/app/[locale]/docs/components/<name>/` 下 `zh.mdx` + `en.mdx` + `page.tsx`）。
+- [ ] Vitest 测试覆盖：渲染、variant、交互、a11y 基线；覆盖率 lines/fn/stmt ≥ 85%、branch ≥ 80%（CI 强制）。
+- [ ] 组件从 `@timeui/react` barrel 导出（重依赖组件改走 subpath export，避免膨胀主 bundle）。
+- [ ] 文档站的 MDX 页面同步更新（`apps/docs/src/app/[locale]/docs/components/<name>/` 下 `zh.mdx` + `en.mdx` + `page.tsx`），双语章节结构一一对应（不能只交付 zh 或只交付 en）。
+- [ ] 每个 variant / size / state 提供独立的 `<LivePlayground>` 可编辑示例，且站点上展示效果与代码完全一致（不允许截图或伪代码）。
+- [ ] 改完 MDX 后必须重建 MCP 索引：`pnpm --filter @timeui/mcp build:index`，否则 AI 客户端拿到的是旧数据。
+- [ ] `pnpm size` 通过，主 bundle 总预算 80 KB gzipped 不超标。
 - [ ] `pnpm changeset` 写了一条条目（新组件 `minor`）。
 - [ ] 不新增 `dependencies`，除非维护者同意；能放 `peerDependencies` 就放。
 

@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 TimeUI 是一个企业级 React 组件库，以 pnpm workspaces + Turborepo 组织的 monorepo，发布到 npm `@timeui/*` 作用域下。技术栈：React 18+（peerDependency）、TypeScript strict、Emotion、tsup（ESM+CJS+d.ts）、Vitest、Next.js 15 App Router + MDX 文档站、Vite playground、Changesets。
 
+> **项目长文档**：本文件提供高密度速查；下列长文档在对应主题上更全面，遇到细节问题先去这里查：
+>
+> - [`docs/guides/development.md`](./docs/guides/development.md) — 本地开发环境、调试、依赖管理
+> - [`docs/guides/testing.md`](./docs/guides/testing.md) — Vitest 配置、`renderWithProviders` / `expectA11y` 用法、覆盖率门禁解释
+> - [`docs/guides/theming.md`](./docs/guides/theming.md) — token / theme 体系、Emotion module augmentation、暗色主题对比度调校
+> - [`docs/guides/releasing.md`](./docs/guides/releasing.md) — Changesets 流程、canary、回滚策略
+> - [`docs/guides/governance.md`](./docs/guides/governance.md) — RFC 流程、维护者职责、行为准则
+> - [`CONTRIBUTING.md`](./CONTRIBUTING.md) — 组件 PR 质量清单（forwardRef / 受控双支持 / a11y / size / changeset 等强制项）
+
 ## 常用命令
 
 ```bash
@@ -67,8 +76,9 @@ packages/ 禁止从 apps/ 引用
 
 ### 添加组件
 
+> **推荐**：直接用 `/new-component` skill，会调起 component-architect → engineer × N → tester × N → docs-author → release-engineer 的完整 Agent Team 流程。下面的手动步骤是底层动作，仅在你**确定要绕开 team 流程**（如临时小改、紧急修补）时使用。
+
 1. `pnpm new:component MyThing`：在 `packages/components/src/MyThing/` 下生成源文件、单元测试、a11y 测试，并自动 append 到 `src/index.ts` 的 barrel 导出。
-   > **已知坑**：脚手架仍会生成一个 `MyThing.stories.tsx`（@storybook/react 模板），但仓库已不再使用 Storybook 也没有 `.storybook` 配置——这个文件可以直接删掉，不会影响构建。
 2. `css={...}` prop + `useTheme()` 读 token（不要硬编码色彩/间距），同时覆盖 `lightTheme` 与 `darkTheme`。
 3. 满足 CONTRIBUTING.md 的质量清单：forwardRef（若包裹 DOM）、controlled/uncontrolled 双支持、ARIA/键盘可达、axe 零违规、支持 `prefers-reduced-motion`。
 4. 新增双语 MDX 文档：`apps/docs/src/app/[locale]/docs/components/<my-thing>/{en,zh}.mdx`，覆盖所有 variant/size/state；同步更新 navigation 配置（参考相邻组件目录结构）。
@@ -87,10 +97,68 @@ Conventional Commits，由 commitlint + Husky + lint-staged 强制（`*.{ts,tsx,
 ### AI / MCP 集成
 
 - `@timeui/mcp` 是独立 npm 包，对 AI 客户端（Claude Code / Cursor 等）暴露组件文档查询工具：`list_categories` / `list_components` / `get_component` / `search_components`。
-- 数据源：`scripts/build-index.ts` 扫描 `apps/docs/.../components/**/*.mdx` 生成 `data/index.json`（31 组件 × 7 分类 × 2 locale），因此 MCP 包构建期与 docs 站 MDX 结构耦合。
+- 数据源：`scripts/build-index.ts` 扫描 `apps/docs/.../components/**/*.mdx` 生成 `data/index.json`（39 组件 × 7 分类 × 2 locale），因此 MCP 包构建期与 docs 站 MDX 结构耦合。
 - 两种 transport：`timeui-mcp`（stdio，用于 IDE/CLI 客户端）与 `timeui-mcp-http`（Streamable HTTP，默认 `127.0.0.1:3333`）。
 - `apps/docs` 内置 AI 助手：`src/app/api/assistant/route.ts` 通过 `@anthropic-ai/sdk` + 自定义 `baseURL` 接 MiniMax / Claude（环境变量 `ANTHROPIC_BASE_URL` / `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL`），SSE 流式 + tool calling loop。凭据模板见 `apps/docs/.env.example`。
 - 助手 UI 使用 Chat 组件族 + `@timeui/react/chat-markdown` 做流式 markdown 渲染。`chat-markdown` 是独立 subpath export，`react-markdown` / `remark-gfm` 是 optional peerDep，不打进主 bundle。
+
+## 团队协作（Skills / Agents / Teammates）
+
+本仓库为常见组件库工作流配置了**项目级 Skill + Agent**。当用户提需求时，主 Claude（tech-lead）应该按下面对照表选择正确的入口，而不是自己埋头写代码。
+
+### Skills（用户可用 `/<name>` 触发，主 Claude 也可主动调）
+
+| Skill                | 何时用                                                                        | 流程                                                                                                                                 |
+| -------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `/new-component`     | 新增 ≥ 1 个组件，要走完整流程；用户提"组个团队做 X"、"按规范走一遍"、"端到端" | 起 TeamCreate → architect 写 spec → engineer×N 实现 → tester×N 测试 → docs-author 文档 → release-engineer 发布预检 → TeamDelete 清场 |
+| `/component-design`  | 用户只想先要 spec，不开工                                                     | 一次性 spawn component-architect 产出 `.claude/team-docs/<feature>-spec.md`                                                          |
+| `/update-docs`       | 已有组件文档缺失/过时，单独补文档                                             | 调起 docs-author + 强制重建 MCP 索引                                                                                                 |
+| `/update-mcp`        | docs MDX / navigation 改了之后；MCP 客户端拿到旧数据                          | `pnpm --filter @timeui/mcp build:index` + 单测                                                                                       |
+| `/release-component` | 实现+测试+文档完成后准备进 release PR                                         | 调起 release-engineer 跑 build/lint/typecheck/coverage/size/MCP/changeset 7 步门禁                                                   |
+
+### Agents（在 `.claude/agents/`，作为 `subagent_type` 调用；多数会作为持久 teammate 通过 TeamCreate + Agent(team_name=, name=) 加入团队）
+
+| Agent                      | 角色                                               | 你的输入                     | 它的输出                                                                                               |
+| -------------------------- | -------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `component-architect`      | 需求分析 + UI/UX 架构师                            | 用户原始需求、要做的组件清单 | `.claude/team-docs/<feature>-spec.md`（含 props/视觉/行为/a11y/测试要点/token 清单/任务切分/冲突防护） |
+| `component-engineer`       | 实现工程师（可多实例并行）                         | spec 路径 + 它负责的组件     | `packages/components/src/<Name>/{<Name>.tsx, <Name>.types.ts, index.ts}` + barrel append               |
+| `component-tester`         | 测试工程师（可多实例并行）                         | spec 路径 + 已实现的组件     | `__tests__/<Name>.test.tsx` + `<Name>.a11y.test.tsx`，覆盖率 ≥ 85/85/85/80                             |
+| `docs-author`              | 双语 MDX + LivePlayground 文档工程师（建议单实例） | 已实现并测过的组件 + spec    | 双语 MDX + `page.tsx` + 更新 `navigation.ts`，并本地浏览器眼检                                         |
+| `release-engineer`         | 发布预检（最后一棒）                               | 所有交付到位的组件清单       | build/lint/typecheck/test:coverage/size/MCP 索引/changeset 7 步全过                                    |
+| `design-language-guardian` | 设计语言守门人（review-only，横切角色）            | spec 或实现路径              | 评审 markdown：✅ 合格 / 🟡 警告 / 🔴 阻断 / 📚 设计语言新发现                                         |
+
+### 何时用持久 Team vs 何时一次性 Agent
+
+**用 TeamCreate（持久 team）—— `/new-component` 内部已经这么做：**
+
+- 同时新增 ≥ 2 个组件
+- 用户用「团队 / team / 成员」字眼
+- 多角色协调（架构 + 实现 + 测试 + 文档同时在线）
+- 流程跨多轮（实现完先暂停评审，再决定是否进测试）
+
+**用一次性 Agent —— 不要拉出整个 team：**
+
+- 仅设计 spec（用 `/component-design`）
+- 单独评审已有 spec/实现（`design-language-guardian`）
+- 单独修文档（用 `/update-docs`）
+- 独立调研、单步并行查询、只读分析
+
+### tech-lead（你，主 Claude）的工作约定
+
+1. **不下场写组件 / 测试 / MDX 实现**：你的角色是协调，不是替队友写代码。识别需求 → 选 skill → 派工 → 读汇报 → 协调冲突 → 提交 PR。
+2. **遵守串行依赖**：spec 必须先就绪 → engineer 才能开工；实现合入 → tester 才能测；测试 + 文档全部到位 → release-engineer 才能跑门禁。
+3. **共享文件冲突防护**：barrel `packages/components/src/index.ts` / `tokens/src/components.ts` / `navigation.ts` —— 让多实例工程师只追加新行，不改其它行；如果某文件需要重构，单独开一个 PR 由单人完成。
+4. **Token 由谁改**：spec 阶段 architect 决定「需要新增哪些 token」；Day 1 由**单一**工程师在 tokens 包一次性加好（即使数值留占位），后续工程师**只读不写**。
+5. **MCP 索引必须重建**：任何 MDX 改动都跟一个 `pnpm --filter @timeui/mcp build:index`；这是最常被遗忘的步骤。
+6. **完工清场**：team 用完必 `TeamDelete`；先给每个 still-running 成员发 `SendMessage({ type: "shutdown_request" })` 再删 team。
+7. **commit/push 由 tech-lead 做**：成员只交付文件，最终 commit 与 PR 描述由你统一写（保证消息风格统一、changeset 完整）。
+
+### 何时**不**走团队流程（直接动手即可）
+
+- 单文件 bug fix（typo、null check、CSS 漏边距等）
+- 升级依赖、改 lint 配置
+- 文档勘误（< 5 行）
+- 仅给已有组件加一个示例（`/update-docs` 也能走，但太轻量也可以直接改）
 
 ## 常见陷阱
 
