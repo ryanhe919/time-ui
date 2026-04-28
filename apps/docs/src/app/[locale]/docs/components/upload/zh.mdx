@@ -34,7 +34,7 @@
 
 传入 `customRequest` 的场景里，上传进度由调用方调用 `handlers.onProgress(percent)` 推送。下面的 demo 用 `setInterval` 每 160ms 推进 10% 模拟真实进度。
 
-<LiveDemo code={`import { Upload } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload } from '@timeui/react';
 import type { UploadRequest } from '@timeui/react';
 
 const simulatedRequest: UploadRequest = ({ signal }, handlers) => {
@@ -74,7 +74,7 @@ export function Demo() {
 
 `maxSize` 以**字节**为单位。不符合的文件会经 `onReject` 回调告诉你，带上拒绝原因（`'size'`）与可选的 i18n 默认消息。
 
-<LiveDemo code={`import { Upload, useToast } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload, useToast } from '@timeui/react';
 import type { UploadRejection } from '@timeui/react';
 
 export function Demo() {
@@ -114,7 +114,7 @@ export function Demo() {
 
 真实项目里 `customRequest` 就是上传的出口：拿到 `File` 对象，发你自己的 fetch / XHR，按情况调 `handlers.onProgress` / `onSuccess` / `onError`。下面的 demo 并不会真的发请求（demo 内是 `setTimeout` 模拟，一半概率失败），但代码里给了 XHR 的典型写法可供复制。
 
-<LiveDemo code={`import { Upload } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload } from '@timeui/react';
 import type { UploadRequest } from '@timeui/react';
 
 const uploadRequest: UploadRequest = ({ file, signal }, handlers) => {
@@ -148,7 +148,7 @@ export function Demo() {
 
 `beforeUpload` 在**单个文件**即将进入队列前触发，返回 `false` / `Promise<false>` 则该文件被拒（`reason === 'before-upload'`）。适合做自定义规则：文件名、魔数、签名等。
 
-<LiveDemo code={`import { Upload, useToast } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload, useToast } from '@timeui/react';
 import type { UploadRejection } from '@timeui/react';
 
 export function Demo() {
@@ -193,7 +193,7 @@ export function Demo() {
 
 `renderItem` 可完全接管单个文件的显示。它传入 `(file, actions)`，`actions.remove` / `actions.retry` 帮你触发标准行为。下面的 demo 展示图片缩略图 + 自定义胶囊删除按钮。
 
-<LiveDemo code={`import { Upload } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload } from '@timeui/react';
 import type { UploadFile } from '@timeui/react';
 
 export function Demo() {
@@ -284,7 +284,7 @@ export function Demo() {
 
 `value` + `onChange` 让你全权管理文件列表；`useRef<UploadHandle>` 还能从外部调 `open()` / `clear()` / `submit()` / `retry()` / `abort()`。
 
-<LiveDemo code={`import { useRef, useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useRef, useState } from 'react';
 import { Upload, Button } from '@timeui/react';
 import type { UploadFile, UploadHandle } from '@timeui/react';
 

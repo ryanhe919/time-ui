@@ -4,7 +4,8 @@
  * @description 验证 PdfViewer 模块的 a11y 行为（axe 0 violation）。
  */
 
-import { describe, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { waitFor } from '@testing-library/react';
 import { PdfViewer } from '../';
 import { renderWithProviders, expectA11y } from '@timeui/react/test-utils';
 
@@ -44,6 +45,7 @@ describe('PdfViewer a11y', () => {
     const { container } = renderWithProviders(
       <PdfViewer source="/sample.pdf" aria-label="Sample PDF" />,
     );
+    await waitFor(() => expect(container.querySelector('[data-loading]')).toBeNull());
     await expectA11y(container);
   });
 
@@ -51,6 +53,7 @@ describe('PdfViewer a11y', () => {
     const { container } = renderWithProviders(
       <PdfViewer source="/sample.pdf" aria-label="Sample PDF" showToolbar={false} />,
     );
+    await waitFor(() => expect(container.querySelector('[data-loading]')).toBeNull());
     await expectA11y(container);
   });
 

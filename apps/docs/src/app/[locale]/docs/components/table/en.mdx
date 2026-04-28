@@ -48,7 +48,7 @@ A minimal example: 3 columns × 5 rows. By default, `column.columnKey` resolves 
 
 Mark a column with `isSortable: true` to render a sortable header. Click cycles `asc → desc → none`. **The consumer performs the actual sort.**
 
-<LiveDemo code={`import { useMemo, useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useMemo, useState } from 'react';
 import { Table } from '@timeui/react';
 import type { SortDescriptor } from '@timeui/react';
 
@@ -368,7 +368,7 @@ Set `maxHeight` to enable vertical scrolling, then `isStickyHeader` to pin the h
 
 `render(row, index)` takes over a cell entirely — drop in tags, avatars, buttons, links, rich text. Marking a column `isInteractive` prevents its clicks from bubbling to `onRowClick`.
 
-<LiveDemo code={`const COLUMNS = [
+<LiveDemo previewSource="children" code={`const COLUMNS = [
   { columnKey: 'name', title: 'Name' },
   {
     columnKey: 'status',
@@ -391,7 +391,7 @@ Set `maxHeight` to enable vertical scrolling, then `isStickyHeader` to pin the h
 
 The canonical client-side pagination pattern: keep `page` + `pageSize` in state, slice the rows for the current page, hand them to `<Table data>`.
 
-<LiveDemo code={`import { useMemo, useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useMemo, useState } from 'react';
 import { Pagination, Table } from '@timeui/react';
 
 export function Demo() {

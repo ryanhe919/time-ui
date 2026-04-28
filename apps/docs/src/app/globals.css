@@ -51,10 +51,19 @@
   --c-text-tertiary: #86868b;
   --c-accent: #0071e3;
   --c-accent-hover: #0077ed;
+  --c-accent-hover-bg: rgba(0, 113, 227, 0.08);
   --c-hairline: rgba(0, 0, 0, 0.08);
   --c-hairline-strong: rgba(0, 0, 0, 0.12);
   --c-nav-bg: rgba(251, 251, 253, 0.72);
   --c-shadow-card: 0 0 1px rgba(0, 0, 0, 0.04), 0 6px 24px rgba(0, 0, 0, 0.04);
+  --c-status-success-bg: #f6ffed;
+  --c-status-success-text: #52c41a;
+  --c-status-warning-bg: #fff7e6;
+  --c-status-warning-text: #ad4e00;
+  --c-status-danger-bg: #fff1f0;
+  --c-status-danger-text: #a8071a;
+  --c-status-info-bg: #e6f4ff;
+  --c-status-info-text: #1677ff;
 
   /* Editorial accents */
   --c-eyebrow: #0071e3;
@@ -98,10 +107,19 @@ html[data-theme='dark'] {
   --c-text-tertiary: #6e6e73;
   --c-accent: #2997ff;
   --c-accent-hover: #0a84ff;
+  --c-accent-hover-bg: rgba(41, 151, 255, 0.12);
   --c-hairline: rgba(255, 255, 255, 0.1);
   --c-hairline-strong: rgba(255, 255, 255, 0.16);
   --c-nav-bg: rgba(0, 0, 0, 0.72);
   --c-shadow-card: 0 0 1px rgba(255, 255, 255, 0.06), 0 6px 24px rgba(0, 0, 0, 0.4);
+  --c-status-success-bg: #092b00;
+  --c-status-success-text: #73d13d;
+  --c-status-warning-bg: #612500;
+  --c-status-warning-text: #ffa940;
+  --c-status-danger-bg: #5c0011;
+  --c-status-danger-text: #ff4d4f;
+  --c-status-info-bg: #001d66;
+  --c-status-info-text: #4096ff;
 
   --c-eyebrow: #64b5ff;
   --c-rule: rgba(255, 255, 255, 0.1);

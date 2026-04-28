@@ -45,7 +45,7 @@ caller via `handlers.onProgress(percent)`. The demo below uses
 `setInterval` to advance 10% every 160ms, simulating real upload
 progress.
 
-<LiveDemo code={`import { Upload } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload } from '@timeui/react';
 import type { UploadRequest } from '@timeui/react';
 
 const simulatedRequest: UploadRequest = ({ signal }, handlers) => {
@@ -88,7 +88,7 @@ local `previewUrl` automatically.
 `maxSize` is expressed in **bytes**. Over-sized files are reported via
 `onReject` with `reason === 'size'` and a localized default message.
 
-<LiveDemo code={`import { Upload, useToast } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload, useToast } from '@timeui/react';
 import type { UploadRejection } from '@timeui/react';
 
 export function Demo() {
@@ -133,7 +133,7 @@ the `File`, run your own fetch / XHR, and call `handlers.onProgress` /
 request (it's a `setTimeout` sim that fails half the time), but the code
 string shows a typical XHR implementation you can paste.
 
-<LiveDemo code={`import { Upload } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload } from '@timeui/react';
 import type { UploadRequest } from '@timeui/react';
 
 const uploadRequest: UploadRequest = ({ file, signal }, handlers) => {
@@ -169,7 +169,7 @@ export function Demo() {
 `false` / `Promise<false>` rejects it (`reason === 'before-upload'`).
 Good for bespoke rules: filename patterns, magic numbers, signatures.
 
-<LiveDemo code={`import { Upload, useToast } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload, useToast } from '@timeui/react';
 import type { UploadRejection } from '@timeui/react';
 
 export function Demo() {
@@ -218,7 +218,7 @@ visible but prevents add / remove.
 standard behaviors. The demo below shows a thumbnail + pill-style remove
 button.
 
-<LiveDemo code={`import { Upload } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { Upload } from '@timeui/react';
 import type { UploadFile } from '@timeui/react';
 
 export function Demo() {
@@ -313,7 +313,7 @@ The same 5 × 6 grid as Button / Input; both variants honor it.
 `useRef<UploadHandle>` also exposes imperative `open()` / `clear()` /
 `submit()` / `retry()` / `abort()`.
 
-<LiveDemo code={`import { useRef, useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useRef, useState } from 'react';
 import { Upload, Button } from '@timeui/react';
 import type { UploadFile, UploadHandle } from '@timeui/react';
 

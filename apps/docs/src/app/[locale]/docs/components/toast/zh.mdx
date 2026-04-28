@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 `useToast()` 返回 `ToastApi`，包含 `success` / `error` / `warning` / `info` / `loading` 五个快捷方法以及通用 `show`。每条 toast 默认 5s 自动关闭，hover 时暂停计时，移开继续。
 
-<LiveDemo code={`import { useToast } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { useToast } from '@timeui/react';
 
 function Demo() {
   const toast = useToast();

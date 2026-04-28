@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fireEvent, screen, within } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test-utils';
 import { DateTimePicker } from '../';
@@ -117,7 +117,9 @@ describe('DateTimePicker — open / close', () => {
     const onOpenChange = vi.fn();
     renderWithProviders(<DateTimePicker onOpenChange={onOpenChange} />);
     await openPanel(user);
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });
 

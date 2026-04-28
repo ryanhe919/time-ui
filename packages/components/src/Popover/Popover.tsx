@@ -19,6 +19,7 @@ import {
   useMemo,
   useRef,
   useState,
+  version as reactVersion,
   type CSSProperties,
   type FocusEvent as ReactFocusEvent,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -427,6 +428,11 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         onFocus?: (e: ReactFocusEvent<HTMLElement>) => void;
         onBlur?: (e: ReactFocusEvent<HTMLElement>) => void;
       };
+      const majorReactVersion = Number.parseInt(reactVersion.split('.')[0] ?? '18', 10);
+      const existingRef =
+        majorReactVersion >= 19
+          ? (element.props as { ref?: Ref<HTMLElement> }).ref
+          : (element as unknown as { ref?: Ref<HTMLElement> }).ref;
       const composed = {
         onClick: (e: ReactMouseEvent<HTMLElement>) => {
           existingProps.onClick?.(e);
@@ -451,13 +457,8 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         'aria-expanded': anchorEventProps['aria-expanded'],
         'aria-haspopup': anchorEventProps['aria-haspopup'],
         'aria-controls': anchorEventProps['aria-controls'],
-        // React 19 把 ref 放进 props；React 18 仍挂在 element.ref 上。
-        // 优先读 props.ref 以消除 R19 的 deprecation 警告，fallback 保持 R18 兼容。
-        ref: mergeRefs<HTMLElement>(
-          anchorRef,
-          ((element.props as { ref?: Ref<HTMLElement> }).ref ??
-            (element as unknown as { ref?: Ref<HTMLElement> }).ref) as Ref<HTMLElement> | undefined,
-        ),
+        // React 19 puts ref on props; React 18 warns if props.ref is read.
+        ref: mergeRefs<HTMLElement>(anchorRef, existingRef),
       };
       return cloneElement(element, composed as unknown as Record<string, unknown>);
     };

@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 `useToast()` returns the `ToastApi` — five shortcuts (`success` / `error` / `warning` / `info` / `loading`) plus the generic `show`. Each toast auto-dismisses after 5 s, pauses while hovered, and resumes on mouse leave.
 
-<LiveDemo code={`import { useToast } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { useToast } from '@timeui/react';
 
 function Demo() {
   const toast = useToast();

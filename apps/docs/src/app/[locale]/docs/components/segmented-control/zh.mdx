@@ -37,6 +37,7 @@ iOS 风格的分段选择器：在一组互斥的选项中选取一个值。底�
 每个 `option` 可以传 `icon`，横向时图标位于文本左侧。当 `label` 是图标节点（无文本）时，请通过 `aria-label` 提供可访问名。
 
 <LiveDemo
+  previewSource="children"
   code={`<SegmentedControl
   aria-label="Inbox"
   value={tab}
@@ -54,7 +55,7 @@ iOS 风格的分段选择器：在一组互斥的选项中选取一个值。底�
 
 当所有 `option` 都只有 `icon` 而没有可见 `label` 时，组件会自动切换为"正方形 segment + 正圆 indicator"形态——常见于主题切换、视图切换等紧凑工具按钮。每个图标必须通过 `option["aria-label"]` 提供可访问名。
 
-<LiveDemo code={`<SegmentedControl
+<LiveDemo previewSource="children" code={`<SegmentedControl
   size="sm"
   aria-label="Theme"
   defaultValue="light"
@@ -80,7 +81,7 @@ iOS 风格的分段选择器：在一组互斥的选项中选取一个值。底�
 
 `value` + `onChange` 即可受控；`onChange` 在每次选择变化时触发，传入新的 `value`。
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { SegmentedControl } from '@timeui/react';
 
 type Range = '1d' | '7d' | '1m' | '1y' | 'all';

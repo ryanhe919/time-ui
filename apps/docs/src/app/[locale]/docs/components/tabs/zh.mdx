@@ -180,7 +180,7 @@
 
 为每个 tab 传入 `icon`，会渲染在 label 左侧。
 
-<LiveDemo code={`<Tabs aria-label="View" variant="pills" defaultSelectedKey="grid"
+<LiveDemo previewSource="children" code={`<Tabs aria-label="View" variant="pills" defaultSelectedKey="grid"
   items={[
     { itemKey: 'list', label: 'List', icon: <ListIcon /> },
     { itemKey: 'grid', label: 'Grid', icon: <GridIcon /> },
@@ -258,7 +258,7 @@
 
 `isLazy` 时，只挂载当前激活 panel —— 切换才挂载下一个。适用于大型 dashboard 或需要按需请求数据的场景。
 
-<LiveDemo code={`<Tabs
+<LiveDemo previewSource="children" code={`<Tabs
   aria-label="Dashboard"
   isLazy
   defaultSelectedKey="overview"

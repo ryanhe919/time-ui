@@ -155,7 +155,7 @@
 
 受控模式下 `value` + `onChange(value)` 每次键入都会触发回调（参数为**解包后的字符串**，不是 event）。下面的 demo 组合了邮箱校验、password toggle 与 clearable：
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { Input, Stack } from '@timeui/react';
 
 export function SignUpForm() {

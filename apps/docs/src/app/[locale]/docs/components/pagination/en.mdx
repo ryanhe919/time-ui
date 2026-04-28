@@ -10,7 +10,7 @@ Page navigation that derives its layout from `total` + `pageSize` and renders th
 
 Click any page number, prev, or next.
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { Pagination } from '@timeui/react';
 
 export function Demo() {
@@ -80,7 +80,7 @@ Number of page buttons rendered on **either side** of the current page, default 
 
 Switching `pageSize` resets `page` to `1` to avoid landing on an out-of-range page. Customize the choices via `pageSizeOptions` (defaults to `[10, 20, 50, 100]`).
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { Pagination } from '@timeui/react';
 
 export function Demo() {

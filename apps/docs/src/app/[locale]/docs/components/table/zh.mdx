@@ -48,7 +48,7 @@
 
 把列标为 `isSortable: true` 即在表头显示排序按钮。点击循环：`asc → desc → 无`。**消费方负责实际 sort**。
 
-<LiveDemo code={`import { useMemo, useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useMemo, useState } from 'react';
 import { Table } from '@timeui/react';
 import type { SortDescriptor } from '@timeui/react';
 
@@ -368,7 +368,7 @@ export function Demo() {
 
 `render(row, index)` 完全接管该单元格的渲染——可以塞 Tag、Avatar、Button、链接、富文本。带 `isInteractive` 的列其点击不会冒泡到行 `onRowClick`。
 
-<LiveDemo code={`const COLUMNS = [
+<LiveDemo previewSource="children" code={`const COLUMNS = [
   { columnKey: 'name', title: 'Name' },
   {
     columnKey: 'status',
@@ -391,7 +391,7 @@ export function Demo() {
 
 典型的"客户端分页"模式：消费方用 `useState` 保存 `page` 与 `pageSize`，每次切换从全量数据切片，再传给 `<Table data>`。
 
-<LiveDemo code={`import { useMemo, useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useMemo, useState } from 'react';
 import { Pagination, Table } from '@timeui/react';
 
 export function Demo() {

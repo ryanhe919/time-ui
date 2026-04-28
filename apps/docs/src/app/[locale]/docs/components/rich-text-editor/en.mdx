@@ -6,7 +6,7 @@ A WYSIWYG editor built on **TipTap** (ProseMirror) that emits HTML and slots int
 
 Controlled HTML state. Every keystroke fires `onChange(html)`; the chip below mirrors the current document length.
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { RichTextEditor } from '@timeui/react/rich-text-editor';
 
 export function BasicEditor() {
@@ -52,7 +52,7 @@ Three visual recipes (`flat`, `bordered`, `faded`) and five size steps (`xs`, `s
 
 A custom array gives you per-button control; insert `'separator'` to draw a vertical divider.
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { SegmentedControl } from '@timeui/react';
 import { RichTextEditor } from '@timeui/react/rich-text-editor';
 

@@ -8,9 +8,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --config ../../eslint.config.js",
+    "lint": "eslint . --config ../../eslint.config.js && node scripts/check-livedemo-scope.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"(no docs tests)\" && exit 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo public/pdf.worker.min.mjs"
   },
   "dependencies": {
@@ -48,14 +49,23 @@
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.1",
     "shiki": "^1.0.0",
-    "styled-jsx": "5.1.6"
+    "styled-jsx": "5.1.6",
+    "sucrase": "^3.35.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
     "@types/node": "^22.10.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "axe-core": "^4.11.3",
+    "jsdom": "^25.0.1",
     "pdfjs-dist": "^4.10.0",
     "rimraf": "^6.0.1",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4",
+    "vitest-axe": "^0.1.0"
   }
 }

@@ -180,7 +180,7 @@ Five tiers — `xs` / `sm` / `md` (default) / `lg` / `xl` — adjust font size, 
 
 Pass `icon` per tab to render a leading glyph next to the label.
 
-<LiveDemo code={`<Tabs aria-label="View" variant="pills" defaultSelectedKey="grid"
+<LiveDemo previewSource="children" code={`<Tabs aria-label="View" variant="pills" defaultSelectedKey="grid"
   items={[
     { itemKey: 'list', label: 'List', icon: <ListIcon /> },
     { itemKey: 'grid', label: 'Grid', icon: <GridIcon /> },
@@ -258,7 +258,7 @@ Pass `icon` per tab to render a leading glyph next to the label.
 
 With `isLazy`, only the active panel is mounted — others mount on first activation. Useful for heavy dashboards or panels that fetch on demand.
 
-<LiveDemo code={`<Tabs
+<LiveDemo previewSource="children" code={`<Tabs
   aria-label="Dashboard"
   isLazy
   defaultSelectedKey="overview"

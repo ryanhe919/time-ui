@@ -19,7 +19,7 @@ active locale automatically.
 Click the button below — it opens a real command palette whose **inner** `<input>`
 is where you can actually type.
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { Search } from '@timeui/react';
 
 export function Demo() {
@@ -127,7 +127,7 @@ The ⌘K command palette dialog. Pairs with the `Search` trigger: `Search` opens
 
 `SearchDialog` accepts a built-in `shortcut="mod+k"` so the dialog binds the global ⌘K (Mac) / Ctrl K (other) keypress itself — no manual `useEffect` needed.
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { Search, SearchDialog } from '@timeui/react';
 
 export function CommandPalette() {

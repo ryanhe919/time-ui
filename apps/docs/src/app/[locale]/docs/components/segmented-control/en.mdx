@@ -37,6 +37,7 @@ The canonical "time range / category filter" — pass an `options` array.
 Each `option` accepts an `icon`; in horizontal mode it sits to the left of the label. If `label` is icon-only, supply `aria-label` so the segment still has an accessible name.
 
 <LiveDemo
+  previewSource="children"
   code={`<SegmentedControl
   aria-label="Inbox"
   value={tab}
@@ -54,7 +55,7 @@ Each `option` accepts an `icon`; in horizontal mode it sits to the left of the l
 
 When every `option` has only an `icon` and no visible `label`, the control auto-switches to a "square segment + circular indicator" shape — perfect for compact tool buttons like theme or view switchers. Each icon must supply `option["aria-label"]` to keep an accessible name.
 
-<LiveDemo code={`<SegmentedControl
+<LiveDemo previewSource="children" code={`<SegmentedControl
   size="sm"
   aria-label="Theme"
   defaultValue="light"
@@ -80,7 +81,7 @@ When every `option` has only an `icon` and no visible `label`, the control auto-
 
 `value` + `onChange` puts you in full control; `onChange` fires once per selection with the next `value`.
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { SegmentedControl } from '@timeui/react';
 
 type Range = '1d' | '7d' | '1m' | '1y' | 'all';

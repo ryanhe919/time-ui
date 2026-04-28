@@ -62,6 +62,36 @@ if (typeof window !== 'undefined') {
       return originalGetComputedStyle(element);
     },
   });
+
+  if (typeof window.Range !== 'undefined') {
+    const emptyClientRects = () => [] as unknown as DOMRectList;
+    const emptyBoundingRect = () =>
+      ({
+        bottom: 0,
+        height: 0,
+        left: 0,
+        right: 0,
+        top: 0,
+        width: 0,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      }) as DOMRect;
+
+    if (!window.Range.prototype.getClientRects) {
+      Object.defineProperty(window.Range.prototype, 'getClientRects', {
+        configurable: true,
+        value: emptyClientRects,
+      });
+    }
+
+    if (!window.Range.prototype.getBoundingClientRect) {
+      Object.defineProperty(window.Range.prototype, 'getBoundingClientRect', {
+        configurable: true,
+        value: emptyBoundingRect,
+      });
+    }
+  }
 }
 
 if (typeof HTMLCanvasElement !== 'undefined') {

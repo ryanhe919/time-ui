@@ -12,7 +12,7 @@ Pill 形状的"搜索触发器"——视觉上像输入框，**语义上是 `<bu
 
 点击下方按钮，会弹出一个真实的命令面板，**里面**是一个原生 `<input>`——这才是可输入的部分。
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { Search } from '@timeui/react';
 
 export function Demo() {
@@ -120,7 +120,7 @@ export function Demo() {
 
 `SearchDialog` 自带 `shortcut="mod+k"`，组件内部就会监听 ⌘K（Mac）/ Ctrl K（其它），不再需要手动写 `useEffect`。
 
-<LiveDemo code={`import { useState } from 'react';
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
 import { Search, SearchDialog } from '@timeui/react';
 
 export function CommandPalette() {

@@ -9,6 +9,7 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import nextPlugin from '@next/eslint-plugin-next';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
@@ -29,6 +30,16 @@ export default [
       '**/public/**',
       '**/pdf.worker*.mjs',
     ],
+  },
+  {
+    plugins: {
+      '@next/next': nextPlugin,
+    },
+    settings: {
+      next: {
+        rootDir: 'apps/docs/',
+      },
+    },
   },
   js.configs.recommended,
   {
@@ -75,7 +86,16 @@ export default [
       'react/no-unescaped-entities': 'off',
       'no-undef': 'off',
     },
-    settings: { react: { version: 'detect' } },
+    settings: { react: { version: '18.3.1' } },
+  },
+  {
+    files: ['apps/docs/**/*.{js,jsx,ts,tsx}'],
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs['core-web-vitals'].rules,
+      '@next/next/no-html-link-for-pages': 'off',
+      '@next/next/no-img-element': 'off',
+    },
   },
   prettier,
 ];
