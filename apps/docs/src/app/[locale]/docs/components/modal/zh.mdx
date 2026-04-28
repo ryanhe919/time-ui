@@ -43,7 +43,7 @@ export function Demo() {
 
 `sm` 420px / `md` 560px（默认）/ `lg` 720px / `xl` 960px / `full` 撑满视口（留 16px 边距）。所有尺寸都受 `max-width: calc(100vw - 32px)` 与 `max-height: calc(100vh - 64px)` 限制，确保在任何视口下不会撑爆。
 
-<LiveDemo code={`<Flex gap={8}>
+<LiveDemo previewSource="children" code={`<Flex gap={8}>
   <Button onClick={openSm}>size = sm</Button>
   <Button onClick={openMd}>size = md</Button>
   <Button onClick={openLg}>size = lg</Button>

@@ -232,6 +232,32 @@ describe('transpileLiveCode — extra hardening', () => {
     }
   });
 
+  it('wraps multi-sibling top-level JSX in an implicit Fragment', () => {
+    // Repro case for manual-test-report Action C (avatar / badge / card et al.):
+    // `<X /><Y />` used to fail at the `return ( <X /><Y /> );` wrap step with
+    // "Unexpected token, expected ';'". Fragment-wrap must auto-fix it.
+    const code = `<Button>A</Button>
+<Button>B</Button>
+<Button>C</Button>`;
+    const result = transpileLiveCode(code, testScope);
+    assertOk(result);
+    const element = result.render();
+    expect(isValidElement(element)).toBe(true);
+    // The wrapper is a Fragment with 3 button children.
+    const fragmentEl = element as ReturnType<typeof createElement>;
+    expect(fragmentEl.type).toBe(Fragment);
+  });
+
+  it('does not wrap when source starts with `(` (IIFE stays a single expression)', () => {
+    // Heuristic guard: leading `(` means user wrote an IIFE — already a single
+    // expression. Wrapping with `<>{...}</>` would still work but is unneeded;
+    // verify the existing path isn't broken.
+    const code = `(() => <Button>IIFE</Button>)()`;
+    const result = transpileLiveCode(code, testScope);
+    assertOk(result);
+    expect(isValidElement(result.render())).toBe(true);
+  });
+
   it('NEVER throws — wraps everything in structured error result (v2 §12 red-line)', () => {
     // 给一组"刁钻输入"做 smoke 检查：每条都必须返回 TranspileResult，不抛。
     const inputs = [

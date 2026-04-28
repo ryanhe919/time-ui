@@ -41,9 +41,11 @@ const withMDX = createMDX({
 
 const isDev = process.env.NODE_ENV !== 'production';
 
-const scriptSrc = isDev
-  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-  : "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'";
+// LiveDemo's editable preview transpiles user-typed JSX with sucrase and
+// evaluates it via `new Function(...)` (apps/docs/src/components/mdx/live/transpile.ts).
+// That call requires CSP `'unsafe-eval'` in both dev and prod — without it the
+// browser blocks the eval and the live editor crashes with a CSP ParseError.
+const scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
 const connectSrc = isDev
   ? "connect-src 'self' ws: wss:"

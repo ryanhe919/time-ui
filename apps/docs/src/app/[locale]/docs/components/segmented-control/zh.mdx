@@ -111,6 +111,7 @@ export function DateRange() {
 `color` 控制选中态文字与焦点环颜色。`isInvalid` 会强制走 `danger`。
 
 <LiveDemo
+  previewSource="children"
   code={`<Stack spacing={16}>
   <SegmentedControl color="primary"   aria-label="primary"   defaultValue="a" options={SAMPLE} />
   <SegmentedControl color="secondary" aria-label="secondary" defaultValue="a" options={SAMPLE} />
@@ -176,6 +177,7 @@ export function DateRange() {
 ## 尺寸
 
 <LiveDemo
+  previewSource="children"
   code={`<Stack spacing={16}>
   <SegmentedControl size="xs" aria-label="xs" defaultValue="a" options={SAMPLE} />
   <SegmentedControl size="sm" aria-label="sm" defaultValue="a" options={SAMPLE} />
@@ -273,6 +275,7 @@ export function DateRange() {
 `isDisabled` 整体禁用，`isReadOnly` 锁定当前选中值，`isInvalid` 强制 `danger` 配色 + `aria-invalid`。也支持单项 `option.isDisabled`。
 
 <LiveDemo
+  previewSource="children"
   code={`<Stack spacing={16}>
   <SegmentedControl label="Disabled" isDisabled defaultValue="a" options={SAMPLE} />
   <SegmentedControl label="Read only" isReadOnly defaultValue="b" options={SAMPLE} />

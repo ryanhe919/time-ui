@@ -46,7 +46,7 @@ export function Demo() {
 
 带 presets 与双月视图的区间选择。第一次点击设定 `start`，第二次点击若早于 `start` 则自动交换；hover 时面板内会高亮预览区间。
 
-<LiveDemo code={`<DateRangePicker
+<LiveDemo previewSource="children" code={`<DateRangePicker
   value={value}
   onChange={setValue}
   presets={[

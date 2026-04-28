@@ -43,7 +43,7 @@ export function Demo() {
 
 `sm` 420 px / `md` 560 px (default) / `lg` 720 px / `xl` 960 px / `full` viewport-spanning (with a 16 px gutter). Every size is bounded by `max-width: calc(100vw - 32px)` and `max-height: calc(100vh - 64px)`, so nothing overflows on small viewports.
 
-<LiveDemo code={`<Flex gap={8}>
+<LiveDemo previewSource="children" code={`<Flex gap={8}>
   <Button onClick={openSm}>size = sm</Button>
   <Button onClick={openMd}>size = md</Button>
   <Button onClick={openLg}>size = lg</Button>

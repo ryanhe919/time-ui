@@ -111,6 +111,7 @@ export function DateRange() {
 `color` drives the selected text and focus ring. `isInvalid` overrides it to `danger`.
 
 <LiveDemo
+  previewSource="children"
   code={`<Stack spacing={16}>
   <SegmentedControl color="primary"   aria-label="primary"   defaultValue="a" options={SAMPLE} />
   <SegmentedControl color="secondary" aria-label="secondary" defaultValue="a" options={SAMPLE} />
@@ -176,6 +177,7 @@ export function DateRange() {
 ## Sizes
 
 <LiveDemo
+  previewSource="children"
   code={`<Stack spacing={16}>
   <SegmentedControl size="xs" aria-label="xs" defaultValue="a" options={SAMPLE} />
   <SegmentedControl size="sm" aria-label="sm" defaultValue="a" options={SAMPLE} />
@@ -273,6 +275,7 @@ export function DateRange() {
 `isDisabled` disables the whole group, `isReadOnly` locks the current selection, `isInvalid` swaps in the `danger` palette + `aria-invalid`. Per-option `isDisabled` is also supported.
 
 <LiveDemo
+  previewSource="children"
   code={`<Stack spacing={16}>
   <SegmentedControl label="Disabled" isDisabled defaultValue="a" options={SAMPLE} />
   <SegmentedControl label="Read only" isReadOnly defaultValue="b" options={SAMPLE} />

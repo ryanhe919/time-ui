@@ -133,7 +133,7 @@ KPI 场景专用卡片。固定 label + value 布局、delta pill 带 arrow tick
 
 `isLoading` 切到骨架态：label / value / delta / icon 各自以对应尺寸的灰块呼吸，整体带 `role='status'` + `aria-busy='true'`，`prefers-reduced-motion` 下不做动画。
 
-<LiveDemo code={`<StatCard
+<LiveDemo previewSource="children" code={`<StatCard
   isLoading={loading}
   label="活跃用户"
   value="12,480"

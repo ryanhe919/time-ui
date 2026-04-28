@@ -133,7 +133,7 @@ A KPI-shaped card. Fixed label + value layout, delta pill with an arrow-tick ani
 
 `isLoading` swaps to a skeleton: label / value / delta / icon each breathe at the corresponding size, the wrapper carries `role='status'` + `aria-busy='true'`, and `prefers-reduced-motion` suppresses the animation.
 
-<LiveDemo code={`<StatCard
+<LiveDemo previewSource="children" code={`<StatCard
   isLoading={loading}
   label="ACTIVE USERS"
   value="12,480"

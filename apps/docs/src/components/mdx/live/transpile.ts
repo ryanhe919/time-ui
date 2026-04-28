@@ -89,10 +89,33 @@ export function transpileLiveCode(code: string, scope: Record<string, unknown>):
   // —— 那是 expression，不会出现在行首。
   const stripped = code.replace(/^[ \t]*import\s+[^;]+?;[\r\n]?/gm, '');
 
+  // ─── 1.5. FRAGMENT-WRAP MULTI-SIBLING JSX ────────────────────────────
+  //
+  // sucrase classic JSX runtime 把每条顶层 JSX 表达式翻译成独立的 `React.createElement`
+  // 调用语句。后面 step 3 的 `return ( ... );` wrap 只能容纳"单个表达式"——
+  // 多 sibling JSX（avatar / badge 等并列展示常用写法）会塞进 `return (X Y);` 里
+  // 触发 SyntaxError。
+  //
+  // 解法：源码层面探测"看起来是 JSX 起手"（去白后第一字符是 `<`），用 `<>...</>`
+  // Fragment 把它包成单一表达式。包了之后：
+  //   - 单元素：`<><Button/></>` → `React.createElement(React.Fragment, null, Button)` ——
+  //     渲染结果与裸 `<Button/>` 在 React 树里多一层透明 Fragment，对用户不可见。
+  //   - 多 sibling：`<><A/><B/></>` → 单个 createElement 调用，多孩子 — 修复目标。
+  //
+  // 不包的情况：
+  //   - 空字符串 / 仅空白 → 上面 :80 已 early-return
+  //   - 以 `(` 开头：IIFE 写法，已经是单一表达式
+  //   - 以 `/` 或 `{` 开头：注释 / JSX 表达式占位符，留给作者负责（罕见）
+  //
+  // scope.ts 提供的 `React` namespace 含 `Fragment`，所以 sucrase classic 输出
+  // `React.createElement(React.Fragment, null, ...)` 可以正常解析。
+  const trimmedStart = stripped.replace(/^\s+/, '').charAt(0);
+  const wrappedSource = trimmedStart === '<' ? `<>\n${stripped}\n</>` : stripped;
+
   // ─── 2. SUCRASE TRANSFORM ────────────────────────────────────────────
   let transpiled: string;
   try {
-    const out = sucraseTransform(stripped, {
+    const out = sucraseTransform(wrappedSource, {
       transforms: ['jsx', 'typescript'],
       jsxRuntime: 'classic', // 关键：classic → React.createElement / React.Fragment
       production: true, // 必需：见文件头注释
