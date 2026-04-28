@@ -29,7 +29,7 @@ A keyboard-navigable dropdown menu: anchored via Popover, supports both declarat
 
 With `selectionMode="multiple"`, clicking an item toggles its checked state and the menu stays open; a checkmark indicator renders on the right. `selectedKeys` / `defaultSelectedKeys` cover both controlled and uncontrolled use.
 
-<LiveDemo code={`const [selected, setSelected] = useState<Set<string>>(new Set(['inbox']));
+<LiveDemo previewSource="children" code={`const [selected, setSelected] = useState<Set<string>>(new Set(['inbox']));
 
 <Menu
   trigger={<Button>Show columns</Button>}

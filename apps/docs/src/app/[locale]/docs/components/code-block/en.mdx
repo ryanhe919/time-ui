@@ -16,7 +16,7 @@ dark surface in dark mode), and the copy button labels route through
 > Hover the top-right of the block to reveal the **Copy** button — clicking it
 > flips to "Copied" for 1.5 s, then resets.
 
-<LiveDemo code={`<CodeBlock code={\`import { Button } from '@timeui/react';\\n\\nexport function Demo() {\\n  return <Button color="primary">Save</Button>;\\n}\`} />`}>
+<LiveDemo previewSource="children" code={`<CodeBlock code={\`import { Button } from '@timeui/react';\\n\\nexport function Demo() {\\n  return <Button color="primary">Save</Button>;\\n}\`} />`}>
   <CodeBlock code={`import { Button } from '@timeui/react';
 
 export function Demo() {
@@ -29,7 +29,7 @@ export function Demo() {
 Providing a `title` renders a filename bar on top, with `language` shown on the
 right.
 
-<LiveDemo code={`<CodeBlock title="button.tsx" language="tsx" code={\`<Button color="success">Confirm</Button>\`} />`}>
+<LiveDemo previewSource="children" code={`<CodeBlock title="button.tsx" language="tsx" code={\`<Button color="success">Confirm</Button>\`} />`}>
   <CodeBlock
     title="button.tsx"
     language="tsx"
@@ -42,7 +42,7 @@ right.
 Beyond the visible label, `language` is also passed to shiki for grammar
 selection — set it correctly for accurate highlighting.
 
-<LiveDemo code={`<CodeBlock title="install.sh" language="bash" code={\`pnpm add @timeui/react @timeui/themes @emotion/react\\npnpm add shiki  # optional: enable syntax highlighting\`} />`}>
+<LiveDemo previewSource="children" code={`<CodeBlock title="install.sh" language="bash" code={\`pnpm add @timeui/react @timeui/themes @emotion/react\\npnpm add shiki  # optional: enable syntax highlighting\`} />`}>
   <CodeBlock
     title="install.sh"
     language="bash"
@@ -55,7 +55,7 @@ pnpm add shiki  # optional: enable syntax highlighting`}
 
 When the snippet is illustrative and shouldn't be copyable, pass `isCopyable={false}`.
 
-<LiveDemo code={`<CodeBlock isCopyable={false} code={\`// This is an illustration\nnot real code\`} />`}>
+<LiveDemo previewSource="children" code={`<CodeBlock isCopyable={false} code={\`// This is an illustration\nnot real code\`} />`}>
   <CodeBlock isCopyable={false} code={`// This is an illustration
 not real code`} />
 </LiveDemo>
@@ -66,7 +66,7 @@ Pass `disableHighlight` to force the plain-text renderer even when `shiki` is in
 This is useful for very large snippets, unknown languages, or environments where you
 want deterministic markup without async highlighting.
 
-<LiveDemo code={`<CodeBlock
+<LiveDemo previewSource="children" code={`<CodeBlock
   title="raw.txt"
   language="text"
   disableHighlight
@@ -85,7 +85,7 @@ Just the raw code surface.`}
 
 `onCopy` fires after a successful copy. Use it for analytics or toast notifications.
 
-<LiveDemo code={`<CodeBlock
+<LiveDemo previewSource="children" code={`<CodeBlock
   code={\`git clone git@github.com:timeui/timeui.git\`}
   onCopy={(code) => console.log('copied', code.length, 'chars')}
 />`}>

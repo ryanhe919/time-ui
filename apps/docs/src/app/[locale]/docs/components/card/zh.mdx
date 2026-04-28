@@ -109,7 +109,7 @@
 
 `isPressable` 让整卡变成一个可聚焦 / 可 Enter / Space 触发的目标，回调走 `onPress`；`isHoverable` 只给视觉反馈、不改键盘语义。`color='primary'` 决定 hover 时的边框 / 环色。
 
-<LiveDemo code={`<Card isPressable color="primary" onPress={() => setCount(c => c + 1)}>
+<LiveDemo previewSource="children" code={`<Card isPressable color="primary" onPress={() => setCount(c => c + 1)}>
   <CardHeader title="可按卡片" subtitle="点击 / Enter / Space 触发 onPress" />
   <CardBody>
     <Text size="sm" color="secondary">已触发次数: <strong>{count}</strong></Text>

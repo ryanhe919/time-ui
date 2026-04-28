@@ -8,7 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --config ../../eslint.config.js && node scripts/check-livedemo-scope.mjs",
+    "lint": "eslint . --config ../../eslint.config.js && node scripts/check-livedemo-scope.mjs && node scripts/audit-livedemo.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

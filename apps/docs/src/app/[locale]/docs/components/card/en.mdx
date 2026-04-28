@@ -109,7 +109,7 @@ The default is `variant='bordered'`. Compose content with `CardHeader` / `CardBo
 
 `isPressable` turns the whole card into a focusable target that responds to click, Enter, and Space — the callback lives on `onPress`. `isHoverable` is visual-only; it does not add keyboard semantics. `color='primary'` drives the hover border / ring colour.
 
-<LiveDemo code={`<Card isPressable color="primary" onPress={() => setCount(c => c + 1)}>
+<LiveDemo previewSource="children" code={`<Card isPressable color="primary" onPress={() => setCount(c => c + 1)}>
   <CardHeader title="Pressable card" subtitle="Click / Enter / Space fires onPress" />
   <CardBody>
     <Text size="sm" color="secondary">Press count: <strong>{count}</strong></Text>

@@ -85,7 +85,7 @@ export function Demo() {
 
 ### Multiple
 
-<LiveDemo code={`<Table
+<LiveDemo previewSource="children" code={`<Table
   selectionMode="multiple"
   rowKey="id"
   selectedKeys={keys}
@@ -135,7 +135,7 @@ export function Demo() {
 
 `compact` / `default` / `comfortable` adjust row height for differing information density.
 
-<LiveDemo code={`<Stack spacing={20}>
+<LiveDemo previewSource="children" code={`<Stack spacing={20}>
   <Table density="compact"     columns={COLS} data={ROWS} />
   <Table density="default"     columns={COLS} data={ROWS} />
   <Table density="comfortable" columns={COLS} data={ROWS} />
@@ -189,7 +189,7 @@ Four visual strategies, **all built from the existing tokens — they coexist wi
 - `grid` — `enclosed` plus hairlines between columns. Numbers / report vibe; great for dense fields.
 - `quiet` — no border, no divider, no background; only row hover reveals separation. The most restrained form, best for documentation / reading contexts.
 
-<LiveDemo code={`<Stack spacing={24}>
+<LiveDemo previewSource="children" code={`<Stack spacing={24}>
   <Table variant="enclosed" columns={COLS} data={ROWS} />
   <Table variant="divided"  columns={COLS} data={ROWS} />
   <Table variant="grid"     columns={COLS} data={ROWS} />
@@ -265,7 +265,7 @@ Four visual strategies, **all built from the existing tokens — they coexist wi
 
 Alternate row tints make long lists easier to scan.
 
-<LiveDemo code={`<Table isStriped columns={COLS} data={ROWS} />`}>
+<LiveDemo previewSource="children" code={`<Table isStriped columns={COLS} data={ROWS} />`}>
   <div style={{ width: '100%', maxWidth: 560 }}>
     <Table
       aria-label="Striped"
@@ -290,7 +290,7 @@ Alternate row tints make long lists easier to scan.
 
 `column.fixed: 'left' | 'right'` pins a column during horizontal scroll. The component watches container overflow and casts a soft shadow on the pinned edge.
 
-<LiveDemo code={`<Table
+<LiveDemo previewSource="children" code={`<Table
   columns={[
     { columnKey: 'name',   title: 'Account', width: 160, fixed: 'left' },
     { columnKey: 'region', title: 'Region',  width: 120 },
@@ -309,7 +309,7 @@ Alternate row tints make long lists easier to scan.
 
 Set `maxHeight` to enable vertical scrolling, then `isStickyHeader` to pin the header to the top.
 
-<LiveDemo code={`<Table
+<LiveDemo previewSource="children" code={`<Table
   isStickyHeader
   maxHeight={240}
   columns={[{ columnKey: 'index', title: '#', width: 60 }, { columnKey: 'value', title: 'Value' }]}
@@ -337,7 +337,7 @@ Set `maxHeight` to enable vertical scrolling, then `isStickyHeader` to pin the h
 
 `isLoading` shows a spinner (header is preserved); `emptyMessage` renders when `data` is empty.
 
-<LiveDemo code={`<Stack spacing={20}>
+<LiveDemo previewSource="children" code={`<Stack spacing={20}>
   <Table isLoading loadingMessage="Loading…" columns={COLS} data={[]} />
   <Table emptyMessage="No records yet"  columns={COLS} data={[]} />
 </Stack>`}>

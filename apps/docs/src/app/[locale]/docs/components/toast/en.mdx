@@ -46,7 +46,7 @@ function Demo() {
 
 `toast.promise(p, msgs)` immediately shows a loading toast and updates it to success / error when the promise settles. `success` / `error` accept a node or a `(value) => node` function.
 
-<LiveDemo code={`toast.promise(uploadFile(file), {
+<LiveDemo previewSource="children" code={`toast.promise(uploadFile(file), {
   loading: 'Uploading file…',
   success: (v) => \`Uploaded — \${v.url}\`,
   error: (e) => \`Failed: \${e.message}\`,

@@ -46,7 +46,7 @@ function Demo() {
 
 `toast.promise(p, msgs)` 会立即弹出 loading toast，并在 promise resolve / reject 后自动 update 为 success / error。`success` / `error` 既可以是节点也可以是 `(value) => node` 函数。
 
-<LiveDemo code={`toast.promise(uploadFile(file), {
+<LiveDemo previewSource="children" code={`toast.promise(uploadFile(file), {
   loading: 'Uploading file…',
   success: (v) => \`Uploaded — \${v.url}\`,
   error: (e) => \`Failed: \${e.message}\`,

@@ -31,7 +31,7 @@ export function Demo() {
 
 Toggle the time columns via `showMinute` (default `true`) and `showSecond` (default `false`). **Hidden fields are forced to `0` when the value is committed** — this is the whole point of the opt-in model: pick the precision you want, and never worry about stray `getSeconds() === 37` leaking out.
 
-<LiveDemo code={`// hour only — minute & second are always 0
+<LiveDemo previewSource="children" code={`// hour only — minute & second are always 0
 <DateTimePicker showMinute={false} />
 
 // hour + minute (default)

@@ -85,7 +85,7 @@ export function Demo() {
 
 ### 多选
 
-<LiveDemo code={`<Table
+<LiveDemo previewSource="children" code={`<Table
   selectionMode="multiple"
   rowKey="id"
   selectedKeys={keys}
@@ -135,7 +135,7 @@ export function Demo() {
 
 `compact` / `default`（默认）/ `comfortable` 三档行高，适配信息密度。
 
-<LiveDemo code={`<Stack spacing={20}>
+<LiveDemo previewSource="children" code={`<Stack spacing={20}>
   <Table density="compact"     columns={COLS} data={ROWS} />
   <Table density="default"     columns={COLS} data={ROWS} />
   <Table density="comfortable" columns={COLS} data={ROWS} />
@@ -189,7 +189,7 @@ export function Demo() {
 - `grid` — 在 `enclosed` 基础上为单元格之间也画 hairline。Numbers / 报表质感，适合密集字段。
 - `quiet` — 无边无线无 bg，仅靠 row hover 揭示行。最克制的形态，适合文档 / 阅读场景。
 
-<LiveDemo code={`<Stack spacing={24}>
+<LiveDemo previewSource="children" code={`<Stack spacing={24}>
   <Table variant="enclosed" columns={COLS} data={ROWS} />
   <Table variant="divided"  columns={COLS} data={ROWS} />
   <Table variant="grid"     columns={COLS} data={ROWS} />
@@ -265,7 +265,7 @@ export function Demo() {
 
 为奇偶行交替着色，提升长列表的扫读速度。
 
-<LiveDemo code={`<Table isStriped columns={COLS} data={ROWS} />`}>
+<LiveDemo previewSource="children" code={`<Table isStriped columns={COLS} data={ROWS} />`}>
   <div style={{ width: '100%', maxWidth: 560 }}>
     <Table
       aria-label="Striped"
@@ -290,7 +290,7 @@ export function Demo() {
 
 `column.fixed: 'left' | 'right'` 锁定列在水平滚动时不动。组件会监听容器溢出并在固定列上添加阴影分隔。
 
-<LiveDemo code={`<Table
+<LiveDemo previewSource="children" code={`<Table
   columns={[
     { columnKey: 'name',   title: 'Account', width: 160, fixed: 'left' },
     { columnKey: 'region', title: 'Region',  width: 120 },
@@ -309,7 +309,7 @@ export function Demo() {
 
 设置 `maxHeight` 启用纵向滚动，再加 `isStickyHeader` 让表头钉住容器顶部。
 
-<LiveDemo code={`<Table
+<LiveDemo previewSource="children" code={`<Table
   isStickyHeader
   maxHeight={240}
   columns={[{ columnKey: 'index', title: '#', width: 60 }, { columnKey: 'value', title: 'Value' }]}
@@ -337,7 +337,7 @@ export function Demo() {
 
 `isLoading` 显示 spinner（保留表头）；`emptyMessage` 在 `data` 为空时显示。
 
-<LiveDemo code={`<Stack spacing={20}>
+<LiveDemo previewSource="children" code={`<Stack spacing={20}>
   <Table isLoading loadingMessage="正在加载…" columns={COLS} data={[]} />
   <Table emptyMessage="还没有任何记录" columns={COLS} data={[]} />
 </Stack>`}>

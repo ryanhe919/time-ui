@@ -10,7 +10,7 @@
 
 > 把鼠标悬到代码块右上角会看到**复制**按钮——点击后会变为"已复制"，1.5 秒后恢复。
 
-<LiveDemo code={`<CodeBlock code={\`import { Button } from '@timeui/react';\\n\\nexport function Demo() {\\n  return <Button color="primary">Save</Button>;\\n}\`} />`}>
+<LiveDemo previewSource="children" code={`<CodeBlock code={\`import { Button } from '@timeui/react';\\n\\nexport function Demo() {\\n  return <Button color="primary">Save</Button>;\\n}\`} />`}>
   <CodeBlock code={`import { Button } from '@timeui/react';
 
 export function Demo() {
@@ -22,7 +22,7 @@ export function Demo() {
 
 传入 `title` 会在顶部渲染一条文件名栏，同时把 `language` 显示在右侧。
 
-<LiveDemo code={`<CodeBlock title="button.tsx" language="tsx" code={\`<Button color="success">Confirm</Button>\`} />`}>
+<LiveDemo previewSource="children" code={`<CodeBlock title="button.tsx" language="tsx" code={\`<Button color="success">Confirm</Button>\`} />`}>
   <CodeBlock
     title="button.tsx"
     language="tsx"
@@ -34,7 +34,7 @@ export function Demo() {
 
 `language` 除了展示标签外，也会传给 shiki 用作语法规则——确认设置正确能得到最准的高亮。
 
-<LiveDemo code={`<CodeBlock title="install.sh" language="bash" code={\`pnpm add @timeui/react @timeui/themes @emotion/react\\npnpm add shiki  # 可选：启用语法高亮\`} />`}>
+<LiveDemo previewSource="children" code={`<CodeBlock title="install.sh" language="bash" code={\`pnpm add @timeui/react @timeui/themes @emotion/react\\npnpm add shiki  # 可选：启用语法高亮\`} />`}>
   <CodeBlock
     title="install.sh"
     language="bash"
@@ -47,7 +47,7 @@ pnpm add shiki  # 可选：启用语法高亮`}
 
 当代码片段只是**示意**、无需复制时，传 `isCopyable={false}`。
 
-<LiveDemo code={`<CodeBlock isCopyable={false} code={\`// 仅作示意\nnot real code\`} />`}>
+<LiveDemo previewSource="children" code={`<CodeBlock isCopyable={false} code={\`// 仅作示意\nnot real code\`} />`}>
   <CodeBlock isCopyable={false} code={`// 仅作示意
 not real code`} />
 </LiveDemo>
@@ -57,7 +57,7 @@ not real code`} />
 传入 `disableHighlight` 可以强制使用纯文本渲染，即使项目已经安装了 `shiki` 也不会触发异步高亮。
 这适合超长代码片段、未知语言，或你希望拿到稳定静态 DOM 的场景。
 
-<LiveDemo code={`<CodeBlock
+<LiveDemo previewSource="children" code={`<CodeBlock
   title="raw.txt"
   language="text"
   disableHighlight
@@ -76,7 +76,7 @@ not real code`} />
 
 `onCopy` 在复制成功后触发，可以用来埋点或弹出提示。
 
-<LiveDemo code={`<CodeBlock
+<LiveDemo previewSource="children" code={`<CodeBlock
   code={\`git clone git@github.com:timeui/timeui.git\`}
   onCopy={(code) => console.log('copied', code.length, 'chars')}
 />`}>

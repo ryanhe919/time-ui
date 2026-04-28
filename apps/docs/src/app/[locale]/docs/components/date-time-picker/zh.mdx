@@ -31,7 +31,7 @@ export function Demo() {
 
 通过 `showMinute`（默认 `true`）与 `showSecond`（默认 `false`）开关时间列。**被隐藏的字段在提交时强制置 0** —— 这正是"可选择性开放"的语义：你想要哪一级精度，就开哪一列，不用担心下游拿到一个多余的 `getSeconds() === 37`。
 
-<LiveDemo code={`// 仅时 —— 分 / 秒恒为 0
+<LiveDemo previewSource="children" code={`// 仅时 —— 分 / 秒恒为 0
 <DateTimePicker showMinute={false} />
 
 // 时 + 分（默认）
