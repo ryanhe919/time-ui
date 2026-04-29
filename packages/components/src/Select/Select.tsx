@@ -285,7 +285,6 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
         availableBelow >= userMaxPx || availableBelow >= availableAbove ? 'bottom' : 'top';
 
       const maxHeight = Math.max(120, placement === 'bottom' ? availableBelow : availableAbove);
-
       // 水平 clamp：dropdown 用 minWidth: r.width 兜底，但实际渲染宽度可能更大（长选项 /
       // 搜索过滤会变化）。优先用 popoverRef 实测宽度；首次渲染 popover 还未挂载时回退到
       // r.width，挂载后由下方 ResizeObserver 触发再次 updateRect 修正。
@@ -435,6 +434,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
 
   const onOptionClick = (e: ReactMouseEvent<HTMLLIElement>, it: SelectItem) => {
     e.preventDefault();
+    e.stopPropagation();
     if (it.isDisabled) return;
     commit(it.value);
   };
@@ -790,6 +790,10 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     [focusSearchInput],
   );
 
+  const stopPopoverEventPropagation = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  }, []);
+
   return (
     <div
       ref={wrapperRef}
@@ -853,6 +857,8 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
             <div
               ref={popoverRef}
               css={popoverCss}
+              onMouseDown={stopPopoverEventPropagation}
+              onClick={stopPopoverEventPropagation}
               style={{
                 ...(popoverRect.placement === 'bottom'
                   ? { top: popoverRect.offset + 6 }

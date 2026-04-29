@@ -294,6 +294,20 @@ describe('Select', () => {
     expect(screen.queryByRole('listbox')).toBeNull();
   });
 
+  it('does not leak option mouse events to document-level handlers', async () => {
+    const onDocumentMouseDown = vi.fn();
+    renderWithProviders(<Select defaultValue="a" items={ITEMS} aria-label="fruit" />);
+    await openListbox();
+
+    document.addEventListener('mousedown', onDocumentMouseDown);
+    try {
+      await userEvent.click(screen.getByRole('option', { name: /Banana/i }));
+      expect(onDocumentMouseDown).not.toHaveBeenCalled();
+    } finally {
+      document.removeEventListener('mousedown', onDocumentMouseDown);
+    }
+  });
+
   it('searchbox navigation supports Home and End keys', async () => {
     renderWithProviders(
       <Select
@@ -494,5 +508,6 @@ describe('Select', () => {
         });
       }
     });
+
   });
 });
