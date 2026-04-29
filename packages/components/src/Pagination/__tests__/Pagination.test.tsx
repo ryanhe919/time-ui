@@ -59,28 +59,46 @@ describe('buildPaginationItems', () => {
     ]);
   });
 
-  it('omits leading ellipsis when current page is near start', () => {
-    // page=2, sibling=1 → left=2, right=3 → [1, 2, 3, ..., 100]
+  it('extends the visible window when current page is near start', () => {
+    // page=2, sibling=1 → 贴左：[1,2,3,4,5, ellipsis, 100]
+    // 总 slot 数恒等于 2*sibling+5 = 7，保证靠边时仍能一击点到附近页码。
     const out = buildPaginationItems(100, 2, 1);
-    expect(out[0]).toEqual({ type: 'page', page: 1 });
-    expect(out[1]).toEqual({ type: 'page', page: 2 });
-    expect(out[2]).toEqual({ type: 'page', page: 3 });
-    expect(out[3]?.type).toBe('ellipsis');
-    expect(out[out.length - 1]).toEqual({ type: 'page', page: 100 });
+    expect(out).toEqual([
+      { type: 'page', page: 1 },
+      { type: 'page', page: 2 },
+      { type: 'page', page: 3 },
+      { type: 'page', page: 4 },
+      { type: 'page', page: 5 },
+      { type: 'ellipsis', key: 'ellipsis-end' },
+      { type: 'page', page: 100 },
+    ]);
     // 不应在头部出现 ellipsis
-    expect(out.findIndex((i) => i.type === 'ellipsis')).toBe(3);
+    expect(out.findIndex((i) => i.type === 'ellipsis')).toBe(5);
   });
 
-  it('omits trailing ellipsis when current page is near end', () => {
-    // page=99, sibling=1 → left=98, right=99 → [1, ..., 98, 99, 100]
+  it('extends the visible window when current page is near end', () => {
+    // page=99, sibling=1 → 贴右：[1, ellipsis, 96,97,98,99,100]
     const out = buildPaginationItems(100, 99, 1);
-    expect(out[0]).toEqual({ type: 'page', page: 1 });
-    expect(out[1]?.type).toBe('ellipsis');
-    expect(out[out.length - 3]).toEqual({ type: 'page', page: 98 });
-    expect(out[out.length - 2]).toEqual({ type: 'page', page: 99 });
-    expect(out[out.length - 1]).toEqual({ type: 'page', page: 100 });
+    expect(out).toEqual([
+      { type: 'page', page: 1 },
+      { type: 'ellipsis', key: 'ellipsis-start' },
+      { type: 'page', page: 96 },
+      { type: 'page', page: 97 },
+      { type: 'page', page: 98 },
+      { type: 'page', page: 99 },
+      { type: 'page', page: 100 },
+    ]);
     // 仅一个 ellipsis
     expect(out.filter((i) => i.type === 'ellipsis')).toHaveLength(1);
+  });
+
+  it('keeps the same total slot count near both edges and middle', () => {
+    // 任何位置都返回相同数量的 slot（保持视觉宽度稳定）
+    const sibling = 1;
+    const expected = 2 * sibling + 5;
+    expect(buildPaginationItems(100, 1, sibling)).toHaveLength(expected);
+    expect(buildPaginationItems(100, 50, sibling)).toHaveLength(expected);
+    expect(buildPaginationItems(100, 100, sibling)).toHaveLength(expected);
   });
 
   it('clamps out-of-range page input', () => {
