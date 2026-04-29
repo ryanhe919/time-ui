@@ -1,5 +1,15 @@
 # @timeui/icons
 
+## 1.3.1
+
+### Patch Changes
+
+- 471b2b8: chore: align all published packages to a fresh patch version
+
+  Coordinated patch bump across the entire `@timeui/*` surface. No
+  behavioural changes — published purely to keep the workspace versions
+  in lockstep.
+
 ## 1.3.0
 
 ### Minor Changes
