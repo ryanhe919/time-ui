@@ -1,5 +1,147 @@
 # @timeui/react
 
+## 2.1.0
+
+### Minor Changes
+
+- f6c71cb: feat(chat): polish Chat family + add ChatScrollToBottom & ChatFileChip
+
+  A round of audit-driven cleanup across the Chat component family, plus
+  two new components that fill recurring product gaps. No breaking
+  changes — `ChatComposer.ref` switches from a `<div>` element to an
+  imperative handle, see migration note below.
+
+  **ChatComposer**
+  - Ref now exposes a `ChatComposerHandle` with `focus()` / `blur()` /
+    `getElement()` / `getTextarea()`. Calling `composerRef.current?.focus()`
+    finally focuses the textarea (was previously a no-op on the wrapper
+    div). Migration: replace `useRef<HTMLDivElement>` with
+    `useRef<ChatComposerHandle>`; if you used `composerRef.current` as a
+    DOM node, call `composerRef.current?.getElement()` instead.
+  - Focus state moved from React `useState` to CSS `:focus-within`, so
+    the wrapper no longer re-renders on focus / blur. The `data-focused`
+    attribute is removed (you can rely on `:focus-within` in CSS).
+  - Focus ring upgraded from a 1px border colour swap to a 2px
+    `inset box-shadow` to match the `Input` / `Select` field family — no
+    more 1→2px width jitter on focus.
+  - Composer demo MDX (`chat/composer/{en,zh}.mdx`) is now a runnable
+    self-contained `Demo()` function so the LiveDemo no longer throws
+    `ScopeError: value is not defined` in editable mode.
+
+  **New: `ChatScrollToBottom`**
+
+  Floating "↓ N new messages" pill button for chat surfaces. Pair with
+  the new `ChatMessageList` `onAtBottomChange(atBottom)` callback so the
+  button only shows when the user has scrolled away from the bottom.
+  Configurable icon, optional unread count badge, full keyboard +
+  focus-visible support.
+
+  **New: `ChatFileChip`**
+
+  Replaces hand-rolled file-chip `<span>`s in the composer top slot. One
+  component covers the standard set: file name + extension-derived kind
+  icon, optional size label, optional remove button (with proper event
+  isolation), optional inline upload progress bar, error state, and a
+  clickable variant for "preview attachment" flows.
+
+  **`ChatMessageList` — auto-scroll bug fix**
+
+  The list previously forced `scrollTop = scrollHeight` on every child
+  update, hijacking the user's position whenever they scrolled up to read
+  history. Auto-scroll now only fires when the user is already within
+  32px of the bottom. The new `onAtBottomChange` prop reports
+  "scrolled-away / back-at-bottom" transitions so consumers can show /
+  hide `ChatScrollToBottom`. Also documents the deliberate
+  `aria-live="polite" aria-relevant="additions"` choice (we omit
+  `'text'` to keep streaming tokens from being re-announced).
+
+  **`ChatToolCall` — focus visual aligned**
+
+  Header focus now lifts the whole card (border colour change + 2px
+  outline ring) instead of drawing an inset outline inside the button.
+  Matches `ChatActionButton` / `ChatSendButton` / `ChatKnowledgeRefs`.
+
+  **`ChatMessage` — flow polish**
+  - Streaming caret sized in `em` units (0.55em × 1em) so it scales with
+    the surrounding font size; visual is unchanged at the default 14px
+    but no longer fixed-pixel.
+  - Assistant / tool / knowledge bubbles now default to
+    `white-space: normal`. User input bubbles still use `pre-wrap` to
+    preserve manual newlines. Fixes spurious empty lines when wrapping a
+    `<ChatMarkdown>` inside an assistant message.
+
+- 145ed45: feat(multi-select): add MultiSelect with chip-based trigger, dropdown toolbar, OptGroup, search and full a11y; extend Tag with non-breaking closeButtonTabIndex / closeButtonAriaLabel props
+
+  **MultiSelect** is a new multi-value listbox built on the same trigger /
+  popover / search skeleton as `Select`, but with chip-based echo in the
+  trigger, checkbox indicators on each option, and an optional toolbar for
+  _Select all_ / _Clear_ inside the popover. It is the canonical answer for
+  picking two or more values from a finite set (tags, categories,
+  recipients…) and ships full keyboard, screen-reader, type-ahead and
+  Backspace support that native `<select multiple>` simply lacks.
+
+  Highlights:
+  - **Design language consistent with `Select`**: shares variants (`flat` /
+    `bordered` / `faded` / `underlined`), color ramp, sizes (xs–xl), radius
+    mapping, FormField integration, popover placement and a11y wiring. The
+    one intentional divergence is the **left-aligned checkbox** on each
+    option — every row could be selected, so a single left column makes
+    selection state scannable at a glance (matches W3C APG Listbox examples
+    and Ant / MUI / NextUI).
+  - **`+N` chip folding**: `maxTagCount` supports `"responsive"` (default,
+    width-aware), a fixed integer cap, or `Infinity` (wrap). The `+N` chip is
+    rendered as an `outline` neutral chip (non-removable) so it reads as
+    metadata rather than another deletable value, and exposes the hidden
+    labels via `title` + `aria-label="+N more: …"`.
+  - **Toolbar** (`showSelectAllInToolbar`): single text button toggles
+    between _Select all_ and _Clear_, scoped to **visible** items so it
+    composes correctly with `isSearchable` filters and `hideSelectedInList`.
+  - **`maxSelectedCount`**: over-cap rows render as `aria-disabled`, but
+    already-selected rows can still toggle off — no dead-end states.
+  - **Native form integration**: pass `name` and `MultiSelect` emits one
+    hidden `<input>` per value, so `FormData` carries the selection without
+    glue code.
+  - **Declarative or compositional**: pass `items={[...]}` _or_ nest
+    `<MultiSelectOption>` / `<MultiSelectOptGroup>` children; option /
+    optgroup components are runtime-prop carriers and emit no DOM of their
+    own.
+  - **Custom rendering**: `tagRender` and `optionRender` for full control;
+    default chip renderer reads `Tag` and is sized from the trigger size.
+
+  **Tag — non-breaking extension**
+
+  Two optional props were added to support `MultiSelect`'s chip slot
+  without breaking any existing `Tag` consumer:
+  - `closeButtonTabIndex?: number` — defaults to `0` (current behaviour);
+    `MultiSelect` passes `-1` to keep the trigger as the only Tab stop.
+  - `closeButtonAriaLabel?: string` — defaults to a sensible
+    i18n-resolved label; `MultiSelect` overrides it to `Remove <label>` so
+    screen readers announce _which_ chip is being removed.
+
+  Both are additive and have no effect on default `Tag` usage.
+
+  **Tokens**
+
+  `@timeui/tokens` adds a `multiSelectTokens` namespace covering trigger
+  height per size, chip-in-trigger gap, toolbar background / divider,
+  checkbox column width, and overflow-chip foreground / background. All
+  new tokens map to existing semantic tokens for both themes — no new
+  raw colors were introduced.
+
+### Patch Changes
+
+- d9e617a: fix(table): scale row selection checkbox by density
+
+  Row-selection and select-all `Checkbox` instances no longer fall back to
+  the default `md` size, which read as visually too large in dense tables.
+  The size now follows `density`: `compact → xs`, `default | comfortable
+→ sm`. No API change — purely visual.
+
+- Updated dependencies [145ed45]
+  - @timeui/tokens@1.6.0
+  - @timeui/core@1.5.3
+  - @timeui/themes@1.2.6
+
 ## 2.0.4
 
 ### Patch Changes
