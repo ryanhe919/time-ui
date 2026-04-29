@@ -42,6 +42,14 @@ const selectionCheckboxSizeMap: Record<TableDensity, CheckboxSize> = {
   comfortable: 'sm',
 };
 
+// Checkbox 是 inline-flex 元素，在 td 里默认按 baseline 对齐会视觉偏下；
+// 包一层 flex wrapper 把它在选择单元格里水平 + 垂直居中。
+const selectionCellInnerCss = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 // ────────────────────────────────────────────────────────────
 // Helpers
 // ────────────────────────────────────────────────────────────
@@ -619,14 +627,16 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
           data-sticky-cell={selectionColumnIsFixed || undefined}
         >
           {selectionMode === 'multiple' ? (
-            <Checkbox
-              aria-label={allSelected ? 'Deselect all rows' : 'Select all rows'}
-              size={selectionCheckboxSizeMap[density]}
-              isSelected={allSelected}
-              isIndeterminate={someSelected}
-              isDisabled={selectableRowKeys.length === 0}
-              onChange={(checked) => handleSelectAll(checked)}
-            />
+            <span css={selectionCellInnerCss}>
+              <Checkbox
+                aria-label={allSelected ? 'Deselect all rows' : 'Select all rows'}
+                size={selectionCheckboxSizeMap[density]}
+                isSelected={allSelected}
+                isIndeterminate={someSelected}
+                isDisabled={selectableRowKeys.length === 0}
+                onChange={(checked) => handleSelectAll(checked)}
+              />
+            </span>
           ) : null}
         </th>
       ) : null}
@@ -773,13 +783,15 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
                 rowBg,
               )}
             >
-              <Checkbox
-                aria-label={isSelected ? `Deselect row ${key}` : `Select row ${key}`}
-                size={selectionCheckboxSizeMap[density]}
-                isSelected={isSelected}
-                isDisabled={isDisabled}
-                onChange={() => toggleRowSelection(key)}
-              />
+              <span css={selectionCellInnerCss}>
+                <Checkbox
+                  aria-label={isSelected ? `Deselect row ${key}` : `Select row ${key}`}
+                  size={selectionCheckboxSizeMap[density]}
+                  isSelected={isSelected}
+                  isDisabled={isDisabled}
+                  onChange={() => toggleRowSelection(key)}
+                />
+              </span>
             </td>
           ) : null}
           {columns.map((col) => {
