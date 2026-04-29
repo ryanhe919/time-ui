@@ -1,5 +1,20 @@
 # @timeui/react
 
+## 2.0.3
+
+### Patch Changes
+
+- 471b2b8: chore: align all published packages to a fresh patch version
+
+  Coordinated patch bump across the entire `@timeui/*` surface. No
+  behavioural changes — published purely to keep the workspace versions
+  in lockstep.
+
+- Updated dependencies [471b2b8]
+  - @timeui/core@1.5.1
+  - @timeui/themes@1.2.4
+  - @timeui/tokens@1.5.1
+
 ## 2.0.2
 
 ### Patch Changes
