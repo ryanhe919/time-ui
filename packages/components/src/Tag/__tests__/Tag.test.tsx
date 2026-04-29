@@ -143,4 +143,45 @@ describe('Tag', () => {
     // when disabled and interactive, we still render span (not button) per implementation
     expect(screen.queryByRole('button', { name: 'Off' })).not.toBeInTheDocument();
   });
+
+  it('uses default close button aria-label and tab order when props are omitted', () => {
+    renderWithProviders(
+      <Tag isClosable onClose={() => {}}>
+        Default
+      </Tag>,
+    );
+    const close = screen.getByTestId('tag-close');
+    expect(close).toHaveAttribute('aria-label', 'Remove');
+    // Default tabIndex is 0 (a real <button> is in tab order by default)
+    expect(close.tabIndex).toBe(0);
+  });
+
+  it('honors closeButtonTabIndex={-1} so the close button is not in the Tab sequence', async () => {
+    renderWithProviders(
+      <>
+        <button data-testid="before">before</button>
+        <Tag isClosable closeButtonTabIndex={-1} onClose={() => {}}>
+          NotTabbable
+        </Tag>
+        <button data-testid="after">after</button>
+      </>,
+    );
+    const close = screen.getByTestId('tag-close');
+    expect(close).toHaveAttribute('tabindex', '-1');
+
+    const before = screen.getByTestId('before');
+    before.focus();
+    await userEvent.tab();
+    // Tab should skip the close button entirely and land on the next focusable
+    expect(document.activeElement).toBe(screen.getByTestId('after'));
+  });
+
+  it('honors a custom closeButtonAriaLabel for screen readers', () => {
+    renderWithProviders(
+      <Tag isClosable closeButtonAriaLabel="Remove apple" onClose={() => {}}>
+        apple
+      </Tag>,
+    );
+    expect(screen.getByRole('button', { name: 'Remove apple' })).toBeInTheDocument();
+  });
 });

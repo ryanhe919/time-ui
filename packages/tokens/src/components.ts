@@ -857,6 +857,42 @@ export const calloutTokens = {
   bodyLineHeight: 1.65,
 } as const;
 
+export const multiSelectTokens = {
+  /** trigger 内 chip 之间间距 */
+  chipGap: '4px',
+  /** trigger 内容区上下 padding（让 chip 不贴边）—— 对应 size */
+  triggerPaddingY: {
+    xs: '2px',
+    sm: '2px',
+    md: '3px',
+    lg: '4px',
+    xl: '4px',
+  },
+  /** option 行的 indicator 与 label 之间 gap */
+  optionIndicatorGap: '10px',
+  /** option 行内边距（与 Select option 一致，便于视觉同源） */
+  optionPaddingY: '7px',
+  optionPaddingX: '10px',
+  optionRadius: '6px',
+  /** dropdown toolbar 高度与排版 */
+  toolbarHeight: '32px',
+  toolbarPaddingY: '6px',
+  toolbarPaddingX: '10px',
+  toolbarFontSize: '12px',
+  /** OptGroup heading 视觉 */
+  optGroupHeadingHeight: '24px',
+  optGroupHeadingPaddingTop: '6px',
+  optGroupHeadingPaddingBottom: '4px',
+  optGroupHeadingPaddingX: '10px',
+  optGroupHeadingFontSize: '11px',
+  optGroupHeadingFontWeight: 600,
+  optGroupHeadingLetterSpacing: '0.04em',
+  /** chip label 截断的最大宽度 */
+  chipMaxWidth: '12em',
+  /** type-ahead 缓冲超时（毫秒） */
+  typeAheadTimeoutMs: 800,
+} as const;
+
 export const components = {
   button: buttonSizes,
   input: inputSizes,
@@ -888,6 +924,7 @@ export const components = {
   stepsSize: stepsSizes,
   steps: stepsTokens,
   callout: calloutTokens,
+  multiSelect: multiSelectTokens,
 } as const;
 
 export type ButtonSizes = typeof buttonSizes;
@@ -920,4 +957,5 @@ export type EmptyTokens = typeof emptyTokens;
 export type StepsSizes = typeof stepsSizes;
 export type StepsTokens = typeof stepsTokens;
 export type CalloutTokens = typeof calloutTokens;
+export type MultiSelectTokens = typeof multiSelectTokens;
 export type Components = typeof components;

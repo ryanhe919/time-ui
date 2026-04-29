@@ -80,6 +80,7 @@ import { SearchDialogDemo } from '../SearchDialogDemo';
 import { SegmentedControlIconOnlyDemo } from '../SegmentedControlIconOnlyDemo';
 import { SegmentedControlInboxDemo } from '../SegmentedControlInboxDemo';
 import { SegmentedControlRangeDemo } from '../SegmentedControlRangeDemo';
+import { MultiSelectControlledDemo } from '../MultiSelectControlledDemo';
 import { SelectDemo } from '../SelectDemo';
 import { SliderRangeDemo } from '../SliderRangeDemo';
 import { SliderVolumeDemo } from '../SliderVolumeDemo';
@@ -186,6 +187,7 @@ export const liveScope: Readonly<Record<string, unknown>> = Object.freeze({
   SegmentedControlIconOnlyDemo,
   SegmentedControlInboxDemo,
   SegmentedControlRangeDemo,
+  MultiSelectControlledDemo,
   SelectDemo,
   SliderRangeDemo,
   SliderVolumeDemo,
