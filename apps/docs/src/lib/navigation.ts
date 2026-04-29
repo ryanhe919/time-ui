@@ -53,6 +53,7 @@ const SECTIONS: readonly SectionConfig[] = [
           'input',
           'textarea',
           'select',
+          'multi-select',
           'search',
           'checkbox',
           'radio',

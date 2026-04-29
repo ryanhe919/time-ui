@@ -26,4 +26,13 @@ export interface TagProps {
   children?: ReactNode;
   className?: string;
   'aria-label'?: string;
+  /**
+   * 关闭按钮的 tabIndex。默认 `0`（与现有 `<button>` 默认 Tab 行为一致）。
+   * 在多选 chip 等场景下传 `-1` 可让 × 退出 Tab 序列，仅鼠标可达。
+   */
+  closeButtonTabIndex?: number;
+  /**
+   * 关闭按钮的 `aria-label`。默认 `'Remove'`，可动态生成（如 `Remove apple`）。
+   */
+  closeButtonAriaLabel?: string;
 }

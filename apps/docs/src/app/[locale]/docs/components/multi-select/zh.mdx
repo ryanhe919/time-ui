@@ -1,0 +1,680 @@
+# 多选 MultiSelect
+
+**多值 listbox**——共用 [`Select`](./select) 的 trigger / popover / 搜索 / 键盘
+骨架，但在 trigger 内用**chip 回显**已选值，每行选项左侧用 **checkbox 指示器**
+表达选中状态，popover 顶部还能挂一条可选的 **toolbar** 提供 *全选 / 清空*。
+
+何时用 `MultiSelect`：用户需要从一个有限集合中选**两个及以上**的值（标签、
+分类、收件人……）。如果选项之间互斥用 [`Select`](./select)；只有当表单必须
+在零 JS 环境下也工作时才用原生 `<select multiple>`——本组件提供原生控件
+完全没有的键盘、屏幕阅读器、type-ahead 与 Backspace 删除支持。
+
+数据源有两种写法：声明式 `items` 数组（推荐），或 `<MultiSelectOption>` /
+`<MultiSelectOptGroup>` children（父组件读取 props 而非渲染为 DOM）。
+
+## 基础用法
+
+<LiveDemo code={`<MultiSelect
+  aria-label="fruit"
+  placeholder="Pick some fruits…"
+  items={[
+    { value: 'apple', label: 'Apple' },
+    { value: 'banana', label: 'Banana' },
+    { value: 'cherry', label: 'Cherry' },
+    { value: 'durian', label: 'Durian' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="fruit"
+    placeholder="Pick some fruits…"
+    items={[
+      { value: 'apple', label: 'Apple' },
+      { value: 'banana', label: 'Banana' },
+      { value: 'cherry', label: 'Cherry' },
+      { value: 'durian', label: 'Durian' },
+    ]}
+  />
+</LiveDemo>
+
+## chip 回显 + `maxTagCount`
+
+trigger 内每个已选值渲染为一颗 [`Tag`](./tag) chip。为了避免 trigger 无限撑高，
+可以用 `maxTagCount` 控制可见 chip 数。三种模式：
+
+### `maxTagCount="responsive"`（默认）
+
+trigger 自动测量可用宽度并把超出的 chip 折成 `+N`。鼠标移到 `+N` chip 上可
+以看到隐藏项的列表（同时设置了 `title` 与 `aria-label="+N more: …"`，对辅助
+技术友好）。
+
+<LiveDemo code={`<MultiSelect
+  aria-label="tags"
+  isFullWidth
+  defaultValue={['frontend', 'backend', 'devops', 'design', 'qa', 'ai']}
+  items={[
+    { value: 'frontend', label: 'Frontend' },
+    { value: 'backend', label: 'Backend' },
+    { value: 'devops', label: 'DevOps' },
+    { value: 'design', label: 'Design' },
+    { value: 'qa', label: 'QA' },
+    { value: 'ai', label: 'AI / ML' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="tags"
+    isFullWidth
+    defaultValue={['frontend', 'backend', 'devops', 'design', 'qa', 'ai']}
+    items={[
+      { value: 'frontend', label: 'Frontend' },
+      { value: 'backend', label: 'Backend' },
+      { value: 'devops', label: 'DevOps' },
+      { value: 'design', label: 'Design' },
+      { value: 'qa', label: 'QA' },
+      { value: 'ai', label: 'AI / ML' },
+    ]}
+  />
+</LiveDemo>
+
+### `maxTagCount={2}`——固定上限
+
+最多显示两颗 chip，其余统一折成 `+N`。
+
+<LiveDemo code={`<MultiSelect
+  aria-label="tags"
+  maxTagCount={2}
+  defaultValue={['frontend', 'backend', 'devops', 'design']}
+  items={[
+    { value: 'frontend', label: 'Frontend' },
+    { value: 'backend', label: 'Backend' },
+    { value: 'devops', label: 'DevOps' },
+    { value: 'design', label: 'Design' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="tags"
+    maxTagCount={2}
+    defaultValue={['frontend', 'backend', 'devops', 'design']}
+    items={[
+      { value: 'frontend', label: 'Frontend' },
+      { value: 'backend', label: 'Backend' },
+      { value: 'devops', label: 'DevOps' },
+      { value: 'design', label: 'Design' },
+    ]}
+  />
+</LiveDemo>
+
+### `maxTagCount={Infinity}`——chip 多行换行
+
+完全关闭折叠。chip 会换到第二、第三行，trigger 会**纵向**撑高——使用前请
+确认外层布局能吸收这种动态高度。
+
+<LiveDemo code={`<MultiSelect
+  aria-label="tags"
+  isFullWidth
+  maxTagCount={Infinity}
+  defaultValue={['frontend', 'backend', 'devops', 'design', 'qa', 'ai', 'pm']}
+  items={[
+    { value: 'frontend', label: 'Frontend' },
+    { value: 'backend', label: 'Backend' },
+    { value: 'devops', label: 'DevOps' },
+    { value: 'design', label: 'Design' },
+    { value: 'qa', label: 'QA' },
+    { value: 'ai', label: 'AI / ML' },
+    { value: 'pm', label: 'Product Management' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="tags"
+    isFullWidth
+    maxTagCount={Infinity}
+    defaultValue={['frontend', 'backend', 'devops', 'design', 'qa', 'ai', 'pm']}
+    items={[
+      { value: 'frontend', label: 'Frontend' },
+      { value: 'backend', label: 'Backend' },
+      { value: 'devops', label: 'DevOps' },
+      { value: 'design', label: 'Design' },
+      { value: 'qa', label: 'QA' },
+      { value: 'ai', label: 'AI / ML' },
+      { value: 'pm', label: 'Product Management' },
+    ]}
+  />
+</LiveDemo>
+
+## 搜索 Searchable
+
+`isSearchable` 在 popover 顶部挂搜索框，按 label 做大小写无关子串过滤。
+**超过约 7 项**的列表建议都加上。
+
+<LiveDemo code={`<MultiSelect
+  isSearchable
+  aria-label="country"
+  placeholder="选择国家…"
+  searchPlaceholder="搜索国家名…"
+  isFullWidth
+  items={[
+    { value: 'cn', label: '中国' },
+    { value: 'us', label: '美国' },
+    { value: 'jp', label: '日本' },
+    { value: 'kr', label: '韩国' },
+    { value: 'de', label: '德国' },
+    { value: 'fr', label: '法国' },
+    { value: 'gb', label: '英国' },
+    { value: 'it', label: '意大利' },
+    { value: 'es', label: '西班牙' },
+    { value: 'br', label: '巴西' },
+    { value: 'in', label: '印度' },
+    { value: 'ru', label: '俄罗斯' },
+  ]}
+/>`}>
+  <MultiSelect
+    isSearchable
+    aria-label="country"
+    placeholder="选择国家…"
+    searchPlaceholder="搜索国家名…"
+    isFullWidth
+    items={[
+      { value: 'cn', label: '中国' },
+      { value: 'us', label: '美国' },
+      { value: 'jp', label: '日本' },
+      { value: 'kr', label: '韩国' },
+      { value: 'de', label: '德国' },
+      { value: 'fr', label: '法国' },
+      { value: 'gb', label: '英国' },
+      { value: 'it', label: '意大利' },
+      { value: 'es', label: '西班牙' },
+      { value: 'br', label: '巴西' },
+      { value: 'in', label: '印度' },
+      { value: 'ru', label: '俄罗斯' },
+    ]}
+  />
+</LiveDemo>
+
+### 自定义 `filterOption`
+
+用任意谓词替换默认子串过滤——简称匹配、模糊搜索、按 value 搜索都能实现。
+
+<LiveDemo code={`<MultiSelect
+  isSearchable
+  aria-label="country"
+  placeholder="试试输入 'us' 或 'jp'…"
+  searchPlaceholder="按 value 或 label 匹配…"
+  isFullWidth
+  filterOption={(input, item) => {
+    const needle = input.toLowerCase();
+    const label = typeof item.label === 'string' ? item.label.toLowerCase() : '';
+    return item.value.toLowerCase().includes(needle) || label.includes(needle);
+  }}
+  items={[
+    { value: 'cn', label: 'China' },
+    { value: 'us', label: 'United States' },
+    { value: 'jp', label: 'Japan' },
+    { value: 'kr', label: 'South Korea' },
+    { value: 'de', label: 'Germany' },
+    { value: 'fr', label: 'France' },
+  ]}
+/>`}>
+  <MultiSelect
+    isSearchable
+    aria-label="country"
+    placeholder="试试输入 'us' 或 'jp'…"
+    searchPlaceholder="按 value 或 label 匹配…"
+    isFullWidth
+    items={[
+      { value: 'cn', label: 'China' },
+      { value: 'us', label: 'United States' },
+      { value: 'jp', label: 'Japan' },
+      { value: 'kr', label: 'South Korea' },
+      { value: 'de', label: 'Germany' },
+      { value: 'fr', label: 'France' },
+    ]}
+  />
+</LiveDemo>
+
+## 分组 OptGroup
+
+用 `<MultiSelectOptGroup>` 给选项分组。group 标题渲染为 `role="presentation"`
+容器，**不**会被算成 option。也可以在扁平 `items` 里给每项加 `group: string`
+字段，相同 group 值的项会进同一段。
+
+<LiveDemo code={`<MultiSelect
+  aria-label="city"
+  placeholder="选择城市…"
+  isFullWidth
+  defaultValue={['shanghai']}
+>
+  <MultiSelectOptGroup label="China">
+    <MultiSelectOption value="beijing">Beijing</MultiSelectOption>
+    <MultiSelectOption value="shanghai">Shanghai</MultiSelectOption>
+    <MultiSelectOption value="shenzhen">Shenzhen</MultiSelectOption>
+  </MultiSelectOptGroup>
+  <MultiSelectOptGroup label="Japan">
+    <MultiSelectOption value="tokyo">Tokyo</MultiSelectOption>
+    <MultiSelectOption value="osaka">Osaka</MultiSelectOption>
+  </MultiSelectOptGroup>
+  <MultiSelectOptGroup label="USA">
+    <MultiSelectOption value="nyc">New York</MultiSelectOption>
+    <MultiSelectOption value="sf">San Francisco</MultiSelectOption>
+    <MultiSelectOption value="la" isDisabled>Los Angeles (full)</MultiSelectOption>
+  </MultiSelectOptGroup>
+</MultiSelect>`}>
+  <MultiSelect
+    aria-label="city"
+    placeholder="选择城市…"
+    isFullWidth
+    defaultValue={['shanghai']}
+  >
+    <MultiSelectOptGroup label="China">
+      <MultiSelectOption value="beijing">Beijing</MultiSelectOption>
+      <MultiSelectOption value="shanghai">Shanghai</MultiSelectOption>
+      <MultiSelectOption value="shenzhen">Shenzhen</MultiSelectOption>
+    </MultiSelectOptGroup>
+    <MultiSelectOptGroup label="Japan">
+      <MultiSelectOption value="tokyo">Tokyo</MultiSelectOption>
+      <MultiSelectOption value="osaka">Osaka</MultiSelectOption>
+    </MultiSelectOptGroup>
+    <MultiSelectOptGroup label="USA">
+      <MultiSelectOption value="nyc">New York</MultiSelectOption>
+      <MultiSelectOption value="sf">San Francisco</MultiSelectOption>
+      <MultiSelectOption value="la" isDisabled>Los Angeles (full)</MultiSelectOption>
+    </MultiSelectOptGroup>
+  </MultiSelect>
+</LiveDemo>
+
+## Toolbar——全选 / 清空
+
+`showSelectAllInToolbar` 在 listbox 上方渲染一条工具栏：左侧文本 `Selected N / M`，
+右侧是单按钮——当**当前可见**项尚未全部选中时显示 **Select all**，已全部选中
+时切换为 **Clear**。这里的 Clear **只**移除当前可见项，不影响搜索 / `hideSelectedInList`
+之外的已选；要彻底清空（包括隐藏的已选）请用 trigger 上的 `isClearable` × 按钮。
+
+<LiveDemo code={`<MultiSelect
+  aria-label="permission"
+  showSelectAllInToolbar
+  isSearchable
+  placeholder="选择权限…"
+  isFullWidth
+  items={[
+    { value: 'read', label: 'Read' },
+    { value: 'write', label: 'Write' },
+    { value: 'delete', label: 'Delete' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'audit', label: 'Audit' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="permission"
+    showSelectAllInToolbar
+    isSearchable
+    placeholder="选择权限…"
+    isFullWidth
+    items={[
+      { value: 'read', label: 'Read' },
+      { value: 'write', label: 'Write' },
+      { value: 'delete', label: 'Delete' },
+      { value: 'admin', label: 'Admin' },
+      { value: 'audit', label: 'Audit' },
+    ]}
+  />
+</LiveDemo>
+
+## 一键清空 Clearable
+
+`isClearable` 在 trigger 右端渲染 × 按钮，当 `value.length > 0` 时显示。
+点击它（或在 `clearOnEsc` 启用时按 `Esc`）即清空所有已选。清空按钮**不**进入
+Tab 序列（`tabIndex={-1}`），保持 trigger 是唯一 Tab stop——与 `Input.isClearable`
+对齐。
+
+<LiveDemo code={`<MultiSelect
+  aria-label="fruit"
+  isClearable
+  defaultValue={['a', 'b']}
+  items={[
+    { value: 'a', label: 'Apple' },
+    { value: 'b', label: 'Banana' },
+    { value: 'c', label: 'Cherry' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="fruit"
+    isClearable
+    defaultValue={['a', 'b']}
+    items={[
+      { value: 'a', label: 'Apple' },
+      { value: 'b', label: 'Banana' },
+      { value: 'c', label: 'Cherry' },
+    ]}
+  />
+</LiveDemo>
+
+## 禁用 / 只读 / 加载中
+
+`isDisabled` 整体置灰、阻断所有交互（含 chip 删除、键盘）。`isReadOnly` 允许
+打开 popover、键盘导航，但拒绝任何**变更**——适合「让用户*查看*当前选中、
+但不允许修改」的场景。`isLoading` 时把 listbox 区域替换为 `role="status"` 占位。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <MultiSelect
+    aria-label="disabled"
+    isDisabled
+    defaultValue={['a']}
+    items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]}
+  />
+  <MultiSelect
+    aria-label="readonly"
+    isReadOnly
+    defaultValue={['a']}
+    items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]}
+  />
+  <MultiSelect
+    aria-label="loading"
+    isLoading
+    loadingMessage="Loading options…"
+    placeholder="点击展开…"
+    items={[{ value: 'a', label: 'Apple' }]}
+  />
+</Stack>`}>
+  <Stack spacing={12}>
+    <MultiSelect
+      aria-label="disabled"
+      isDisabled
+      defaultValue={['a']}
+      items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]}
+    />
+    <MultiSelect
+      aria-label="readonly"
+      isReadOnly
+      defaultValue={['a']}
+      items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]}
+    />
+    <MultiSelect
+      aria-label="loading"
+      isLoading
+      loadingMessage="Loading options…"
+      placeholder="点击展开…"
+      items={[{ value: 'a', label: 'Apple' }]}
+    />
+  </Stack>
+</LiveDemo>
+
+## 校验状态
+
+外层若提供 `label` / `description` / `errorMessage` 任一，组件会自动包入
+[`FormField`](./form-field)，并把 `aria-invalid` / `aria-describedby` /
+danger 配色串好。**错误**用 `errorMessage`；**软提示**用 `color="warning"`。
+
+<LiveDemo code={`<Stack spacing={16}>
+  <MultiSelect
+    label="标签（错误）"
+    errorMessage="请至少选择一个标签。"
+    placeholder="尚未选择…"
+    items={[
+      { value: 'a', label: 'Tag A' },
+      { value: 'b', label: 'Tag B' },
+    ]}
+    isFullWidth
+  />
+  <MultiSelect
+    label="标签（警告）"
+    color="warning"
+    description="提示：仅前 3 个标签会被索引。"
+    defaultValue={['a', 'b', 'c', 'd']}
+    items={[
+      { value: 'a', label: 'A' },
+      { value: 'b', label: 'B' },
+      { value: 'c', label: 'C' },
+      { value: 'd', label: 'D' },
+    ]}
+    isFullWidth
+  />
+</Stack>`}>
+  <Stack spacing={16}>
+    <MultiSelect
+      label="标签（错误）"
+      errorMessage="请至少选择一个标签。"
+      placeholder="尚未选择…"
+      items={[
+        { value: 'a', label: 'Tag A' },
+        { value: 'b', label: 'Tag B' },
+      ]}
+      isFullWidth
+    />
+    <MultiSelect
+      label="标签（警告）"
+      color="warning"
+      description="提示：仅前 3 个标签会被索引。"
+      defaultValue={['a', 'b', 'c', 'd']}
+      items={[
+        { value: 'a', label: 'A' },
+        { value: 'b', label: 'B' },
+        { value: 'c', label: 'C' },
+        { value: 'd', label: 'D' },
+      ]}
+      isFullWidth
+    />
+  </Stack>
+</LiveDemo>
+
+## 尺寸 Sizes
+
+五档尺寸——`xs` / `sm` / `md` / `lg` / `xl`——与 [`Input`](./input) /
+[`Select`](./select) / [`Button`](./button) 共享同一组 token。chip 会按
+trigger size 做映射（如 trigger `lg` → chip `md`），保证 chip 不顶满 trigger
+高度。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <MultiSelect size="xs" placeholder="XS" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="xs" />
+  <MultiSelect size="sm" placeholder="Small" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="sm" />
+  <MultiSelect size="md" placeholder="Medium" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="md" />
+  <MultiSelect size="lg" placeholder="Large" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="lg" />
+  <MultiSelect size="xl" placeholder="XL" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="xl" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <MultiSelect size="xs" placeholder="XS" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="xs" />
+    <MultiSelect size="sm" placeholder="Small" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="sm" />
+    <MultiSelect size="md" placeholder="Medium" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="md" />
+    <MultiSelect size="lg" placeholder="Large" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="lg" />
+    <MultiSelect size="xl" placeholder="XL" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="xl" />
+  </Stack>
+</LiveDemo>
+
+## 非受控 vs 受控
+
+传入 `defaultValue` 即为**非受控**——父组件不持有 state，仅在需要时通过
+`onChange` 读取最新值：
+
+<LiveDemo code={`<MultiSelect
+  aria-label="uncontrolled"
+  defaultValue={['a']}
+  onChange={(v) => console.log('next value:', v)}
+  items={[
+    { value: 'a', label: 'Apple' },
+    { value: 'b', label: 'Banana' },
+    { value: 'c', label: 'Cherry' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="uncontrolled"
+    defaultValue={['a']}
+    items={[
+      { value: 'a', label: 'Apple' },
+      { value: 'b', label: 'Banana' },
+      { value: 'c', label: 'Cherry' },
+    ]}
+  />
+</LiveDemo>
+
+传入 `value` + `onChange` 即为**受控**——父组件完全持有 state，可以在传回前
+拦截 / 排序 / 截断数组：
+
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
+import { MultiSelect, Stack } from '@timeui/react';
+
+const FRAMEWORKS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', isDisabled: true },
+];
+
+export function ControlledFrameworks() {
+  const [value, setValue] = useState(['react']);
+  return (
+    <Stack spacing={12}>
+      <MultiSelect
+        aria-label="frameworks"
+        value={value}
+        onChange={setValue}
+        showSelectAllInToolbar
+        items={FRAMEWORKS}
+        isFullWidth
+      />
+      <pre>value = {JSON.stringify(value)}</pre>
+    </Stack>
+  );
+}`}>
+  <MultiSelectControlledDemo />
+</LiveDemo>
+
+## 原生表单集成
+
+传入 `name`，`MultiSelect` 会按已选数量渲染**多个** `<input type="hidden">`，
+`FormData` 在外层 `<form>` 上即可拿到这组值，无需额外胶水代码。
+
+<LiveDemo code={`<form
+  onSubmit={(e) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    alert('fruits = ' + JSON.stringify(fd.getAll('fruits')));
+  }}
+>
+  <Stack spacing={12}>
+    <MultiSelect
+      label="水果"
+      name="fruits"
+      defaultValue={['a', 'b']}
+      items={[
+        { value: 'a', label: 'Apple' },
+        { value: 'b', label: 'Banana' },
+        { value: 'c', label: 'Cherry' },
+      ]}
+      isFullWidth
+    />
+    <Button type="submit">提交</Button>
+  </Stack>
+</form>`}>
+  <Stack spacing={12}>
+    <MultiSelect
+      label="水果"
+      name="fruits"
+      defaultValue={['a', 'b']}
+      items={[
+        { value: 'a', label: 'Apple' },
+        { value: 'b', label: 'Banana' },
+        { value: 'c', label: 'Cherry' },
+      ]}
+      isFullWidth
+    />
+    <Button type="submit">提交</Button>
+  </Stack>
+</LiveDemo>
+
+## 设计决策：为什么 checkbox 在**左侧**？
+
+`Select` 中已选项的 `✓` 在**右侧**，是因为任意时刻只有一行被勾——`✓` 在右侧
+能让单行视觉重心更平衡。多选反过来：每行都可能被勾，每行都需要指示器。
+把指示器**左对齐**让用户能在单一列里**纵向扫读**当前选中状态，符合
+W3C APG Listbox 示例与所有主流多选库（Ant Design / MUI / NextUI）的惯例。
+这是与 `Select` 的**有意分歧**，不是不一致。
+
+## API
+
+### MultiSelect
+
+<PropsTable props={[
+  { name: 'value', type: 'string[]', description: '受控值（已选项 value 的数组）。' },
+  { name: 'defaultValue', type: 'string[]', default: '[]', description: '非受控初始值。' },
+  { name: 'onChange', type: '(value: string[]) => void', description: '变化回调，参数为新数组（已去重）。' },
+  { name: 'items', type: 'MultiSelectItem[]', description: '声明式选项数组，与 children 二选一（items 优先）。' },
+  { name: 'children', type: 'ReactNode', description: '`<MultiSelectOption>` / `<MultiSelectOptGroup>` 节点；运行时仅读取 props。' },
+  { name: 'placeholder', type: 'string', description: '未选中任何值时 trigger 显示的占位文案。' },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: '视觉样式，与 Input / Select 共享。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '语义色；invalid 时强制 danger。' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设。' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: '圆角，按 size 自动映射。' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: 'trigger 撑满父容器宽度。' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用整个组件。' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: '可打开但不可改值。' },
+  { name: 'isInvalid', type: 'boolean', description: '显式 invalid；由 errorMessage 自动推导。' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'FormField 显示 `*`，trigger 写 aria-required。' },
+  { name: 'isLoading', type: 'boolean', default: 'false', description: '把 list 区域替换为 `role="status"` 占位。' },
+  { name: 'isSearchable', type: 'boolean', default: 'false', description: '在 listbox 上方渲染搜索框。' },
+  { name: 'searchPlaceholder', type: 'string', description: '搜索框占位符。' },
+  { name: 'filterOption', type: '(input: string, item: MultiSelectItem) => boolean', description: '自定义过滤器；默认按 label 子串大小写无关匹配。' },
+  { name: 'emptyMessage', type: 'ReactNode', description: '匹配为空时的空态文案。' },
+  { name: 'loadingMessage', type: 'ReactNode', description: '`isLoading=true` 时显示的文案。' },
+  { name: 'isClearable', type: 'boolean', default: 'false', description: 'value 非空时在 trigger 右端显示 Clear × 按钮。' },
+  { name: 'clearButtonTabIndex', type: 'number', default: '-1', description: 'Clear 按钮的 tabIndex；默认不进入 Tab 序列。' },
+  { name: 'clearOnEsc', type: 'boolean', default: 'false', description: '按 Esc 是否清空（仅在 popover 关闭时）。' },
+  { name: 'onClear', type: '() => void', description: 'Clear 按钮清空后触发。' },
+  { name: 'closeOnSelect', type: 'boolean', default: 'false', description: '选中后是否自动关闭 popover。' },
+  { name: 'maxSelectedCount', type: 'number', default: 'Infinity', description: '已选上限；超出后未选项渲染为 aria-disabled。' },
+  { name: 'maxTagCount', type: "number | 'responsive'", default: "'responsive'", description: 'trigger 中 chip 的可见数；超出折叠为 `+N`。' },
+  { name: 'showSelectAllInToolbar', type: 'boolean', default: 'false', description: '在 popover 顶部渲染 Select all / Clear 工具栏。' },
+  { name: 'hideSelectedInList', type: 'boolean', default: 'false', description: '隐藏已选项（罕用）。' },
+  { name: 'tagRender', type: '(item, opts) => ReactNode', description: '自定义 chip 渲染；opts 含 `{ onRemove, isDisabled }`。' },
+  { name: 'optionRender', type: '(item, opts) => ReactNode', description: '自定义选项内容（外壳 `<li role="option">` 仍由组件提供）。' },
+  { name: 'startContent', type: 'ReactNode', description: 'trigger 内左侧 slot（图标等）。' },
+  { name: 'endContent', type: 'ReactNode', description: 'trigger 内右侧 slot。' },
+  { name: 'maxListHeight', type: 'number | string', default: '280', description: '选项列表最大高度。' },
+  { name: 'placement', type: "'auto' | 'bottom' | 'top'", default: "'auto'", description: 'popover 位置；auto 在下方空间不足时自动翻转。' },
+  { name: 'label', type: 'ReactNode', description: '字段标题；触发隐式 FormField 包装。' },
+  { name: 'description', type: 'ReactNode', description: 'FormField 的辅助文案。' },
+  { name: 'errorMessage', type: 'ReactNode', description: '错误提示；触发 `isInvalid`。' },
+  { name: 'name', type: 'string', description: '为每个已选值渲染一个 hidden `<input>`，便于原生表单提交。' }
+]} />
+
+### MultiSelectItem
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: '选项值。' },
+  { name: 'label', type: 'ReactNode', required: true, description: '选项内容；搜索过滤按其文本形态匹配。' },
+  { name: 'isDisabled', type: 'boolean', description: '禁用该选项。' },
+  { name: 'description', type: 'ReactNode', description: '选项下方的辅助文案。' },
+  { name: 'group', type: 'string', description: '相同 group 值的项归到同一段。' }
+]} />
+
+### MultiSelectOption
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: '选项值。' },
+  { name: 'children', type: 'ReactNode', description: '选项内容。' },
+  { name: 'isDisabled', type: 'boolean', description: '禁用该选项。' },
+  { name: 'description', type: 'ReactNode', description: '选项下方的辅助文案。' }
+]} />
+
+### MultiSelectOptGroup
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', required: true, description: '分组标题文本。' },
+  { name: 'children', type: 'ReactNode', description: '隶属于该分组的 `<MultiSelectOption>` 节点。' }
+]} />
+
+<Callout variant="info" title="可访问性">
+  trigger 为 `role="combobox"` + `aria-haspopup="listbox"` + `aria-expanded`
+  + `aria-controls`；popover 为 `role="listbox"` 并带 `aria-multiselectable="true"`；
+  选项为 `role="option"` 带 `aria-selected` / `aria-disabled` 与稳定 id（被
+  `aria-activedescendant` 引用）。group 标题为 `role="group"` 容器并自带
+  `aria-labelledby`。
+
+  键盘：
+  - **`↑` / `↓`** 切换高亮（自动跳过 disabled 项）
+  - **`Home` / `End`** 跳到首/末个未禁用项
+  - **`Enter` / `Space`** 切换当前高亮项的选中态
+  - **`Esc`** 关闭 popover、焦点回 trigger；trigger 已关闭且开启 `clearOnEsc` 时清空数值
+  - **`Backspace`** 在 trigger（或空搜索框）上按下会移除最后一颗 chip
+  - **Type-ahead**——800 ms 内累积可打印字符为前缀，匹配第一个 label 起始命中的项
+  - **`Tab`** 关闭 popover 并把焦点交给浏览器
+
+  所有 transition 与 animation 都遵循 `prefers-reduced-motion: reduce`。
+</Callout>

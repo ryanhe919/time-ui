@@ -1,0 +1,704 @@
+# MultiSelect
+
+A **multi-value listbox** built on top of the same trigger / popover / search
+skeleton as [`Select`](./select), but with **chip-based echo** in the trigger,
+**checkbox indicators** on each option, and an optional **toolbar** for
+*Select all* / *Clear* inside the popover.
+
+Use `MultiSelect` when the user needs to pick **two or more** values from a
+finite set (tags, categories, recipients…). Reach for `Select` when the
+choice is mutually exclusive, and for native `<select multiple>` only when
+your form must work with no JavaScript at all — `MultiSelect` ships full
+keyboard, screen-reader, type-ahead and Backspace support that the native
+control simply does not have.
+
+Two ways to declare options: the declarative `items` array (preferred), or
+`<MultiSelectOption>` / `<MultiSelectOptGroup>` children (whose props are
+read at render time — they don't emit DOM themselves).
+
+## Basic usage
+
+<LiveDemo code={`<MultiSelect
+  aria-label="fruit"
+  placeholder="Pick some fruits…"
+  items={[
+    { value: 'apple', label: 'Apple' },
+    { value: 'banana', label: 'Banana' },
+    { value: 'cherry', label: 'Cherry' },
+    { value: 'durian', label: 'Durian' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="fruit"
+    placeholder="Pick some fruits…"
+    items={[
+      { value: 'apple', label: 'Apple' },
+      { value: 'banana', label: 'Banana' },
+      { value: 'cherry', label: 'Cherry' },
+      { value: 'durian', label: 'Durian' },
+    ]}
+  />
+</LiveDemo>
+
+## Chip echo + `maxTagCount`
+
+The trigger renders one [`Tag`](./tag) chip per selected value. To stop the
+trigger from growing unboundedly you can clamp the visible chip count with
+`maxTagCount`. Three modes are supported:
+
+### `maxTagCount="responsive"` (default)
+
+The trigger measures available width and folds the overflow into a `+N`
+chip. Hover the `+N` chip to read the hidden labels (`title` attribute and
+`aria-label="+N more: …"` make it accessible).
+
+<LiveDemo code={`<MultiSelect
+  aria-label="tags"
+  isFullWidth
+  defaultValue={['frontend', 'backend', 'devops', 'design', 'qa', 'ai']}
+  items={[
+    { value: 'frontend', label: 'Frontend' },
+    { value: 'backend', label: 'Backend' },
+    { value: 'devops', label: 'DevOps' },
+    { value: 'design', label: 'Design' },
+    { value: 'qa', label: 'QA' },
+    { value: 'ai', label: 'AI / ML' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="tags"
+    isFullWidth
+    defaultValue={['frontend', 'backend', 'devops', 'design', 'qa', 'ai']}
+    items={[
+      { value: 'frontend', label: 'Frontend' },
+      { value: 'backend', label: 'Backend' },
+      { value: 'devops', label: 'DevOps' },
+      { value: 'design', label: 'Design' },
+      { value: 'qa', label: 'QA' },
+      { value: 'ai', label: 'AI / ML' },
+    ]}
+  />
+</LiveDemo>
+
+### `maxTagCount={2}` — fixed cap
+
+Show at most two chips, fold the rest into `+N`.
+
+<LiveDemo code={`<MultiSelect
+  aria-label="tags"
+  maxTagCount={2}
+  defaultValue={['frontend', 'backend', 'devops', 'design']}
+  items={[
+    { value: 'frontend', label: 'Frontend' },
+    { value: 'backend', label: 'Backend' },
+    { value: 'devops', label: 'DevOps' },
+    { value: 'design', label: 'Design' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="tags"
+    maxTagCount={2}
+    defaultValue={['frontend', 'backend', 'devops', 'design']}
+    items={[
+      { value: 'frontend', label: 'Frontend' },
+      { value: 'backend', label: 'Backend' },
+      { value: 'devops', label: 'DevOps' },
+      { value: 'design', label: 'Design' },
+    ]}
+  />
+</LiveDemo>
+
+### `maxTagCount={Infinity}` — wrap to multiple lines
+
+Disable the cap entirely. Chips wrap to a second / third line and the
+trigger grows vertically — make sure the surrounding layout can absorb a
+growing field height before opting in.
+
+<LiveDemo code={`<MultiSelect
+  aria-label="tags"
+  isFullWidth
+  maxTagCount={Infinity}
+  defaultValue={['frontend', 'backend', 'devops', 'design', 'qa', 'ai', 'pm']}
+  items={[
+    { value: 'frontend', label: 'Frontend' },
+    { value: 'backend', label: 'Backend' },
+    { value: 'devops', label: 'DevOps' },
+    { value: 'design', label: 'Design' },
+    { value: 'qa', label: 'QA' },
+    { value: 'ai', label: 'AI / ML' },
+    { value: 'pm', label: 'Product Management' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="tags"
+    isFullWidth
+    maxTagCount={Infinity}
+    defaultValue={['frontend', 'backend', 'devops', 'design', 'qa', 'ai', 'pm']}
+    items={[
+      { value: 'frontend', label: 'Frontend' },
+      { value: 'backend', label: 'Backend' },
+      { value: 'devops', label: 'DevOps' },
+      { value: 'design', label: 'Design' },
+      { value: 'qa', label: 'QA' },
+      { value: 'ai', label: 'AI / ML' },
+      { value: 'pm', label: 'Product Management' },
+    ]}
+  />
+</LiveDemo>
+
+## Searchable
+
+`isSearchable` mounts a search input at the top of the popover and filters
+items by case-insensitive substring match on `label`. Recommended for any
+list with more than ~7 items.
+
+<LiveDemo code={`<MultiSelect
+  isSearchable
+  aria-label="country"
+  placeholder="Pick countries…"
+  searchPlaceholder="Search country…"
+  isFullWidth
+  items={[
+    { value: 'cn', label: 'China' },
+    { value: 'us', label: 'United States' },
+    { value: 'jp', label: 'Japan' },
+    { value: 'kr', label: 'South Korea' },
+    { value: 'de', label: 'Germany' },
+    { value: 'fr', label: 'France' },
+    { value: 'gb', label: 'United Kingdom' },
+    { value: 'it', label: 'Italy' },
+    { value: 'es', label: 'Spain' },
+    { value: 'br', label: 'Brazil' },
+    { value: 'in', label: 'India' },
+    { value: 'ru', label: 'Russia' },
+  ]}
+/>`}>
+  <MultiSelect
+    isSearchable
+    aria-label="country"
+    placeholder="Pick countries…"
+    searchPlaceholder="Search country…"
+    isFullWidth
+    items={[
+      { value: 'cn', label: 'China' },
+      { value: 'us', label: 'United States' },
+      { value: 'jp', label: 'Japan' },
+      { value: 'kr', label: 'South Korea' },
+      { value: 'de', label: 'Germany' },
+      { value: 'fr', label: 'France' },
+      { value: 'gb', label: 'United Kingdom' },
+      { value: 'it', label: 'Italy' },
+      { value: 'es', label: 'Spain' },
+      { value: 'br', label: 'Brazil' },
+      { value: 'in', label: 'India' },
+      { value: 'ru', label: 'Russia' },
+    ]}
+  />
+</LiveDemo>
+
+### Custom `filterOption`
+
+Override the default substring filter with any predicate — useful for
+acronym matching, fuzzy search, value-based search, etc.
+
+<LiveDemo code={`<MultiSelect
+  isSearchable
+  aria-label="country"
+  placeholder="Try typing 'us' or 'jp'…"
+  searchPlaceholder="Match by value or label…"
+  isFullWidth
+  filterOption={(input, item) => {
+    const needle = input.toLowerCase();
+    const label = typeof item.label === 'string' ? item.label.toLowerCase() : '';
+    return item.value.toLowerCase().includes(needle) || label.includes(needle);
+  }}
+  items={[
+    { value: 'cn', label: 'China' },
+    { value: 'us', label: 'United States' },
+    { value: 'jp', label: 'Japan' },
+    { value: 'kr', label: 'South Korea' },
+    { value: 'de', label: 'Germany' },
+    { value: 'fr', label: 'France' },
+  ]}
+/>`}>
+  <MultiSelect
+    isSearchable
+    aria-label="country"
+    placeholder="Try typing 'us' or 'jp'…"
+    searchPlaceholder="Match by value or label…"
+    isFullWidth
+    items={[
+      { value: 'cn', label: 'China' },
+      { value: 'us', label: 'United States' },
+      { value: 'jp', label: 'Japan' },
+      { value: 'kr', label: 'South Korea' },
+      { value: 'de', label: 'Germany' },
+      { value: 'fr', label: 'France' },
+    ]}
+  />
+</LiveDemo>
+
+## Grouped options
+
+Use `<MultiSelectOptGroup>` to label semantic groups — group headings render
+as `role="presentation"` containers and are **not** counted as options. You
+can also pass a flat `items` array where each item carries a `group: string`
+field; items with the same `group` value land in the same section.
+
+<LiveDemo code={`<MultiSelect
+  aria-label="city"
+  placeholder="Pick cities…"
+  isFullWidth
+  defaultValue={['shanghai']}
+>
+  <MultiSelectOptGroup label="China">
+    <MultiSelectOption value="beijing">Beijing</MultiSelectOption>
+    <MultiSelectOption value="shanghai">Shanghai</MultiSelectOption>
+    <MultiSelectOption value="shenzhen">Shenzhen</MultiSelectOption>
+  </MultiSelectOptGroup>
+  <MultiSelectOptGroup label="Japan">
+    <MultiSelectOption value="tokyo">Tokyo</MultiSelectOption>
+    <MultiSelectOption value="osaka">Osaka</MultiSelectOption>
+  </MultiSelectOptGroup>
+  <MultiSelectOptGroup label="USA">
+    <MultiSelectOption value="nyc">New York</MultiSelectOption>
+    <MultiSelectOption value="sf">San Francisco</MultiSelectOption>
+    <MultiSelectOption value="la" isDisabled>Los Angeles (full)</MultiSelectOption>
+  </MultiSelectOptGroup>
+</MultiSelect>`}>
+  <MultiSelect
+    aria-label="city"
+    placeholder="Pick cities…"
+    isFullWidth
+    defaultValue={['shanghai']}
+  >
+    <MultiSelectOptGroup label="China">
+      <MultiSelectOption value="beijing">Beijing</MultiSelectOption>
+      <MultiSelectOption value="shanghai">Shanghai</MultiSelectOption>
+      <MultiSelectOption value="shenzhen">Shenzhen</MultiSelectOption>
+    </MultiSelectOptGroup>
+    <MultiSelectOptGroup label="Japan">
+      <MultiSelectOption value="tokyo">Tokyo</MultiSelectOption>
+      <MultiSelectOption value="osaka">Osaka</MultiSelectOption>
+    </MultiSelectOptGroup>
+    <MultiSelectOptGroup label="USA">
+      <MultiSelectOption value="nyc">New York</MultiSelectOption>
+      <MultiSelectOption value="sf">San Francisco</MultiSelectOption>
+      <MultiSelectOption value="la" isDisabled>Los Angeles (full)</MultiSelectOption>
+    </MultiSelectOptGroup>
+  </MultiSelect>
+</LiveDemo>
+
+## Toolbar — Select all / Clear
+
+`showSelectAllInToolbar` mounts a thin toolbar above the listbox showing
+`Selected N / M` plus a single text button. The button toggles between
+**Select all** (when not all visible items are selected) and **Clear**
+(when they are). The Clear here only removes *visible* items — to wipe
+*everything* (including items hidden by search / `hideSelectedInList`),
+prefer the trigger-side `isClearable` × button.
+
+<LiveDemo code={`<MultiSelect
+  aria-label="permission"
+  showSelectAllInToolbar
+  isSearchable
+  placeholder="Pick permissions…"
+  isFullWidth
+  items={[
+    { value: 'read', label: 'Read' },
+    { value: 'write', label: 'Write' },
+    { value: 'delete', label: 'Delete' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'audit', label: 'Audit' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="permission"
+    showSelectAllInToolbar
+    isSearchable
+    placeholder="Pick permissions…"
+    isFullWidth
+    items={[
+      { value: 'read', label: 'Read' },
+      { value: 'write', label: 'Write' },
+      { value: 'delete', label: 'Delete' },
+      { value: 'admin', label: 'Admin' },
+      { value: 'audit', label: 'Audit' },
+    ]}
+  />
+</LiveDemo>
+
+## Clearable
+
+`isClearable` shows an × button on the right side of the trigger when
+`value.length > 0`. Click it (or press `Esc` if `clearOnEsc` is enabled) to
+wipe the selection. The clear button is **not** in the Tab sequence
+(`tabIndex={-1}`) — the trigger stays the only Tab stop, just like
+`Input.isClearable`.
+
+<LiveDemo code={`<MultiSelect
+  aria-label="fruit"
+  isClearable
+  defaultValue={['a', 'b']}
+  items={[
+    { value: 'a', label: 'Apple' },
+    { value: 'b', label: 'Banana' },
+    { value: 'c', label: 'Cherry' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="fruit"
+    isClearable
+    defaultValue={['a', 'b']}
+    items={[
+      { value: 'a', label: 'Apple' },
+      { value: 'b', label: 'Banana' },
+      { value: 'c', label: 'Cherry' },
+    ]}
+  />
+</LiveDemo>
+
+## Disabled / read-only / loading
+
+`isDisabled` greys out the trigger and blocks all interaction (including
+chip removal and keyboard). `isReadOnly` keeps the popover openable and
+keyboard-navigable but rejects every value change — useful when you want
+users to *inspect* the current selection but not edit it. `isLoading`
+replaces the listbox area with a `role="status"` placeholder.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <MultiSelect
+    aria-label="disabled"
+    isDisabled
+    defaultValue={['a']}
+    items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]}
+  />
+  <MultiSelect
+    aria-label="readonly"
+    isReadOnly
+    defaultValue={['a']}
+    items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]}
+  />
+  <MultiSelect
+    aria-label="loading"
+    isLoading
+    loadingMessage="Loading options…"
+    placeholder="Click to open…"
+    items={[{ value: 'a', label: 'Apple' }]}
+  />
+</Stack>`}>
+  <Stack spacing={12}>
+    <MultiSelect
+      aria-label="disabled"
+      isDisabled
+      defaultValue={['a']}
+      items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]}
+    />
+    <MultiSelect
+      aria-label="readonly"
+      isReadOnly
+      defaultValue={['a']}
+      items={[{ value: 'a', label: 'Apple' }, { value: 'b', label: 'Banana' }]}
+    />
+    <MultiSelect
+      aria-label="loading"
+      isLoading
+      loadingMessage="Loading options…"
+      placeholder="Click to open…"
+      items={[{ value: 'a', label: 'Apple' }]}
+    />
+  </Stack>
+</LiveDemo>
+
+## Validation states
+
+When wrapped in a [`FormField`](./form-field) (any of `label` /
+`description` / `errorMessage` triggers the wrapper automatically), the
+trigger inherits `aria-invalid`, `aria-describedby` and the danger color
+ramp. Use `errorMessage` for the **error** state and `color="warning"` for
+soft, non-blocking hints.
+
+<LiveDemo code={`<Stack spacing={16}>
+  <MultiSelect
+    label="Tags (error)"
+    errorMessage="Pick at least one tag."
+    placeholder="No tags yet…"
+    items={[
+      { value: 'a', label: 'Tag A' },
+      { value: 'b', label: 'Tag B' },
+    ]}
+    isFullWidth
+  />
+  <MultiSelect
+    label="Tags (warning)"
+    color="warning"
+    description="Heads-up: only the first three tags are indexed."
+    defaultValue={['a', 'b', 'c', 'd']}
+    items={[
+      { value: 'a', label: 'A' },
+      { value: 'b', label: 'B' },
+      { value: 'c', label: 'C' },
+      { value: 'd', label: 'D' },
+    ]}
+    isFullWidth
+  />
+</Stack>`}>
+  <Stack spacing={16}>
+    <MultiSelect
+      label="Tags (error)"
+      errorMessage="Pick at least one tag."
+      placeholder="No tags yet…"
+      items={[
+        { value: 'a', label: 'Tag A' },
+        { value: 'b', label: 'Tag B' },
+      ]}
+      isFullWidth
+    />
+    <MultiSelect
+      label="Tags (warning)"
+      color="warning"
+      description="Heads-up: only the first three tags are indexed."
+      defaultValue={['a', 'b', 'c', 'd']}
+      items={[
+        { value: 'a', label: 'A' },
+        { value: 'b', label: 'B' },
+        { value: 'c', label: 'C' },
+        { value: 'd', label: 'D' },
+      ]}
+      isFullWidth
+    />
+  </Stack>
+</LiveDemo>
+
+## Sizes
+
+Five sizes — `xs` / `sm` / `md` / `lg` / `xl` — share one ramp with
+[`Input`](./input), [`Select`](./select) and [`Button`](./button). Chip size
+is mapped from trigger size so chips stay clearly inside the trigger
+height (e.g. trigger `lg` → chip `md`).
+
+<LiveDemo code={`<Stack spacing={12}>
+  <MultiSelect size="xs" placeholder="XS" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="xs" />
+  <MultiSelect size="sm" placeholder="Small" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="sm" />
+  <MultiSelect size="md" placeholder="Medium" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="md" />
+  <MultiSelect size="lg" placeholder="Large" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="lg" />
+  <MultiSelect size="xl" placeholder="XL" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="xl" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <MultiSelect size="xs" placeholder="XS" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="xs" />
+    <MultiSelect size="sm" placeholder="Small" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="sm" />
+    <MultiSelect size="md" placeholder="Medium" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="md" />
+    <MultiSelect size="lg" placeholder="Large" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="lg" />
+    <MultiSelect size="xl" placeholder="XL" items={[{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]} defaultValue={['a']} aria-label="xl" />
+  </Stack>
+</LiveDemo>
+
+## Uncontrolled vs controlled
+
+Pass `defaultValue` for an uncontrolled component (the parent stays
+hands-off and reads the latest value from `onChange` if interested):
+
+<LiveDemo code={`<MultiSelect
+  aria-label="uncontrolled"
+  defaultValue={['a']}
+  onChange={(v) => console.log('next value:', v)}
+  items={[
+    { value: 'a', label: 'Apple' },
+    { value: 'b', label: 'Banana' },
+    { value: 'c', label: 'Cherry' },
+  ]}
+/>`}>
+  <MultiSelect
+    aria-label="uncontrolled"
+    defaultValue={['a']}
+    items={[
+      { value: 'a', label: 'Apple' },
+      { value: 'b', label: 'Banana' },
+      { value: 'c', label: 'Cherry' },
+    ]}
+  />
+</LiveDemo>
+
+Pass `value` + `onChange` for controlled — the parent fully owns state and
+can intercept / sort / cap the array before passing it back down:
+
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
+import { MultiSelect, Stack } from '@timeui/react';
+
+const FRAMEWORKS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', isDisabled: true },
+];
+
+export function ControlledFrameworks() {
+  const [value, setValue] = useState(['react']);
+  return (
+    <Stack spacing={12}>
+      <MultiSelect
+        aria-label="frameworks"
+        value={value}
+        onChange={setValue}
+        showSelectAllInToolbar
+        items={FRAMEWORKS}
+        isFullWidth
+      />
+      <pre>value = {JSON.stringify(value)}</pre>
+    </Stack>
+  );
+}`}>
+  <MultiSelectControlledDemo />
+</LiveDemo>
+
+## Native form integration
+
+Pass a `name` prop and `MultiSelect` will emit one `<input type="hidden">`
+per selected value, so `FormData` on the surrounding `<form>` carries the
+selection without any glue code.
+
+<LiveDemo code={`<form
+  onSubmit={(e) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    alert('fruits = ' + JSON.stringify(fd.getAll('fruits')));
+  }}
+>
+  <Stack spacing={12}>
+    <MultiSelect
+      label="Fruits"
+      name="fruits"
+      defaultValue={['a', 'b']}
+      items={[
+        { value: 'a', label: 'Apple' },
+        { value: 'b', label: 'Banana' },
+        { value: 'c', label: 'Cherry' },
+      ]}
+      isFullWidth
+    />
+    <Button type="submit">Submit</Button>
+  </Stack>
+</form>`}>
+  <Stack spacing={12}>
+    <MultiSelect
+      label="Fruits"
+      name="fruits"
+      defaultValue={['a', 'b']}
+      items={[
+        { value: 'a', label: 'Apple' },
+        { value: 'b', label: 'Banana' },
+        { value: 'c', label: 'Cherry' },
+      ]}
+      isFullWidth
+    />
+    <Button type="submit">Submit</Button>
+  </Stack>
+</LiveDemo>
+
+## Design note: why is the checkbox on the **left**?
+
+In `Select` the chosen item shows a `✓` on the **right** because there is
+exactly one selected row at any time — putting the indicator on the right
+balances the row visually. Multi-select inverts that: every row could be
+selected, every row needs an indicator. Aligning indicators to the **left
+edge** lets the user scan a single column to read selection state at a
+glance. This matches the established practice in W3C APG Listbox examples
+and every major multi-select library (Ant Design, MUI, NextUI). It is an
+intentional divergence from `Select`, not an inconsistency.
+
+## API
+
+### MultiSelect
+
+<PropsTable props={[
+  { name: 'value', type: 'string[]', description: 'Controlled value (array of selected option values).' },
+  { name: 'defaultValue', type: 'string[]', default: '[]', description: 'Uncontrolled initial value.' },
+  { name: 'onChange', type: '(value: string[]) => void', description: 'Fires with the new array (deduped) on every change.' },
+  { name: 'items', type: 'MultiSelectItem[]', description: 'Declarative options; mutually exclusive with children (items wins).' },
+  { name: 'children', type: 'ReactNode', description: '`<MultiSelectOption>` / `<MultiSelectOptGroup>` nodes; only their props are read at runtime.' },
+  { name: 'placeholder', type: 'string', description: 'Shown in the trigger when nothing is selected.' },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: 'Visual recipe — shared with Input / Select.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Semantic color; forced to `danger` when invalid.' },
+  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset.' },
+  { name: 'radius', type: "'sm' | 'md' | 'lg' | 'full'", description: 'Corner radius. Defaults to a size-driven mapping.' },
+  { name: 'isFullWidth', type: 'boolean', default: 'false', description: 'Expand the trigger to 100% width.' },
+  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Disables the whole component.' },
+  { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Popover opens but value cannot change.' },
+  { name: 'isInvalid', type: 'boolean', description: 'Explicit invalid override; auto-derived from `errorMessage`.' },
+  { name: 'isRequired', type: 'boolean', default: 'false', description: 'FormField shows `*`; trigger sets `aria-required`.' },
+  { name: 'isLoading', type: 'boolean', default: 'false', description: 'Replace the list area with a `role="status"` placeholder.' },
+  { name: 'isSearchable', type: 'boolean', default: 'false', description: 'Render a search input above the listbox.' },
+  { name: 'searchPlaceholder', type: 'string', description: 'Placeholder for the search input.' },
+  { name: 'filterOption', type: '(input: string, item: MultiSelectItem) => boolean', description: 'Custom filter; defaults to case-insensitive substring on label.' },
+  { name: 'emptyMessage', type: 'ReactNode', description: 'Shown when the filter matches zero items.' },
+  { name: 'loadingMessage', type: 'ReactNode', description: 'Shown when `isLoading=true`.' },
+  { name: 'isClearable', type: 'boolean', default: 'false', description: 'Show a Clear × button on the trigger when value is non-empty.' },
+  { name: 'clearButtonTabIndex', type: 'number', default: '-1', description: 'Tab index of the Clear button. The trigger is the only Tab stop by default.' },
+  { name: 'clearOnEsc', type: 'boolean', default: 'false', description: 'Pressing Esc on a closed trigger clears the selection.' },
+  { name: 'onClear', type: '() => void', description: 'Fires after the Clear × button empties the value.' },
+  { name: 'closeOnSelect', type: 'boolean', default: 'false', description: 'Close the popover on every selection (rarely useful for multi-select).' },
+  { name: 'maxSelectedCount', type: 'number', default: 'Infinity', description: 'Cap the number of selectable values; over-cap rows render as aria-disabled.' },
+  { name: 'maxTagCount', type: "number | 'responsive'", default: "'responsive'", description: 'How many chips to show in the trigger; the rest fold into a `+N` chip.' },
+  { name: 'showSelectAllInToolbar', type: 'boolean', default: 'false', description: 'Render the Select all / Clear toolbar at the top of the popover.' },
+  { name: 'hideSelectedInList', type: 'boolean', default: 'false', description: 'Hide already-selected items from the list (uncommon).' },
+  { name: 'tagRender', type: '(item, opts) => ReactNode', description: 'Custom chip renderer; receives `{ onRemove, isDisabled }`.' },
+  { name: 'optionRender', type: '(item, opts) => ReactNode', description: 'Custom option content (the `<li role="option">` shell is provided).' },
+  { name: 'startContent', type: 'ReactNode', description: 'Left slot inside the trigger (icon).' },
+  { name: 'endContent', type: 'ReactNode', description: 'Right slot inside the trigger.' },
+  { name: 'maxListHeight', type: 'number | string', default: '280', description: 'Max height of the scrollable option list.' },
+  { name: 'placement', type: "'auto' | 'bottom' | 'top'", default: "'auto'", description: 'Popover placement; `auto` flips when there is not enough room below.' },
+  { name: 'label', type: 'ReactNode', description: 'Field title; triggers implicit FormField wrapping.' },
+  { name: 'description', type: 'ReactNode', description: 'Helper text rendered by FormField.' },
+  { name: 'errorMessage', type: 'ReactNode', description: 'Error text; triggers `isInvalid`.' },
+  { name: 'name', type: 'string', description: 'Renders one hidden `<input>` per selected value for native form submission.' }
+]} />
+
+### MultiSelectItem
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: 'Option value.' },
+  { name: 'label', type: 'ReactNode', required: true, description: 'Option content; its text form is used for search matching.' },
+  { name: 'isDisabled', type: 'boolean', description: 'Disable this option.' },
+  { name: 'description', type: 'ReactNode', description: 'Secondary text rendered below the label.' },
+  { name: 'group', type: 'string', description: 'Items sharing the same `group` value render under a single heading.' }
+]} />
+
+### MultiSelectOption
+
+<PropsTable props={[
+  { name: 'value', type: 'string', required: true, description: 'Option value.' },
+  { name: 'children', type: 'ReactNode', description: 'Option content.' },
+  { name: 'isDisabled', type: 'boolean', description: 'Disable this option.' },
+  { name: 'description', type: 'ReactNode', description: 'Secondary text rendered below the label.' }
+]} />
+
+### MultiSelectOptGroup
+
+<PropsTable props={[
+  { name: 'label', type: 'ReactNode', required: true, description: 'Group heading text.' },
+  { name: 'children', type: 'ReactNode', description: '`<MultiSelectOption>` nodes that belong to the group.' }
+]} />
+
+<Callout variant="info" title="Accessibility">
+  The trigger is `role="combobox"` + `aria-haspopup="listbox"` +
+  `aria-expanded` + `aria-controls`; the popover is `role="listbox"` with
+  `aria-multiselectable="true"`; options are `role="option"` with
+  `aria-selected` / `aria-disabled` and a stable id targeted by
+  `aria-activedescendant`. Group headings are `role="group"` containers
+  with their own `aria-labelledby`.
+
+  Keyboard:
+  - **`↑` / `↓`** moves the highlight (skips disabled options)
+  - **`Home` / `End`** jumps to the first / last enabled option
+  - **`Enter` / `Space`** toggles the highlighted option's selection
+  - **`Esc`** closes the popover and returns focus to the trigger; on a
+    closed trigger with `clearOnEsc`, it clears the value
+  - **`Backspace`** on the trigger (or in an empty searchbox) removes the
+    last selected chip
+  - **Type-ahead** — typing printable characters within an 800 ms window
+    builds a prefix and highlights the first matching label
+  - **`Tab`** closes the popover and lets the browser take focus
+
+  All transitions and animations honor `prefers-reduced-motion: reduce`.
+</Callout>
