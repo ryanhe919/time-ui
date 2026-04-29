@@ -1,5 +1,11 @@
 # @timeui/react
 
+## 2.0.6
+
+### Patch Changes
+
+- 58f8613: Fix Select popover interaction near page edges so right-aligned Pagination page-size menus stay selectable.
+
 ## 2.0.5
 
 ### Patch Changes
