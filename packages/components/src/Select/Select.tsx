@@ -272,6 +272,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       if (!trigger) return;
       const r = trigger.getBoundingClientRect();
       const vh = window.innerHeight;
+      const vw = window.innerWidth;
       const gap = 6; // 与 trigger 之间的间距
       const safeMargin = 8; // 距视口边缘的安全留白
       const userMaxPx = typeof maxListHeight === 'number' ? maxListHeight : 280;
@@ -285,10 +286,19 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
 
       const maxHeight = Math.max(120, placement === 'bottom' ? availableBelow : availableAbove);
 
+      // 水平 clamp：dropdown 用 minWidth: r.width 兜底，但实际渲染宽度可能更大（长选项 /
+      // 搜索过滤会变化）。优先用 popoverRef 实测宽度；首次渲染 popover 还未挂载时回退到
+      // r.width，挂载后由下方 ResizeObserver 触发再次 updateRect 修正。
+      const popoverEl = popoverRef.current;
+      const measuredWidth = popoverEl ? popoverEl.getBoundingClientRect().width : 0;
+      const dropWidth = Math.max(r.width, measuredWidth);
+      const overflowsRight = r.left + dropWidth + safeMargin > vw;
+      const left = overflowsRight ? Math.max(safeMargin, vw - dropWidth - safeMargin) : r.left;
+
       setPopoverRect({
         placement,
         offset: placement === 'bottom' ? r.bottom : vh - r.top,
-        left: r.left,
+        left,
         width: r.width,
         maxHeight,
       });
@@ -296,9 +306,26 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     updateRect();
     window.addEventListener('scroll', updateRect, true);
     window.addEventListener('resize', updateRect);
+
+    // popover 在初次 setPopoverRect 触发的 commit 之后才挂载，rAF 推迟一帧确保
+    // popoverRef.current 已就绪；之后监听其尺寸变化（长选项渲染 / 搜索过滤）以重算 left。
+    let ro: ResizeObserver | null = null;
+    let rafId: number | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (popoverRef.current) {
+          ro = new ResizeObserver(() => updateRect());
+          ro.observe(popoverRef.current);
+        }
+      });
+    }
+
     return () => {
       window.removeEventListener('scroll', updateRect, true);
       window.removeEventListener('resize', updateRect);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      ro?.disconnect();
     };
   }, [open, maxListHeight]);
 
