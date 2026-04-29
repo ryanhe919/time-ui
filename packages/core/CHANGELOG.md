@@ -1,5 +1,13 @@
 # @timeui/core
 
+## 1.5.2
+
+### Patch Changes
+
+- Updated dependencies [7ee2011]
+  - @timeui/tokens@1.5.2
+  - @timeui/themes@1.2.5
+
 ## 1.5.1
 
 ### Patch Changes
