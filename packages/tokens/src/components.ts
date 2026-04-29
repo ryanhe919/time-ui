@@ -410,37 +410,39 @@ export const paginationSizes = {
     fontSize: '11px',
     gap: '3px',
     radius: '6px',
+    jumperWidth: '44px',
   },
   sm: {
     itemSize: '28px',
     fontSize: '12px',
     gap: '4px',
     radius: '8px',
+    jumperWidth: '52px',
   },
   md: {
     itemSize: '40px',
     fontSize: '14px',
     gap: '6px',
     radius: '12px',
+    jumperWidth: '64px',
   },
   lg: {
     itemSize: '48px',
     fontSize: '16px',
     gap: '8px',
     radius: '14px',
+    jumperWidth: '72px',
   },
   xl: {
     itemSize: '56px',
     fontSize: '18px',
     gap: '10px',
     radius: '16px',
+    jumperWidth: '80px',
   },
 } as const;
 
 export const paginationTokens = {
-  jumperWidth: '56px',
-  jumperHeight: '40px',
-  jumperRadius: '12px',
   sizeSelectorMinWidth: '88px',
   itemBorder: '1px',
   hoverDuration: '120ms',

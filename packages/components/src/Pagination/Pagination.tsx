@@ -21,6 +21,7 @@ import {
 import { useTheme, css, type Theme } from '@emotion/react';
 import { useI18n } from '@timeui/core';
 import { useControllableState } from '../utils';
+import { Input } from '../Input';
 import { Select } from '../Select';
 import { SelectOption } from '../Select/SelectOption';
 import type { PaginationItem, PaginationProps, PaginationSize } from './Pagination.types';
@@ -31,15 +32,20 @@ const formatTemplate = (template: string, params: Record<string, string | number
 /**
  * 生成页码列表（含 ellipsis 占位）。
  *
- * 算法：
- *   左边界 = max(2, page - siblingCount)
- *   右边界 = min(totalPages - 1, page + siblingCount)
- *   首页与末页恒在；左右与首页/末页之间若间隔 > 1 用 ellipsis 占位，
- *   若仅相邻则不插省略号（避免 "1 ... 2 3" 形式）。
+ * 设计目标：可见 slot 数恒定 = `2 * siblingCount + 5`
+ *   组成：首页 + 末页 + 当前页 + 左右各 siblingCount + 至多两个 ellipsis 占位
+ *   即便靠近边缘（page=1 或 page=totalPages），也展开同侧的连续页码窗口，
+ *   避免「最后一页只能看到 N-1 / N 这两项」之类的死角，让用户在任何位置
+ *   都能一击点到附近的页码。
  *
- * 边界情况：
+ * 三段式分支：
+ *   - isNearStart  → [1 .. (2s+3)] … last
+ *   - isNearEnd    → 1 … [(last-2s-2) .. last]
+ *   - 居中          → 1 … [p-s .. p+s] … last
+ *
+ * 边界：
  *   - totalPages <= 1：返回 [{ page: 1 }]
- *   - 总页数较少（<= 1 + siblingCount*2 + 4）：直接返回完整序列，不折叠
+ *   - totalPages <= 2s+5：直接返回完整序列，不折叠
  */
 export function buildPaginationItems(
   totalPages: number,
@@ -53,10 +59,8 @@ export function buildPaginationItems(
     return [{ type: 'page', page: 1 }];
   }
 
-  // 阈值：首+末+当前+左右 sibling+两个 ellipsis 占位 → 5 + 2*sibling
-  // 当总页数 <= 阈值，整段直出，没必要折叠。
-  const threshold = 5 + safeSibling * 2;
-  if (safeTotal <= threshold) {
+  const totalSlots = 2 * safeSibling + 5;
+  if (safeTotal <= totalSlots) {
     return Array.from({ length: safeTotal }, (_, i) => ({
       type: 'page' as const,
       page: i + 1,
@@ -64,26 +68,37 @@ export function buildPaginationItems(
   }
 
   const safePage = Math.min(Math.max(1, page), safeTotal);
-  const left = Math.max(2, safePage - safeSibling);
-  const right = Math.min(safeTotal - 1, safePage + safeSibling);
+  // 贴边时同侧连续段的页数：当前页 + 2*sibling + 2 个补位
+  const edgeRunLength = 2 * safeSibling + 3;
+  const isNearStart = safePage <= safeSibling + 3;
+  const isNearEnd = safePage >= safeTotal - safeSibling - 2;
 
   const items: PaginationItem[] = [];
-  items.push({ type: 'page', page: 1 });
 
-  // 头部：left 与 2 之间是否需要省略
-  if (left > 2) {
-    items.push({ type: 'ellipsis', key: 'ellipsis-start' });
+  if (isNearStart) {
+    for (let p = 1; p <= edgeRunLength; p += 1) {
+      items.push({ type: 'page', page: p });
+    }
+    items.push({ type: 'ellipsis', key: 'ellipsis-end' });
+    items.push({ type: 'page', page: safeTotal });
+    return items;
   }
 
-  for (let p = left; p <= right; p += 1) {
+  if (isNearEnd) {
+    items.push({ type: 'page', page: 1 });
+    items.push({ type: 'ellipsis', key: 'ellipsis-start' });
+    for (let p = safeTotal - edgeRunLength + 1; p <= safeTotal; p += 1) {
+      items.push({ type: 'page', page: p });
+    }
+    return items;
+  }
+
+  items.push({ type: 'page', page: 1 });
+  items.push({ type: 'ellipsis', key: 'ellipsis-start' });
+  for (let p = safePage - safeSibling; p <= safePage + safeSibling; p += 1) {
     items.push({ type: 'page', page: p });
   }
-
-  // 尾部：right 与 totalPages-1 之间是否需要省略
-  if (right < safeTotal - 1) {
-    items.push({ type: 'ellipsis', key: 'ellipsis-end' });
-  }
-
+  items.push({ type: 'ellipsis', key: 'ellipsis-end' });
   items.push({ type: 'page', page: safeTotal });
   return items;
 }
@@ -366,43 +381,9 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
     color: ${theme.colors.text.secondary};
   `;
 
-  const jumperInputCss = css`
-    box-sizing: border-box;
-    width: ${tokens.jumperWidth};
-    height: ${tokens.jumperHeight};
-    padding: 0 8px;
-    border: ${tokens.itemBorder} solid ${theme.colors.border.default};
-    border-radius: ${tokens.jumperRadius};
-    background: ${theme.colors.bg.surface ?? theme.colors.bg.canvas};
-    color: ${theme.colors.text.primary};
-    font: inherit;
-    font-size: ${sizeTokens.fontSize};
-    line-height: 1;
-    text-align: center;
-    appearance: textfield;
-    outline: none;
-    transition: border-color ${tokens.hoverDuration} ease;
-
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    &:focus-visible {
-      outline: 2px solid ${theme.colors.border.focus ?? theme.colors.focus};
-      outline-offset: 2px;
-    }
-
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      transition: none;
-    }
-  `;
+  const jumperInputStyle: CSSProperties = {
+    width: sizeTokens.jumperWidth,
+  };
 
   const sizeSelectorCss: CSSProperties = {
     minWidth: tokens.sizeSelectorMinWidth,
@@ -502,18 +483,19 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
     return (
       <span css={jumperWrapCss} data-slot="jumper">
         <label htmlFor={`${id}-jumper`}>{jumperLabel}</label>
-        <input
+        <Input
           id={`${id}-jumper`}
           type="number"
           inputMode="numeric"
+          size={size}
           min={1}
           max={totalPages}
           value={jumperValue}
-          onChange={(e) => setJumperValue(e.target.value)}
+          onChange={setJumperValue}
           onKeyDown={handleJumperKeyDown}
-          disabled={isDisabled}
+          isDisabled={isDisabled}
           aria-label={jumperLabel}
-          css={jumperInputCss}
+          style={jumperInputStyle}
         />
       </span>
     );
@@ -525,7 +507,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
       <span data-slot="size-changer" style={{ display: 'inline-flex' }}>
         <Select
           aria-label={sizeChangerLabel}
-          size={size === 'lg' ? 'lg' : size === 'md' ? 'md' : 'sm'}
+          size={size}
           value={String(safePageSize)}
           onChange={handlePageSizeChange}
           isDisabled={isDisabled}
