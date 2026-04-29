@@ -389,6 +389,76 @@ describe('Select', () => {
       expect(popover!.style.bottom).toBe('');
     });
 
+    it('clamps popover left when the trigger sits near the viewport right edge', async () => {
+      // 模拟 trigger 贴近视口右边的真实情况（例：Pagination size-changer 在 flex justify-end）：
+      // viewport=1024, trigger.left=950, width=80 → r.left+r.width=1030 > 1024，
+      // 触发右侧 clamp，左移到 max(8, 1024-80-8)=936，避免 dropdown 越过视口被裁。
+      const originalGetRect = Element.prototype.getBoundingClientRect;
+      const originalInnerWidth = window.innerWidth;
+      Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+      Element.prototype.getBoundingClientRect = vi.fn(() => ({
+        x: 950,
+        y: 100,
+        top: 100,
+        bottom: 120,
+        left: 950,
+        right: 1030,
+        width: 80,
+        height: 20,
+        toJSON: () => ({}),
+      })) as unknown as typeof Element.prototype.getBoundingClientRect;
+      try {
+        renderWithProviders(<Select aria-label="size" items={ITEMS} />);
+        await userEvent.click(screen.getByRole('combobox'));
+        const listbox = await screen.findByRole('listbox');
+        const popover = listbox.closest('[data-timeui-select-popover]') as HTMLElement | null;
+        expect(popover).not.toBeNull();
+        const leftPx = parseFloat(popover!.style.left);
+        // 不能越过视口右边（dropWidth=80, safeMargin=8 → 上限 1024-80-8=936）
+        expect(leftPx).toBeLessThanOrEqual(1024 - 80 - 8);
+        // 也不能跑出左边
+        expect(leftPx).toBeGreaterThanOrEqual(8);
+      } finally {
+        Element.prototype.getBoundingClientRect = originalGetRect;
+        Object.defineProperty(window, 'innerWidth', {
+          value: originalInnerWidth,
+          configurable: true,
+        });
+      }
+    });
+
+    it('keeps popover left aligned with trigger when there is room on the right', async () => {
+      const originalGetRect = Element.prototype.getBoundingClientRect;
+      const originalInnerWidth = window.innerWidth;
+      Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+      Element.prototype.getBoundingClientRect = vi.fn(() => ({
+        x: 100,
+        y: 100,
+        top: 100,
+        bottom: 120,
+        left: 100,
+        right: 200,
+        width: 100,
+        height: 20,
+        toJSON: () => ({}),
+      })) as unknown as typeof Element.prototype.getBoundingClientRect;
+      try {
+        renderWithProviders(<Select aria-label="fruit" items={ITEMS} />);
+        await userEvent.click(screen.getByRole('combobox'));
+        const listbox = await screen.findByRole('listbox');
+        const popover = listbox.closest('[data-timeui-select-popover]') as HTMLElement | null;
+        expect(popover).not.toBeNull();
+        // 100 + 100 + 8 = 208 ≤ 1024，没有 overflow，保持 r.left
+        expect(parseFloat(popover!.style.left)).toBe(100);
+      } finally {
+        Element.prototype.getBoundingClientRect = originalGetRect;
+        Object.defineProperty(window, 'innerWidth', {
+          value: originalInnerWidth,
+          configurable: true,
+        });
+      }
+    });
+
     it('flips to top placement when the trigger sits near the viewport bottom', async () => {
       // 模拟 trigger 贴近视口底部的真实情况：viewport=600, trigger.bottom=590
       // → availableBelow=600-590-6-8=−4 → 0；availableAbove=570-6-8=556 → flip top。
