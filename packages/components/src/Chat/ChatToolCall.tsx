@@ -119,9 +119,13 @@ export const ChatToolCall = forwardRef<HTMLDivElement, ChatToolCallProps>(functi
     cursor: ${isCollapsible ? 'pointer' : 'default'};
     border-radius: ${tokens.toolCardRadius};
     font: inherit;
+    /* Y4：focus 时让整张卡片高亮（外凸 ring），不再用 inset outline——
+       与 ChatActionButton / ChatSendButton / ChatKnowledgeRefs 的标准一致。 */
     &:focus-visible {
-      outline: 2px solid ${theme.colors.border.focus ?? theme.colors.focus};
-      outline-offset: -2px;
+      outline: none;
+    }
+    &:focus-visible ~ * {
+      /* placeholder：实际 ring 在 containerCss 通过 :focus-within 画 */
     }
   `;
 
@@ -134,7 +138,19 @@ export const ChatToolCall = forwardRef<HTMLDivElement, ChatToolCallProps>(functi
     border-radius: ${tokens.toolCardRadius};
     overflow: hidden;
     font-family: inherit;
-    transition: border-color ${duration} ${easing};
+    transition:
+      border-color ${duration} ${easing},
+      box-shadow ${duration} ${easing};
+
+    /* Y4：键盘 focus 落在内部 header button 时，让整张卡片高亮（外凸 ring + 主色边框）。 */
+    &:focus-within {
+      border-color: ${theme.colors.border.focus ?? theme.colors.focus};
+      box-shadow: 0 0 0 2px ${theme.colors.border.focus ?? theme.colors.focus};
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   `;
 
   const titleRowCss = css`

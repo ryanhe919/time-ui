@@ -7,13 +7,30 @@
 
 'use client';
 
-import { Children, forwardRef, useCallback, useRef, type ReactNode } from 'react';
+import {
+  Children,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { css, useTheme } from '@emotion/react';
 import { mergeRefs, useIsomorphicLayoutEffect } from '../utils';
 import type { ChatCommonStyleProps } from './Chat.types';
 
+/** 阈值：用户离底部多少 px 内仍视为"贴底"，新消息可继续 auto-scroll。 */
+const NEAR_BOTTOM_THRESHOLD_PX = 32;
+
 export interface ChatMessageListProps extends ChatCommonStyleProps {
-  /** 子节点变化时自动滚到底部。默认 true。 */
+  /**
+   * 子节点变化时自动滚到底部。默认 true。
+   *
+   * **抢位防护**：只有在用户已经"贴底"（离底部 ≤ 32px）时才自动滚动；
+   * 用户向上滚动查看历史时不会被新消息打断。配合 `<ChatScrollToBottom>` 浮动按钮，
+   * 可让用户手动回到底部并恢复 auto-follow 行为。
+   */
   shouldAutoScrollToBottom?: boolean;
   /** 最大高度（启用滚动）；默认 'none'，由父级决定。 */
   maxHeight?: string | number;
@@ -21,8 +38,21 @@ export interface ChatMessageListProps extends ChatCommonStyleProps {
   children: ReactNode;
   /** ARIA role；默认 'log'。 */
   role?: 'log' | 'list' | 'region';
-  /** polite live region；默认 true。 */
+  /**
+   * polite live region；默认 true。
+   *
+   * **a11y 设计共识**：当 `isLive` 为 true 时，容器声明
+   * `role="log"` + `aria-live="polite"` + `aria-relevant="additions"`。
+   * 故意省略 `'text'` 是为了避免屏幕阅读器在 assistant 流式输出每个 token 时
+   * 重复朗读已念过的部分；新消息节点加入仍会被朗读。
+   */
   isLive?: boolean;
+  /**
+   * 用户向上滚开导致 auto-scroll 被抑制时的回调；接收 `true` 表示"用户离底了，
+   * 该显示 ScrollToBottom 按钮"，`false` 表示"用户回到底部了，按钮可隐藏"。
+   * 与 `<ChatScrollToBottom>` 浮动按钮配套使用。
+   */
+  onAtBottomChange?: (atBottom: boolean) => void;
 }
 
 function asLength(v: string | number | undefined): string | undefined {
@@ -38,6 +68,7 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
       children,
       role = 'log',
       isLive = true,
+      onAtBottomChange,
       className,
       style,
       id,
@@ -49,6 +80,13 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
     const innerRef = useRef<HTMLDivElement | null>(null);
     // 用 child 数量作为 effect 依赖键；新增消息时触发滚动。
     const childCount = Children.count(children);
+    // 跟踪用户是否"贴底"：默认 true（首次渲染视作贴底）。
+    const isNearBottomRef = useRef(true);
+    const [, forceTick] = useState(0);
+
+    const isNearBottom = useCallback((el: HTMLDivElement) => {
+      return el.scrollHeight - el.scrollTop - el.clientHeight <= NEAR_BOTTOM_THRESHOLD_PX;
+    }, []);
 
     const scrollToBottom = useCallback(() => {
       const el = innerRef.current;
@@ -60,8 +98,28 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
     useIsomorphicLayoutEffect(() => {
       if (!shouldAutoScrollToBottom) return;
       if (maxHeight === undefined) return; // 无滚动容器时无需滚到底
-      scrollToBottom();
+      // 抢位防护：只在用户当前贴底时才自动滚动；向上看历史时不打扰。
+      if (isNearBottomRef.current) {
+        scrollToBottom();
+      }
     }, [shouldAutoScrollToBottom, childCount, maxHeight, scrollToBottom]);
+
+    useEffect(() => {
+      const el = innerRef.current;
+      if (!el || maxHeight === undefined) return;
+      const handle = () => {
+        const next = isNearBottom(el);
+        if (next !== isNearBottomRef.current) {
+          isNearBottomRef.current = next;
+          onAtBottomChange?.(next);
+          forceTick((t) => t + 1);
+        }
+      };
+      el.addEventListener('scroll', handle, { passive: true });
+      // 初始同步一次
+      handle();
+      return () => el.removeEventListener('scroll', handle);
+    }, [maxHeight, isNearBottom, onAtBottomChange]);
 
     const resolvedMaxHeight = asLength(maxHeight);
     const isScrollable = resolvedMaxHeight !== undefined;

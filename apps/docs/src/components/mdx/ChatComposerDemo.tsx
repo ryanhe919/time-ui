@@ -15,6 +15,7 @@ import {
   ChatActionButton,
   ChatSendButton,
   ChatVoiceWave,
+  ChatFileChip,
   Select,
   SelectOption,
 } from '@timeui/react';
@@ -76,7 +77,7 @@ export function ChatComposerDemo() {
   const [recording, setRecording] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [lastSent, setLastSent] = useState<string | null>(null);
-  const [files] = useState(['roadmap-q2.pdf', 'latency-bench.csv']);
+  const [files, setFiles] = useState<string[]>(['roadmap-q2.pdf', 'latency-bench.csv']);
 
   const handleSubmit = (text: string) => {
     setLastSent(text);
@@ -109,22 +110,11 @@ export function ChatComposerDemo() {
             `}
           >
             {files.map((file) => (
-              <span
+              <ChatFileChip
                 key={file}
-                css={css`
-                  display: inline-flex;
-                  align-items: center;
-                  height: 28px;
-                  padding: 0 10px;
-                  border-radius: 999px;
-                  background: var(--c-bg-secondary);
-                  border: 1px solid var(--c-hairline);
-                  font-size: 12px;
-                  color: var(--c-text-secondary);
-                `}
-              >
-                {file}
-              </span>
+                name={file}
+                onRemove={() => setFiles((curr) => curr.filter((f) => f !== file))}
+              />
             ))}
           </div>
         }

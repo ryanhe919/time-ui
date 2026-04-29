@@ -12,7 +12,6 @@ import {
   useCallback,
   useImperativeHandle,
   useRef,
-  useState,
   type ChangeEvent,
   type CompositionEvent,
   type KeyboardEvent,
@@ -21,6 +20,22 @@ import {
 import { css, useTheme } from '@emotion/react';
 import { useControllableState, useIsomorphicLayoutEffect } from '../utils';
 import type { ChatCommonStyleProps } from './Chat.types';
+
+/**
+ * 由 `ref` 暴露给消费者的 imperative handle。
+ * 让 `composerRef.current?.focus()` 真正落到 textarea 而不是包装 div，
+ * 这是 starter card / suggestion 点击后把焦点送回输入框的必备能力。
+ */
+export interface ChatComposerHandle {
+  /** 把焦点送到内部 textarea。 */
+  focus: () => void;
+  /** 让 textarea 失去焦点。 */
+  blur: () => void;
+  /** 拿到包装 `<div>`（用于宽度测量、定位等）。 */
+  getElement: () => HTMLDivElement | null;
+  /** 拿到内部 `<textarea>`（用于选区操作等高级需求）。 */
+  getTextarea: () => HTMLTextAreaElement | null;
+}
 
 export interface ChatComposerProps extends ChatCommonStyleProps {
   value?: string;
@@ -63,7 +78,7 @@ function readLineHeightPx(node: HTMLElement): number {
   return (Number.isNaN(fs) ? 14 : fs) * 1.4;
 }
 
-export const ChatComposer = forwardRef<HTMLDivElement, ChatComposerProps>(
+export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
   function ChatComposer(props, forwardedRef) {
     const {
       value,
@@ -92,8 +107,17 @@ export const ChatComposer = forwardRef<HTMLDivElement, ChatComposerProps>(
     const duration = theme.motion.duration.normal ?? '250ms';
 
     const wrapperRef = useRef<HTMLDivElement | null>(null);
-    useImperativeHandle(forwardedRef, () => wrapperRef.current as HTMLDivElement, []);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    useImperativeHandle(
+      forwardedRef,
+      (): ChatComposerHandle => ({
+        focus: () => textareaRef.current?.focus(),
+        blur: () => textareaRef.current?.blur(),
+        getElement: () => wrapperRef.current,
+        getTextarea: () => textareaRef.current,
+      }),
+      [],
+    );
     const isComposingRef = useRef(false);
 
     const [rawValue, setValue] = useControllableState<string>({
@@ -105,8 +129,6 @@ export const ChatComposer = forwardRef<HTMLDivElement, ChatComposerProps>(
     });
     const currentValue = rawValue ?? '';
     const isControlled = value !== undefined;
-
-    const [isFocused, setIsFocused] = useState(false);
 
     const handleChange = useCallback(
       (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -148,9 +170,6 @@ export const ChatComposer = forwardRef<HTMLDivElement, ChatComposerProps>(
       isComposingRef.current = false;
     }, []);
 
-    const handleFocus = useCallback(() => setIsFocused(true), []);
-    const handleBlur = useCallback(() => setIsFocused(false), []);
-
     // Auto-grow：reset → 'auto'，再读取 scrollHeight 并夹在 [minHeight, maxHeight]。
     useIsomorphicLayoutEffect(() => {
       const el = textareaRef.current;
@@ -165,6 +184,9 @@ export const ChatComposer = forwardRef<HTMLDivElement, ChatComposerProps>(
       el.style.overflowY = natural > maxHeight ? 'auto' : 'hidden';
     }, [currentValue, minRows, maxRows]);
 
+    // Y1+Y2 (chat-audit.md)：focus 视觉与 Input/Select 体系对齐 ——
+    // 用 `:focus-within` 选择器（不再 useState 跟踪）+ 2px 内描边 box-shadow
+    // 来代替 1→2px 边框宽度切换（避免 1px 跳变 + 与 fieldStyles 一致）。
     const shellCss = css`
       display: flex;
       flex-direction: column;
@@ -174,13 +196,19 @@ export const ChatComposer = forwardRef<HTMLDivElement, ChatComposerProps>(
       gap: ${tokens.composerToolbarGap};
       background-color: ${theme.colors.bg.surface};
       color: ${theme.colors.text.primary};
-      border: 1px solid ${isFocused ? focusColor : theme.colors.border.default};
+      border: 1px solid ${theme.colors.border.default};
       border-radius: ${tokens.composerRadius};
       font-family: inherit;
       transition:
         border-color ${duration},
+        box-shadow ${duration},
         opacity ${duration};
       opacity: ${isDisabled ? 0.6 : 1};
+
+      &:focus-within {
+        border-color: ${focusColor};
+        box-shadow: inset 0 0 0 1px ${focusColor};
+      }
 
       @media (prefers-reduced-motion: reduce) {
         transition: none;
@@ -239,7 +267,6 @@ export const ChatComposer = forwardRef<HTMLDivElement, ChatComposerProps>(
         style={style}
         css={shellCss}
         data-disabled={isDisabled || undefined}
-        data-focused={isFocused || undefined}
       >
         {topContent ? (
           <div data-slot="top" css={toolbarSlotCss}>
@@ -255,8 +282,6 @@ export const ChatComposer = forwardRef<HTMLDivElement, ChatComposerProps>(
           onKeyDown={handleKeyDown}
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           placeholder={placeholder}
           disabled={isDisabled}
           aria-label={ariaLabel}

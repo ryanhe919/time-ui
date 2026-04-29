@@ -37,6 +37,8 @@ import {
 } from 'react';
 
 import * as TimeUI from '@/components/timeui-client';
+// 本次新增的 chat 组件已通过 timeui-client re-export 自动进入 TimeUI namespace 扩散：
+// ChatScrollToBottom（N1）/ ChatFileChip（N8）。无需在此手工列出。
 
 // 与 mdx-components.tsx 已 import 的 *Demo 列表保持同步：
 import { ButtonIconOnlyDemo } from '../ButtonIconOnlyDemo';
