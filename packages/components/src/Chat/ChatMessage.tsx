@@ -201,7 +201,11 @@ export const ChatMessage = forwardRef<HTMLDivElement, ChatMessageProps>(
               ? `inset 0 0 0 1px ${visual.border}`
               : 'none'};
             word-break: break-word;
-            white-space: pre-wrap;
+            /* Y6 (chat-audit)：user 输入要 pre-wrap 保留换行；
+               assistant / 其它 role 默认 normal，避免嵌入 ChatMarkdown 时段落
+               之间多出一个空行。消费者若需要 assistant 也保留输入换行，自己包一层
+               <span style={{ whiteSpace: 'pre-wrap' }}> 即可。 */
+            white-space: ${isRight ? 'pre-wrap' : 'normal'};
             max-width: 100%;
           `
       : css`
@@ -213,12 +217,14 @@ export const ChatMessage = forwardRef<HTMLDivElement, ChatMessageProps>(
           max-width: 100%;
         `;
 
+    // Y5 (chat-audit)：caret 用 em 单位跟随字号缩放，不再硬编码 8x14px。
+    // 0.55em / 1em 在 14px 字号下视觉等价于原 8x14px，但放大字号后比例正确。
     const caretCss = css`
       display: inline-block;
-      width: 8px;
-      height: 14px;
-      margin-left: 2px;
-      vertical-align: -2px;
+      width: 0.55em;
+      height: 1em;
+      margin-left: 0.15em;
+      vertical-align: -0.12em;
       background-color: currentColor;
       border-radius: 1px;
       animation: ${caretBlink} 1s steps(1, end) infinite;

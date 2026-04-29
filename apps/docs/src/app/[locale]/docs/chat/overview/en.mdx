@@ -151,7 +151,7 @@ AI surfaces are rarely just "prompt in, response out". Real interfaces often nee
 
 The components carry no fetch logic and bind to no SSE protocol. `useChatStream` accumulates any `AsyncIterable<string>` into `text`; pair it with `<ChatMessage isStreaming>` to show the blinking caret. The demo below uses `setTimeout` slicing to simulate a stream:
 
-<LiveDemo code={`import { useChatStream, ChatMessage, ChatMessageList, Button } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { useChatStream, ChatMessage, ChatMessageList, Button } from '@timeui/react';
 
 async function\* fakeStream(text: string) {
 for (let i = 0; i < text.length; i += 6) {

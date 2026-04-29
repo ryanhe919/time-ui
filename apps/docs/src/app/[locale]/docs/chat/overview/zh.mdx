@@ -151,7 +151,7 @@ AI UI 往往不只是“你一问我一答”。真实场景里还需要把 agen
 
 组件不内置 fetch 也不绑定特定 SSE 协议。`useChatStream` 把任何 `AsyncIterable<string>` 累加成 `text`，配合 `<ChatMessage isStreaming>` 显示闪烁光标即可。下面 demo 用 setTimeout 切片模拟一个流：
 
-<LiveDemo code={`import { useChatStream, ChatMessage, ChatMessageList, Button } from '@timeui/react';
+<LiveDemo previewSource="children" code={`import { useChatStream, ChatMessage, ChatMessageList, Button } from '@timeui/react';
 
 async function\* fakeStream(text: string) {
 for (let i = 0; i < text.length; i += 6) {

@@ -35,7 +35,13 @@ export { ChatKnowledgeRefs } from './ChatKnowledgeRefs';
 export type { ChatKnowledgeRefsProps } from './ChatKnowledgeRefs';
 
 export { ChatComposer } from './ChatComposer';
-export type { ChatComposerProps } from './ChatComposer';
+export type { ChatComposerHandle, ChatComposerProps } from './ChatComposer';
+
+export { ChatScrollToBottom } from './ChatScrollToBottom';
+export type { ChatScrollToBottomProps } from './ChatScrollToBottom';
+
+export { ChatFileChip } from './ChatFileChip';
+export type { ChatFileChipKind, ChatFileChipProps } from './ChatFileChip';
 
 export { ChatActionButton } from './ChatActionButton';
 export type { ChatActionButtonProps } from './ChatActionButton';

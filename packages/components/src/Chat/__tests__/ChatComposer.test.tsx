@@ -9,7 +9,7 @@ import { createRef, useState } from 'react';
 import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test-utils';
-import { ChatComposer } from '../ChatComposer';
+import { ChatComposer, type ChatComposerHandle } from '../ChatComposer';
 
 const getTextarea = (): HTMLTextAreaElement => screen.getByRole('textbox') as HTMLTextAreaElement;
 
@@ -24,10 +24,16 @@ describe('ChatComposer — rendering', () => {
     expect(getTextarea()).toHaveAttribute('placeholder', 'Type a message');
   });
 
-  it('forwards ref to the wrapper div', () => {
-    const ref = createRef<HTMLDivElement>();
+  it('exposes an imperative handle that focuses the textarea', () => {
+    const ref = createRef<ChatComposerHandle>();
     renderWithProviders(<ChatComposer aria-label="x" ref={ref} />);
-    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).not.toBeNull();
+    expect(ref.current?.getElement()).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current?.getTextarea()).toBeInstanceOf(HTMLTextAreaElement);
+    ref.current?.focus();
+    expect(document.activeElement).toBe(ref.current?.getTextarea());
+    ref.current?.blur();
+    expect(document.activeElement).not.toBe(ref.current?.getTextarea());
   });
 
   it('applies className / style / id to the wrapper', () => {
@@ -204,13 +210,13 @@ describe('ChatComposer — slots', () => {
 });
 
 describe('ChatComposer — focus state', () => {
-  it('toggles data-focused on focus / blur', async () => {
+  it('uses :focus-within so the wrapper does not need a focus state attribute', () => {
     const { container } = renderWithProviders(<ChatComposer aria-label="x" />);
     const wrap = container.firstElementChild as HTMLElement;
+    // 视觉态由 CSS `:focus-within` 处理，不再用 React state；
+    // 这里仅断言 wrapper 不再暴露 data-focused（避免 state-driven re-render）。
     expect(wrap.dataset.focused).toBeUndefined();
-    fireEvent.focus(getTextarea());
-    expect(wrap.dataset.focused).toBe('true');
-    fireEvent.blur(getTextarea());
+    getTextarea().focus();
     expect(wrap.dataset.focused).toBeUndefined();
   });
 

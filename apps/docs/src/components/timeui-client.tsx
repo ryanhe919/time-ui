@@ -42,6 +42,8 @@ export {
   ChatActionButton,
   ChatSendButton,
   ChatVoiceWave,
+  ChatScrollToBottom,
+  ChatFileChip,
   SearchDialog,
   Popover,
   Tooltip,
