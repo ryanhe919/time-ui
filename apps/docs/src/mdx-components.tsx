@@ -31,6 +31,9 @@ import {
   SegmentedControl,
   Select,
   SelectOption,
+  MultiSelect,
+  MultiSelectOption,
+  MultiSelectOptGroup,
   ChatMessage,
   ChatMessageList,
   ChatAvatar,
@@ -107,6 +110,7 @@ import { ChatStreamingDemo } from '@/components/mdx/ChatStreamingDemo';
 import { ChatToolStatesDemo } from '@/components/mdx/ChatToolStatesDemo';
 import { ChatWorkspaceDemo } from '@/components/mdx/ChatWorkspaceDemo';
 import { SelectDemo } from '@/components/mdx/SelectDemo';
+import { MultiSelectControlledDemo } from '@/components/mdx/MultiSelectControlledDemo';
 import { CodeBlockOnCopyDemo } from '@/components/mdx/CodeBlockOnCopyDemo';
 import { PopoverDemo } from '@/components/mdx/PopoverDemo';
 import { PopoverPlacementDemo } from '@/components/mdx/PopoverPlacementDemo';
@@ -203,6 +207,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ChatToolStatesDemo,
     ChatWorkspaceDemo,
     SelectDemo,
+    MultiSelectControlledDemo,
     CodeBlockOnCopyDemo,
     PopoverDemo,
     PopoverPlacementDemo,
@@ -275,6 +280,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     SegmentedControl,
     Select,
     SelectOption,
+    MultiSelect,
+    MultiSelectOption,
+    MultiSelectOptGroup,
     ChatMessage,
     ChatMessageList,
     ChatAvatar,

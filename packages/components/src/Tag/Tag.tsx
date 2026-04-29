@@ -49,6 +49,8 @@ export const Tag = forwardRef<HTMLElement, TagProps>(function Tag(props, ref) {
     children,
     className,
     'aria-label': ariaLabel,
+    closeButtonTabIndex = 0,
+    closeButtonAriaLabel = 'Remove',
   } = props;
 
   const theme = useTheme();
@@ -196,7 +198,8 @@ export const Tag = forwardRef<HTMLElement, TagProps>(function Tag(props, ref) {
       {isClosable ? (
         <button
           type="button"
-          aria-label="Remove"
+          aria-label={closeButtonAriaLabel}
+          tabIndex={closeButtonTabIndex}
           disabled={isDisabled}
           onClick={handleClose}
           data-testid="tag-close"

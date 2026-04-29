@@ -13,7 +13,7 @@ module.exports = [
     name: '@timeui/react — full import (no CodeBlock)',
     path: 'packages/components/dist/index.js',
     import: '*',
-    limit: '76 KB',
+    limit: '80 KB',
     ignore: ['react', 'react-dom', '@emotion/react', '@emotion/styled'],
   },
   {
