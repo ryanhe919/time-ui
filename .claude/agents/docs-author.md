@@ -50,7 +50,7 @@ apps/docs/src/app/[locale]/docs/components/<kebab-name>/
 - **示例代码必须能跑**（站点会在浏览器里实时编译）；不能用未导出的 internal API。
 - **示例展示效果与代码完全一致**：用户编辑代码后看到的效果就是当前 import 的组件实际行为。**绝不**用截图或自己拼装的"看起来像"的 div。
 - **import 路径**：从 `@timeui/react` 主 barrel 引；如果是 subpath export 组件（RichTextEditor / CodeEditor / PdfViewer / MarkdownViewer），从对应 subpath 引并在文档顶部注明。
-- **每个 variant/size 单独一个 playground**，不要混在一起 — 用户的编辑场景是"我想改一个 prop 看效果"，混在一起反而难学。
+- **每个 variant/size 单独一个 LivePlayground**，不要混在一起 — 用户的编辑场景是"我想改一个 prop 看效果"，混在一起反而难学。
 
 ## 双语对齐
 

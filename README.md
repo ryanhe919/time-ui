@@ -23,7 +23,6 @@ packages/
   mcp/         @timeui/mcp      — MCP server + 文档索引，供 AI 客户端查询组件
 apps/
   docs/        Next.js 15 App Router + @next/mdx 的文档站（部署到 CentOS + pm2）
-  playground/  Vite 本地沙盒
 tools/
   create-component/  组件脚手架（pnpm new:component Foo）
 docs/
@@ -46,7 +45,7 @@ docs/
 
 ```bash
 pnpm install
-pnpm dev            # 并行启动 docs + playground
+pnpm dev            # 启动 docs (Next.js dev)
 pnpm build          # 构建所有包（按依赖图）
 pnpm test           # 跨包 Vitest
 pnpm lint           # ESLint

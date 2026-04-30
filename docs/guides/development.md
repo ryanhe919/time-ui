@@ -23,8 +23,7 @@ cp -r .vscode-template .vscode   # 可选：推荐的编辑器配置
 ```
 timeui/
 ├── apps/
-│   ├── docs/                  Next.js 15 App Router + @next/mdx 文档站
-│   └── playground/            Vite 本地沙盒
+│   └── docs/                  Next.js 15 App Router + @next/mdx 文档站
 ├── packages/
 │   ├── tokens/                @timeui/tokens — 设计 token（色板、spacing、字体、radius、shadow）
 │   ├── themes/                @timeui/themes — light/dark 主题，由 tokens 组合而成
@@ -45,7 +44,7 @@ timeui/
 
 | 任务                                  | 命令                                         |
 | ------------------------------------- | -------------------------------------------- |
-| 启动 docs + playground                | `pnpm dev`                                   |
+| 启动 docs                             | `pnpm dev`                                   |
 | 运行所有包的测试                      | `pnpm test`                                  |
 | 单包测试                              | `pnpm --filter @timeui/react test`           |
 | 单测试文件                            | `pnpm --filter @timeui/react test -- Button` |

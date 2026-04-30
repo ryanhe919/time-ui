@@ -86,4 +86,4 @@ model: opus
 
 - 不要为了凑覆盖率写无意义用例（"渲染不报错"是 1 条，再来 5 条形似的就不行）。
 - 不要 mock `useTheme` 或 `ConfigProvider` —— 那等于绕过了测试栈一致性。
-- 不要在测试里硬编码主题色值（如 `expect(...).toHaveStyle('color: #fff')`）—— 测语义不测样式。视觉验证靠 docs/playground 手测。
+- 不要在测试里硬编码主题色值（如 `expect(...).toHaveStyle('color: #fff')`）—— 测语义不测样式。视觉验证靠 docs 站手测。

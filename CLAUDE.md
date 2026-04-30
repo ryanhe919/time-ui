@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概览
 
-TimeUI 是一个企业级 React 组件库，以 pnpm workspaces + Turborepo 组织的 monorepo，发布到 npm `@timeui/*` 作用域下。技术栈：React 18+（peerDependency）、TypeScript strict、Emotion、tsup（ESM+CJS+d.ts）、Vitest、Next.js 15 App Router + MDX 文档站、Vite playground、Changesets。
+TimeUI 是一个企业级 React 组件库，以 pnpm workspaces + Turborepo 组织的 monorepo，发布到 npm `@timeui/*` 作用域下。技术栈：React 18+（peerDependency）、TypeScript strict、Emotion、tsup（ESM+CJS+d.ts）、Vitest、Next.js 15 App Router + MDX 文档站、Changesets。
 
 > **项目长文档**：本文件提供高密度速查；下列长文档在对应主题上更全面，遇到细节问题先去这里查：
 >
@@ -18,7 +18,7 @@ TimeUI 是一个企业级 React 组件库，以 pnpm workspaces + Turborepo 组�
 ## 常用命令
 
 ```bash
-pnpm dev                              # 并行启动 playground (Vite) + docs (Next.js dev)
+pnpm dev                              # 启动 docs (Next.js dev)
 pnpm build                            # 构建所有包（Turbo 按依赖图顺序）
 pnpm test                             # 跨包运行 Vitest
 pnpm lint                             # ESLint（flat config）
@@ -38,14 +38,13 @@ pnpm --filter @timeui/react test:coverage        # v8 覆盖率（CI 上传到 C
 pnpm --filter @timeui/react test -- Button       # 只跑匹配的测试文件（传给 vitest）
 pnpm --filter @timeui/docs dev                   # 文档站 dev http://localhost:3000
 pnpm --filter @timeui/docs build                 # next build（产物 .next/）
-pnpm --filter @timeui/playground dev             # Vite playground，手动验证组件
 pnpm --filter @timeui/icons generate             # 从 svg/ 重新生成图标组件
 pnpm --filter @timeui/mcp build:index            # 扫 docs MDX 重建 data/index.json
 pnpm --filter @timeui/mcp test                   # MCP 包单元测试
 pnpm changeset:snapshot                          # 发 canary 预览版
 ```
 
-> 当前没有 Storybook、Chromatic、Playwright e2e。视觉验证靠 docs 站 + playground 在浏览器里手测。
+> 当前没有 Storybook、Chromatic、Playwright e2e。视觉验证靠 docs 站（含每个组件页的 LiveDemo 可编辑预览）在浏览器里手测。
 
 ## 架构
 
@@ -166,4 +165,4 @@ Conventional Commits，由 commitlint + Husky + lint-staged 强制（`*.{ts,tsx,
 - Size budget 本地过 CI 不过：`pnpm clean && pnpm install && pnpm build && pnpm size` 重新跑。
 - 文档站找不到新组件：除了 `packages/components/src/index.ts` 的 barrel，还要在 `apps/docs/src/app/[locale]/docs/components/<name>/{en,zh}.mdx` 加文档并更新 navigation；改完 MDX 记得跑 `pnpm --filter @timeui/mcp build:index`。
 - ESLint 用的是 flat config（`eslint.config.js`），编辑器需开启 `eslint.useFlatConfig: true`。
-- 受 token 影响的视觉变化没法靠测试发现（无 Chromatic）：改 `packages/tokens` 或 `packages/themes` 后，至少在 `pnpm dev` 起的 docs/playground 里手动眼检几个典型组件。
+- 受 token 影响的视觉变化没法靠测试发现（无 Chromatic）：改 `packages/tokens` 或 `packages/themes` 后，至少在 `pnpm dev` 起的 docs 站里手动眼检几个典型组件。

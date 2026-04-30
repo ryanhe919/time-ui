@@ -349,7 +349,10 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
       onChange,
       name: 'MultiSelect',
     });
-    const currentValue = rawValue ?? [];
+    // Wrap in useMemo to keep the array reference stable when `rawValue` is
+    // unchanged — otherwise the `?? []` fallback creates a fresh array on every
+    // render, busting downstream useMemo / useCallback dep arrays.
+    const currentValue = useMemo(() => rawValue ?? [], [rawValue]);
 
     /** value -> item 反查表，便于按外部传入的 value 顺序渲染 chip。 */
     const itemByValue = useMemo(() => {
