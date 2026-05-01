@@ -13,6 +13,7 @@ coverage
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 .claude/team-docs
+.codex
 storybook-static
 .scratch
 .playwright-mcp
