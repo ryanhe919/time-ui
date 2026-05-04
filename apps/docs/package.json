@@ -15,7 +15,7 @@
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo public/pdf.worker.min.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
+    "@anthropic-ai/sdk": "^0.92.0",
     "@codemirror/autocomplete": "^6.0.0",
     "@codemirror/commands": "^6.0.0",
     "@codemirror/lang-css": "^6.0.0",
