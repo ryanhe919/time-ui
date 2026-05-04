@@ -37,7 +37,7 @@
     "@timeui/react": "workspace:*",
     "@tiptap/core": "^2.10.0",
     "@tiptap/extension-link": "^2.10.0",
-    "@tiptap/extension-placeholder": "^2.10.0",
+    "@tiptap/extension-placeholder": "^3.22.5",
     "@tiptap/extension-underline": "^2.10.0",
     "@tiptap/pm": "^2.10.0",
     "@tiptap/react": "^2.10.0",
