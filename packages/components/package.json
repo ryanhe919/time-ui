@@ -192,7 +192,7 @@
     "@tiptap/pm": "^2.10.0",
     "@tiptap/starter-kit": "^2.10.0",
     "@tiptap/extension-underline": "^2.10.0",
-    "@tiptap/extension-link": "^2.10.0",
+    "@tiptap/extension-link": "^3.22.5",
     "@tiptap/extension-placeholder": "^2.10.0",
     "codemirror": "^6.0.0",
     "@codemirror/view": "^6.0.0",
