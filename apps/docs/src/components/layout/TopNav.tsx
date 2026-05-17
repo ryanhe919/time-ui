@@ -26,6 +26,8 @@ interface Props {
   navigation: Navigation;
   messages: DocsMessages;
   locale: Locale;
+  /** `@timeui/react` 当前版本号，渲染为 logo 右侧的版本徽标。 */
+  version?: string;
 }
 
 const GITHUB_URL = 'https://github.com/ryanhe919/time-ui';
@@ -43,7 +45,7 @@ const AssistantIcon = () => (
   </svg>
 );
 
-export function TopNav({ navigation, messages, locale }: Props) {
+export function TopNav({ navigation, messages, locale, version }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const activeSection = pathname.match(/\/docs\/([^/]+)/)?.[1];
@@ -139,6 +141,27 @@ export function TopNav({ navigation, messages, locale }: Props) {
           >
             TimeUI
           </span>
+          {version && (
+            <span
+              aria-label={`@timeui/react v${version}`}
+              css={css`
+                display: inline-flex;
+                align-items: center;
+                font-family: var(--docs-mono);
+                font-size: 10px;
+                font-weight: 500;
+                letter-spacing: 0.04em;
+                line-height: 1;
+                padding: 3px 6px;
+                border-radius: 4px;
+                color: var(--c-iris);
+                background: color-mix(in srgb, var(--c-iris) 10%, transparent);
+                border: 1px solid color-mix(in srgb, var(--c-iris) 22%, transparent);
+              `}
+            >
+              v{version}
+            </span>
+          )}
           <span
             aria-hidden
             css={css`

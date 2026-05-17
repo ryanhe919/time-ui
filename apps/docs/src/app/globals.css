@@ -168,7 +168,7 @@ body {
  * BEHIND body content. Fixed full-viewport, never intercepts
  * pointer events. Slightly stronger in dark mode to keep texture
  * legible against ink. Lives at z-index: -1 so it never competes
- * with the TopNav (z 1100) / ReadingProgress (z 1200) / popovers.
+ * with the TopNav (z 1100) / popovers.
  * ============================================================ */
 body::before {
   content: '';

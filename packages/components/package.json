@@ -55,7 +55,8 @@
     "./test-utils": {
       "types": "./src/test-utils/index.ts",
       "import": "./src/test-utils/index.ts"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"

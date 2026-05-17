@@ -8,9 +8,9 @@ import { TopNav } from '@/components/layout/TopNav';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TableOfContents } from '@/components/layout/TableOfContents';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
-import { ReadingProgress } from '@/components/layout/ReadingProgress';
 import { getNavigation } from '@/lib/navigation';
 import { getDocsMessages } from '@/lib/docs-i18n';
+import { version as timeuiVersion } from '@timeui/react/package.json';
 import type { Locale } from '@timeui/react';
 
 export const dynamic = 'force-dynamic';
@@ -28,8 +28,7 @@ export default async function DocsLayout({ children, params }: Props) {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--c-bg)' }}>
-      <ReadingProgress />
-      <TopNav navigation={navigation} messages={messages} locale={lc} />
+      <TopNav navigation={navigation} messages={messages} locale={lc} version={timeuiVersion} />
 
       <div
         style={{
