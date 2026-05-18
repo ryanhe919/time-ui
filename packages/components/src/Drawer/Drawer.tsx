@@ -11,6 +11,7 @@
 
 import {
   forwardRef,
+  isValidElement,
   useCallback,
   useEffect,
   useId,
@@ -135,7 +136,14 @@ const DrawerHeaderImpl = forwardRef<HTMLDivElement, DrawerHeaderProps>(function 
   const theme = useTheme();
   const drawer = theme.components.drawer as Record<string, unknown>;
   const headerCss = css`
+    display: flex;
+    align-items: center;
+    min-height: ${String(drawer.headerMinHeight)};
     padding: ${String(drawer.headerPaddingY)} ${String(drawer.headerPaddingX)};
+    padding-right: calc(
+      ${String(drawer.headerPaddingX)} + ${String(drawer.closeButtonSize)} +
+        ${String(drawer.closeButtonOffset)}
+    );
     font-size: ${String(drawer.headerFontSize)};
     font-weight: ${Number(drawer.headerFontWeight)};
     color: ${theme.colors.text.primary};
@@ -186,6 +194,7 @@ const DrawerFooterImpl = forwardRef<HTMLDivElement, DrawerFooterProps>(function 
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    min-height: ${String(drawer.footerMinHeight)};
     gap: ${String(drawer.footerGap)};
     padding: ${String(drawer.footerPaddingY)} ${String(drawer.footerPaddingX)};
     border-top: 1px solid ${theme.colors.border.subtle};
@@ -357,8 +366,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
   );
 
   // ── styles ──
-  const easing =
-    (theme.motion.easing as { spring?: string }).spring ?? theme.motion.easing.easeInOut;
+  const easing = theme.motion.easing.easeOut;
   const overlayDuration = String(drawer.overlayDuration);
   const panelDuration = String(drawer.panelDuration);
   const enterDistance = String(drawer.panelEnterTranslate);
@@ -370,8 +378,10 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
   const closeOffset = String(drawer.closeButtonOffset);
   const headerPaddingY = String(drawer.headerPaddingY);
   const headerPaddingX = String(drawer.headerPaddingX);
+  const headerMinHeight = String(drawer.headerMinHeight);
   const headerFontSize = String(drawer.headerFontSize);
   const headerFontWeight = Number(drawer.headerFontWeight);
+  const footerMinHeight = String(drawer.footerMinHeight);
 
   const overlayCss = css`
     position: fixed;
@@ -485,6 +495,9 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
   `;
 
   const headerCss = css`
+    display: flex;
+    align-items: center;
+    min-height: ${headerMinHeight};
     padding: ${headerPaddingY} ${headerPaddingX};
     padding-right: calc(${headerPaddingX} + ${closeSize} + ${closeOffset});
     font-size: ${headerFontSize};
@@ -533,6 +546,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    min-height: ${footerMinHeight};
     gap: ${String(drawer.footerGap)};
     padding: ${String(drawer.footerPaddingY)} ${String(drawer.footerPaddingX)};
     border-top: 1px solid ${theme.colors.border.subtle};
@@ -599,7 +613,11 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
         data-scroll-behavior={scrollBehavior}
       >
         {header !== undefined && header !== null && header !== false ? (
-          <div css={headerCss}>{header}</div>
+          isValidElement(header) && header.type === DrawerHeaderImpl ? (
+            header
+          ) : (
+            <div css={headerCss}>{header}</div>
+          )
         ) : null}
 
         {!hideCloseButton ? (
@@ -616,7 +634,11 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(pr
         {children !== undefined ? <div css={bodyCss}>{children}</div> : null}
 
         {footer !== undefined && footer !== null && footer !== false ? (
-          <div css={footerCss}>{footer}</div>
+          isValidElement(footer) && footer.type === DrawerFooterImpl ? (
+            footer
+          ) : (
+            <div css={footerCss}>{footer}</div>
+          )
         ) : null}
       </div>
     </div>,

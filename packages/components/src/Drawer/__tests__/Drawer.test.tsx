@@ -563,26 +563,6 @@ describe('Drawer — motion / a11y / theming', () => {
     expect(collectStyles()).toMatch(/prefers-reduced-motion:\s*reduce/);
   });
 
-  it('falls back to easeInOut when theme.motion.easing.spring is missing', () => {
-    const themeNoSpring = {
-      ...lightTheme,
-      motion: {
-        ...lightTheme.motion,
-        easing: {
-          ...lightTheme.motion.easing,
-          spring: undefined,
-        },
-      },
-    } as unknown as TimeUITheme;
-    renderWithProviders(
-      <Drawer isOpen aria-label="d">
-        x
-      </Drawer>,
-      { theme: themeNoSpring },
-    );
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-  });
-
   it('falls back to colors.focus when border.focus is missing', () => {
     const themeNoBorderFocus: TimeUITheme = {
       ...lightTheme,
