@@ -35,7 +35,7 @@
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.39.4",
-    "@next/eslint-plugin-next": "^15.5.15",
+    "@next/eslint-plugin-next": "^15.5.18",
     "@size-limit/preset-big-lib": "^11.2.0",
     "@types/node": "^22.19.17",
     "@typescript-eslint/eslint-plugin": "^8.59.1",
@@ -69,7 +69,10 @@
       "vite@<6.4.2": ">=6.4.2",
       "esbuild@<0.25.0": ">=0.25.0",
       "basic-ftp@<5.3.0": ">=5.3.0",
-      "postcss@<8.5.10": ">=8.5.10"
+      "postcss@<8.5.10": ">=8.5.10",
+      "fast-uri@<3.1.2": ">=3.1.2",
+      "hono@<4.12.18": ">=4.12.18",
+      "ip-address@<10.1.1": ">=10.1.1"
     },
     "ignoredBuiltDependencies": [
       "@swc/core",
