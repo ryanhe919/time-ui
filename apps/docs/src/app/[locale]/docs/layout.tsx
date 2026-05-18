@@ -10,7 +10,9 @@ import { TableOfContents } from '@/components/layout/TableOfContents';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { getNavigation } from '@/lib/navigation';
 import { getDocsMessages } from '@/lib/docs-i18n';
-import { version as timeuiVersion } from '@timeui/react/package.json';
+import timeuiPkg from '@timeui/react/package.json';
+
+const timeuiVersion = timeuiPkg.version;
 import type { Locale } from '@timeui/react';
 
 export const dynamic = 'force-dynamic';
