@@ -27,6 +27,46 @@ export function Demo() {
   <DateTimePickerBasicDemo />
 </LiveDemo>
 
+## 样式 Variants
+
+四种触发器样式，与 `Input` 一致——`flat`（默认）带柔和底色与 hairline 边框；`bordered` 清晰中性边框；`faded` 同时拥有底色与强边框，视觉最突出；`underlined` 只保留底部一条线，适配 Material 风格表单。variant 仅影响输入触发器，日期时间面板不受影响。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <DateTimePicker variant="flat" placeholder="flat（默认）" />
+  <DateTimePicker variant="bordered" placeholder="bordered" />
+  <DateTimePicker variant="faded" placeholder="faded" />
+  <DateTimePicker variant="underlined" placeholder="underlined" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <DateTimePicker variant="flat" placeholder="flat（默认）" />
+    <DateTimePicker variant="bordered" placeholder="bordered" />
+    <DateTimePicker variant="faded" placeholder="faded" />
+    <DateTimePicker variant="underlined" placeholder="underlined" />
+  </Stack>
+</LiveDemo>
+
+## 颜色 Colors
+
+六种语义色。`color` 驱动触发器的边框、聚焦环与背景底色——`bordered` / `faded` 在静态就能看到 tint；`flat` / `underlined` 在聚焦时显现。`isInvalid` 会强制覆盖为 `danger`。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <DateTimePicker variant="bordered" color="default" placeholder="Default" />
+  <DateTimePicker variant="bordered" color="primary" placeholder="Primary" />
+  <DateTimePicker variant="bordered" color="secondary" placeholder="Secondary" />
+  <DateTimePicker variant="bordered" color="success" placeholder="Success" />
+  <DateTimePicker variant="bordered" color="warning" placeholder="Warning" />
+  <DateTimePicker variant="bordered" color="danger" placeholder="Danger" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <DateTimePicker variant="bordered" color="default" placeholder="Default" />
+    <DateTimePicker variant="bordered" color="primary" placeholder="Primary" />
+    <DateTimePicker variant="bordered" color="secondary" placeholder="Secondary" />
+    <DateTimePicker variant="bordered" color="success" placeholder="Success" />
+    <DateTimePicker variant="bordered" color="warning" placeholder="Warning" />
+    <DateTimePicker variant="bordered" color="danger" placeholder="Danger" />
+  </Stack>
+</LiveDemo>
+
 ## 选择性开放分 / 秒
 
 通过 `showMinute`（默认 `true`）与 `showSecond`（默认 `false`）开关时间列。**被隐藏的字段在提交时强制置 0** —— 这正是"可选择性开放"的语义：你想要哪一级精度，就开哪一列，不用担心下游拿到一个多余的 `getSeconds() === 37`。
@@ -101,6 +141,8 @@ export function Demo() {
   { name: 'isInvalid', type: 'boolean', default: 'false' },
   { name: 'isClearable', type: 'boolean', default: 'false' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: '触发器输入框样式；与 Input / Select 一致。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '触发器语义色；`isInvalid` 时强制 `danger`。' },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
   { name: 'isOpen', type: 'boolean' },
   { name: 'defaultOpen', type: 'boolean', default: 'false' },

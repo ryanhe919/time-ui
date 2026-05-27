@@ -8,7 +8,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../../test-utils';
+import { renderWithProviders, expectA11y } from '../../test-utils';
 import { DateRangePicker } from '../';
 
 const installRectMocks = (
@@ -374,6 +374,71 @@ describe('DateRangePicker — Today button', () => {
     expect(onChange).toHaveBeenCalledTimes(1);
     const arg = onChange.mock.calls[0]![0] as { start: Date; end: Date };
     expect(arg.start.getDate()).toBe(arg.end.getDate());
+  });
+});
+
+// ────────────────────────────────────────────────────────────
+// variant + color props
+// ────────────────────────────────────────────────────────────
+
+describe('DateRangePicker — variant and color props', () => {
+  it('renders with default flat variant and default color when no variant/color passed', () => {
+    const { container } = renderWithProviders(<DateRangePicker aria-label="r" />);
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'flat');
+    expect(inputWrapper).toHaveAttribute('data-color', 'default');
+  });
+
+  it('variant="bordered" is forwarded to the internal Input', () => {
+    const { container } = renderWithProviders(
+      <DateRangePicker variant="bordered" aria-label="r" />,
+    );
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'bordered');
+  });
+
+  it('variant="faded" is forwarded to the internal Input', () => {
+    const { container } = renderWithProviders(<DateRangePicker variant="faded" aria-label="r" />);
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'faded');
+  });
+
+  it('variant="underlined" is forwarded to the internal Input', () => {
+    const { container } = renderWithProviders(
+      <DateRangePicker variant="underlined" aria-label="r" />,
+    );
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'underlined');
+  });
+
+  it('color="secondary" is forwarded to the internal Input', () => {
+    const { container } = renderWithProviders(<DateRangePicker color="secondary" aria-label="r" />);
+    const inputWrapper = container.querySelector('[data-color]');
+    expect(inputWrapper).toHaveAttribute('data-color', 'secondary');
+  });
+
+  it('variant + color combination: variant="faded" color="warning"', () => {
+    const { container } = renderWithProviders(
+      <DateRangePicker variant="faded" color="warning" aria-label="r" />,
+    );
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'faded');
+    expect(inputWrapper).toHaveAttribute('data-color', 'warning');
+  });
+
+  it('isInvalid overrides color to danger', () => {
+    const { container } = renderWithProviders(
+      <DateRangePicker color="success" isInvalid aria-label="r" />,
+    );
+    const inputWrapper = container.querySelector('[data-color]');
+    expect(inputWrapper).toHaveAttribute('data-color', 'danger');
+  });
+
+  it('variant does not break a11y (axe zero violations)', async () => {
+    const { container } = renderWithProviders(
+      <DateRangePicker variant="bordered" color="secondary" aria-label="r" />,
+    );
+    await expectA11y(container);
   });
 });
 

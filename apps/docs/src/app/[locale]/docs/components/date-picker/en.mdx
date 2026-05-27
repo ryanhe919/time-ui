@@ -42,6 +42,46 @@ export function Demo() {
   <DatePickerSizesDemo />
 </LiveDemo>
 
+## Variants
+
+Four trigger variants matching `Input` — `flat` (default), `bordered`, `faded`, and `underlined`. The variant only affects the input trigger; the calendar panel is unchanged.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <DatePicker variant="flat" placeholder="flat (default)" />
+  <DatePicker variant="bordered" placeholder="bordered" />
+  <DatePicker variant="faded" placeholder="faded" />
+  <DatePicker variant="underlined" placeholder="underlined" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <DatePicker variant="flat" placeholder="flat (default)" />
+    <DatePicker variant="bordered" placeholder="bordered" />
+    <DatePicker variant="faded" placeholder="faded" />
+    <DatePicker variant="underlined" placeholder="underlined" />
+  </Stack>
+</LiveDemo>
+
+## Colors
+
+Six semantic colors. `color` tints the trigger border, focus ring, and soft background — best visible with `bordered` or `faded`. `isInvalid` always forces `danger`.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <DatePicker variant="bordered" color="default" placeholder="Default" />
+  <DatePicker variant="bordered" color="primary" placeholder="Primary" />
+  <DatePicker variant="bordered" color="secondary" placeholder="Secondary" />
+  <DatePicker variant="bordered" color="success" placeholder="Success" />
+  <DatePicker variant="bordered" color="warning" placeholder="Warning" />
+  <DatePicker variant="bordered" color="danger" placeholder="Danger" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <DatePicker variant="bordered" color="default" placeholder="Default" />
+    <DatePicker variant="bordered" color="primary" placeholder="Primary" />
+    <DatePicker variant="bordered" color="secondary" placeholder="Secondary" />
+    <DatePicker variant="bordered" color="success" placeholder="Success" />
+    <DatePicker variant="bordered" color="warning" placeholder="Warning" />
+    <DatePicker variant="bordered" color="danger" placeholder="Danger" />
+  </Stack>
+</LiveDemo>
+
 ## DateRangePicker — range
 
 A range picker with presets and a two-month view. The first click sets `start`; if the second click is earlier than `start` the values swap automatically. While hovering, the panel previews the upcoming range.
@@ -87,6 +127,8 @@ A range picker with presets and a two-month view. The first click sets `start`; 
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Trigger size.' },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: 'Trigger input variant; matches Input / Select.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Trigger semantic color; forced to `danger` when `isInvalid`.' },
   { name: 'panelSize', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Calendar overlay size; scales the panel width, day cells, header, and footer controls together.' },
   { name: 'minValue', type: 'Date', description: 'Earliest selectable date (inclusive).' },
   { name: 'maxValue', type: 'Date', description: 'Latest selectable date (inclusive).' },

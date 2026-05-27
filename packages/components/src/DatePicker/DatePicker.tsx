@@ -74,6 +74,8 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       onOpenChange,
       placement = 'bottom-start',
       size = 'md',
+      variant = 'flat',
+      color = 'default',
       panelSize = 'md',
       minValue,
       maxValue,
@@ -307,6 +309,8 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       >
         <Input
           size={size}
+          variant={variant}
+          color={color}
           value={inputText}
           onChange={handleInputChange}
           onKeyDown={(e) => {

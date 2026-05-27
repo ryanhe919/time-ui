@@ -27,6 +27,46 @@ export function Demo() {
   <DateTimePickerBasicDemo />
 </LiveDemo>
 
+## Variants
+
+Four trigger variants matching `Input` — `flat` (default), `bordered`, `faded`, and `underlined`. The variant only affects the input trigger; the date-time panel is unchanged.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <DateTimePicker variant="flat" placeholder="flat (default)" />
+  <DateTimePicker variant="bordered" placeholder="bordered" />
+  <DateTimePicker variant="faded" placeholder="faded" />
+  <DateTimePicker variant="underlined" placeholder="underlined" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <DateTimePicker variant="flat" placeholder="flat (default)" />
+    <DateTimePicker variant="bordered" placeholder="bordered" />
+    <DateTimePicker variant="faded" placeholder="faded" />
+    <DateTimePicker variant="underlined" placeholder="underlined" />
+  </Stack>
+</LiveDemo>
+
+## Colors
+
+Six semantic colors. `color` tints the trigger border, focus ring, and soft background — best visible with `bordered` or `faded`. `isInvalid` always forces `danger`.
+
+<LiveDemo code={`<Stack spacing={12}>
+  <DateTimePicker variant="bordered" color="default" placeholder="Default" />
+  <DateTimePicker variant="bordered" color="primary" placeholder="Primary" />
+  <DateTimePicker variant="bordered" color="secondary" placeholder="Secondary" />
+  <DateTimePicker variant="bordered" color="success" placeholder="Success" />
+  <DateTimePicker variant="bordered" color="warning" placeholder="Warning" />
+  <DateTimePicker variant="bordered" color="danger" placeholder="Danger" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <DateTimePicker variant="bordered" color="default" placeholder="Default" />
+    <DateTimePicker variant="bordered" color="primary" placeholder="Primary" />
+    <DateTimePicker variant="bordered" color="secondary" placeholder="Secondary" />
+    <DateTimePicker variant="bordered" color="success" placeholder="Success" />
+    <DateTimePicker variant="bordered" color="warning" placeholder="Warning" />
+    <DateTimePicker variant="bordered" color="danger" placeholder="Danger" />
+  </Stack>
+</LiveDemo>
+
 ## Granularity — hide minutes or seconds
 
 Toggle the time columns via `showMinute` (default `true`) and `showSecond` (default `false`). **Hidden fields are forced to `0` when the value is committed** — this is the whole point of the opt-in model: pick the precision you want, and never worry about stray `getSeconds() === 37` leaking out.
@@ -101,6 +141,8 @@ Footer buttons:
   { name: 'isInvalid', type: 'boolean', default: 'false' },
   { name: 'isClearable', type: 'boolean', default: 'false' },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'" },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: 'Trigger input variant; matches Input / Select.' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: 'Trigger semantic color; forced to `danger` when `isInvalid`.' },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
   { name: 'isOpen', type: 'boolean' },
   { name: 'defaultOpen', type: 'boolean', default: 'false' },

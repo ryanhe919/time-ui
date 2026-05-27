@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../../test-utils';
+import { renderWithProviders, expectA11y } from '../../test-utils';
 import { DatePicker } from '../';
 
 // ────────────────────────────────────────────────────────────
@@ -701,5 +701,76 @@ describe('DatePicker — misc props', () => {
   it('uses provided id on the input', () => {
     renderWithProviders(<DatePicker id="my-date" aria-label="d" />);
     expect(screen.getByLabelText('d')).toHaveAttribute('id', 'my-date');
+  });
+});
+
+// ────────────────────────────────────────────────────────────
+// variant + color props
+// ────────────────────────────────────────────────────────────
+
+describe('DatePicker — variant and color props', () => {
+  it('renders with default flat variant and default color when no variant/color passed', () => {
+    const { container } = renderWithProviders(<DatePicker aria-label="d" />);
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'flat');
+    expect(inputWrapper).toHaveAttribute('data-color', 'default');
+  });
+
+  it('variant="bordered" is forwarded to the internal Input', () => {
+    const { container } = renderWithProviders(<DatePicker variant="bordered" aria-label="d" />);
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'bordered');
+  });
+
+  it('variant="faded" is forwarded to the internal Input', () => {
+    const { container } = renderWithProviders(<DatePicker variant="faded" aria-label="d" />);
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'faded');
+  });
+
+  it('variant="underlined" is forwarded to the internal Input', () => {
+    const { container } = renderWithProviders(<DatePicker variant="underlined" aria-label="d" />);
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'underlined');
+  });
+
+  it('color="primary" is forwarded to the internal Input', () => {
+    const { container } = renderWithProviders(<DatePicker color="primary" aria-label="d" />);
+    const inputWrapper = container.querySelector('[data-color]');
+    expect(inputWrapper).toHaveAttribute('data-color', 'primary');
+  });
+
+  it('variant + color combination: variant="faded" color="success"', () => {
+    const { container } = renderWithProviders(
+      <DatePicker variant="faded" color="success" aria-label="d" />,
+    );
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'faded');
+    expect(inputWrapper).toHaveAttribute('data-color', 'success');
+  });
+
+  it('isInvalid overrides color to danger', () => {
+    const { container } = renderWithProviders(
+      <DatePicker variant="bordered" color="primary" isInvalid aria-label="d" />,
+    );
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'bordered');
+    expect(inputWrapper).toHaveAttribute('data-color', 'danger');
+  });
+
+  it('isDisabled + variant renders without error', () => {
+    const { container } = renderWithProviders(
+      <DatePicker variant="bordered" isDisabled aria-label="d" />,
+    );
+    const inputWrapper = container.querySelector('[data-variant]');
+    expect(inputWrapper).toHaveAttribute('data-variant', 'bordered');
+    expect(screen.getByLabelText('Open calendar')).toBeDisabled();
+  });
+
+  it('variant does not break a11y (axe zero violations)', async () => {
+    const { container } = renderWithProviders(
+      <DatePicker variant="bordered" color="primary" aria-label="d" />,
+    );
+    await expectA11y(container);
   });
 });

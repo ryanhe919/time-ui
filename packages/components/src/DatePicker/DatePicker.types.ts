@@ -6,6 +6,7 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 import type { PopoverPlacement } from '../Popover/Popover.types';
+import type { FieldVariant, FieldColor } from '../utils/fieldStyles';
 import type { WeekStartsOn } from './date-utils';
 
 export type DatePickerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -32,6 +33,10 @@ export interface DatePickerCommonProps {
   placement?: PopoverPlacement;
   /** 触发器尺寸，跟随 Input。 */
   size?: DatePickerSize;
+  /** 触发器输入框的变体样式，与 Input / Select 一致。 */
+  variant?: FieldVariant;
+  /** 触发器输入框的颜色主题，与 Input / Select 一致。 */
+  color?: FieldColor;
   /** 弹出日历面板尺寸，默认 'md'。 */
   panelSize?: DatePickerPanelSize;
   minValue?: DateValue;

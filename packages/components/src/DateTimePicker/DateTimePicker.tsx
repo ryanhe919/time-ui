@@ -72,6 +72,8 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       onOpenChange,
       placement = 'bottom-start',
       size = 'md',
+      variant = 'flat',
+      color = 'default',
       minValue,
       maxValue,
       isDateUnavailable,
@@ -389,6 +391,8 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       >
         <Input
           size={size}
+          variant={variant}
+          color={color}
           value={inputText}
           onChange={handleInputChange}
           onKeyDown={(e) => {

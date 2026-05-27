@@ -42,6 +42,46 @@ export function Demo() {
   <DatePickerSizesDemo />
 </LiveDemo>
 
+## 样式 Variants
+
+四种触发器样式，与 `Input` 一致——`flat`（默认）带柔和底色与 hairline 边框；`bordered` 清晰中性边框；`faded` 同时拥有底色与强边框，视觉最突出；`underlined` 只保留底部一条线，适配 Material 风格表单。variant 仅影响输入触发器，日历面板不受影响。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <DatePicker variant="flat" placeholder="flat（默认）" />
+  <DatePicker variant="bordered" placeholder="bordered" />
+  <DatePicker variant="faded" placeholder="faded" />
+  <DatePicker variant="underlined" placeholder="underlined" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <DatePicker variant="flat" placeholder="flat（默认）" />
+    <DatePicker variant="bordered" placeholder="bordered" />
+    <DatePicker variant="faded" placeholder="faded" />
+    <DatePicker variant="underlined" placeholder="underlined" />
+  </Stack>
+</LiveDemo>
+
+## 颜色 Colors
+
+六种语义色。`color` 驱动触发器的边框、聚焦环与背景底色——`bordered` / `faded` 在静态就能看到 tint；`flat` / `underlined` 在聚焦时显现。`isInvalid` 会强制覆盖为 `danger`。
+
+<LiveDemo code={`<Stack spacing={12}>
+  <DatePicker variant="bordered" color="default" placeholder="Default" />
+  <DatePicker variant="bordered" color="primary" placeholder="Primary" />
+  <DatePicker variant="bordered" color="secondary" placeholder="Secondary" />
+  <DatePicker variant="bordered" color="success" placeholder="Success" />
+  <DatePicker variant="bordered" color="warning" placeholder="Warning" />
+  <DatePicker variant="bordered" color="danger" placeholder="Danger" />
+</Stack>`}>
+  <Stack spacing={12}>
+    <DatePicker variant="bordered" color="default" placeholder="Default" />
+    <DatePicker variant="bordered" color="primary" placeholder="Primary" />
+    <DatePicker variant="bordered" color="secondary" placeholder="Secondary" />
+    <DatePicker variant="bordered" color="success" placeholder="Success" />
+    <DatePicker variant="bordered" color="warning" placeholder="Warning" />
+    <DatePicker variant="bordered" color="danger" placeholder="Danger" />
+  </Stack>
+</LiveDemo>
+
 ## DateRangePicker — 区间
 
 带 presets 与双月视图的区间选择。第一次点击设定 `start`，第二次点击若早于 `start` 则自动交换；hover 时面板内会高亮预览区间。
@@ -87,6 +127,8 @@ export function Demo() {
   { name: 'onOpenChange', type: '(open: boolean) => void' },
   { name: 'placement', type: 'PopoverPlacement', default: "'bottom-start'" },
   { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '触发器尺寸。' },
+  { name: 'variant', type: "'flat' | 'bordered' | 'faded' | 'underlined'", default: "'flat'", description: '触发器输入框样式；与 Input / Select 一致。' },
+  { name: 'color', type: "'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'", default: "'default'", description: '触发器语义色；`isInvalid` 时强制 `danger`。' },
   { name: 'panelSize', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '弹出日历面板尺寸；会同步调整面板宽度、日期格、头部与底部操作区。' },
   { name: 'minValue', type: 'Date', description: '最早可选日期（含）。' },
   { name: 'maxValue', type: 'Date', description: '最晚可选日期（含）。' },

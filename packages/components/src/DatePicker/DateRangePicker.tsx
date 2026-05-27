@@ -74,6 +74,8 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       onOpenChange,
       placement = 'bottom-start',
       size = 'md',
+      variant = 'flat',
+      color = 'default',
       panelSize = 'md',
       minValue,
       maxValue,
@@ -373,6 +375,8 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       >
         <Input
           size={size}
+          variant={variant}
+          color={color}
           value={inputText}
           isReadOnly
           onChange={() => {
