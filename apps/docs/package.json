@@ -31,7 +31,7 @@
     "@emotion/react": "^11.13.3",
     "@lezer/highlight": "^1.0.0",
     "@mdx-js/loader": "^3.1.1",
-    "@next/mdx": "^15.5.15",
+    "@next/mdx": "^16.2.7",
     "@timeui/icons": "workspace:*",
     "@timeui/mcp": "workspace:*",
     "@timeui/react": "workspace:*",
