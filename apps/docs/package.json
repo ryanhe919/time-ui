@@ -35,7 +35,7 @@
     "@timeui/icons": "workspace:*",
     "@timeui/mcp": "workspace:*",
     "@timeui/react": "workspace:*",
-    "@tiptap/core": "^2.10.0",
+    "@tiptap/core": "^3.24.0",
     "@tiptap/extension-link": "^2.10.0",
     "@tiptap/extension-placeholder": "^2.10.0",
     "@tiptap/extension-underline": "^2.10.0",

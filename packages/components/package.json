@@ -188,7 +188,7 @@
     "shiki": "^1.0.0",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.0",
-    "@tiptap/core": "^2.10.0",
+    "@tiptap/core": "^3.24.0",
     "@tiptap/react": "^2.10.0",
     "@tiptap/pm": "^2.10.0",
     "@tiptap/starter-kit": "^2.10.0",
