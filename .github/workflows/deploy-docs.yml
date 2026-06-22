@@ -17,7 +17,7 @@ jobs:
     name: Build & Deploy to CentOS Server
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # ── SSH setup happens FIRST so credential issues fail fast ────
       # Without this, a broken DEPLOY_KEY wastes ~3 min of install+build
