@@ -54,6 +54,17 @@ export * from './Skeleton';
 export * from './Empty';
 export * from './Steps';
 export * from './MultiSelect';
+
+// 远程搜索契约：Select / MultiSelect 的 loadOptions 等 props 需要这些类型来标注实现。
+export type {
+  AsyncOptionLike,
+  AsyncSearchProps,
+  AsyncOptionsLoader,
+  AsyncOptionsPage,
+  AsyncOptionsReason,
+  AsyncOptionsRequest,
+} from './utils';
+
 // 注意：以下组件均故意不在主 barrel 暴露，强制使用 subpath import 以避免把
 // optional peer (TipTap / CodeMirror / pdfjs-dist / react-markdown / shiki) 拖进主 bundle：
 //   - RichTextEditor → `@timeui/react/rich-text-editor`     (TipTap)

@@ -117,6 +117,9 @@ import { PopoverDemo } from '@/components/mdx/PopoverDemo';
 import { PopoverPlacementDemo } from '@/components/mdx/PopoverPlacementDemo';
 import { ModalBasicDemo } from '@/components/mdx/ModalBasicDemo';
 import { ModalSizesDemo } from '@/components/mdx/ModalSizesDemo';
+import { ModalDraggableDemo } from '@/components/mdx/ModalDraggableDemo';
+import { SelectRemoteSearchDemo } from '@/components/mdx/SelectRemoteSearchDemo';
+import { MultiSelectRemoteSearchDemo } from '@/components/mdx/MultiSelectRemoteSearchDemo';
 import { TabsBasicDemo } from '@/components/mdx/TabsBasicDemo';
 import { PaginationBasicDemo } from '@/components/mdx/PaginationBasicDemo';
 import { PaginationFullDemo } from '@/components/mdx/PaginationFullDemo';
@@ -214,6 +217,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     PopoverPlacementDemo,
     ModalBasicDemo,
     ModalSizesDemo,
+    ModalDraggableDemo,
+    SelectRemoteSearchDemo,
+    MultiSelectRemoteSearchDemo,
     TabsBasicDemo,
     PaginationBasicDemo,
     PaginationFullDemo,

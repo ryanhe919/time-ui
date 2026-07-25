@@ -110,6 +110,82 @@ Disable all three to get a **forced-flow** dialog that can only be dismissed via
 </Modal>
 ```
 
+## Draggable & resizable
+
+Both are opt-in and default to `false`, so every existing dialog keeps its current behaviour. `isDraggable` turns the built-in header into a drag handle; `isResizable` adds eight edge/corner handles. The panel stays inside the viewport while you drag (`shouldConstrainToViewport`, default `true`) and re-centers the next time it opens unless you pass `shouldResetRectOnClose={false}`.
+
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
+import { Modal, Button } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open draggable modal</Button>
+      <Modal
+        isOpen={open}
+        onOpenChange={setOpen}
+        title="Drag me by the header"
+        isDraggable
+        isResizable
+        onRectChange={(rect, { reason }) => console.log(reason, rect)}
+        footer={<Button onClick={() => setOpen(false)}>Done</Button>}
+      >
+        Drag the title bar to move, drag any edge or corner to resize.
+      </Modal>
+    </>
+  );
+}`}>
+  <ModalDraggableDemo />
+</LiveDemo>
+
+### Custom drag handle
+
+Without a `title` there is no built-in header to grab. Mark any element inside the panel with `data-timeui-modal-drag-handle` (also exported as `MODAL_DRAG_HANDLE_ATTR`) and it becomes the handle. Buttons, links and form controls **inside** the handle stay clickable, and anything tagged `data-timeui-modal-no-drag` is excluded too.
+
+```tsx
+import { Modal, MODAL_DRAG_HANDLE_ATTR } from '@timeui/react';
+
+<Modal isOpen={open} onOpenChange={setOpen} isDraggable aria-label="Editor">
+  <div {...{ [MODAL_DRAG_HANDLE_ATTR]: '' }}>
+    <strong>my-file.tsx</strong>
+    {/* still clickable — it will not start a drag */}
+    <Button variant="ghost" onClick={onMore}>⋯</Button>
+  </div>
+  <Editor />
+</Modal>
+```
+
+### Controlling position and size
+
+`rect` / `defaultRect` / `onRectChange` follow the usual controlled / uncontrolled split. Fields you leave out of `defaultRect` fall back to the measured, centered geometry for the current `size`, so `defaultRect={{ width: 720 }}` simply opens wider and still centered.
+
+```tsx
+const [rect, setRect] = useState<ModalRect>({ x: 120, y: 80, width: 640, height: 420 });
+
+<Modal
+  isOpen={open}
+  onOpenChange={setOpen}
+  title="Preview"
+  isDraggable
+  isResizable
+  rect={rect}
+  onRectChange={setRect}
+  minWidth={360}
+  minHeight={240}
+  resizeHandles={['e', 's', 'se']}
+/>
+```
+
+`onRectChange` also reports **why** the geometry changed: `init` (first measurement), `drag`, `resize`, or `constrain` (the viewport shrank and the panel was pulled back into view).
+
+### Keyboard
+
+Dragging is not mouse-only. With focus anywhere inside the dialog:
+
+- <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + arrow keys — move the panel by 16 px.
+- <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Shift</kbd> + arrow keys — resize the panel by 16 px.
+
 ## API
 
 ### Modal
@@ -128,6 +204,16 @@ Disable all three to get a **forced-flow** dialog that can only be dismissed via
   { name: 'shouldBlockScroll', type: 'boolean', default: 'true', description: 'Lock `body` scroll while the dialog is open.' },
   { name: 'autoFocus', type: 'boolean', default: 'true', description: 'Focus the first focusable element inside the panel on open. When `false`, the panel itself receives focus.' },
   { name: 'shouldReturnFocus', type: 'boolean', default: 'true', description: 'Return focus to the previously focused element on close.' },
+  { name: 'isDraggable', type: 'boolean', default: 'false', description: 'Move the panel by its header, or by any element tagged `data-timeui-modal-drag-handle`.' },
+  { name: 'isResizable', type: 'boolean', default: 'false', description: 'Resize the panel from its edges and corners.' },
+  { name: 'resizeHandles', type: "ModalResizeHandle[]", default: "all eight", description: "Which handles to render — 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'." },
+  { name: 'rect', type: 'ModalRect', description: 'Controlled panel geometry `{ x, y, width, height }` in px.' },
+  { name: 'defaultRect', type: 'Partial<ModalRect>', description: 'Uncontrolled initial geometry; omitted fields fall back to the centered measurement.' },
+  { name: 'onRectChange', type: '(rect: ModalRect, meta: { reason: ModalRectChangeReason }) => void', description: "Fires on 'init' | 'drag' | 'resize' | 'constrain'." },
+  { name: 'minWidth', type: 'number', default: '240', description: 'Lower bound when resizing (px).' },
+  { name: 'minHeight', type: 'number', default: '120', description: 'Lower bound when resizing (px).' },
+  { name: 'shouldConstrainToViewport', type: 'boolean', default: 'true', description: 'Keep the panel fully inside the viewport while dragging / resizing.' },
+  { name: 'shouldResetRectOnClose', type: 'boolean', default: 'true', description: 'Discard the dragged geometry on close so the next open is centered again.' },
   { name: 'children', type: 'ReactNode', description: 'Modal body content.' },
   { name: 'className', type: 'string' },
   { name: 'style', type: 'CSSProperties' },

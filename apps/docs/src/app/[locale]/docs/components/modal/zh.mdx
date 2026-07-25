@@ -110,6 +110,82 @@ export function Demo() {
 </Modal>
 ```
 
+## 拖动与缩放
+
+两者都是 opt-in、默认 `false`，因此现有对话框行为不受任何影响。`isDraggable` 把内置 header 变成拖拽把手；`isResizable` 会在四边四角加上八个缩放把手。拖动过程中面板始终被约束在视口内（`shouldConstrainToViewport`，默认 `true`），关闭后默认丢弃位置、下次打开重新居中——需要保留就传 `shouldResetRectOnClose={false}`。
+
+<LiveDemo previewSource="children" code={`import { useState } from 'react';
+import { Modal, Button } from '@timeui/react';
+
+export function Demo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>打开可拖动 Modal</Button>
+      <Modal
+        isOpen={open}
+        onOpenChange={setOpen}
+        title="拖住标题栏移动我"
+        isDraggable
+        isResizable
+        onRectChange={(rect, { reason }) => console.log(reason, rect)}
+        footer={<Button onClick={() => setOpen(false)}>完成</Button>}
+      >
+        拖标题栏移动窗口，拖边缘或四角缩放。
+      </Modal>
+    </>
+  );
+}`}>
+  <ModalDraggableDemo />
+</LiveDemo>
+
+### 自定义拖拽把手
+
+没有 `title` 时就没有内置 header 可抓。给面板内任意元素加上 `data-timeui-modal-drag-handle`（也以 `MODAL_DRAG_HANDLE_ATTR` 常量导出）即可把它变成把手。把手**内部**的按钮、链接、表单控件依然可以正常点击，标了 `data-timeui-modal-no-drag` 的元素同样不会触发拖动。
+
+```tsx
+import { Modal, MODAL_DRAG_HANDLE_ATTR } from '@timeui/react';
+
+<Modal isOpen={open} onOpenChange={setOpen} isDraggable aria-label="编辑器">
+  <div {...{ [MODAL_DRAG_HANDLE_ATTR]: '' }}>
+    <strong>my-file.tsx</strong>
+    {/* 仍然可点，不会误触发拖动 */}
+    <Button variant="ghost" onClick={onMore}>⋯</Button>
+  </div>
+  <Editor />
+</Modal>
+```
+
+### 受控位置与尺寸
+
+`rect` / `defaultRect` / `onRectChange` 遵循常规的受控 / 非受控划分。`defaultRect` 里省略的字段会回退到当前 `size` 实测的居中几何，所以 `defaultRect={{ width: 720 }}` 就是「更宽一些但依然居中」。
+
+```tsx
+const [rect, setRect] = useState<ModalRect>({ x: 120, y: 80, width: 640, height: 420 });
+
+<Modal
+  isOpen={open}
+  onOpenChange={setOpen}
+  title="预览"
+  isDraggable
+  isResizable
+  rect={rect}
+  onRectChange={setRect}
+  minWidth={360}
+  minHeight={240}
+  resizeHandles={['e', 's', 'se']}
+/>
+```
+
+`onRectChange` 会同时告诉你**变化原因**：`init`（首次测量）、`drag`、`resize`、`constrain`（视口变小后把面板拉回可见区域）。
+
+### 键盘操作
+
+拖动不是鼠标专属。焦点位于对话框内时：
+
+- <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + 方向键 —— 每次移动 16px。
+- <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Shift</kbd> + 方向键 —— 每次缩放 16px。
+
 ## API
 
 ### Modal
@@ -128,6 +204,16 @@ export function Demo() {
   { name: 'shouldBlockScroll', type: 'boolean', default: 'true', description: '打开时锁定 `body` 滚动。' },
   { name: 'autoFocus', type: 'boolean', default: 'true', description: '打开后把焦点放到 panel 内第一个可聚焦元素；否则只 focus panel 自身。' },
   { name: 'shouldReturnFocus', type: 'boolean', default: 'true', description: '关闭时把焦点归还到打开前聚焦的元素。' },
+  { name: 'isDraggable', type: 'boolean', default: 'false', description: '允许拖动面板：把手是内置 header，或任意带 `data-timeui-modal-drag-handle` 的元素。' },
+  { name: 'isResizable', type: 'boolean', default: 'false', description: '允许拖拽边缘 / 四角缩放面板。' },
+  { name: 'resizeHandles', type: 'ModalResizeHandle[]', default: '八向全开', description: "渲染哪些把手 —— 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'。" },
+  { name: 'rect', type: 'ModalRect', description: '受控几何 `{ x, y, width, height }`，单位 px。' },
+  { name: 'defaultRect', type: 'Partial<ModalRect>', description: '非受控初始几何；省略的字段回退到实测的居中值。' },
+  { name: 'onRectChange', type: '(rect: ModalRect, meta: { reason: ModalRectChangeReason }) => void', description: "变化时触发，reason 为 'init' | 'drag' | 'resize' | 'constrain'。" },
+  { name: 'minWidth', type: 'number', default: '240', description: '缩放下限（px）。' },
+  { name: 'minHeight', type: 'number', default: '120', description: '缩放下限（px）。' },
+  { name: 'shouldConstrainToViewport', type: 'boolean', default: 'true', description: '拖动 / 缩放时把面板约束在视口内。' },
+  { name: 'shouldResetRectOnClose', type: 'boolean', default: 'true', description: '关闭后丢弃拖动结果，下次打开重新居中。' },
   { name: 'children', type: 'ReactNode', description: 'Modal 主体内容。' },
   { name: 'className', type: 'string', description: '透传到 panel。' },
   { name: 'style', type: 'CSSProperties', description: '透传到 panel。' },

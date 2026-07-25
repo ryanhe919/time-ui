@@ -629,14 +629,17 @@ describe('MultiSelect', () => {
 
   /* ---------------- isLoading ---------------- */
 
-  it('isLoading: replaces list area with role="status" loading message', async () => {
+  it('isLoading: swaps the options for a role="status" loading message', async () => {
     renderWithProviders(
       <MultiSelect items={ITEMS} isLoading loadingMessage="Loading…" aria-label="fruit" />,
     );
     await userEvent.click(screen.getByRole('combobox'));
     const status = await screen.findByRole('status');
     expect(status).toHaveTextContent('Loading…');
-    expect(screen.queryByRole('listbox')).toBeNull();
+    // listbox 本身保留（trigger 的 aria-controls 必须指向真实存在的元素），但不渲染任何 option
+    const listbox = screen.getByRole('listbox');
+    expect(listbox).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
   });
 
   /* ---------------- tagRender ---------------- */

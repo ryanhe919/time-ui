@@ -13,7 +13,10 @@ module.exports = [
     name: '@timeui/react — full import (no CodeBlock)',
     path: 'packages/components/dist/index.js',
     import: '*',
-    limit: '80 KB',
+    // 2026-07：79.93 KB → 83.5 KB。Modal 拖动/缩放（useModalDragResize）与
+    // Select / MultiSelect 共用的远程搜索内核（useAsyncOptions：debounce、
+    // 竞态取消、分页累积、重试）各贡献约 1.5 KB。上调到 88 KB 留出余量。
+    limit: '88 KB',
     ignore: ['react', 'react-dom', '@emotion/react', '@emotion/styled'],
   },
   {

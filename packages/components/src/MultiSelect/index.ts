@@ -15,6 +15,7 @@ export type {
   MultiSelectSize,
   MultiSelectRadius,
   MultiSelectPlacement,
+  MultiSelectLoadOptions,
   TagRenderOptions,
   OptionRenderOptions,
 } from './MultiSelect.types';

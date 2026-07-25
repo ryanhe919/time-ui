@@ -35,6 +35,16 @@ if (typeof globalThis.IntersectionObserver === 'undefined') {
   ).IntersectionObserver = IntersectionObserverStub;
 }
 
+// jsdom 不实现 PointerEvent — Modal 的拖动 / 缩放交互基于 pointer 事件。
+// MouseEvent 已带 clientX / clientY / button，足够替身之用。
+if (typeof window !== 'undefined' && typeof window.PointerEvent === 'undefined') {
+  Object.defineProperty(window, 'PointerEvent', {
+    configurable: true,
+    writable: true,
+    value: MouseEvent,
+  });
+}
+
 if (typeof globalThis.matchMedia === 'undefined') {
   Object.defineProperty(globalThis, 'matchMedia', {
     writable: true,

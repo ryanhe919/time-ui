@@ -5,6 +5,7 @@
  */
 
 export { Modal, ModalHeader, ModalBody, ModalFooter } from './Modal';
+export { MODAL_DRAG_HANDLE_ATTR } from './useModalDragResize';
 export type {
   ModalProps,
   ModalHeaderProps,
@@ -12,4 +13,7 @@ export type {
   ModalFooterProps,
   ModalSize,
   ModalScrollBehavior,
+  ModalResizeHandle,
+  ModalRect,
+  ModalRectChangeReason,
 } from './Modal.types';

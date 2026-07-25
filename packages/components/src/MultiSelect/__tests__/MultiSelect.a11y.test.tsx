@@ -24,6 +24,12 @@ const ITEMS: MultiSelectItem[] = [
 
 const themes = ['light', 'dark'] as const;
 
+/**
+ * popover 通过 portal 挂到 body，在测试里没有外层 landmark 包裹；
+ * `region` 规则针对的是页面整体结构，与浮层本身的可访问性无关，故关闭。
+ */
+const PORTAL_AXE_OPTIONS = { rules: { region: { enabled: false } } };
+
 describe('MultiSelect a11y', () => {
   test.each(themes)(
     'default + label/description has zero axe violations in %s theme',
@@ -77,6 +83,37 @@ describe('MultiSelect a11y', () => {
       await userEvent.click(screen.getByRole('combobox'));
       await screen.findByRole('listbox');
       await expectA11y(container);
+    },
+  );
+
+  test.each(themes)('remote loading state has zero axe violations in %s theme', async (theme) => {
+    const { baseElement } = renderWithProviders(
+      <MultiSelect aria-label="Fruits" searchMode="remote" isSearchable isLoading items={[]} />,
+      { theme },
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    await screen.findByRole('status');
+    await expectA11y(baseElement, PORTAL_AXE_OPTIONS);
+  });
+
+  test.each(themes)(
+    'remote error + load-more state has zero axe violations in %s theme',
+    async (theme) => {
+      const { baseElement } = renderWithProviders(
+        <MultiSelect
+          aria-label="Fruits"
+          searchMode="remote"
+          isSearchable
+          items={ITEMS}
+          hasMore
+          isLoadingMore
+          loadError="Network down"
+        />,
+        { theme },
+      );
+      await userEvent.click(screen.getByRole('combobox'));
+      await screen.findByRole('alert');
+      await expectA11y(baseElement, PORTAL_AXE_OPTIONS);
     },
   );
 });

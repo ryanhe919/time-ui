@@ -20,6 +20,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
   type ReactNode,
+  type UIEvent as ReactUIEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { useTheme, css } from '@emotion/react';
@@ -27,7 +28,9 @@ import {
   getFieldVariantStyles,
   isDev,
   mergeRefs,
+  useAsyncOptions,
   useControllableState,
+  useDebouncedValue,
   useIsomorphicLayoutEffect,
 } from '../utils';
 import { FormField } from '../FormField';
@@ -143,6 +146,28 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     searchPlaceholder,
     emptyMessage,
     maxListHeight = 280,
+
+    searchMode = 'local',
+    searchValue,
+    onSearchChange,
+    onSearch,
+    searchDebounce = 300,
+    filterOption,
+    loadOptions,
+    searchParams,
+    pageSize = 20,
+    resetOnClose = true,
+    isLoading = false,
+    loadingMessage,
+    isLoadingMore = false,
+    loadingMoreMessage,
+    hasMore = false,
+    onLoadMore,
+    loadMoreThreshold = 48,
+    loadError,
+    onRetry,
+    retryText,
+
     className,
     style,
     id: idProp,
@@ -163,7 +188,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     );
   }
 
-  const sourceItems = useMemo<SelectItem[]>(
+  const localItems = useMemo<SelectItem[]>(
     // items 显式传入优先；否则从子节点推导，保证两种用法行为一致。
     () => items ?? childrenToItems(children),
     [items, children],
@@ -177,14 +202,77 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   });
   const current = rawValue ?? '';
 
-  const currentItem = useMemo(
-    () => sourceItems.find((it) => it.value === current),
-    [sourceItems, current],
-  );
-
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
+  const [rawSearch, setSearch] = useControllableState<string>({
+    value: searchValue,
+    // 受控时必须显式传 undefined，否则 useControllableState 会报「同时受控与非受控」。
+    defaultValue: (searchValue !== undefined ? undefined : '') as string,
+    onChange: onSearchChange,
+    name: 'Select(search)',
+  });
+  const search = rawSearch ?? '';
   const [highlight, setHighlight] = useState(-1);
+
+  // ── 远程选项：托管模式由 hook 自管，受控模式沿用外部 items ──
+  const asyncOptions = useAsyncOptions<SelectItem>({
+    loadOptions,
+    keyword: search,
+    params: searchParams,
+    pageSize,
+    debounceMs: searchDebounce,
+    isOpen: open,
+    resetOnClose,
+  });
+
+  /** 远程模式（托管或受控）下列表由后端决定顺序与内容，前端不再二次过滤。 */
+  const isRemote = asyncOptions.isEnabled || searchMode === 'remote';
+  const sourceItems = asyncOptions.isEnabled ? asyncOptions.items : localItems;
+
+  const resolvedIsLoading = asyncOptions.isEnabled ? asyncOptions.isLoading : isLoading;
+  const resolvedIsLoadingMore = asyncOptions.isEnabled ? asyncOptions.isLoadingMore : isLoadingMore;
+  const resolvedHasMore = asyncOptions.isEnabled ? asyncOptions.hasMore : hasMore;
+  const hasLoadError = asyncOptions.isEnabled
+    ? asyncOptions.error !== undefined || loadError != null
+    : loadError != null;
+
+  // debounce 后通知外部发请求；受控远程模式靠它驱动，展开时也会带空串触发首屏。
+  const debouncedSearch = useDebouncedValue(search, searchDebounce);
+  const onSearchRef = useRef(onSearch);
+  onSearchRef.current = onSearch;
+  useEffect(() => {
+    if (!open) return;
+    onSearchRef.current?.(debouncedSearch);
+  }, [debouncedSearch, open]);
+
+  const requestLoadMore = useCallback(() => {
+    if (asyncOptions.isEnabled) {
+      asyncOptions.loadMore();
+      return;
+    }
+    onLoadMore?.();
+  }, [asyncOptions, onLoadMore]);
+
+  const handleRetry = useCallback(() => {
+    onRetry?.();
+    if (asyncOptions.isEnabled) asyncOptions.retry();
+  }, [asyncOptions, onRetry]);
+
+  /**
+   * 已选项快照。远程搜索会整体替换列表，选中项随时可能不在当前 items 里；
+   * 记住它才能保证 trigger 一直显示正确的 label（而不是退回 placeholder）。
+   */
+  const knownItemsRef = useRef<Map<string, SelectItem>>(new Map());
+  const currentItem = useMemo(() => {
+    if (!current) return undefined;
+    const found =
+      sourceItems.find((it) => it.value === current) ??
+      localItems.find((it) => it.value === current);
+    if (found) {
+      knownItemsRef.current.set(current, found);
+      return found;
+    }
+    return knownItemsRef.current.get(current);
+  }, [sourceItems, localItems, current]);
   const [popoverRect, setPopoverRect] = useState<{
     /** bottom: 菜单挂在 trigger 下方；top: 挂在上方（贴 trigger 顶） */
     placement: 'bottom' | 'top';
@@ -211,10 +299,11 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const listboxId = `${triggerId}-listbox`;
 
   const filteredItems = useMemo(() => {
-    if (!isSearchable || !search) return sourceItems;
+    if (isRemote || !isSearchable || !search) return sourceItems;
+    if (filterOption) return sourceItems.filter((it) => filterOption(search, it));
     const q = search.toLowerCase();
     return sourceItems.filter((it) => labelToString(it.label).toLowerCase().includes(q));
-  }, [sourceItems, search, isSearchable]);
+  }, [sourceItems, search, isSearchable, isRemote, filterOption]);
 
   useEffect(() => {
     if (!open) return;
@@ -261,6 +350,26 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       el.scrollIntoView({ block: 'nearest' });
     }
   }, [highlight, open]);
+
+  const canLoadMore =
+    resolvedHasMore && !resolvedIsLoading && !resolvedIsLoadingMore && !hasLoadError;
+
+  // 键盘走到列表末尾同样要翻页，否则纯键盘用户永远够不到第二页。
+  useEffect(() => {
+    if (!open || highlight < 0 || !canLoadMore) return;
+    if (highlight >= filteredItems.length - 1) requestLoadMore();
+  }, [highlight, open, canLoadMore, filteredItems.length, requestLoadMore]);
+
+  const onListScroll = useCallback(
+    (e: ReactUIEvent<HTMLUListElement>) => {
+      if (!canLoadMore) return;
+      const el = e.currentTarget;
+      if (el.scrollHeight - el.scrollTop - el.clientHeight <= loadMoreThreshold) {
+        requestLoadMore();
+      }
+    },
+    [canLoadMore, loadMoreThreshold, requestLoadMore],
+  );
 
   useIsomorphicLayoutEffect(() => {
     if (!open) {
@@ -319,7 +428,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
       setOpen(false);
       triggerRef.current?.focus();
     },
-    [setValue],
+    [setValue, setSearch],
   );
 
   const moveHighlight = useCallback(
@@ -612,6 +721,46 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
     margin: 0;
   `;
 
+  const statusCss = css`
+    padding: 12px;
+    text-align: center;
+    color: ${theme.colors.text.muted};
+    font-size: 13px;
+    margin: 0;
+    list-style: none;
+  `;
+
+  const errorCss = css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 1px solid ${theme.colors.border.subtle ?? theme.colors.border.default};
+    color: ${theme.colors.danger[600]};
+    font-size: 12px;
+  `;
+
+  const retryButtonCss = css`
+    appearance: none;
+    border: 1px solid ${theme.colors.border.default};
+    background: transparent;
+    color: ${theme.colors.text.primary};
+    border-radius: 6px;
+    padding: 3px 8px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    &:hover {
+      background: ${theme.colors.bg.muted ?? theme.colors.bg.sunken};
+    }
+    &:focus-visible {
+      outline: 2px solid ${theme.colors.focus};
+      outline-offset: 1px;
+    }
+  `;
+
   const renderOption = (it: SelectItem, idx: number) => {
     const isSelected = it.value === current;
     const isHighlighted = idx === highlight;
@@ -728,12 +877,19 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
   const showEmpty = filteredItems.length === 0;
   const defaultSearchPlaceholder = searchPlaceholder ?? 'Search…';
   const defaultEmptyMessage = emptyMessage ?? 'No results';
+  const defaultLoadingMessage = loadingMessage ?? 'Loading…';
+  const defaultLoadingMoreMessage = loadingMoreMessage ?? 'Loading more…';
+  const defaultLoadErrorMessage = loadError ?? 'Failed to load options';
+  const defaultRetryText = retryText ?? 'Retry';
 
   const isEmptyValue = !current;
   const triggerLabel: ReactNode = currentItem?.label ?? placeholder ?? '';
 
+  // 首屏 loading 时 listbox 里没有任何 option，此时不能留下指向 option 的 activedescendant。
+  const hasRenderedOptions = open && !resolvedIsLoading;
+
   const activeDescendantId =
-    open && highlight >= 0 && highlight < filteredItems.length
+    hasRenderedOptions && highlight >= 0 && highlight < filteredItems.length
       ? `${listboxId}-opt-${highlight}`
       : undefined;
 
@@ -865,7 +1021,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
                     placeholder={defaultSearchPlaceholder}
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={onSearchKeyDown}
-                    aria-controls={listboxId}
+                    aria-controls={open ? listboxId : undefined}
                     aria-autocomplete="list"
                     // 每次 popover 打开都会重新挂载 input，autoFocus 因此在每次
                     // 打开时同步聚焦——比 useEffect+RAF 更可靠，且测试可用。
@@ -874,22 +1030,54 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectProps>(function Select
                 </div>
               ) : null}
 
+              {/* listbox 始终渲染：trigger 的 aria-expanded 依赖 aria-controls 指向一个真实存在的元素 */}
+              {resolvedIsLoading ? (
+                <div role="status" aria-live="polite" css={statusCss}>
+                  {defaultLoadingMessage}
+                </div>
+              ) : null}
+
               <ul
                 ref={listRef}
                 id={listboxId}
                 role="listbox"
                 aria-labelledby={ariaLabelledByProp}
+                aria-busy={resolvedIsLoading || resolvedIsLoadingMore || undefined}
                 tabIndex={-1}
                 css={listCss}
+                onScroll={onListScroll}
               >
-                {showEmpty ? (
-                  <li role="presentation" css={emptyCss}>
-                    {defaultEmptyMessage}
-                  </li>
+                {resolvedIsLoading ? null : showEmpty ? (
+                  // 加载失败时列表为空是「没拿到数据」而不是「没有结果」，交给下方错误块说明。
+                  hasLoadError ? null : (
+                    <li role="presentation" css={emptyCss}>
+                      {defaultEmptyMessage}
+                    </li>
+                  )
                 ) : (
                   filteredItems.map(renderOption)
                 )}
+                {resolvedIsLoadingMore ? (
+                  <li role="presentation" css={statusCss} data-timeui-select-loading-more="">
+                    {defaultLoadingMoreMessage}
+                  </li>
+                ) : null}
               </ul>
+
+              {hasLoadError ? (
+                <div role="alert" css={errorCss} data-timeui-select-error="">
+                  <span>{defaultLoadErrorMessage}</span>
+                  <button
+                    type="button"
+                    // 阻止默认行为以免搜索框在点重试时失焦。
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={handleRetry}
+                    css={retryButtonCss}
+                  >
+                    {defaultRetryText}
+                  </button>
+                </div>
+              ) : null}
             </div>,
             document.body,
           )
