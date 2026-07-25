@@ -1,12 +1,11 @@
 # @timeui/react
 
-## 2.2.0
+## 2.2.1
 
 ### Minor Changes
 
-- 0578648: feat(datepicker): add `variant` and `color` props to DatePicker, DateRangePicker, and DateTimePicker
-
-  The three date/time picker components now accept `variant` (`flat` | `bordered` | `faded` | `underlined`) and `color` (`default` | `primary` | `secondary` | `success` | `warning` | `danger`) props, matching the existing Input / Select / MultiSelect field styling system. Props are transparently forwarded to the internal `<Input>` trigger — no new tokens or style overrides are introduced.
+> 版本号说明：`2.2.0` 已于此前发布到 npm（内容见下方 2.2.0 条目），仓库侧的 version commit
+> 随后被回滚，因此本次变更以 `2.2.1` 发布。功能上属于 minor 级别的新增。
 
 - de7b580: Modal 支持拖动与缩放；Select / MultiSelect 接入后端搜索与分页。
 
@@ -36,6 +35,14 @@
   - @timeui/tokens@1.7.0
   - @timeui/core@1.5.5
   - @timeui/themes@1.2.8
+
+## 2.2.0
+
+### Minor Changes
+
+- 0578648: feat(datepicker): add `variant` and `color` props to DatePicker, DateRangePicker, and DateTimePicker
+
+  The three date/time picker components now accept `variant` (`flat` | `bordered` | `faded` | `underlined`) and `color` (`default` | `primary` | `secondary` | `success` | `warning` | `danger`) props, matching the existing Input / Select / MultiSelect field styling system. Props are transparently forwarded to the internal `<Input>` trigger — no new tokens or style overrides are introduced.
 
 ## 2.1.1
 
