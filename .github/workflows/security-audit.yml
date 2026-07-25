@@ -5,13 +5,17 @@ on:
     branches: [main]
     paths:
       - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
       - '**/package.json'
+      - 'osv-scanner.toml'
       - '.github/workflows/security-audit.yml'
   push:
     branches: [main]
     paths:
       - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
       - '**/package.json'
+      - 'osv-scanner.toml'
   schedule:
     # Every Monday 01:00 UTC — catches newly-disclosed CVEs on already-pinned deps.
     - cron: '0 1 * * 1'

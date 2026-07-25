@@ -1,3 +1,54 @@
 packages:
   - 'packages/*'
   - 'apps/*'
+
+# pnpm 10 起不再读取 package.json 里的 `pnpm` 字段（会打印 "no longer read" 警告并
+# 静默忽略），overrides 与构建脚本白名单都必须写在这里。之前放在 package.json 的那份
+# 从升级 pnpm 那一刻起就没生效过 —— security-audit 长期飘红的根因即此。
+#
+# 维护约定：
+#  1. 每条 override 都对应 OSV 报出的 advisory，选择器写成 `pkg@<修复版本`，
+#     这样上游自己修好后 override 会自动变成 no-op，不会把依赖钉死在某个版本。
+#  2. 替换范围**必须带上界**锁在同一个 major 内。不写上界时 pnpm 会解析到最新的
+#     major（实测把 vite 7 拉到 8、js-yaml 4 拉到 5），等于用一个安全补丁换来一次
+#     不受控的破坏性升级。0.x 的包按 minor 收敛（0.x 的 minor 即 breaking）。
+# 复核命令：`osv-scanner scan source --lockfile=pnpm-lock.yaml`
+overrides:
+  # --- 传递依赖，无法靠自身 semver range 自愈 ---
+  'basic-ftp@<5.3.0': '>=5.3.0 <6'
+  'esbuild@<0.28.1': '>=0.28.1 <0.29'
+  'fast-uri@<3.1.4': '>=3.1.4 <4'
+  'form-data@<4.0.6': '>=4.0.6 <5'
+  'hono@<4.12.27': '>=4.12.27 <5'
+  # 1.x 线没有补丁（GHSA-frvp-7c67-39w9 只在 2.0.5 修复），只能跨 major。
+  # @modelcontextprotocol/sdk 声明的是 ^1.19.9，但 2.x 的 peer 仍是 `hono: ^4`
+  # 且 engines 要求 node>=20（本仓库 .nvmrc = 24），实测 MCP 的 HTTP transport 正常。
+  '@hono/node-server@<2.0.5': '>=2.0.5 <3'
+  'ip-address@<10.1.1': '>=10.1.1 <11'
+  'linkify-it@<5.0.2': '>=5.0.2 <6'
+  'markdown-it@<14.2.0': '>=14.2.0 <15'
+  'postcss@<8.5.18': '>=8.5.18 <9'
+  'qs@<6.15.2': '>=6.15.2 <7'
+  'sharp@<0.35.0': '>=0.35.0 <0.36'
+  'vite@<7.3.5': '>=7.3.5 <8'
+  'ws@<8.20.1': '>=8.20.1 <9'
+
+  # --- 同时存在多条 major 线，逐段抬到各自的修复版本 ---
+  'body-parser@<1.20.6': '>=1.20.6 <2'
+  'body-parser@>=2 <2.3.0': '>=2.3.0 <3'
+  'js-yaml@<3.15.0': '>=3.15.0 <4'
+  'js-yaml@>=4 <4.3.0': '>=4.3.0 <5'
+  # brace-expansion: GHSA-3jxr 每条线都有补丁，抬到各自最高补丁版即可。
+  # GHSA-mh99-v99m-4gvg 只在 5.0.8 修复，但 5.x 的 CJS 入口导出的是对象而非函数，
+  # 而 minimatch@3（eslint 依赖链）的用法是 `require('brace-expansion')(pattern)`,
+  # 实测统一抬到 5.x 会让全部 8 个包的 lint 直接失败。因此 1.x / 2.x 维持在各自
+  # 补丁版，GHSA-mh99 在 osv-scanner.toml 里带理由豁免（纯 devDependency 链）。
+  'brace-expansion@<1.1.16': '>=1.1.16 <2'
+  'brace-expansion@>=2 <2.1.2': '>=2.1.2 <3'
+  'brace-expansion@>=5 <5.0.8': '>=5.0.8 <6'
+
+# 这些包的 install 脚本不在 CI 里执行（原本也在 package.json 的 pnpm 字段中）。
+ignoredBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - sharp

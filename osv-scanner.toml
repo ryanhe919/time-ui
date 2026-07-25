@@ -1,0 +1,22 @@
+# osv-scanner 配置 —— 被 .github/workflows/security-audit.yml 的
+# `osv-scanner scan source --lockfile=pnpm-lock.yaml` 自动读取。
+#
+# 只在「上游确实没有可用补丁」且「风险面已评估」时才往这里加条目，
+# 并写清楚为什么不能修。能靠 pnpm-workspace.yaml 的 overrides 解决的一律不豁免。
+
+[[IgnoredVulns]]
+id = "GHSA-mh99-v99m-4gvg"
+# 复审日期：到期后 osv-scanner 会重新报出来，届时确认 minimatch@3 链是否已消失，
+# 或 brace-expansion 是否为 1.x / 2.x 补发了补丁。
+ignoreUntil = 2027-01-31
+reason = """
+brace-expansion ReDoS。该 advisory 只在 5.0.8 修复，1.x / 2.x 线没有补丁。
+
+不能强升到 5.x：5.0.8 的 CJS 入口导出的是对象而非函数，而 minimatch@3
+（eslint -> @eslint/config-array 依赖链）的用法是 `require('brace-expansion')(pattern)`，
+实测统一抬到 5.x 会让仓库全部 8 个包的 lint 立刻失败。
+
+风险面：命中的 1.1.16 / 2.1.2 全部来自 eslint 依赖链，属于 devDependency，
+不进入任何已发布包的运行时，也不处理不可信输入（只解析本地 glob 模式）。
+已通过 pnpm-workspace.yaml 的 overrides 抬到各自线上的最高补丁版（GHSA-3jxr 已修复）。
+"""
