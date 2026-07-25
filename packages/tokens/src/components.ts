@@ -347,6 +347,15 @@ export const modalTokens = {
   panelDuration: '250ms',
   panelEnterTranslateY: '8px',
   panelEnterScale: 0.985,
+  /** 边缘 resize 把手的命中宽度（超出 panel 一半，视觉上贴边但更好点中）。 */
+  resizeHandleSize: '8px',
+  /** 四角 resize 把手的命中边长。 */
+  resizeHandleCornerSize: '16px',
+  /** 可拖拽时 panel 允许被缩放到的最小尺寸。 */
+  minWidth: '240px',
+  minHeight: '120px',
+  /** 距视口边缘的最小留白，约束拖拽/缩放不让 panel 完全移出屏幕。 */
+  viewportPadding: '8px',
 } as const;
 
 export const tabsSizes = {

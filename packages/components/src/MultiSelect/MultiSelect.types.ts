@@ -9,6 +9,7 @@
 
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import type { FieldColor, FieldVariant } from '../utils/fieldStyles';
+import type { AsyncOptionsLoader, AsyncSearchProps } from '../utils/useAsyncOptions';
 
 export type MultiSelectSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -43,10 +44,15 @@ export interface OptionRenderOptions {
 
 type MultiSelectPassthrough = Omit<
   HTMLAttributes<HTMLDivElement>,
-  'role' | 'children' | 'onChange' | 'defaultValue'
+  // 末项排除远程搜索相关键，避免与 DOM 事件属性（如 onSearch）撞名。
+  'role' | 'children' | 'onChange' | 'defaultValue' | keyof AsyncSearchProps<MultiSelectItem>
 >;
 
-export interface MultiSelectProps extends MultiSelectPassthrough {
+/** MultiSelect 的远程选项加载器。 */
+export type MultiSelectLoadOptions = AsyncOptionsLoader<MultiSelectItem>;
+
+export interface MultiSelectProps
+  extends MultiSelectPassthrough, AsyncSearchProps<MultiSelectItem> {
   /** 受控值。提供则进入受控模式。 */
   value?: string[];
   /** 非受控初始值。 */
@@ -54,7 +60,12 @@ export interface MultiSelectProps extends MultiSelectPassthrough {
   /** 变化回调；参数为新数组（已去重）。 */
   onChange?: (value: string[]) => void;
 
-  /** items 提供则忽略 children（与 Select 一致）。 */
+  /**
+   * items 提供则忽略 children（与 Select 一致）。
+   *
+   * 远程模式下它不再是列表数据源，而是「已知项」补充——把当前 `value` 对应的
+   * item 放进来即可保证首屏未加载时 chip 也能显示正确的 label。
+   */
   items?: MultiSelectItem[];
   /** 仅接受 `<MultiSelectOption>` / `<MultiSelectOptGroup>`。 */
   children?: ReactNode;
@@ -71,13 +82,11 @@ export interface MultiSelectProps extends MultiSelectPassthrough {
   isReadOnly?: boolean;
   isInvalid?: boolean;
   isRequired?: boolean;
-  isLoading?: boolean;
 
   isSearchable?: boolean;
   searchPlaceholder?: string;
-  filterOption?: (input: string, item: MultiSelectItem) => boolean;
   emptyMessage?: ReactNode;
-  loadingMessage?: ReactNode;
+  // isLoading / loadingMessage / filterOption 以及全套远程搜索 props 见 AsyncSearchProps。
 
   isClearable?: boolean;
   clearButtonTabIndex?: number;

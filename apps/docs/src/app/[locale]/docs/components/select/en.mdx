@@ -139,6 +139,108 @@ lists or when users can't remember the full option name.
   />
 </LiveDemo>
 
+## Server-side search & pagination
+
+`isSearchable` alone filters the `items` you already have. When the option set lives behind an API, Select can talk to it directly — with debounce, in-flight cancellation, infinite scroll and retry handled for you. There are three modes and they are fully backwards compatible:
+
+| Mode | How you opt in | Who owns the data |
+| --- | --- | --- |
+| **Local** (default) | nothing to do | you pass `items` / `<SelectOption>`; the component filters |
+| **Managed remote** | pass `loadOptions` | the component fetches, paginates and caches |
+| **Controlled remote** | `searchMode="remote"` + your own `items` | you fetch; the component only renders |
+
+### Managed remote (`loadOptions`)
+
+Give Select an async loader and it takes care of the rest: the keyword is debounced (`searchDebounce`, 300 ms), each new query cancels the previous one via `AbortSignal`, out-of-order responses are discarded, scrolling to the bottom pulls the next page, and a failure shows an inline retry.
+
+<LiveDemo previewSource="children" code={`import { Select } from '@timeui/react';
+
+<Select
+  label="Assignee"
+  placeholder="Search users…"
+  isSearchable
+  isFullWidth
+  value={assignee}
+  onChange={setAssignee}
+  pageSize={20}
+  searchParams={{ dept }}
+  loadOptions={async ({ keyword, page, pageSize, params, signal }) => {
+    const res = await fetch(
+      \`/api/users?q=\${encodeURIComponent(keyword)}&page=\${page}&size=\${pageSize}&dept=\${params.dept}\`,
+      { signal },
+    );
+    const data = await res.json();
+    return { items: data.list, hasMore: data.hasNext, total: data.total };
+  }}
+/>`}>
+  <SelectRemoteSearchDemo />
+</LiveDemo>
+
+The loader receives everything it needs to build a request:
+
+```ts
+loadOptions: (req: {
+  keyword: string;      // the debounced search term
+  page: number;         // 1-based
+  pageSize: number;     // from the `pageSize` prop (default 20)
+  params?: Record<string, unknown>;  // whatever you put in `searchParams`
+  reason: 'open' | 'search' | 'params' | 'loadMore' | 'retry';
+  signal: AbortSignal;  // forward it to fetch to cancel superseded requests
+}) => Promise<{ items: SelectItem[]; hasMore?: boolean; total?: number } | SelectItem[]>
+```
+
+Returning a bare array is fine — `hasMore` is then inferred from `items.length >= pageSize`.
+
+### Extra query parameters
+
+`searchParams` is merged into every request as `params`, and **changing it re-runs the search from page 1**. That is how you wire a Select to sibling filters (department, project, status…) without writing an effect.
+
+```tsx
+<Select isSearchable loadOptions={loadUsers} searchParams={{ dept, includeArchived }} />
+```
+
+### Pagination
+
+Pages accumulate in order and are de-duplicated by `value`, so overlapping backend pages never produce duplicate rows. The next page is requested when the list scrolls within `loadMoreThreshold` (48 px) of the bottom — and also when keyboard navigation reaches the last option, so keyboard users can page through too.
+
+### Controlled remote
+
+If you already have a data layer (React Query, SWR, Redux…), keep it and let Select render:
+
+```tsx
+const [keyword, setKeyword] = useState('');
+const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error, refetch } =
+  useUsers(keyword);
+
+<Select
+  isSearchable
+  searchMode="remote"          {/* skip local filtering */}
+  items={data?.items ?? []}
+  searchValue={keyword}
+  onSearchChange={setKeyword}  {/* every keystroke */}
+  onSearch={runQuery}          {/* debounced — fire the request here */}
+  isLoading={isLoading}
+  isLoadingMore={isFetchingNextPage}
+  hasMore={hasNextPage}
+  onLoadMore={fetchNextPage}
+  loadError={error ? 'Could not load users' : undefined}
+  onRetry={refetch}
+/>
+```
+
+### Keeping the selected label
+
+Remote results are replaced on every new query, so the selected option often is not in the current list. Select remembers the label of whatever you picked, and also looks into `items` — pass the already-known option there to render a preselected value that has not been fetched yet:
+
+```tsx
+<Select
+  value={user.id}
+  items={[{ value: user.id, label: user.name }]}  {/* known option for the initial render */}
+  loadOptions={loadUsers}
+  isSearchable
+/>
+```
+
 ## Long list + scrolling
 
 When there are many options the popover clamps to a max height (280px by
@@ -286,6 +388,26 @@ export function FrameworkPicker() {
   { name: 'searchPlaceholder', type: 'string', default: "'Search…'", description: 'Placeholder for the search input.' },
   { name: 'emptyMessage', type: 'ReactNode', default: "'No results'", description: 'Shown when the filter matches zero items.' },
   { name: 'maxListHeight', type: 'number | string', default: '280', description: 'Max height of the scrollable option list.' },
+  { name: 'searchMode', type: "'local' | 'remote'", default: "'local'", description: "'remote' skips local filtering — the backend decides what the list shows." },
+  { name: 'loadOptions', type: 'SelectLoadOptions', description: 'Managed remote loader. Handles debounce, cancellation, pagination and retry for you.' },
+  { name: 'searchParams', type: 'Record<string, unknown>', description: 'Extra params sent with every request; changing it re-searches from page 1.' },
+  { name: 'pageSize', type: 'number', default: '20', description: 'Page size passed to `loadOptions`.' },
+  { name: 'searchValue', type: 'string', description: 'Controlled search keyword.' },
+  { name: 'onSearchChange', type: '(keyword: string) => void', description: 'Fires on every keystroke.' },
+  { name: 'onSearch', type: '(keyword: string) => void', description: 'Fires after the debounce — issue your request here in controlled remote mode.' },
+  { name: 'searchDebounce', type: 'number', default: '300', description: 'Debounce in ms; `0` disables it.' },
+  { name: 'filterOption', type: '(input: string, item: SelectItem) => boolean', description: 'Custom local filter; ignored in remote mode.' },
+  { name: 'isLoading', type: 'boolean', default: 'false', description: 'First-page loading state (controlled remote mode).' },
+  { name: 'loadingMessage', type: 'ReactNode', default: "'Loading…'" },
+  { name: 'isLoadingMore', type: 'boolean', default: 'false', description: 'Next-page loading state (controlled remote mode).' },
+  { name: 'loadingMoreMessage', type: 'ReactNode', default: "'Loading more…'" },
+  { name: 'hasMore', type: 'boolean', default: 'false', description: 'Whether another page exists (controlled remote mode).' },
+  { name: 'onLoadMore', type: '() => void', description: 'Called when the list scrolls to the bottom (controlled remote mode).' },
+  { name: 'loadMoreThreshold', type: 'number', default: '48', description: 'Distance from the bottom (px) that triggers `onLoadMore`.' },
+  { name: 'loadError', type: 'ReactNode', description: 'Inline failure message; managed mode falls back to a default one.' },
+  { name: 'onRetry', type: '() => void', description: 'Retry button handler; managed mode also re-issues the request.' },
+  { name: 'retryText', type: 'ReactNode', default: "'Retry'" },
+  { name: 'resetOnClose', type: 'boolean', default: 'true', description: 'Drop remote results when the popover closes.' },
   { name: 'name', type: 'string', description: 'Forwarded to a hidden `<input>` so native form submission carries the value.' },
   { name: 'label', type: 'ReactNode', description: 'Field title; triggers implicit FormField wrapping.' },
   { name: 'description', type: 'ReactNode', description: 'Helper text.' },

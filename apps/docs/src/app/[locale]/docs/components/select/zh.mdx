@@ -132,6 +132,108 @@
   />
 </LiveDemo>
 
+## 后端搜索与分页
+
+只开 `isSearchable` 是在已有 `items` 里做前端过滤。当选项来自接口时，Select 可以直接对接后端——debounce、请求取消、无限滚动、失败重试都由组件处理。三种模式互相兼容，老代码零改动：
+
+| 模式 | 如何启用 | 数据由谁负责 |
+| --- | --- | --- |
+| **本地**（默认） | 什么都不用做 | 你传 `items` / `<SelectOption>`，组件负责过滤 |
+| **托管远程** | 传 `loadOptions` | 组件负责请求、分页、缓存 |
+| **受控远程** | `searchMode="remote"` + 自己维护 `items` | 你负责请求，组件只负责渲染 |
+
+### 托管远程（`loadOptions`）
+
+给 Select 一个异步加载函数，剩下的它全包了：关键词自动 debounce（`searchDebounce`，默认 300ms）、新请求通过 `AbortSignal` 取消上一次、乱序返回自动丢弃、滚动触底拉下一页、失败时就地给出重试按钮。
+
+<LiveDemo previewSource="children" code={`import { Select } from '@timeui/react';
+
+<Select
+  label="负责人"
+  placeholder="搜索用户…"
+  isSearchable
+  isFullWidth
+  value={assignee}
+  onChange={setAssignee}
+  pageSize={20}
+  searchParams={{ dept }}
+  loadOptions={async ({ keyword, page, pageSize, params, signal }) => {
+    const res = await fetch(
+      \`/api/users?q=\${encodeURIComponent(keyword)}&page=\${page}&size=\${pageSize}&dept=\${params.dept}\`,
+      { signal },
+    );
+    const data = await res.json();
+    return { items: data.list, hasMore: data.hasNext, total: data.total };
+  }}
+/>`}>
+  <SelectRemoteSearchDemo />
+</LiveDemo>
+
+加载函数拿到的入参足以拼出任何请求：
+
+```ts
+loadOptions: (req: {
+  keyword: string;      // debounce 之后的搜索词
+  page: number;         // 从 1 开始
+  pageSize: number;     // 来自 pageSize prop（默认 20）
+  params?: Record<string, unknown>;  // 你放进 searchParams 的内容
+  reason: 'open' | 'search' | 'params' | 'loadMore' | 'retry';
+  signal: AbortSignal;  // 转发给 fetch 即可自动取消过期请求
+}) => Promise<{ items: SelectItem[]; hasMore?: boolean; total?: number } | SelectItem[]>
+```
+
+直接返回数组也可以——此时 `hasMore` 按 `items.length >= pageSize` 推断。
+
+### 给后端传额外参数
+
+`searchParams` 会作为 `params` 随每次请求下发，**并且它一变就从第一页重新搜索**。想让 Select 跟着旁边的筛选器（部门、项目、状态…）联动，不需要自己写 effect：
+
+```tsx
+<Select isSearchable loadOptions={loadUsers} searchParams={{ dept, includeArchived }} />
+```
+
+### 分页
+
+多页结果按顺序累积，并按 `value` 去重——后端分页有重叠也不会出现重复行。列表滚动到距底部 `loadMoreThreshold`（默认 48px）时请求下一页；键盘导航走到最后一项时同样会翻页，纯键盘用户不会被卡在第一页。
+
+### 受控远程
+
+如果你已经有数据层（React Query / SWR / Redux…），保留它，让 Select 只管渲染：
+
+```tsx
+const [keyword, setKeyword] = useState('');
+const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error, refetch } =
+  useUsers(keyword);
+
+<Select
+  isSearchable
+  searchMode="remote"          {/* 跳过本地过滤 */}
+  items={data?.items ?? []}
+  searchValue={keyword}
+  onSearchChange={setKeyword}  {/* 每次击键 */}
+  onSearch={runQuery}          {/* debounce 之后：在这里发请求 */}
+  isLoading={isLoading}
+  isLoadingMore={isFetchingNextPage}
+  hasMore={hasNextPage}
+  onLoadMore={fetchNextPage}
+  loadError={error ? '加载用户失败' : undefined}
+  onRetry={refetch}
+/>
+```
+
+### 已选项的回显
+
+远程结果每次搜索都会整体替换，选中项经常不在当前列表里。Select 会记住你选过的项的 label；同时它也会在 `items` 里兜底查找——把已知选项放进去，就能在数据尚未加载时正确回显：
+
+```tsx
+<Select
+  value={user.id}
+  items={[{ value: user.id, label: user.name }]}  {/* 首屏回显用的已知项 */}
+  loadOptions={loadUsers}
+  isSearchable
+/>
+```
+
 ## 长列表 + 滚动
 
 选项很多时，popover 自动限制高度（默认 280px），多余部分出现滚动条。也可以用 `maxListHeight` 自定义。
@@ -276,6 +378,26 @@ export function FrameworkPicker() {
   { name: 'searchPlaceholder', type: 'string', default: "'Search…'", description: '搜索框占位符。' },
   { name: 'emptyMessage', type: 'ReactNode', default: "'No results'", description: '搜索无结果时的空态文案。' },
   { name: 'maxListHeight', type: 'number | string', default: '280', description: '选项列表的最大高度；超出时出现滚动条。' },
+  { name: 'searchMode', type: "'local' | 'remote'", default: "'local'", description: "'remote' 跳过本地过滤，列表内容完全由后端决定。" },
+  { name: 'loadOptions', type: 'SelectLoadOptions', description: '托管远程加载器：debounce / 取消 / 分页 / 重试全由组件处理。' },
+  { name: 'searchParams', type: 'Record<string, unknown>', description: '随每次请求下发的额外参数；变化时从第一页重新搜索。' },
+  { name: 'pageSize', type: 'number', default: '20', description: '传给 `loadOptions` 的每页条数。' },
+  { name: 'searchValue', type: 'string', description: '受控搜索词。' },
+  { name: 'onSearchChange', type: '(keyword: string) => void', description: '每次击键都触发。' },
+  { name: 'onSearch', type: '(keyword: string) => void', description: 'debounce 之后触发；受控远程模式在这里发请求。' },
+  { name: 'searchDebounce', type: 'number', default: '300', description: 'debounce 毫秒；传 0 关闭。' },
+  { name: 'filterOption', type: '(input: string, item: SelectItem) => boolean', description: '自定义本地过滤；remote 模式下不生效。' },
+  { name: 'isLoading', type: 'boolean', default: 'false', description: '首屏加载态（受控远程模式）。' },
+  { name: 'loadingMessage', type: 'ReactNode', default: "'Loading…'" },
+  { name: 'isLoadingMore', type: 'boolean', default: 'false', description: '下一页加载态（受控远程模式）。' },
+  { name: 'loadingMoreMessage', type: 'ReactNode', default: "'Loading more…'" },
+  { name: 'hasMore', type: 'boolean', default: 'false', description: '是否还有下一页（受控远程模式）。' },
+  { name: 'onLoadMore', type: '() => void', description: '列表滚动触底时调用（受控远程模式）。' },
+  { name: 'loadMoreThreshold', type: 'number', default: '48', description: '触发 `onLoadMore` 的距底阈值（px）。' },
+  { name: 'loadError', type: 'ReactNode', description: '失败提示；托管模式下有默认文案。' },
+  { name: 'onRetry', type: '() => void', description: '重试按钮回调；托管模式还会自动重发请求。' },
+  { name: 'retryText', type: 'ReactNode', default: "'Retry'" },
+  { name: 'resetOnClose', type: 'boolean', default: 'true', description: '收起时是否丢弃远程结果。' },
   { name: 'name', type: 'string', description: '隐藏 `<input>` 的 name，用于原生表单提交。' },
   { name: 'label', type: 'ReactNode', description: '字段标题；触发隐式 FormField 包装。' },
   { name: 'description', type: 'ReactNode', description: '辅助文案。' },

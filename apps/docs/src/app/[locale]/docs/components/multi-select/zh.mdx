@@ -230,6 +230,72 @@ trigger 自动测量可用宽度并把超出的 chip 折成 `+N`。鼠标移到 
   />
 </LiveDemo>
 
+## 后端搜索与分页
+
+MultiSelect 与 [Select](/docs/components/select#后端搜索与分页) 共用同一套远程搜索契约：传入 `loadOptions`，组件负责 debounce 关键词、取消过期请求、滚动分页、失败重试。全部 opt-in——不传这些 props 时，现有的前端过滤行为完全不变。
+
+<LiveDemo previewSource="children" code={`import { MultiSelect } from '@timeui/react';
+
+<MultiSelect
+  label="评审人"
+  placeholder="搜索并选择评审人…"
+  isSearchable
+  isClearable
+  isFullWidth
+  value={value}
+  onChange={setValue}
+  pageSize={20}
+  maxTagCount={3}
+  loadOptions={async ({ keyword, page, pageSize, signal }) => {
+    const res = await fetch(
+      \`/api/users?q=\${encodeURIComponent(keyword)}&page=\${page}&size=\${pageSize}\`,
+      { signal },
+    );
+    const data = await res.json();
+    return { items: data.list, hasMore: data.hasNext, total: data.total };
+  }}
+/>`}>
+  <MultiSelectRemoteSearchDemo />
+</LiveDemo>
+
+### chip 不会因为搜索而丢 label
+
+这件事对多选比单选更要紧：换一次关键词后，之前选中的项通常已经不在列表里了。MultiSelect 会为选过的每一项留一份快照，chip 因此始终显示真实 label，而不会退化成裸 `value`。对于上次会话选中的值，把已知选项通过 `items` 传进来，首屏就能正确解析：
+
+```tsx
+<MultiSelect
+  value={reviewerIds}
+  items={knownReviewers}   {/* 已选 id 的 label 来源 */}
+  loadOptions={loadUsers}
+  isSearchable
+/>
+```
+
+### 受控远程
+
+props 与 Select 同名同义——`searchMode="remote"` 关掉本地过滤，其余由你驱动：
+
+```tsx
+<MultiSelect
+  isSearchable
+  searchMode="remote"
+  items={data?.items ?? []}
+  searchValue={keyword}
+  onSearchChange={setKeyword}
+  onSearch={runQuery}
+  isLoading={isLoading}
+  isLoadingMore={isFetchingNextPage}
+  hasMore={hasNextPage}
+  onLoadMore={fetchNextPage}
+  loadError={error ? '加载用户失败' : undefined}
+  onRetry={refetch}
+/>
+```
+
+<Callout variant="warning" title="远程模式下的「全选」">
+  `showSelectAllInToolbar` 只作用于**当前已加载**的选项——浏览器没拿到的数据它选不了。需要「选中全部 3000 条匹配项」时，请走服务端批量操作。
+</Callout>
+
 ## 分组 OptGroup
 
 用 `<MultiSelectOptGroup>` 给选项分组。group 标题渲染为 `role="presentation"`
@@ -613,6 +679,23 @@ W3C APG Listbox 示例与所有主流多选库（Ant Design / MUI / NextUI）的
   { name: 'filterOption', type: '(input: string, item: MultiSelectItem) => boolean', description: '自定义过滤器；默认按 label 子串大小写无关匹配。' },
   { name: 'emptyMessage', type: 'ReactNode', description: '匹配为空时的空态文案。' },
   { name: 'loadingMessage', type: 'ReactNode', description: '`isLoading=true` 时显示的文案。' },
+  { name: 'searchMode', type: "'local' | 'remote'", default: "'local'", description: "'remote' 跳过本地过滤，列表内容完全由后端决定。" },
+  { name: 'loadOptions', type: 'MultiSelectLoadOptions', description: '托管远程加载器：debounce / 取消 / 分页 / 重试全由组件处理。' },
+  { name: 'searchParams', type: 'Record<string, unknown>', description: '随每次请求下发的额外参数；变化时从第一页重新搜索。' },
+  { name: 'pageSize', type: 'number', default: '20', description: '传给 `loadOptions` 的每页条数。' },
+  { name: 'searchValue', type: 'string', description: '受控搜索词。' },
+  { name: 'onSearchChange', type: '(keyword: string) => void', description: '每次击键都触发。' },
+  { name: 'onSearch', type: '(keyword: string) => void', description: 'debounce 之后触发；受控远程模式在这里发请求。' },
+  { name: 'searchDebounce', type: 'number', default: '300', description: 'debounce 毫秒；传 0 关闭。' },
+  { name: 'isLoadingMore', type: 'boolean', default: 'false', description: '下一页加载态（受控远程模式）。' },
+  { name: 'loadingMoreMessage', type: 'ReactNode', default: "'Loading more…'" },
+  { name: 'hasMore', type: 'boolean', default: 'false', description: '是否还有下一页（受控远程模式）。' },
+  { name: 'onLoadMore', type: '() => void', description: '列表滚动触底时调用（受控远程模式）。' },
+  { name: 'loadMoreThreshold', type: 'number', default: '48', description: '触发 `onLoadMore` 的距底阈值（px）。' },
+  { name: 'loadError', type: 'ReactNode', description: '失败提示；托管模式下有默认文案。' },
+  { name: 'onRetry', type: '() => void', description: '重试按钮回调；托管模式还会自动重发请求。' },
+  { name: 'retryText', type: 'ReactNode', default: "'Retry'" },
+  { name: 'resetOnClose', type: 'boolean', default: 'true', description: '收起时是否丢弃远程结果。' },
   { name: 'isClearable', type: 'boolean', default: 'false', description: 'value 非空时在 trigger 右端显示 Clear × 按钮。' },
   { name: 'clearButtonTabIndex', type: 'number', default: '-1', description: 'Clear 按钮的 tabIndex；默认不进入 Tab 序列。' },
   { name: 'clearOnEsc', type: 'boolean', default: 'false', description: '按 Esc 是否清空（仅在 popover 关闭时）。' },

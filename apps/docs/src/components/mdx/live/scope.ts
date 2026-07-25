@@ -67,7 +67,9 @@ import { MarkdownViewerTocDemo } from '../MarkdownViewerTocDemo';
 import { MenuBasicDemo } from '../MenuBasicDemo';
 import { MenuSelectionDemo } from '../MenuSelectionDemo';
 import { ModalBasicDemo } from '../ModalBasicDemo';
+import { ModalDraggableDemo } from '../ModalDraggableDemo';
 import { ModalSizesDemo } from '../ModalSizesDemo';
+import { MultiSelectRemoteSearchDemo } from '../MultiSelectRemoteSearchDemo';
 import { PaginationBasicDemo } from '../PaginationBasicDemo';
 import { PaginationFullDemo } from '../PaginationFullDemo';
 import { PdfViewerBasicDemo } from '../PdfViewerBasicDemo';
@@ -84,6 +86,7 @@ import { SegmentedControlInboxDemo } from '../SegmentedControlInboxDemo';
 import { SegmentedControlRangeDemo } from '../SegmentedControlRangeDemo';
 import { MultiSelectControlledDemo } from '../MultiSelectControlledDemo';
 import { SelectDemo } from '../SelectDemo';
+import { SelectRemoteSearchDemo } from '../SelectRemoteSearchDemo';
 import { SliderRangeDemo } from '../SliderRangeDemo';
 import { SliderVolumeDemo } from '../SliderVolumeDemo';
 import { StatCardDeltaDemo } from '../StatCardDeltaDemo';
@@ -174,7 +177,9 @@ export const liveScope: Readonly<Record<string, unknown>> = Object.freeze({
   MenuBasicDemo,
   MenuSelectionDemo,
   ModalBasicDemo,
+  ModalDraggableDemo,
   ModalSizesDemo,
+  MultiSelectRemoteSearchDemo,
   PaginationBasicDemo,
   PaginationFullDemo,
   PdfViewerBasicDemo,
@@ -191,6 +196,7 @@ export const liveScope: Readonly<Record<string, unknown>> = Object.freeze({
   SegmentedControlRangeDemo,
   MultiSelectControlledDemo,
   SelectDemo,
+  SelectRemoteSearchDemo,
   SliderRangeDemo,
   SliderVolumeDemo,
   StatCardDeltaDemo,

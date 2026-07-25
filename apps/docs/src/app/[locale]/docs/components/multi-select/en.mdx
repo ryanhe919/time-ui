@@ -238,6 +238,72 @@ acronym matching, fuzzy search, value-based search, etc.
   />
 </LiveDemo>
 
+## Server-side search & pagination
+
+MultiSelect speaks the same remote-search contract as [Select](/docs/components/select#server-side-search--pagination): pass `loadOptions` and the component debounces the keyword, cancels superseded requests, paginates on scroll and offers an inline retry. All of it is opt-in — without these props the local filtering you have today is untouched.
+
+<LiveDemo previewSource="children" code={`import { MultiSelect } from '@timeui/react';
+
+<MultiSelect
+  label="Reviewers"
+  placeholder="Search and pick reviewers…"
+  isSearchable
+  isClearable
+  isFullWidth
+  value={value}
+  onChange={setValue}
+  pageSize={20}
+  maxTagCount={3}
+  loadOptions={async ({ keyword, page, pageSize, signal }) => {
+    const res = await fetch(
+      \`/api/users?q=\${encodeURIComponent(keyword)}&page=\${page}&size=\${pageSize}\`,
+      { signal },
+    );
+    const data = await res.json();
+    return { items: data.list, hasMore: data.hasNext, total: data.total };
+  }}
+/>`}>
+  <MultiSelectRemoteSearchDemo />
+</LiveDemo>
+
+### Chips survive the search
+
+This matters more for multi-select than for single: after a new query the previously selected options are usually no longer in the list. MultiSelect keeps a snapshot of everything you have picked, so chips keep rendering their real label instead of degrading to the raw `value`. For values selected in an earlier session, pass the known options through `items` so the first render can resolve them:
+
+```tsx
+<MultiSelect
+  value={reviewerIds}
+  items={knownReviewers}   {/* label source for pre-selected ids */}
+  loadOptions={loadUsers}
+  isSearchable
+/>
+```
+
+### Controlled remote
+
+Same props as Select — `searchMode="remote"` turns off local filtering, and you drive the rest:
+
+```tsx
+<MultiSelect
+  isSearchable
+  searchMode="remote"
+  items={data?.items ?? []}
+  searchValue={keyword}
+  onSearchChange={setKeyword}
+  onSearch={runQuery}
+  isLoading={isLoading}
+  isLoadingMore={isFetchingNextPage}
+  hasMore={hasNextPage}
+  onLoadMore={fetchNextPage}
+  loadError={error ? 'Could not load users' : undefined}
+  onRetry={refetch}
+/>
+```
+
+<Callout variant="warning" title="Select all in remote mode">
+  `showSelectAllInToolbar` only ever acts on the options currently loaded — it cannot select rows the browser has never seen. For "select all 3,000 matches" you need a server-side bulk operation instead.
+</Callout>
+
 ## Grouped options
 
 Use `<MultiSelectOptGroup>` to label semantic groups — group headings render
@@ -633,6 +699,23 @@ intentional divergence from `Select`, not an inconsistency.
   { name: 'filterOption', type: '(input: string, item: MultiSelectItem) => boolean', description: 'Custom filter; defaults to case-insensitive substring on label.' },
   { name: 'emptyMessage', type: 'ReactNode', description: 'Shown when the filter matches zero items.' },
   { name: 'loadingMessage', type: 'ReactNode', description: 'Shown when `isLoading=true`.' },
+  { name: 'searchMode', type: "'local' | 'remote'", default: "'local'", description: "'remote' skips local filtering — the backend decides what the list shows." },
+  { name: 'loadOptions', type: 'MultiSelectLoadOptions', description: 'Managed remote loader. Handles debounce, cancellation, pagination and retry for you.' },
+  { name: 'searchParams', type: 'Record<string, unknown>', description: 'Extra params sent with every request; changing it re-searches from page 1.' },
+  { name: 'pageSize', type: 'number', default: '20', description: 'Page size passed to `loadOptions`.' },
+  { name: 'searchValue', type: 'string', description: 'Controlled search keyword.' },
+  { name: 'onSearchChange', type: '(keyword: string) => void', description: 'Fires on every keystroke.' },
+  { name: 'onSearch', type: '(keyword: string) => void', description: 'Fires after the debounce — issue your request here in controlled remote mode.' },
+  { name: 'searchDebounce', type: 'number', default: '300', description: 'Debounce in ms; `0` disables it.' },
+  { name: 'isLoadingMore', type: 'boolean', default: 'false', description: 'Next-page loading state (controlled remote mode).' },
+  { name: 'loadingMoreMessage', type: 'ReactNode', default: "'Loading more…'" },
+  { name: 'hasMore', type: 'boolean', default: 'false', description: 'Whether another page exists (controlled remote mode).' },
+  { name: 'onLoadMore', type: '() => void', description: 'Called when the list scrolls to the bottom (controlled remote mode).' },
+  { name: 'loadMoreThreshold', type: 'number', default: '48', description: 'Distance from the bottom (px) that triggers `onLoadMore`.' },
+  { name: 'loadError', type: 'ReactNode', description: 'Inline failure message; managed mode falls back to a default one.' },
+  { name: 'onRetry', type: '() => void', description: 'Retry button handler; managed mode also re-issues the request.' },
+  { name: 'retryText', type: 'ReactNode', default: "'Retry'" },
+  { name: 'resetOnClose', type: 'boolean', default: 'true', description: 'Drop remote results when the dropdown closes.' },
   { name: 'isClearable', type: 'boolean', default: 'false', description: 'Show a Clear × button on the trigger when value is non-empty.' },
   { name: 'clearButtonTabIndex', type: 'number', default: '-1', description: 'Tab index of the Clear button. The trigger is the only Tab stop by default.' },
   { name: 'clearOnEsc', type: 'boolean', default: 'false', description: 'Pressing Esc on a closed trigger clears the selection.' },

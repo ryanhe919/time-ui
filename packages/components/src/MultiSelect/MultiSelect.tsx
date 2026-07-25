@@ -22,6 +22,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
   type ReactNode,
+  type UIEvent as ReactUIEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { useTheme, css } from '@emotion/react';
@@ -29,7 +30,9 @@ import {
   getFieldVariantStyles,
   isDev,
   mergeRefs,
+  useAsyncOptions,
   useControllableState,
+  useDebouncedValue,
   useIsomorphicLayoutEffect,
 } from '../utils';
 import { FormField } from '../FormField';
@@ -289,12 +292,31 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
       isDisabled = false,
       isReadOnly = false,
       isRequired = false,
-      isLoading = false,
       isSearchable = false,
       searchPlaceholder,
-      filterOption,
       emptyMessage,
+
+      searchMode = 'local',
+      searchValue,
+      onSearchChange,
+      onSearch,
+      searchDebounce = 300,
+      filterOption,
+      loadOptions,
+      searchParams,
+      pageSize = 20,
+      resetOnClose = true,
+      isLoading = false,
       loadingMessage,
+      isLoadingMore = false,
+      loadingMoreMessage,
+      hasMore = false,
+      onLoadMore,
+      loadMoreThreshold = 48,
+      loadError,
+      onRetry,
+      retryText,
+
       isClearable = false,
       clearButtonTabIndex = -1,
       clearOnEsc = false,
@@ -341,7 +363,7 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
       return childrenToItems(children);
     }, [items, children]);
 
-    const sourceItems = parsed.items;
+    const localItems = parsed.items;
 
     const [rawValue, setRawValue] = useControllableState<string[]>({
       value,
@@ -354,23 +376,91 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
     // render, busting downstream useMemo / useCallback dep arrays.
     const currentValue = useMemo(() => rawValue ?? [], [rawValue]);
 
-    /** value -> item 反查表，便于按外部传入的 value 顺序渲染 chip。 */
-    const itemByValue = useMemo(() => {
-      const m = new Map<string, MultiSelectItem>();
-      sourceItems.forEach((it) => m.set(it.value, it));
-      return m;
-    }, [sourceItems]);
-
-    const selectedItems = useMemo(
-      () => currentValue.map<MultiSelectItem>((v) => itemByValue.get(v) ?? { value: v, label: v }),
-      [currentValue, itemByValue],
-    );
-
     /* ---------------- open / search / highlight ---------------- */
 
     const [open, setOpen] = useState(false);
-    const [search, setSearch] = useState('');
+    const [rawSearch, setSearch] = useControllableState<string>({
+      value: searchValue,
+      // 受控时必须显式传 undefined，否则 useControllableState 会报「同时受控与非受控」。
+      defaultValue: (searchValue !== undefined ? undefined : '') as string,
+      onChange: onSearchChange,
+      name: 'MultiSelect(search)',
+    });
+    const search = rawSearch ?? '';
     const [highlight, setHighlight] = useState(-1);
+
+    /* ---------------- 远程选项 ---------------- */
+
+    const asyncOptions = useAsyncOptions<MultiSelectItem>({
+      loadOptions,
+      keyword: search,
+      params: searchParams,
+      pageSize,
+      debounceMs: searchDebounce,
+      isOpen: open,
+      resetOnClose,
+    });
+
+    /** 远程模式（托管或受控）下列表由后端决定内容，前端不再二次过滤。 */
+    const isRemote = asyncOptions.isEnabled || searchMode === 'remote';
+    const sourceItems = asyncOptions.isEnabled ? asyncOptions.items : localItems;
+
+    const resolvedIsLoading = asyncOptions.isEnabled ? asyncOptions.isLoading : isLoading;
+    const resolvedIsLoadingMore = asyncOptions.isEnabled
+      ? asyncOptions.isLoadingMore
+      : isLoadingMore;
+    const resolvedHasMore = asyncOptions.isEnabled ? asyncOptions.hasMore : hasMore;
+    const hasLoadError = asyncOptions.isEnabled
+      ? asyncOptions.error !== undefined || loadError != null
+      : loadError != null;
+
+    // debounce 后通知外部发请求；受控远程模式靠它驱动，展开时也会带空串触发首屏。
+    const debouncedSearch = useDebouncedValue(search, searchDebounce);
+    const onSearchRef = useRef(onSearch);
+    onSearchRef.current = onSearch;
+    useEffect(() => {
+      if (!open) return;
+      onSearchRef.current?.(debouncedSearch);
+    }, [debouncedSearch, open]);
+
+    const requestLoadMore = useCallback(() => {
+      if (asyncOptions.isEnabled) {
+        asyncOptions.loadMore();
+        return;
+      }
+      onLoadMore?.();
+    }, [asyncOptions, onLoadMore]);
+
+    const handleRetry = useCallback(() => {
+      onRetry?.();
+      if (asyncOptions.isEnabled) asyncOptions.retry();
+    }, [asyncOptions, onRetry]);
+
+    /** value -> item 反查表；`items` 作为已知项兜底，当前列表优先。 */
+    const itemByValue = useMemo(() => {
+      const m = new Map<string, MultiSelectItem>();
+      localItems.forEach((it) => m.set(it.value, it));
+      sourceItems.forEach((it) => m.set(it.value, it));
+      return m;
+    }, [sourceItems, localItems]);
+
+    /**
+     * 已选项快照。远程搜索会整体替换列表，已选中的项随时可能不在当前 items 里；
+     * 记住它才能保证 chip 一直显示 label 而不是退化成裸 value。
+     */
+    const knownItemsRef = useRef<Map<string, MultiSelectItem>>(new Map());
+    const selectedItems = useMemo(
+      () =>
+        currentValue.map<MultiSelectItem>((v) => {
+          const found = itemByValue.get(v);
+          if (found) {
+            knownItemsRef.current.set(v, found);
+            return found;
+          }
+          return knownItemsRef.current.get(v) ?? { value: v, label: v };
+        }),
+      [currentValue, itemByValue],
+    );
 
     const wrapperRef = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<HTMLDivElement>(null);
@@ -398,9 +488,9 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
       if (hideSelectedInList) {
         arr = arr.filter((it) => !currentValue.includes(it.value));
       }
-      if (isSearchable && search) arr = arr.filter((it) => filterFn(search, it));
+      if (!isRemote && isSearchable && search) arr = arr.filter((it) => filterFn(search, it));
       return arr;
-    }, [sourceItems, hideSelectedInList, isSearchable, search, filterFn, currentValue]);
+    }, [sourceItems, hideSelectedInList, isRemote, isSearchable, search, filterFn, currentValue]);
 
     /** 渲染顺序的扁平结构：包含 group heading 占位，便于 keyboard / aria-activedescendant 对位。 */
     interface FlatRow {
@@ -486,6 +576,26 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
         el.scrollIntoView({ block: 'nearest' });
       }
     }, [highlight, open]);
+
+    const canLoadMore =
+      resolvedHasMore && !resolvedIsLoading && !resolvedIsLoadingMore && !hasLoadError;
+
+    // 键盘走到列表末尾同样要翻页，否则纯键盘用户永远够不到第二页。
+    useEffect(() => {
+      if (!open || highlight < 0 || !canLoadMore) return;
+      if (highlight >= visibleOptionItems.length - 1) requestLoadMore();
+    }, [highlight, open, canLoadMore, visibleOptionItems.length, requestLoadMore]);
+
+    const onListScroll = useCallback(
+      (e: ReactUIEvent<HTMLUListElement>) => {
+        if (!canLoadMore) return;
+        const el = e.currentTarget;
+        if (el.scrollHeight - el.scrollTop - el.clientHeight <= loadMoreThreshold) {
+          requestLoadMore();
+        }
+      },
+      [canLoadMore, loadMoreThreshold, requestLoadMore],
+    );
 
     /* ---------------- popover positioning ---------------- */
 
@@ -1176,6 +1286,46 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
       margin: 0;
     `;
 
+    const statusCss = css`
+      padding: 12px;
+      text-align: center;
+      color: ${theme.colors.text.muted};
+      font-size: 13px;
+      margin: 0;
+      list-style: none;
+    `;
+
+    const loadErrorCss = css`
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-top: 1px solid ${theme.colors.border.subtle ?? theme.colors.border.default};
+      color: ${theme.colors.danger[600]};
+      font-size: 12px;
+    `;
+
+    const retryButtonCss = css`
+      appearance: none;
+      border: 1px solid ${theme.colors.border.default};
+      background: transparent;
+      color: ${theme.colors.text.primary};
+      border-radius: 6px;
+      padding: 3px 8px;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+      &:hover {
+        background: ${theme.colors.bg.muted ?? theme.colors.bg.sunken};
+      }
+      &:focus-visible {
+        outline: 2px solid ${theme.colors.focus};
+        outline-offset: 1px;
+      }
+    `;
+
     const groupHeadingCss = css`
       padding: ${ms.optGroupHeadingPaddingTop} ${ms.optGroupHeadingPaddingX}
         ${ms.optGroupHeadingPaddingBottom};
@@ -1416,8 +1566,11 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
       [focusSearchInput],
     );
 
+    // 首屏 loading 时 listbox 里没有任何 option，此时不能留下指向 option 的 activedescendant。
+    const hasRenderedOptions = open && !resolvedIsLoading;
+
     const activeDescendantId =
-      open && highlight >= 0 && highlight < visibleOptionItems.length
+      hasRenderedOptions && highlight >= 0 && highlight < visibleOptionItems.length
         ? `${listboxId}-opt-${highlight}`
         : undefined;
 
@@ -1426,6 +1579,9 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
     const defaultSearchPlaceholder = searchPlaceholder ?? 'Search…';
     const defaultEmptyMessage = emptyMessage ?? 'No results';
     const defaultLoadingMessage = loadingMessage ?? 'Loading…';
+    const defaultLoadingMoreMessage = loadingMoreMessage ?? 'Loading more…';
+    const defaultLoadErrorMessage = loadError ?? 'Failed to load options';
+    const defaultRetryText = retryText ?? 'Retry';
 
     const popoverPositionStyle: CSSProperties | null = popoverRect
       ? {
@@ -1613,7 +1769,7 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
                       placeholder={defaultSearchPlaceholder}
                       onChange={(e) => setSearch(e.target.value)}
                       onKeyDown={onSearchKeyDown}
-                      aria-controls={listboxId}
+                      aria-controls={open ? listboxId : undefined}
                       aria-autocomplete="list"
                       autoFocus
                     />
@@ -1639,7 +1795,8 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
                   </div>
                 ) : null}
 
-                {isLoading ? (
+                {/* listbox 始终渲染：trigger 的 aria-expanded 依赖 aria-controls 指向一个真实存在的元素 */}
+                {resolvedIsLoading ? (
                   <div
                     role="status"
                     aria-live="polite"
@@ -1652,34 +1809,59 @@ const MultiSelectControl = forwardRef<HTMLDivElement, MultiSelectProps>(
                   >
                     {defaultLoadingMessage}
                   </div>
-                ) : (
-                  <ul
-                    ref={listRef}
-                    id={listboxId}
-                    role="listbox"
-                    aria-multiselectable="true"
-                    aria-labelledby={ariaLabelledByProp}
-                    tabIndex={-1}
-                    css={listCss}
-                  >
-                    {flatRows.length === 0 ? (
+                ) : null}
+
+                <ul
+                  ref={listRef}
+                  id={listboxId}
+                  role="listbox"
+                  aria-multiselectable="true"
+                  aria-labelledby={ariaLabelledByProp}
+                  aria-busy={resolvedIsLoading || resolvedIsLoadingMore || undefined}
+                  tabIndex={-1}
+                  css={listCss}
+                  onScroll={onListScroll}
+                >
+                  {resolvedIsLoading ? null : flatRows.length === 0 ? (
+                    // 加载失败时列表为空是「没拿到数据」而不是「没有结果」，交给下方错误块说明。
+                    hasLoadError ? null : (
                       <li role="presentation" css={emptyCss}>
                         {defaultEmptyMessage}
                       </li>
-                    ) : (
-                      flatRows.map((row) => {
-                        if (row.kind === 'heading') {
-                          return (
-                            <li key={row.key} role="presentation" css={groupHeadingCss}>
-                              {row.label}
-                            </li>
-                          );
-                        }
-                        return renderOption(row.item!, row.index!);
-                      })
-                    )}
-                  </ul>
-                )}
+                    )
+                  ) : (
+                    flatRows.map((row) => {
+                      if (row.kind === 'heading') {
+                        return (
+                          <li key={row.key} role="presentation" css={groupHeadingCss}>
+                            {row.label}
+                          </li>
+                        );
+                      }
+                      return renderOption(row.item!, row.index!);
+                    })
+                  )}
+                  {resolvedIsLoadingMore ? (
+                    <li role="presentation" css={statusCss} data-timeui-multiselect-loading-more="">
+                      {defaultLoadingMoreMessage}
+                    </li>
+                  ) : null}
+                </ul>
+
+                {hasLoadError ? (
+                  <div role="alert" css={loadErrorCss} data-timeui-multiselect-error="">
+                    <span>{defaultLoadErrorMessage}</span>
+                    <button
+                      type="button"
+                      // 阻止默认行为以免搜索框在点重试时失焦。
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={handleRetry}
+                      css={retryButtonCss}
+                    >
+                      {defaultRetryText}
+                    </button>
+                  </div>
+                ) : null}
               </div>,
               document.body,
             )

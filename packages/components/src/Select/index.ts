@@ -12,4 +12,5 @@ export type {
   SelectSize,
   SelectRadius,
   SelectItem,
+  SelectLoadOptions,
 } from './Select.types';
