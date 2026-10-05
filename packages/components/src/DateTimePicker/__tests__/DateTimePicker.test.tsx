@@ -282,6 +282,20 @@ describe('DateTimePicker — commit flow', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('showTodayButton hides Now unless showNowButton explicitly overrides it', () => {
+    installRectMocks();
+    const { rerender } = renderWithProviders(<DateTimePicker isOpen showTodayButton={false} />);
+    expect(within(screen.getByRole('dialog')).queryByRole('button', { name: 'Now' })).toBeNull();
+
+    rerender(<DateTimePicker isOpen showTodayButton={false} showNowButton />);
+    expect(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Now' }),
+    ).toBeInTheDocument();
+
+    rerender(<DateTimePicker isOpen showTodayButton showNowButton={false} />);
+    expect(within(screen.getByRole('dialog')).queryByRole('button', { name: 'Now' })).toBeNull();
+  });
+
   it('Now button fills draft with current date + current time', async () => {
     installRectMocks();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });

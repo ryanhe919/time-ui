@@ -11,6 +11,27 @@ import { ChatMessageList } from '../ChatMessageList';
 import { ChatMessage } from '../ChatMessage';
 
 describe('ChatMessageList — base rendering', () => {
+  it('exposes the conversation name through aria-label', () => {
+    renderWithProviders(
+      <ChatMessageList aria-label="Assistant conversation">
+        <ChatMessage role="assistant">Hello</ChatMessage>
+      </ChatMessageList>,
+    );
+    expect(screen.getByRole('log', { name: 'Assistant conversation' })).toBeInTheDocument();
+  });
+
+  it('names a region from an external heading through aria-labelledby', () => {
+    renderWithProviders(
+      <>
+        <h2 id="conversation-heading">Conversation history</h2>
+        <ChatMessageList role="region" aria-labelledby="conversation-heading">
+          <ChatMessage role="assistant">Hello</ChatMessage>
+        </ChatMessageList>
+      </>,
+    );
+    expect(screen.getByRole('region', { name: 'Conversation history' })).toBeInTheDocument();
+  });
+
   it('defaults to role="log" + aria-live="polite"', () => {
     renderWithProviders(
       <ChatMessageList>

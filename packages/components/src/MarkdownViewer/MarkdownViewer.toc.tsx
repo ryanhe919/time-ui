@@ -250,6 +250,18 @@ export function MarkdownViewerToc(props: MarkdownViewerTocProps): ReactElement |
     font-size: ${theme.typography.fontSize.sm};
     color: ${theme.colors.text.secondary};
 
+    /* Keep the document readable in narrow drawers and mobile layouts. The
+       bounded TOC remains available above the independently scrolling body. */
+    @container timeui-markdown-viewer (max-width: 640px) {
+      order: -1;
+      flex: 0 0 auto;
+      align-self: stretch;
+      max-height: ${theme.spacing[40]};
+      padding: ${theme.spacing[3]} ${theme.spacing[4]};
+      border-inline-start: 0;
+      border-bottom: 1px solid ${theme.colors.border.subtle};
+    }
+
     /* hover-only thin scrollbar，与正文滚动区一致。 */
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;

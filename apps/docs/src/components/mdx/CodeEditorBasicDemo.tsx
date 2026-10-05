@@ -19,11 +19,13 @@ export function CodeEditorBasicDemo() {
 console.log(greet('World'));`);
 
   return (
-    <CodeEditor
-      value={code}
-      onChange={setCode}
-      language="typescript"
-      aria-label="Basic code editor demo"
-    />
+    <div data-livedemo="custom" data-live-preview="">
+      <CodeEditor
+        value={code}
+        onChange={setCode}
+        language="typescript"
+        aria-label="Basic code editor demo"
+      />
+    </div>
   );
 }

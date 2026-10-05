@@ -30,6 +30,10 @@ export interface ChatMessageListProps extends ChatCommonStyleProps {
   children: ReactNode;
   /** ARIA role；默认 'log'。 */
   role?: 'log' | 'list' | 'region';
+  /** Accessible name for the conversation or region. */
+  'aria-label'?: string;
+  /** ID of an element that names the conversation or region. */
+  'aria-labelledby'?: string;
   /**
    * polite live region；默认 true。
    *
@@ -59,6 +63,8 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
       maxHeight,
       children,
       role = 'log',
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledby,
       isLive = true,
       onAtBottomChange,
       className,
@@ -186,6 +192,8 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
         style={style}
         css={rootCss}
         role={role}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledby}
         aria-live={isLive ? 'polite' : undefined}
         aria-relevant={isLive ? 'additions' : undefined}
         data-scrollable={isScrollable || undefined}

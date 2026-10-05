@@ -320,6 +320,7 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
       box-sizing: border-box;
       width: 100%;
       min-width: 0;
+      container: timeui-markdown-viewer / inline-size;
       border: 1px solid ${theme.colors.border.subtle};
       border-radius: ${theme.componentRadius.md};
       background: ${theme.colors.bg.surface};
@@ -332,6 +333,10 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
       flex-direction: ${tocPosition === 'left' ? 'row-reverse' : 'row'};
       min-height: 0;
       flex: 1 1 auto;
+
+      @container timeui-markdown-viewer (max-width: 640px) {
+        flex-direction: column;
+      }
     `;
 
     // 细滚动条：默认透明，hover / 滚动期内才浮现；theme-aware；Firefox 走标准属性。
@@ -342,6 +347,7 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
     const scrollCss = css`
       flex: 1 1 auto;
       min-width: 0;
+      min-height: 0;
       overflow: auto;
       padding: 1.25em 1.5em;
 

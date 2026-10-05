@@ -1,5 +1,6 @@
 ---
 '@timeui/react': minor
+'@timeui/mcp': patch
 ---
 
 Fix component rendering and interaction regressions across forms, overlays, tables, navigation, PDF and chat: preserve icon button dimensions and keyboard focus, prevent textarea/upload overlap, synchronize date and async option state, update floating and sticky positioning after resize, and keep streamed content and replacement PDFs current.

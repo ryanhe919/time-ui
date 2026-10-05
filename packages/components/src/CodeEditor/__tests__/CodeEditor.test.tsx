@@ -364,3 +364,55 @@ describe('CodeEditor — copy button interaction', () => {
     expect(await screen.findByRole('button', { name: 'Copied!' })).toBeInTheDocument();
   });
 });
+
+describe('CodeEditor — theme readability', () => {
+  function channels(color: string): number[] {
+    return (color.match(/[\d.]+/g) ?? []).map(Number);
+  }
+
+  function luminance(color: string): number {
+    const linear = channels(color)
+      .slice(0, 3)
+      .map((value) => {
+        const normalized = value / 255;
+        return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+    return linear[0]! * 0.2126 + linear[1]! * 0.7152 + linear[2]! * 0.0722;
+  }
+
+  it.each(['light', 'dark'] as const)(
+    'keeps highlighted text opaque and selection/search backgrounds visible in %s mode',
+    (theme) => {
+      const { container } = renderEditor(
+        <CodeEditor
+          aria-label="Readable code"
+          defaultValue={'const answer = 42; const message = "ready";'}
+        />,
+        { theme },
+      );
+      const editor = container.querySelector<HTMLElement>('.cm-editor')!;
+      const spans = [...editor.querySelectorAll<HTMLElement>('.cm-line span')];
+      const keyword = spans.find((span) => span.textContent === 'const')!;
+      const foreground = getComputedStyle(keyword).color;
+      expect(channels(foreground)[3] ?? 1).toBe(1);
+      const lightness = [
+        luminance(foreground),
+        luminance(getComputedStyle(editor).backgroundColor),
+      ].sort((a, b) => b - a);
+      expect((lightness[0]! + 0.05) / (lightness[1]! + 0.05)).toBeGreaterThanOrEqual(4.5);
+
+      for (const text of ['42', '"ready"']) {
+        const span = spans.find((item) => item.textContent === text)!;
+        expect(channels(getComputedStyle(span).color)[3] ?? 1).toBe(1);
+      }
+
+      for (const className of ['cm-selectionBackground', 'cm-searchMatch']) {
+        const marker = document.createElement('span');
+        marker.className = className;
+        editor.append(marker);
+        const background = channels(getComputedStyle(marker).backgroundColor);
+        expect(background[3] ?? 1).toBeGreaterThan(0);
+      }
+    },
+  );
+});

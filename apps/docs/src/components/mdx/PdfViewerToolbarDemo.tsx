@@ -14,6 +14,8 @@ import { PdfViewer } from '@timeui/react/pdf-viewer';
 export function PdfViewerToolbarDemo() {
   return (
     <div
+      data-livedemo="custom"
+      data-live-preview=""
       css={css`
         width: min(720px, 100%);
       `}

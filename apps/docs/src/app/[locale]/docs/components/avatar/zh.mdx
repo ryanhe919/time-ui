@@ -6,15 +6,17 @@
 
 最简形态：传 `src` 渲染图片头像；同时建议传 `name` 作为 fallback。
 
-<LiveDemo code={`<Avatar src="https://i.pravatar.cc/64?u=ada" name="Ada Lovelace" />
+<LiveDemo code={`<Avatar src="/avatars/ada.svg" name="Ada Lovelace" />
 <Avatar name="Alan Turing" />
 <Avatar />`}>
   <Flex gap={12} align="center">
-    <Avatar src="https://i.pravatar.cc/64?u=ada" name="Ada Lovelace" />
+    <Avatar src="/avatars/ada.svg" name="Ada Lovelace" />
     <Avatar name="Alan Turing" />
     <Avatar />
   </Flex>
 </LiveDemo>
+
+图片示例使用[本地插画](/avatars/ada.svg)。在自己的应用中，请将 `src` 替换为实际的图片地址。
 
 ## 尺寸 size
 
@@ -25,7 +27,7 @@
 <Avatar size="md" name="A B" />
 <Avatar size="lg" name="A B" />
 <Avatar size="xl" name="A B" />
-<Avatar size={56}  name="A B" />`}>
+<Avatar size={56} name="A B" />`}>
   <Flex gap={12} align="center">
     <Avatar size="xs" name="A B" />
     <Avatar size="sm" name="A B" />
@@ -87,11 +89,11 @@
 把多个头像堆叠为一组，`max` 控制最多展示几个，剩余折叠为 `+N`；`spacing` 控制重叠程度。
 
 <LiveDemo code={`<AvatarGroup max={3}>
-  <Avatar name="Ada" />
-  <Avatar name="Bob" />
-  <Avatar name="Carol" />
-  <Avatar name="Dan" />
-  <Avatar name="Eve" />
+  <Avatar name="Ada" color="auto" />
+  <Avatar name="Bob" color="auto" />
+  <Avatar name="Carol" color="auto" />
+  <Avatar name="Dan" color="auto" />
+  <Avatar name="Eve" color="auto" />
 </AvatarGroup>`}>
   <AvatarGroup max={3}>
     <Avatar name="Ada" color="auto" />

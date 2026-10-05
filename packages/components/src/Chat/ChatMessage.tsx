@@ -262,7 +262,13 @@ export const ChatMessage = forwardRef<HTMLDivElement, ChatMessageProps>(
           <ChatAvatar
             source={resolvedAvatar}
             role={role}
-            aria-label={typeof name === 'string' ? name : undefined}
+            aria-label={
+              typeof name === 'string' && name.trim()
+                ? name
+                : resolvedAvatar.kind === 'image'
+                  ? undefined
+                  : role
+            }
           />
         ) : null}
         <div css={bodyCss}>

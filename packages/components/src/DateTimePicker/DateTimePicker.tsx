@@ -86,7 +86,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       isDisabled = false,
       isInvalid = false,
       isClearable = false,
-      showTodayButton: _showTodayButton = true, // eslint-disable-line @typescript-eslint/no-unused-vars
+      showTodayButton = true,
       startContent,
       endContent,
       portalContainer,
@@ -100,7 +100,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       minuteStep = 1,
       secondStep = 1,
       is12Hour = false,
-      showNowButton = true,
+      showNowButton = showTodayButton,
       showConfirmButton = true,
       nowLabel,
       confirmLabel,

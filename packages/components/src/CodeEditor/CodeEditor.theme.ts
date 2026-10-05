@@ -26,9 +26,7 @@ export function createCodeEditorTheme(theme: TimeUITheme, isDark: boolean): Exte
         borderLeftColor: theme.colors.primary[500],
       },
       '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': {
-        backgroundColor: isDark
-          ? `${theme.colors.primary[200]}44`
-          : `${theme.colors.primary[200]}88`,
+        backgroundColor: theme.colors.primary[200],
       },
       '.cm-panels': {
         backgroundColor: theme.colors.bg.muted,
@@ -41,20 +39,21 @@ export function createCodeEditorTheme(theme: TimeUITheme, isDark: boolean): Exte
         borderTop: `1px solid ${theme.colors.border.subtle}`,
       },
       '.cm-searchMatch': {
-        backgroundColor: `${theme.colors.primary[200]}66`,
+        backgroundColor: theme.colors.primary[200],
         outline: `1px solid ${theme.colors.primary[200]}`,
       },
       '.cm-searchMatch.cm-searchMatch-selected': {
-        backgroundColor: `${theme.colors.primary[200]}88`,
+        backgroundColor: `color-mix(in srgb, ${theme.colors.primary[500]} 35%, transparent)`,
+        outlineColor: theme.colors.primary[600],
       },
       '.cm-activeLine': {
-        backgroundColor: isDark ? `${theme.colors.bg.muted}88` : `${theme.colors.bg.sunken}88`,
+        backgroundColor: isDark ? theme.colors.bg.muted : theme.colors.bg.sunken,
       },
       '.cm-selectionMatch': {
-        backgroundColor: `${theme.colors.primary[100]}88`,
+        backgroundColor: theme.colors.primary[100],
       },
       '&.cm-focused .cm-matchingBracket, &.cm-focused .cm-nonmatchingBracket': {
-        backgroundColor: `${theme.colors.primary[200]}66`,
+        backgroundColor: theme.colors.primary[200],
       },
       '.cm-gutters': {
         backgroundColor: theme.colors.bg.muted,
@@ -63,7 +62,7 @@ export function createCodeEditorTheme(theme: TimeUITheme, isDark: boolean): Exte
         borderRight: `1px solid ${theme.colors.border.subtle}`,
       },
       '.cm-activeLineGutter': {
-        backgroundColor: isDark ? `${theme.colors.bg.sunken}88` : `${theme.colors.bg.canvas}88`,
+        backgroundColor: isDark ? theme.colors.bg.sunken : theme.colors.bg.canvas,
       },
       '.cm-foldPlaceholder': {
         backgroundColor: 'transparent',
@@ -86,8 +85,8 @@ export function createCodeEditorTheme(theme: TimeUITheme, isDark: boolean): Exte
       },
       '.cm-tooltip-autocomplete': {
         '& > ul > li[aria-selected]': {
-          backgroundColor: isDark ? theme.colors.primary[600] : theme.colors.primary[100],
-          color: isDark ? theme.colors.primary[100] : theme.colors.primary[600],
+          backgroundColor: theme.colors.primary[100],
+          color: theme.colors.primary[600],
         },
       },
     },
@@ -95,25 +94,25 @@ export function createCodeEditorTheme(theme: TimeUITheme, isDark: boolean): Exte
   );
 
   const highlightStyle = HighlightStyle.define([
-    { tag: tags.comment, color: theme.colors.text.disabled, fontStyle: 'italic' },
-    { tag: tags.lineComment, color: theme.colors.text.disabled, fontStyle: 'italic' },
-    { tag: tags.blockComment, color: theme.colors.text.disabled, fontStyle: 'italic' },
-    { tag: tags.docComment, color: theme.colors.text.disabled, fontStyle: 'italic' },
+    { tag: tags.comment, color: theme.colors.text.muted, fontStyle: 'italic' },
+    { tag: tags.lineComment, color: theme.colors.text.muted, fontStyle: 'italic' },
+    { tag: tags.blockComment, color: theme.colors.text.muted, fontStyle: 'italic' },
+    { tag: tags.docComment, color: theme.colors.text.muted, fontStyle: 'italic' },
     {
       tag: tags.keyword,
-      color: isDark ? theme.colors.primary[200] : theme.colors.primary[600],
+      color: theme.colors.primary[600],
     },
     {
       tag: [tags.deleted, tags.character, tags.propertyName, tags.macroName],
-      color: isDark ? theme.colors.primary[200] : theme.colors.primary[600],
+      color: theme.colors.primary[600],
     },
     {
       tag: [tags.function(tags.variableName), tags.definition(tags.variableName), tags.labelName],
-      color: isDark ? theme.colors.primary[200] : theme.colors.primary[500],
+      color: theme.colors.primary[600],
     },
     {
       tag: [tags.color, tags.constant(tags.name), tags.standard(tags.name)],
-      color: isDark ? theme.colors.primary[200] : theme.colors.primary[600],
+      color: theme.colors.primary[600],
     },
     {
       tag: [tags.definition(tags.name), tags.separator],
@@ -130,12 +129,12 @@ export function createCodeEditorTheme(theme: TimeUITheme, isDark: boolean): Exte
         tags.self,
         tags.namespace,
       ],
-      color: isDark ? '#79b8ff' : '#0086b3',
+      color: theme.colors.text.link,
     },
     {
       tag: [tags.number],
       // orange for numbers — use warning color if available
-      color: isDark ? theme.colors.warning[200] : theme.colors.warning[600],
+      color: theme.colors.warning[600],
     },
     {
       tag: [
@@ -180,16 +179,16 @@ export function createCodeEditorTheme(theme: TimeUITheme, isDark: boolean): Exte
     },
     {
       tag: [tags.atom, tags.bool, tags.special(tags.variableName)],
-      color: isDark ? theme.colors.primary[200] : theme.colors.primary[600],
+      color: theme.colors.primary[600],
     },
     {
       // green tones for strings
       tag: [tags.processingInstruction, tags.string, tags.inserted],
-      color: isDark ? '#85e89d' : '#22863a',
+      color: theme.colors.success[600],
     },
     {
       tag: tags.invalid,
-      color: isDark ? theme.colors.danger[200] : theme.colors.danger[600],
+      color: theme.colors.danger[600],
     },
   ]);
 

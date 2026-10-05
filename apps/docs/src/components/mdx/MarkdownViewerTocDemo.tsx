@@ -53,6 +53,8 @@ scrolls within its own scroll container, so the page URL stays unchanged.
 export function MarkdownViewerTocDemo() {
   return (
     <div
+      data-livedemo="custom"
+      data-live-preview=""
       css={css`
         width: min(900px, 100%);
         height: 460px;
