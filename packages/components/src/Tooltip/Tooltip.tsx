@@ -26,6 +26,7 @@ import {
   useMemo,
   useRef,
   useState,
+  version as reactVersion,
   type CSSProperties,
   type FocusEvent as ReactFocusEvent,
   type ReactElement,
@@ -227,9 +228,14 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
       }
       updatePosition();
       const onScrollResize = () => updatePosition();
+      const observer =
+        typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(updatePosition);
+      if (anchorRef.current) observer?.observe(anchorRef.current);
+      if (panelRef.current) observer?.observe(panelRef.current);
       window.addEventListener('scroll', onScrollResize, { passive: true, capture: true });
       window.addEventListener('resize', onScrollResize, { passive: true });
       return () => {
+        observer?.disconnect();
         window.removeEventListener('scroll', onScrollResize, true);
         window.removeEventListener('resize', onScrollResize);
       };
@@ -323,12 +329,12 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
           scheduleClose();
         },
         'aria-describedby': composedDescribedBy,
-        // React 19 把 ref 放进 props；React 18 仍挂在 element.ref 上。
-        // 优先读 props.ref 以消除 R19 的 deprecation 警告，fallback 保持 R18 兼容。
+        // 只读取当前 React 版本对应的 ref 位置，避免开发模式警告。
         ref: mergeRefs<HTMLElement>(
           anchorRef,
-          ((element.props as { ref?: Ref<HTMLElement> }).ref ??
-            (element as unknown as { ref?: Ref<HTMLElement> }).ref) as Ref<HTMLElement> | undefined,
+          parseInt(reactVersion, 10) >= 19
+            ? (element.props as { ref?: Ref<HTMLElement> }).ref
+            : element.ref,
         ),
       };
       return cloneElement(element, composed as unknown as Record<string, unknown>);

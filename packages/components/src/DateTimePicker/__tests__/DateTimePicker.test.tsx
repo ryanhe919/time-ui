@@ -103,6 +103,43 @@ describe('DateTimePicker — base rendering', () => {
 // ────────────────────────────────────────────────────────────
 
 describe('DateTimePicker — open / close', () => {
+  it('renders the date and time panel inside a requested portal container', () => {
+    installRectMocks();
+    const portalContainer = document.createElement('div');
+    document.body.append(portalContainer);
+    const { unmount } = renderWithProviders(
+      <DateTimePicker isOpen portalContainer={portalContainer} />,
+    );
+    expect(portalContainer.querySelector('[role="dialog"]')).toBeInTheDocument();
+    unmount();
+    portalContainer.remove();
+  });
+
+  it('opens the month belonging to a value changed while the panel is closed', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const { rerender } = renderWithProviders(
+      <DateTimePicker value={new Date(2026, 3, 17, 9, 30)} />,
+    );
+    rerender(<DateTimePicker value={new Date(2027, 8, 5, 10, 15)} />);
+    const dialog = await openPanel(user);
+    const grid = within(dialog).getByRole('grid');
+    expect(within(grid).getByRole('gridcell', { selected: true })).toHaveTextContent('5');
+  });
+
+  it('isReadOnly prevents ArrowDown from opening an editable date and time panel', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const onOpenChange = vi.fn();
+    renderWithProviders(
+      <DateTimePicker isReadOnly aria-label="Appointment" onOpenChange={onOpenChange} />,
+    );
+    screen.getByRole('textbox', { name: 'Appointment' }).focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
   it('clicking the trigger opens both calendar grid and time listboxes', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderWithProviders(<DateTimePicker />);

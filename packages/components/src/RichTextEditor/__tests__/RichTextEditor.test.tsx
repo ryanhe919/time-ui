@@ -8,7 +8,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { useRef } from 'react';
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Extension, type Editor } from '@tiptap/core';
+import { Extension, mergeAttributes, type Editor } from '@tiptap/core';
+import { DOMSerializer } from '@tiptap/pm/model';
 
 import { renderWithProviders, type RenderWithProvidersOptions } from '../../test-utils';
 import { RichTextEditor } from '../';
@@ -68,13 +69,62 @@ describe('RichTextEditor — rendering', () => {
 });
 
 describe('RichTextEditor — controlled / uncontrolled', () => {
+  it('does not inherit executable attributes from imported attribute objects', () => {
+    const imported = JSON.parse('{"__proto__":{"src":"invalid:","onerror":"alert(1)"}}');
+    const attributes = mergeAttributes(imported);
+    expect(Object.getPrototypeOf(attributes)).toBe(Object.prototype);
+    const { dom } = DOMSerializer.renderSpec(document, ['img', attributes]);
+    expect(dom).not.toHaveAttribute('src');
+    expect(dom).not.toHaveAttribute('onerror');
+  });
+
+  it.each(['isDisabled', 'isReadOnly'] as const)(
+    'preserves an uncontrolled draft when %s changes',
+    async (flag) => {
+      const editorRef: { current: Editor | null } = { current: null };
+      const onCreate = vi.fn((editor: Editor) => {
+        editorRef.current = editor;
+      });
+      const { container, rerender } = renderWithProviders(
+        <RichTextEditor aria-label="Editor" defaultValue="<p>seed</p>" onCreate={onCreate} />,
+      );
+      const editor = await waitForEditor(() => editorRef.current);
+      await act(async () => {
+        editor.commands.setContent('<p>edited draft</p>');
+      });
+      rerender(
+        <RichTextEditor
+          aria-label="Editor"
+          defaultValue="<p>seed</p>"
+          onCreate={onCreate}
+          {...{ [flag]: true }}
+        />,
+      );
+      await waitFor(() => {
+        expect(container.querySelector('.ProseMirror')).toHaveAttribute('contenteditable', 'false');
+      });
+      expect(container.querySelector('.ProseMirror')).toHaveTextContent('edited draft');
+      expect(onCreate).toHaveBeenCalledOnce();
+      expect(editor.isDestroyed).toBe(false);
+
+      rerender(
+        <RichTextEditor aria-label="Editor" defaultValue="<p>seed</p>" onCreate={onCreate} />,
+      );
+      await waitFor(() => {
+        expect(container.querySelector('.ProseMirror')).toHaveAttribute('contenteditable', 'true');
+      });
+      expect(editor.getHTML()).toContain('edited draft');
+    },
+  );
+
   it('controlled: updates editor content when `value` prop changes', async () => {
     const editorRef: { current: Editor | null } = { current: null };
+    const onChange = vi.fn();
     const { container, rerender } = renderWithProviders(
       <RichTextEditor
         aria-label="Editor"
         value="<p>one</p>"
-        onChange={() => {}}
+        onChange={onChange}
         onCreate={(e) => {
           editorRef.current = e;
         }}
@@ -87,7 +137,7 @@ describe('RichTextEditor — controlled / uncontrolled', () => {
       <RichTextEditor
         aria-label="Editor"
         value="<p>two</p>"
-        onChange={() => {}}
+        onChange={onChange}
         onCreate={(e) => {
           editorRef.current = e;
         }}
@@ -99,6 +149,7 @@ describe('RichTextEditor — controlled / uncontrolled', () => {
       expect(pm?.textContent).toContain('two');
     });
     expect(editor.getHTML()).toContain('two');
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('uncontrolled: onChange fires when content changes via editor command', async () => {

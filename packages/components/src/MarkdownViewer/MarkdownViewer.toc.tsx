@@ -65,7 +65,7 @@ export function extractHeadings(markdown: string, maxDepth: number): MarkdownToc
   const slugger = createSlugger();
   const items: MarkdownTocItem[] = [];
 
-  let inFence = false;
+  let fence: { marker: string; length: number } | null = null;
   let inFrontmatter = false;
 
   /** 清洗 markdown 标题里常见的 inline 装饰（不影响 slug 与展示文本）。 */
@@ -94,11 +94,22 @@ export function extractHeadings(markdown: string, maxDepth: number): MarkdownToc
     }
 
     // fenced code block
-    if (/^\s{0,3}(```|~~~)/.test(line)) {
-      inFence = !inFence;
+    const fenceMatch = /^\s{0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    if (fence) {
+      if (
+        fenceMatch &&
+        fenceMatch[1]![0] === fence.marker &&
+        fenceMatch[1]!.length >= fence.length &&
+        fenceMatch[2]!.trim() === ''
+      ) {
+        fence = null;
+      }
       continue;
     }
-    if (inFence) continue;
+    if (fenceMatch && !(fenceMatch[1]![0] === '`' && fenceMatch[2]!.includes('`'))) {
+      fence = { marker: fenceMatch[1]![0]!, length: fenceMatch[1]!.length };
+      continue;
+    }
 
     // ATX 标题（# / ## / ...）
     const atx = /^\s{0,3}(#{1,6})\s+(.+?)\s*#*\s*$/.exec(line);

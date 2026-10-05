@@ -6,7 +6,7 @@
 
 import { createRef } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { PdfViewer } from '../';
@@ -33,11 +33,12 @@ const mockPage = {
 const mockDoc = {
   numPages: 5,
   getPage: vi.fn(() => Promise.resolve(mockPage)),
-  destroy: vi.fn(() => Promise.resolve()),
 };
+const destroyLoadingTask = vi.fn(() => Promise.resolve());
 
 const getDocumentMock = vi.fn(() => ({
   promise: Promise.resolve(mockDoc),
+  destroy: destroyLoadingTask,
 }));
 
 vi.mock('pdfjs-dist', () => ({
@@ -58,11 +59,85 @@ beforeEach(() => {
   getDocumentMock.mockClear();
   mockPage.render.mockClear();
   mockDoc.getPage.mockClear();
+  destroyLoadingTask.mockClear();
 });
 
 // ─── 1. Rendering ─────────────────────────────────────────────────────────────
 
 describe('PdfViewer — rendering', () => {
+  it('renders a replacement document even when its page count is unchanged', async () => {
+    const replacementPage = { ...mockPage, render: vi.fn(() => mockRenderTask) };
+    const replacementDoc = {
+      ...mockDoc,
+      getPage: vi.fn(() => Promise.resolve(replacementPage)),
+    };
+    const destroyReplacementTask = vi.fn(() => Promise.resolve());
+    const { rerender } = renderWithProviders(<PdfViewer source="/first.pdf" />);
+    await waitFor(() => expect(mockPage.render).toHaveBeenCalled());
+    getDocumentMock.mockReturnValueOnce({
+      promise: Promise.resolve(replacementDoc),
+      destroy: destroyReplacementTask,
+    });
+    rerender(<PdfViewer source="/second.pdf" />);
+    await waitFor(() => expect(replacementPage.render).toHaveBeenCalled());
+    expect(replacementDoc.getPage).toHaveBeenCalledWith(1);
+    expect(destroyLoadingTask).toHaveBeenCalledOnce();
+    expect(destroyReplacementTask).not.toHaveBeenCalled();
+  });
+
+  it('destroys a pending load on unmount before the document promise resolves', async () => {
+    let resolveDocument: ((document: typeof mockDoc) => void) | undefined;
+    const destroyPendingTask = vi.fn(() => Promise.resolve());
+    getDocumentMock.mockReturnValueOnce({
+      promise: new Promise((resolve) => {
+        resolveDocument = resolve;
+      }),
+      destroy: destroyPendingTask,
+    });
+    const onLoad = vi.fn();
+    const { unmount } = renderWithProviders(<PdfViewer source="/pending.pdf" onLoad={onLoad} />);
+    await waitFor(() => expect(getDocumentMock).toHaveBeenCalled());
+    unmount();
+    expect(destroyPendingTask).toHaveBeenCalledOnce();
+    await act(async () => resolveDocument?.(mockDoc));
+    expect(onLoad).not.toHaveBeenCalled();
+    expect(mockPage.render).not.toHaveBeenCalled();
+    expect(destroyPendingTask).toHaveBeenCalledOnce();
+  });
+
+  it('renders a valid document after a previous source failed', async () => {
+    const { rerender } = renderWithProviders(<PdfViewer source="" />);
+    await screen.findByRole('alert');
+    rerender(<PdfViewer source="/recovered.pdf" />);
+    await waitFor(() => expect(mockPage.render).toHaveBeenCalled());
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('clamps the visible page controls to the page actually rendered', async () => {
+    renderWithProviders(<PdfViewer source="/sample.pdf" defaultPage={12} />);
+    await waitFor(() => expect(mockDoc.getPage).toHaveBeenCalledWith(5));
+    expect(screen.getByLabelText('Current page')).toHaveValue(5);
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+    expect(screen.getByText('Page 5 of 5')).toBeInTheDocument();
+  });
+
+  it('renders sharp pages on high density displays without changing their CSS size', async () => {
+    const pixelRatio = vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(2);
+    try {
+      renderWithProviders(<PdfViewer source="/sample.pdf" defaultZoom={1} />);
+      await waitFor(() => expect(mockPage.render).toHaveBeenCalled());
+      const canvas = screen.getByTestId('pdf-canvas');
+      expect(canvas).toHaveAttribute('width', '1200');
+      expect(canvas).toHaveAttribute('height', '1600');
+      expect(canvas).toHaveStyle({ width: '600px', height: '800px' });
+      expect(mockPage.render).toHaveBeenCalledWith(
+        expect.objectContaining({ canvas, transform: [2, 0, 0, 2, 0, 0] }),
+      );
+    } finally {
+      pixelRatio.mockRestore();
+    }
+  });
+
   it('renders without crashing with default props', () => {
     const { container } = renderWithProviders(<PdfViewer source="/sample.pdf" />);
     expect(container.firstChild).not.toBeNull();
@@ -242,6 +317,40 @@ describe('PdfViewer — page navigation', () => {
 // ─── 5. Zoom ──────────────────────────────────────────────────────────────────
 
 describe('PdfViewer — zoom', () => {
+  it('shows the fitted scale and keeps fitting when the viewport is resized', async () => {
+    let resize: ResizeObserverCallback | undefined;
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: ResizeObserverCallback) {
+          resize = callback;
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    try {
+      const onZoomChange = vi.fn();
+      const { container, unmount } = renderWithProviders(
+        <PdfViewer source="/sample.pdf" onZoomChange={onZoomChange} />,
+      );
+      const area = container.querySelector('[data-slot="pdf-viewer-mount"]') as HTMLElement;
+      Object.defineProperty(area, 'clientWidth', { configurable: true, value: 332 });
+      await waitFor(() => expect(screen.getByText('50%')).toBeInTheDocument());
+      expect(screen.getByTestId('pdf-canvas')).toHaveAttribute('width', '300');
+
+      Object.defineProperty(area, 'clientWidth', { configurable: true, value: 512 });
+      act(() => resize?.([], {} as ResizeObserver));
+      await waitFor(() => expect(screen.getByText('80%')).toBeInTheDocument());
+      expect(screen.getByTestId('pdf-canvas')).toHaveAttribute('width', '480');
+      await userEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
+      expect(onZoomChange).toHaveBeenLastCalledWith(0.9);
+      unmount();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('calls onZoomChange when Zoom in is clicked', async () => {
     const onZoomChange = vi.fn();
     const user = userEvent.setup();

@@ -99,6 +99,25 @@ describe('Upload — rendering & ref', () => {
     expect(screen.queryByText('Choose file')).toBeNull();
     expect(screen.queryByText('选择文件')).toBeNull();
   });
+
+  it('includes padding and borders in the full-width dropzone dimensions', () => {
+    renderWithProviders(<Upload variant="dropzone" isFullWidth aria-label="Upload files" />);
+    const dropzoneStyle = getComputedStyle(screen.getByRole('button', { name: 'Upload files' }));
+    expect(dropzoneStyle.width).toBe('100%');
+    expect(dropzoneStyle.boxSizing).toBe('border-box');
+  });
+
+  it.each(['light', 'dark'] as const)(
+    'uses a valid token color for the %s dropzone glow',
+    (theme) => {
+      renderWithProviders(<Upload variant="dropzone" />, { theme });
+      const styles = Array.from(document.querySelectorAll('style'))
+        .map((s) => s.textContent ?? '')
+        .join('\n');
+      expect(styles).toContain('radial-gradient(');
+      expect(styles).not.toMatch(/rgba?\([^)]*\)(?:0d|14)/);
+    },
+  );
 });
 
 describe('Upload — controlled vs uncontrolled', () => {

@@ -61,6 +61,45 @@ describe('useAsyncOptions — response normalization', () => {
 });
 
 describe('useAsyncOptions — pagination', () => {
+  it('drops duplicate values inside each page to keep rendered option keys unique', async () => {
+    const loadOptions = vi.fn(async ({ page }: AsyncOptionsRequest) =>
+      page === 1
+        ? { items: items('a', 'a', 'b'), hasMore: true }
+        : { items: items('b', 'c', 'c'), hasMore: false },
+    );
+    const { result } = renderHook(() =>
+      useAsyncOptions<Item>({ loadOptions, keyword: '', isOpen: true, debounceMs: 0 }),
+    );
+    await waitFor(() => expect(result.current.items.map((item) => item.value)).toEqual(['a', 'b']));
+    act(() => result.current.loadMore());
+    await waitFor(() => expect(result.current.hasMore).toBe(false));
+    expect(result.current.items.map((item) => item.value)).toEqual(['a', 'b', 'c']);
+  });
+
+  it('coalesces repeated loadMore calls before React commits the loading state', async () => {
+    let resolveNextPage!: (page: { items: Item[]; hasMore: boolean }) => void;
+    const loadOptions = vi
+      .fn()
+      .mockResolvedValueOnce({ items: items('a'), hasMore: true })
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveNextPage = resolve;
+          }),
+      );
+    const { result } = renderHook(() =>
+      useAsyncOptions<Item>({ loadOptions, keyword: '', isOpen: true, debounceMs: 0 }),
+    );
+    await waitFor(() => expect(result.current.items).toHaveLength(1));
+    act(() => {
+      result.current.loadMore();
+      result.current.loadMore();
+    });
+    expect(loadOptions).toHaveBeenCalledTimes(2);
+    await act(async () => resolveNextPage({ items: items('b'), hasMore: false }));
+    expect(result.current.items.map((item) => item.value)).toEqual(['a', 'b']);
+  });
+
   it('drops duplicates when pages overlap', async () => {
     const loadOptions = vi.fn(async ({ page }: AsyncOptionsRequest) =>
       page === 1

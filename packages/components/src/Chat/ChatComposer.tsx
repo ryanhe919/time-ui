@@ -175,14 +175,21 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(
       const el = textareaRef.current;
       if (!el) return;
       const lineHeightPx = readLineHeightPx(el);
-      const minHeight = lineHeightPx * minRows;
-      const maxHeight = lineHeightPx * maxRows;
+      const computed = window.getComputedStyle(el);
+      const verticalPadding =
+        (parseFloat(computed.paddingTop) || 0) + (parseFloat(computed.paddingBottom) || 0);
+      // scrollHeight includes padding; a border-box height must leave room
+      // for it as well, otherwise the last configured row is clipped.
+      const minHeight = lineHeightPx * minRows + verticalPadding;
+      const maxHeight = Math.max(minHeight, lineHeightPx * maxRows + verticalPadding);
+      el.style.minHeight = `max(${tokens.composerMinHeight}, ${minHeight}px)`;
+      el.style.maxHeight = `${maxHeight}px`;
       el.style.height = 'auto';
       const natural = el.scrollHeight;
       const clamped = Math.max(minHeight, Math.min(natural, maxHeight));
       el.style.height = `${clamped}px`;
       el.style.overflowY = natural > maxHeight ? 'auto' : 'hidden';
-    }, [currentValue, minRows, maxRows]);
+    }, [currentValue, minRows, maxRows, tokens.composerMinHeight]);
 
     // Y1+Y2 (chat-audit.md)：focus 视觉与 Input/Select 体系对齐 ——
     // 用 `:focus-within` 选择器（不再 useState 跟踪）+ 2px 内描边 box-shadow

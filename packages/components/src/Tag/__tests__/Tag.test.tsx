@@ -94,7 +94,7 @@ describe('Tag', () => {
     const btn = screen.getByRole('button', { name: 'Press' });
     btn.focus();
     await userEvent.keyboard('{Enter}');
-    expect(onPress).toHaveBeenCalled();
+    expect(onPress).toHaveBeenCalledOnce();
   });
 
   it('fires onPress on Space key', async () => {
@@ -107,7 +107,29 @@ describe('Tag', () => {
     const btn = screen.getByRole('button', { name: 'Press' });
     btn.focus();
     await userEvent.keyboard(' ');
-    expect(onPress).toHaveBeenCalled();
+    expect(onPress).toHaveBeenCalledOnce();
+  });
+
+  it('keeps press and close actions separate for interactive closable tags', async () => {
+    const onPress = vi.fn();
+    const onClose = vi.fn();
+    const { container } = renderWithProviders(
+      <Tag isInteractive isClosable onPress={onPress} onClose={onClose}>
+        Label
+      </Tag>,
+    );
+    expect(container.querySelector('button button')).toBeNull();
+    const press = screen.getByRole('button', { name: 'Label' });
+    const close = screen.getByRole('button', { name: 'Remove' });
+    press.focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onPress).toHaveBeenCalledOnce();
+    expect(onClose).not.toHaveBeenCalled();
+    await userEvent.tab();
+    expect(close).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(onPress).toHaveBeenCalledOnce();
   });
 
   it('renders as span when not interactive', () => {

@@ -29,7 +29,8 @@ export function BasicEditor() {
 
 Three visual recipes (`flat`, `bordered`, `faded`) and five size steps (`xs`, `sm`, `md`, `lg`, `xl`). They reuse the same field-style helpers as `Input` / `Textarea`, so spacing, focus ring, and invalid color all stay consistent.
 
-<LiveDemo code={`<Stack spacing={24}>
+<LiveDemo
+  code={`<Stack spacing={24}>
   {/* Variants */}
   <RichTextEditor variant="flat" defaultValue="<p>flat</p>" toolbar="minimal" />
   <RichTextEditor variant="bordered" defaultValue="<p>bordered (default)</p>" toolbar="minimal" />
@@ -38,7 +39,8 @@ Three visual recipes (`flat`, `bordered`, `faded`) and five size steps (`xs`, `s
   <RichTextEditor size="sm" defaultValue="<p>sm</p>" toolbar="minimal" />
   <RichTextEditor size="md" defaultValue="<p>md (default)</p>" toolbar="minimal" />
   <RichTextEditor size="lg" defaultValue="<p>lg</p>" toolbar="minimal" />
-</Stack>`}>
+</Stack>`}
+>
   <RichTextEditorVariantsDemo />
 </LiveDemo>
 
@@ -85,7 +87,8 @@ export function ToolbarPresets() {
 
 `isDisabled` blocks all interaction (and pointer events); `isReadOnly` keeps focus and selection but rejects edits; `isInvalid` surfaces the danger color via the shared field-style helper.
 
-<LiveDemo code={`<Stack spacing={16}>
+<LiveDemo
+  code={`<Stack spacing={16}>
   <RichTextEditor
     aria-label="Disabled editor"
     isDisabled
@@ -104,7 +107,8 @@ export function ToolbarPresets() {
     defaultValue="<p>This document failed validation.</p>"
     toolbar="minimal"
   />
-</Stack>`}>
+</Stack>`}
+>
   <Stack spacing={16}>
     <RichTextEditor
       aria-label="Disabled editor"
@@ -131,11 +135,13 @@ export function ToolbarPresets() {
 
 When the document is empty, `placeholder` is rendered through TipTap's `Placeholder` extension and styled with `theme.colors.text.muted`.
 
-<LiveDemo code={`<RichTextEditor
+<LiveDemo
+  code={`<RichTextEditor
   aria-label="Editor with placeholder"
   placeholder="What's on your mind today?"
   toolbar="minimal"
-/>`}>
+/>`}
+>
   <RichTextEditor
     aria-label="Editor with placeholder"
     placeholder="What's on your mind today?"
@@ -147,11 +153,13 @@ When the document is empty, `placeholder` is rendered through TipTap's `Placehol
 
 Pass `toolbar={false}` for a chrome-less editor — useful inside chat composers, comment fields, or anywhere the toolbar would steal focus from surrounding UI. Formatting still works through keyboard shortcuts (`Cmd/Ctrl+B`, `Cmd/Ctrl+I`, etc.).
 
-<LiveDemo code={`<RichTextEditor
+<LiveDemo
+  code={`<RichTextEditor
   aria-label="Toolbar-less editor"
   toolbar={false}
   placeholder="Type freely — no toolbar."
-/>`}>
+/>`}
+>
   <RichTextEditor
     aria-label="Toolbar-less editor"
     toolbar={false}
@@ -173,11 +181,7 @@ export function ExtendedEditor() {
   return (
     <RichTextEditor
       placeholder="Smart quotes, ellipses and task lists are now active."
-      extensions={[
-        Typography,
-        TaskList,
-        TaskItem.configure({ nested: true }),
-      ]}
+      extensions={[Typography, TaskList, TaskItem.configure({ nested: true })]}
     />
   );
 }
@@ -222,22 +226,86 @@ export function ProgrammaticEditor() {
 
 ## API
 
-<PropsTable props={[
-  { name: 'value', type: 'string', description: 'Controlled HTML content.' },
-  { name: 'defaultValue', type: 'string', default: "''", description: 'Uncontrolled initial HTML content.' },
-  { name: 'onChange', type: '(html: string) => void', description: 'Fires on every document mutation with the serialized HTML.' },
-  { name: 'placeholder', type: 'string', description: 'Empty-state placeholder, rendered via TipTap’s `Placeholder` extension.' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size preset; controls padding, font size, and default min-height.' },
-  { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: 'Visual recipe — shared with Input / Textarea.' },
-  { name: 'isDisabled', type: 'boolean', default: 'false', description: 'Block all interaction; pointer events are turned off.' },
-  { name: 'isReadOnly', type: 'boolean', default: 'false', description: 'Focusable & selectable but rejects edits.' },
-  { name: 'isInvalid', type: 'boolean', default: 'false', description: 'Apply the invalid (danger) color.' },
-  { name: 'minHeight', type: 'number | string', description: 'Editable area min-height. Defaults: sm 120 / md 160 / lg 220.' },
-  { name: 'maxHeight', type: 'number | string | null', default: "'60vh'", description: 'Max height of the scroll viewport. Pass `null` to remove the cap.' },
-  { name: 'toolbar', type: "'minimal' | 'basic' | 'full' | ToolbarItem[] | false", default: "'basic'", description: 'Pick a preset, list explicit items, or pass `false` to hide the toolbar.' },
-  { name: 'extensions', type: 'AnyExtension[]', description: 'Extra TipTap extensions appended after the built-ins (`StarterKit`, `Underline`, `Link`, `Placeholder`).' },
-  { name: 'onCreate', type: '(editor: Editor) => void', description: 'Receives the TipTap `Editor` instance once mounted — your hook for advanced control.' }
-]} />
+<PropsTable
+  props={[
+    { name: 'value', type: 'string', description: 'Controlled HTML content.' },
+    {
+      name: 'defaultValue',
+      type: 'string',
+      default: "''",
+      description: 'Uncontrolled initial HTML content.',
+    },
+    {
+      name: 'onChange',
+      type: '(html: string) => void',
+      description: 'Fires on every document mutation with the serialized HTML.',
+    },
+    {
+      name: 'placeholder',
+      type: 'string',
+      description: 'Empty-state placeholder, rendered via TipTap’s `Placeholder` extension.',
+    },
+    {
+      name: 'size',
+      type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'",
+      default: "'md'",
+      description: 'Size preset; controls padding, font size, and default min-height.',
+    },
+    {
+      name: 'variant',
+      type: "'flat' | 'bordered' | 'faded'",
+      default: "'bordered'",
+      description: 'Visual recipe — shared with Input / Textarea.',
+    },
+    {
+      name: 'isDisabled',
+      type: 'boolean',
+      default: 'false',
+      description: 'Block all interaction; pointer events are turned off.',
+    },
+    {
+      name: 'isReadOnly',
+      type: 'boolean',
+      default: 'false',
+      description: 'Focusable & selectable but rejects edits.',
+    },
+    {
+      name: 'isInvalid',
+      type: 'boolean',
+      default: 'false',
+      description: 'Apply the invalid (danger) color.',
+    },
+    {
+      name: 'minHeight',
+      type: 'number | string',
+      description: 'Editable area min-height. Defaults: sm 120 / md 160 / lg 220.',
+    },
+    {
+      name: 'maxHeight',
+      type: 'number | string | null',
+      default: "'60vh'",
+      description: 'Max height of the scroll viewport. Pass `null` to remove the cap.',
+    },
+    {
+      name: 'toolbar',
+      type: "'minimal' | 'basic' | 'full' | ToolbarItem[] | false",
+      default: "'basic'",
+      description: 'Pick a preset, list explicit items, or pass `false` to hide the toolbar.',
+    },
+    {
+      name: 'extensions',
+      type: 'AnyExtension[]',
+      description:
+        'Extra TipTap extensions appended after the built-ins (`StarterKit`, `Underline`, `Link`, `Placeholder`).',
+    },
+    {
+      name: 'onCreate',
+      type: '(editor: Editor) => void',
+      description:
+        'Receives the TipTap `Editor` instance once mounted — your hook for advanced control.',
+    },
+  ]}
+/>
 
 ### `ToolbarItem` values
 
@@ -252,7 +320,10 @@ pnpm add @tiptap/core @tiptap/react @tiptap/pm \
   @tiptap/extension-link @tiptap/extension-placeholder
 ```
 
+Use one consistent Tiptap major across all seven packages: version 2.27.3 or newer on 2.x, or 3.30.4 or newer on 3.x. These minimum versions include the `mergeAttributes` security fix. Mixing Tiptap 2 and 3 packages causes incompatible extension types.
+
 Import only from the dedicated subpath — `import { RichTextEditor } from '@timeui/react/rich-text-editor'` — so tree-shaking keeps TipTap out of pages that never render the editor.
+
 </Callout>
 
 <Callout variant="info" title="Accessibility">

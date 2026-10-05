@@ -89,7 +89,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       showTodayButton: _showTodayButton = true, // eslint-disable-line @typescript-eslint/no-unused-vars
       startContent,
       endContent,
-      portalContainer: _portalContainer, // eslint-disable-line @typescript-eslint/no-unused-vars
+      portalContainer,
       className,
       style,
       id: idProp,
@@ -220,11 +220,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       setInputDraft(null);
     }, [setCurrentValue]);
 
-    const initialAnchor = useMemo(
-      () => startOfMonth(currentValue ?? new Date()),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [],
-    );
+    const initialAnchor = useMemo(() => startOfMonth(currentValue ?? new Date()), [currentValue]);
 
     // 日历日期变更：只改 draft 的 y/m/d，保留 h/m/s。若 draft 尚未初始化，用新日期 + 当下时间兜底。
     const handleSelectDate = useCallback(
@@ -399,7 +395,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
             if (e.key === 'Enter') {
               e.preventDefault();
               setOpen(false);
-            } else if (e.key === 'ArrowDown' && !open) {
+            } else if (e.key === 'ArrowDown' && !open && !isDisabled && !isReadOnly) {
               e.preventDefault();
               setOpen(true);
             }
@@ -555,6 +551,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         placement={placement}
         hasArrow={false}
         trigger="manual"
+        portalContainer={portalContainer}
         offset={parseInt(tokens.panelOffset, 10) || 8}
         id={`${baseId}-panel`}
         aria-label={pickerAriaLabel}

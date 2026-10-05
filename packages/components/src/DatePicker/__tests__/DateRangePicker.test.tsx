@@ -97,10 +97,9 @@ describe('DateRangePicker — base rendering', () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderWithProviders(<DateRangePicker aria-label="r" />);
     await user.click(screen.getByLabelText('Open calendar'));
-    expect(screen.getByRole('dialog')).toHaveStyle({
-      width: 'max-content',
-      maxWidth: 'calc(100vw - 32px)',
-    });
+    const dialogStyle = getComputedStyle(screen.getByRole('dialog'));
+    expect(dialogStyle.width).toBe('max-content');
+    expect(parseFloat(dialogStyle.maxWidth)).toBe(window.innerWidth - 32);
   });
 
   it('keeps the calendars row sized by content instead of shrinking in the popover', async () => {
@@ -141,6 +140,53 @@ describe('DateRangePicker — base rendering', () => {
 // ────────────────────────────────────────────────────────────
 
 describe('DateRangePicker — selection', () => {
+  it('renders the calendar inside a requested portal container', () => {
+    installRectMocks();
+    const portalContainer = document.createElement('div');
+    document.body.append(portalContainer);
+    const { unmount } = renderWithProviders(
+      <DateRangePicker isOpen portalContainer={portalContainer} />,
+    );
+    expect(portalContainer.querySelector('[role="dialog"]')).toBeInTheDocument();
+    unmount();
+    portalContainer.remove();
+  });
+
+  it('discards an incomplete range when dismissed and starts a new selection on reopening', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const onChange = vi.fn();
+    renderWithProviders(
+      <DateRangePicker
+        defaultValue={{ start: new Date(2026, 3, 1), end: new Date(2026, 3, 1) }}
+        onChange={onChange}
+      />,
+    );
+    const firstGrid = (await openCalendar(user))[0]!;
+    await user.click(findCellByDay(firstGrid, 5));
+    await user.keyboard('{Escape}');
+    const reopenedGrid = (await openCalendar(user))[0]!;
+    await user.click(findCellByDay(reopenedGrid, 10));
+    expect(onChange).not.toHaveBeenCalled();
+    await user.click(findCellByDay(reopenedGrid, 20));
+    const range = onChange.mock.calls[0]![0] as { start: Date; end: Date };
+    expect(range.start.getDate()).toBe(10);
+    expect(range.end.getDate()).toBe(20);
+  });
+
+  it('opens the start month of a range changed while the calendar is closed', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const { rerender } = renderWithProviders(
+      <DateRangePicker value={{ start: new Date(2026, 3, 10), end: new Date(2026, 3, 20) }} />,
+    );
+    rerender(
+      <DateRangePicker value={{ start: new Date(2027, 8, 5), end: new Date(2027, 8, 10) }} />,
+    );
+    const grid = (await openCalendar(user))[0]!;
+    expect(within(grid).getAllByRole('gridcell', { selected: true })[0]).toHaveTextContent('5');
+  });
+
   it('two clicks complete a range and fire onChange + close popover', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const onChange = vi.fn();

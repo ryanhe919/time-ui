@@ -251,6 +251,7 @@ export const ToastItem: FC<ToastItemProps> = ({ toast, onClose }) => {
   const remainingRef = useRef<number | null>(duration);
   const startedAtRef = useRef<number>(Date.now());
   const isHoveredRef = useRef(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   // 关闭流程：先动画，再实际从 store 移除
   const beginClose = useCallback(() => {
@@ -285,16 +286,16 @@ export const ToastItem: FC<ToastItemProps> = ({ toast, onClose }) => {
 
   // 初次挂载 / duration 变化（update 后）：根据 duration 排程
   useEffect(() => {
-    if (duration === null) {
+    if (duration === null || isExiting || isHoveredRef.current) {
       clearCloseTimer();
-      remainingRef.current = null;
+      remainingRef.current = duration;
       return;
     }
     scheduleClose(duration);
     return () => {
       clearCloseTimer();
     };
-  }, [duration, scheduleClose]);
+  }, [duration, isExiting, scheduleClose]);
 
   // 卸载时清理 exit timer
   useEffect(() => {
@@ -305,6 +306,7 @@ export const ToastItem: FC<ToastItemProps> = ({ toast, onClose }) => {
 
   const onPointerEnter = () => {
     isHoveredRef.current = true;
+    setIsPaused(true);
     if (closeTimerRef.current && remainingRef.current !== null) {
       clearCloseTimer();
       const consumed = Date.now() - startedAtRef.current;
@@ -314,6 +316,7 @@ export const ToastItem: FC<ToastItemProps> = ({ toast, onClose }) => {
 
   const onPointerLeave = () => {
     isHoveredRef.current = false;
+    setIsPaused(false);
     if (remainingRef.current !== null && !isExiting) {
       scheduleClose(remainingRef.current);
     }
@@ -486,6 +489,7 @@ export const ToastItem: FC<ToastItemProps> = ({ toast, onClose }) => {
           opacity: 0.6;
           transform-origin: left center;
           animation: timeui-toast-progress ${duration}ms linear forwards;
+          animation-play-state: ${isPaused ? 'paused' : 'running'};
           @keyframes timeui-toast-progress {
             from {
               transform: scaleX(1);
@@ -551,7 +555,7 @@ export const ToastItem: FC<ToastItemProps> = ({ toast, onClose }) => {
           <CloseIcon size={14} />
         </button>
       ) : null}
-      {progressBarCss ? <span aria-hidden css={progressBarCss} /> : null}
+      {progressBarCss ? <span key={duration} aria-hidden css={progressBarCss} /> : null}
     </div>
   );
 };

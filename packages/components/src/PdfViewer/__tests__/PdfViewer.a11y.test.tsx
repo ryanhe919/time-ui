@@ -21,12 +21,11 @@ const mockPage = {
 const mockDoc = {
   numPages: 3,
   getPage: vi.fn(() => Promise.resolve(mockPage)),
-  destroy: vi.fn(() => Promise.resolve()),
 };
 
 vi.mock('pdfjs-dist', () => ({
   GlobalWorkerOptions: { workerSrc: '' },
-  getDocument: vi.fn(() => ({ promise: Promise.resolve(mockDoc) })),
+  getDocument: vi.fn(() => ({ promise: Promise.resolve(mockDoc), destroy: vi.fn() })),
 }));
 
 beforeEach(() => {

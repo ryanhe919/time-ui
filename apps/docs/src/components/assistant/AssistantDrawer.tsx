@@ -244,6 +244,19 @@ export function AssistantDrawer(props: Props) {
   const canClear = turns.length > 0 || topLevelError !== null || isStreaming;
 
   // Drawer 容器 + overlay CSS
+  const viewportCss = css`
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    visibility: ${open ? 'visible' : 'hidden'};
+    transition: visibility 0s ${open ? '0s' : '240ms'};
+    z-index: 1400;
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  `;
+
   const overlayCss = css`
     position: fixed;
     inset: 0;
@@ -268,6 +281,7 @@ export function AssistantDrawer(props: Props) {
     box-shadow: -12px 0 32px rgba(0, 0, 0, 0.14);
     display: flex;
     flex-direction: column;
+    pointer-events: ${open ? 'auto' : 'none'};
     transform: translateX(${open ? '0%' : '100%'});
     transition: transform 240ms cubic-bezier(0.32, 0.72, 0, 1);
     z-index: 1401;
@@ -406,7 +420,13 @@ export function AssistantDrawer(props: Props) {
   if (!mounted) return null;
 
   const tree = (
-    <div aria-hidden={!open}>
+    <div
+      aria-hidden={!open}
+      css={viewportCss}
+      ref={(node) => {
+        if (node) node.inert = !open;
+      }}
+    >
       <div css={overlayCss} onClick={onClose} />
       <aside
         ref={panelRef}

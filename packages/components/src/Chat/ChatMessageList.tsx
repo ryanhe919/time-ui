@@ -7,15 +7,7 @@
 
 'use client';
 
-import {
-  Children,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { css, useTheme } from '@emotion/react';
 import { mergeRefs, useIsomorphicLayoutEffect } from '../utils';
 import type { ChatCommonStyleProps } from './Chat.types';
@@ -78,8 +70,6 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
     const tokens = theme.components.chat;
 
     const innerRef = useRef<HTMLDivElement | null>(null);
-    // 用 child 数量作为 effect 依赖键；新增消息时触发滚动。
-    const childCount = Children.count(children);
     // 跟踪用户是否"贴底"：默认 true（首次渲染视作贴底）。
     const isNearBottomRef = useRef(true);
     const [, forceTick] = useState(0);
@@ -102,7 +92,21 @@ export const ChatMessageList = forwardRef<HTMLDivElement, ChatMessageListProps>(
       if (isNearBottomRef.current) {
         scrollToBottom();
       }
-    }, [shouldAutoScrollToBottom, childCount, maxHeight, scrollToBottom]);
+    }, [shouldAutoScrollToBottom, children, maxHeight, scrollToBottom]);
+
+    // Streaming text, highlighted code and loaded images can grow an existing
+    // message without adding a child to the list or re-rendering this component.
+    useEffect(() => {
+      const el = innerRef.current;
+      if (!el || maxHeight === undefined || !shouldAutoScrollToBottom) return;
+      if (typeof ResizeObserver === 'undefined') return;
+      const observer = new ResizeObserver(() => {
+        if (isNearBottomRef.current) scrollToBottom();
+      });
+      observer.observe(el);
+      for (const child of Array.from(el.children)) observer.observe(child);
+      return () => observer.disconnect();
+    }, [children, maxHeight, shouldAutoScrollToBottom, scrollToBottom]);
 
     useEffect(() => {
       const el = innerRef.current;

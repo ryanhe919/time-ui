@@ -8,7 +8,7 @@
 
 'use client';
 
-import { forwardRef, useId, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
+import { forwardRef, useId, type MouseEvent, type ReactElement } from 'react';
 import { css, useTheme } from '@emotion/react';
 import type { TagColor, TagProps, TagVariant } from './Tag.types';
 
@@ -91,81 +91,12 @@ export const Tag = forwardRef<HTMLElement, TagProps>(function Tag(props, ref) {
     onClose?.(e);
   };
 
-  const renderAsButton = isInteractive && !isDisabled;
+  const canPress = isInteractive && !isDisabled;
+  const renderAsButton = canPress && !isClosable;
   const Comp = (renderAsButton ? 'button' : 'span') as 'button' | 'span';
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
-    if (!renderAsButton) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onPress?.();
-    }
-  };
-
-  return (
-    <Comp
-      ref={ref as never}
-      id={`timeui-tag-${safeAutoId}`}
-      type={renderAsButton ? 'button' : undefined}
-      onClick={renderAsButton ? () => onPress?.() : undefined}
-      onKeyDown={renderAsButton ? handleKeyDown : undefined}
-      disabled={renderAsButton ? isDisabled : undefined}
-      aria-disabled={isDisabled || undefined}
-      aria-label={ariaLabel}
-      data-color={color}
-      data-variant={variant}
-      data-size={size}
-      data-shape={shape}
-      data-interactive={isInteractive || undefined}
-      data-disabled={isDisabled || undefined}
-      className={className}
-      css={css`
-        display: inline-flex;
-        align-items: center;
-        gap: ${sizeTokens.gap};
-        box-sizing: border-box;
-        height: ${sizeTokens.height};
-        padding: 0 ${sizeTokens.paddingX};
-        border-radius: ${radius};
-        background-color: ${bg};
-        color: ${fg};
-        border: ${border};
-        font-family: inherit;
-        font-size: ${sizeTokens.fontSize};
-        line-height: 1;
-        font-weight: ${tag.fontWeight};
-        white-space: nowrap;
-        user-select: none;
-        vertical-align: middle;
-        cursor: ${isDisabled ? 'not-allowed' : renderAsButton ? 'pointer' : 'default'};
-        transition:
-          background-color ${duration},
-          color ${duration},
-          border-color ${duration},
-          opacity ${duration};
-
-        &:hover {
-          opacity: ${renderAsButton && !isDisabled ? tag.hoverOpacity : 1};
-        }
-        &:active {
-          opacity: ${renderAsButton && !isDisabled ? tag.activeOpacity : 1};
-        }
-
-        &:focus-visible {
-          outline: 2px solid ${focusColor};
-          outline-offset: 2px;
-        }
-
-        &[data-disabled='true'] {
-          opacity: 0.55;
-          cursor: not-allowed;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          transition: none;
-        }
-      `}
-    >
+  const content = (
+    <>
       {startContent ? (
         <span
           aria-hidden
@@ -195,6 +126,100 @@ export const Tag = forwardRef<HTMLElement, TagProps>(function Tag(props, ref) {
           {endContent}
         </span>
       ) : null}
+    </>
+  );
+
+  return (
+    <Comp
+      ref={ref as never}
+      id={`timeui-tag-${safeAutoId}`}
+      type={renderAsButton ? 'button' : undefined}
+      onClick={renderAsButton ? () => onPress?.() : undefined}
+      disabled={renderAsButton ? isDisabled : undefined}
+      aria-disabled={isDisabled || undefined}
+      aria-label={canPress && isClosable ? undefined : ariaLabel}
+      data-color={color}
+      data-variant={variant}
+      data-size={size}
+      data-shape={shape}
+      data-interactive={isInteractive || undefined}
+      data-disabled={isDisabled || undefined}
+      className={className}
+      css={css`
+        display: inline-flex;
+        align-items: center;
+        gap: ${sizeTokens.gap};
+        box-sizing: border-box;
+        height: ${sizeTokens.height};
+        padding: 0 ${sizeTokens.paddingX};
+        border-radius: ${radius};
+        background-color: ${bg};
+        color: ${fg};
+        border: ${border};
+        font-family: inherit;
+        font-size: ${sizeTokens.fontSize};
+        line-height: 1;
+        font-weight: ${tag.fontWeight};
+        white-space: nowrap;
+        user-select: none;
+        vertical-align: middle;
+        cursor: ${isDisabled ? 'not-allowed' : canPress ? 'pointer' : 'default'};
+        transition:
+          background-color ${duration},
+          color ${duration},
+          border-color ${duration},
+          opacity ${duration};
+
+        &:hover {
+          opacity: ${canPress ? tag.hoverOpacity : 1};
+        }
+        &:active {
+          opacity: ${canPress ? tag.activeOpacity : 1};
+        }
+
+        &:focus-visible {
+          outline: 2px solid ${focusColor};
+          outline-offset: 2px;
+        }
+
+        &[data-disabled='true'] {
+          opacity: 0.55;
+          cursor: not-allowed;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          transition: none;
+        }
+      `}
+    >
+      {canPress && isClosable ? (
+        <button
+          type="button"
+          aria-label={ariaLabel}
+          onClick={() => onPress?.()}
+          css={css`
+            display: inline-flex;
+            align-items: center;
+            gap: ${sizeTokens.gap};
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            line-height: inherit;
+            cursor: pointer;
+            border-radius: inherit;
+            &:focus-visible {
+              outline: 2px solid ${focusColor};
+              outline-offset: 2px;
+            }
+          `}
+        >
+          {content}
+        </button>
+      ) : (
+        content
+      )}
       {isClosable ? (
         <button
           type="button"

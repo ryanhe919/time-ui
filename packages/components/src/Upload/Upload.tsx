@@ -716,6 +716,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
         className={classNames?.dropzone}
         css={css`
           position: relative;
+          box-sizing: border-box;
           isolation: isolate;
           display: flex;
           align-items: center;
@@ -744,7 +745,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
             border-radius: inherit;
             background: radial-gradient(
               ellipse at center top,
-              ${theme.colors.primary.DEFAULT}0d 0%,
+              ${theme.colors.primary[100]} 0%,
               transparent 60%
             );
             opacity: 0;
@@ -782,7 +783,7 @@ export const Upload = forwardRef<UploadHandle, UploadProps>(function Upload(
           &[data-rejecting='true']::before {
             background: radial-gradient(
               ellipse at center top,
-              ${theme.colors.status.danger}14 0%,
+              ${theme.colors.danger[100]} 0%,
               transparent 60%
             );
             opacity: 1;

@@ -202,8 +202,8 @@ button {
  * They MUST stop at the LiveDemo preview boundary, otherwise any component
  * that renders <h1>…<h6> inside a demo (e.g. <Heading>) inherits this
  * editorial styling and the demo no longer reflects the component's real
- * appearance. The `[data-live-preview]` reset block at the bottom of this
- * section neutralises the cascade inside that boundary.
+ * appearance. Selectors exclude `[data-live-preview]` descendants so component
+ * styles, including heading, list and code styles, remain authoritative.
  * ============================================================ */
 
 .mdx-article {
@@ -235,7 +235,7 @@ button {
 }
 
 /* ----- H1: editorial serif display with italic accent ----- */
-.mdx-article h1 {
+.mdx-article h1:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-display) !important;
   font-weight: 400 !important;
   font-style: normal !important;
@@ -252,19 +252,19 @@ button {
 
 /* If H1 contains mixed Chinese + English, let the CJK glyphs keep their
    natural weight while the Latin falls on the serif. */
-.mdx-article h1 code {
+.mdx-article h1 code:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-mono) !important;
   font-size: 0.78em;
   padding: 0 6px;
   vertical-align: 0.1em;
 }
 
-.mdx-article > h1:first-child {
+.mdx-article > h1:first-child:not([data-live-preview] *, [data-livedemo] *) {
   animation: docs-fade-up 600ms cubic-bezier(0.42, 0, 0.18, 1) both;
 }
 
 /* Lead paragraph — larger, slightly softer color, ample air below. */
-.mdx-article > h1 + p {
+.mdx-article > h1 + p:not([data-live-preview] *, [data-livedemo] *) {
   font-size: 20px;
   line-height: 1.55;
   letter-spacing: -0.008em;
@@ -276,7 +276,7 @@ button {
 }
 
 /* ----- H2: sans with a discreet accent rule on the left ----- */
-.mdx-article h2 {
+.mdx-article h2:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-sans) !important;
   font-weight: 600 !important;
   font-size: 30px !important;
@@ -291,7 +291,7 @@ button {
 }
 
 /* Small italic "§" before H2 for a subtle editorial touch. */
-.mdx-article h2::before {
+.mdx-article h2:not([data-live-preview] *, [data-livedemo] *)::before {
   content: '§';
   font-family: var(--docs-display);
   font-style: italic;
@@ -304,7 +304,7 @@ button {
   opacity: 0.9;
 }
 
-.mdx-article h3 {
+.mdx-article h3:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-sans) !important;
   font-weight: 600 !important;
   font-size: 20px !important;
@@ -316,7 +316,7 @@ button {
 }
 
 /* H4 — quiet sub-heading. Smaller than H3, still scannable. */
-.mdx-article h4 {
+.mdx-article h4:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-sans) !important;
   font-weight: 600 !important;
   font-size: 16px !important;
@@ -328,7 +328,7 @@ button {
 }
 
 /* H5 — minor heading, on the body baseline. */
-.mdx-article h5 {
+.mdx-article h5:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-sans) !important;
   font-weight: 600 !important;
   font-size: 14px !important;
@@ -341,7 +341,7 @@ button {
 
 /* H6 — eyebrow label (uppercase only renders on Latin; gracefully ignored
    on CJK so it just reads as a small caps-like caption). */
-.mdx-article h6 {
+.mdx-article h6:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-sans) !important;
   font-weight: 600 !important;
   font-size: 12px !important;
@@ -355,31 +355,13 @@ button {
 
 /* H6 in CJK contexts: drop uppercase + tracking (no-op on glyphs but
    keeps the visual rhythm clean). */
-.mdx-article:lang(zh) h6 {
+.mdx-article:lang(zh) h6:not([data-live-preview] *, [data-livedemo] *) {
   text-transform: none !important;
   letter-spacing: 0 !important;
 }
 
-/* ----- Reset inside LiveDemo preview boundary -----
-   Components rendered inside a LiveDemo (e.g. <Heading level={1..6}/>) emit
-   real <h1>…<h6> tags. Without this reset they inherit the editorial recipes
-   above and look nothing like the real component. `all: revert` cancels these
-   author rules, allowing the component's own emotion class styles to take
-   over. We also kill the H2 "§" prefix and the H1 fade-in animation. */
-.mdx-article [data-live-preview] h1,
-.mdx-article [data-live-preview] h2,
-.mdx-article [data-live-preview] h3,
-.mdx-article [data-live-preview] h4,
-.mdx-article [data-live-preview] h5,
-.mdx-article [data-live-preview] h6 {
-  all: revert !important;
-}
-.mdx-article [data-live-preview] h2::before {
-  content: none !important;
-}
-
 /* ----- Paragraphs ----- */
-.mdx-article p {
+.mdx-article p:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-sans);
   font-size: 16px;
   line-height: 1.72;
@@ -391,21 +373,21 @@ button {
 
 /* Adjacent paragraph after a heading gets snug margin so the header
    owns the whitespace, not the paragraph. */
-.mdx-article h2 + p,
-.mdx-article h3 + p {
+.mdx-article h2 + p:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article h3 + p:not([data-live-preview] *, [data-livedemo] *) {
   margin-top: 4px;
 }
 
 /* ----- Lists — custom markers, breathing space, hanging indent ----- */
-.mdx-article ul,
-.mdx-article ol {
+.mdx-article ul:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article ol:not([data-live-preview] *, [data-livedemo] *) {
   padding-left: 0;
   margin: 22px 0;
   max-width: 68ch;
   list-style: none;
 }
 
-.mdx-article li {
+.mdx-article li:not([data-live-preview] *, [data-livedemo] *) {
   position: relative;
   padding-left: 22px;
   margin: 10px 0;
@@ -415,7 +397,7 @@ button {
 }
 
 /* Bulleted list — refined dot with accent ring. */
-.mdx-article ul > li::before {
+.mdx-article ul > li:not([data-live-preview] *, [data-livedemo] *)::before {
   content: '';
   position: absolute;
   left: 4px;
@@ -428,14 +410,14 @@ button {
 }
 
 /* Numbered list — use rounded accent numerals. */
-.mdx-article ol {
+.mdx-article ol:not([data-live-preview] *, [data-livedemo] *) {
   counter-reset: docs-ol;
 }
-.mdx-article ol > li {
+.mdx-article ol > li:not([data-live-preview] *, [data-livedemo] *) {
   padding-left: 30px;
   counter-increment: docs-ol;
 }
-.mdx-article ol > li::before {
+.mdx-article ol > li:not([data-live-preview] *, [data-livedemo] *)::before {
   content: counter(docs-ol);
   position: absolute;
   left: 0;
@@ -454,28 +436,28 @@ button {
 }
 
 /* Nested lists — slightly smaller marker, tighter gap. */
-.mdx-article li ul,
-.mdx-article li ol {
+.mdx-article li ul:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article li ol:not([data-live-preview] *, [data-livedemo] *) {
   margin: 8px 0 4px;
 }
-.mdx-article li li {
+.mdx-article li li:not([data-live-preview] *, [data-livedemo] *) {
   font-size: 15px;
 }
-.mdx-article li li::before {
+.mdx-article li li:not([data-live-preview] *, [data-livedemo] *)::before {
   background: var(--c-text-tertiary);
   width: 4px;
   height: 4px;
 }
 
 /* ----- Strong — slight weight bump, no color shift. ----- */
-.mdx-article strong {
+.mdx-article strong:not([data-live-preview] *, [data-livedemo] *) {
   font-weight: 600;
   color: var(--c-text);
   letter-spacing: 0;
 }
 
 /* Em — Fraunces italic for Latin, LXGW WenKai (楷) for CJK. */
-.mdx-article em {
+.mdx-article em:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-cjk-accent);
   font-style: italic;
   font-weight: 400;
@@ -486,7 +468,7 @@ button {
 }
 
 /* ----- Links — Apple blue, subtle hover ----- */
-.mdx-article a {
+.mdx-article a:not([data-live-preview] *, [data-livedemo] *) {
   color: var(--c-accent);
   text-decoration: none;
   background-image: linear-gradient(currentColor, currentColor);
@@ -498,22 +480,22 @@ button {
     color 200ms ease,
     background-size 200ms ease;
 }
-.mdx-article a:hover {
+.mdx-article a:hover:not([data-live-preview] *, [data-livedemo] *) {
   color: var(--c-accent-hover);
   background-size: 100% 2px;
 }
 
 /* ----- Inline code — refined, quiet chip ----- */
-.mdx-article :not(pre) > code,
-.mdx-article p code,
-.mdx-article li code,
-.mdx-article td code,
-.mdx-article h2 code,
-.mdx-article h3 code,
-.mdx-article h4 code,
-.mdx-article a code,
-.mdx-article strong code,
-.mdx-article em code {
+.mdx-article :not(pre) > code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article p code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article li code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article td code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article h2 code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article h3 code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article h4 code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article a code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article strong code:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article em code:not([data-live-preview] *, [data-livedemo] *) {
   font-family: var(--docs-mono) !important;
   font-size: 0.86em !important;
   font-weight: 450 !important;
@@ -533,14 +515,14 @@ button {
 }
 
 /* Code inside links — inherit link color but keep mono + subtle bg. */
-.mdx-article a code {
+.mdx-article a code:not([data-live-preview] *, [data-livedemo] *) {
   color: inherit !important;
   border-color: color-mix(in oklch, currentColor 14%, transparent) !important;
   background: color-mix(in oklch, currentColor 6%, transparent) !important;
 }
 
 /* ----- Blockquote — editorial楷体 accent for Chinese, italic Fraunces for Latin ----- */
-.mdx-article blockquote {
+.mdx-article blockquote:not([data-live-preview] *, [data-livedemo] *) {
   margin: 28px 0;
   padding: 4px 0 4px 22px;
   border-left: 2px solid var(--c-accent);
@@ -552,7 +534,7 @@ button {
   max-width: 68ch;
   font-feature-settings: 'kern', 'liga';
 }
-.mdx-article blockquote p {
+.mdx-article blockquote p:not([data-live-preview] *, [data-livedemo] *) {
   margin: 4px 0;
   color: inherit;
   font-size: inherit;
@@ -560,7 +542,7 @@ button {
 }
 
 /* ----- Horizontal rule: a refined centered mark ----- */
-.mdx-article hr {
+.mdx-article hr:not([data-live-preview] *, [data-livedemo] *) {
   border: 0;
   margin: 80px auto;
   height: 1px;
@@ -568,7 +550,7 @@ button {
   background: var(--c-rule);
   position: relative;
 }
-.mdx-article hr::after {
+.mdx-article hr:not([data-live-preview] *, [data-livedemo] *)::after {
   content: '\25c7 \00b7 \25c7';
   position: absolute;
   left: 50%;
@@ -582,19 +564,19 @@ button {
 }
 
 /* ----- Tables (used by some embedded HTML; PropsTable is a custom comp) ----- */
-.mdx-article table {
+.mdx-article table:not([data-live-preview] *, [data-livedemo] *) {
   width: 100%;
   border-collapse: collapse;
   margin: 24px 0;
   font-size: 14px;
 }
-.mdx-article th,
-.mdx-article td {
+.mdx-article th:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article td:not([data-live-preview] *, [data-livedemo] *) {
   padding: 10px 14px;
   text-align: left;
   border-bottom: 1px solid var(--c-rule);
 }
-.mdx-article th {
+.mdx-article th:not([data-live-preview] *, [data-livedemo] *) {
   font-weight: 600;
   font-size: 12px;
   letter-spacing: 0.04em;
@@ -603,8 +585,8 @@ button {
 }
 
 /* ----- CJK rhythm — Chinese text sits slightly airier ----- */
-.mdx-article:lang(zh) p,
-.mdx-article:lang(zh) li {
+.mdx-article:lang(zh) p:not([data-live-preview] *, [data-livedemo] *),
+.mdx-article:lang(zh) li:not([data-live-preview] *, [data-livedemo] *) {
   line-height: 1.8;
   letter-spacing: 0;
 }
@@ -627,15 +609,15 @@ button {
 /* Section reveal stagger — each top-level H2 fades up on page load.
    Scoped to direct children so it never fires on H2s inside LiveDemo
    preview boundaries (those are descendants of [data-live-preview]). */
-.mdx-article > h2 {
+.mdx-article > h2:not([data-live-preview] *, [data-livedemo] *) {
   animation: docs-fade-up 540ms var(--ease-editorial) both;
   animation-delay: 120ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mdx-article > h1:first-child,
-  .mdx-article > h1 + p,
-  .mdx-article > h2 {
+  .mdx-article > h1:first-child:not([data-live-preview] *, [data-livedemo] *),
+  .mdx-article > h1 + p:not([data-live-preview] *, [data-livedemo] *),
+  .mdx-article > h2:not([data-live-preview] *, [data-livedemo] *) {
     animation: none !important;
   }
   html {
@@ -675,12 +657,12 @@ html[data-theme='dark'] ::selection {
 
 /* Editorial-tone selection on display headings + pull quotes — uses the
    iris glow instead of Apple blue so the marquee feels printy, not UI. */
-.mdx-article h1::selection,
-.mdx-article h2::selection,
-.mdx-article blockquote::selection,
-.mdx-article h1 ::selection,
-.mdx-article h2 ::selection,
-.mdx-article blockquote ::selection {
+.mdx-article h1:not([data-live-preview] *, [data-livedemo] *)::selection,
+.mdx-article h2:not([data-live-preview] *, [data-livedemo] *)::selection,
+.mdx-article blockquote:not([data-live-preview] *, [data-livedemo] *)::selection,
+.mdx-article h1:not([data-live-preview] *, [data-livedemo] *)::selection,
+.mdx-article h2:not([data-live-preview] *, [data-livedemo] *)::selection,
+.mdx-article blockquote:not([data-live-preview] *, [data-livedemo] *)::selection {
   background: var(--c-iris-glow);
   color: inherit;
 }
@@ -696,4 +678,77 @@ html[data-theme='dark'] ::-webkit-scrollbar-thumb {
 }
 html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.18);
+}
+
+/* Documentation shell keeps the preview column visible at every viewport. */
+.docs-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 220px;
+  max-width: 1440px;
+  margin: 0 auto;
+  gap: 48px;
+  padding: 0 32px;
+}
+.docs-main {
+  min-width: 0;
+  max-width: 760px;
+  width: 100%;
+  padding: 64px 0 160px;
+  margin: 0 auto;
+}
+.docs-mobile-navigation {
+  display: none;
+}
+@media (max-width: 1199px) {
+  .docs-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 32px;
+  }
+  .docs-toc {
+    display: none;
+  }
+}
+@media (max-width: 959px) {
+  .docs-layout {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 20px;
+  }
+  .docs-sidebar {
+    display: none;
+  }
+  .docs-main {
+    padding-top: 32px;
+  }
+  .docs-mobile-navigation {
+    display: block;
+    margin: 16px 20px 0;
+    padding: 12px;
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-card);
+  }
+  .docs-mobile-navigation summary {
+    cursor: pointer;
+  }
+  .docs-mobile-navigation nav {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-top: 12px;
+  }
+  .docs-mobile-navigation nav div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  .docs-mobile-navigation strong {
+    width: 100%;
+  }
+  .mdx-article::before {
+    inset-inline: 0;
+  }
+}
+
+/* Long API identifiers in prose must fit the narrow documentation column. */
+.mdx-article :is(h1, h2, h3, h4, h5, h6, p):not([data-live-preview] *, [data-livedemo] *) {
+  overflow-wrap: anywhere;
 }

@@ -201,6 +201,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
       hasArrow = true,
       closeOnBlur = true,
       closeOnEsc = true,
+      portalContainer,
       header,
       footer,
       openDelay = 0,
@@ -301,9 +302,14 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
       }
       updatePosition();
       const onScrollResize = () => updatePosition();
+      const observer =
+        typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(updatePosition);
+      if (anchorRef.current) observer?.observe(anchorRef.current);
+      if (panelRef.current) observer?.observe(panelRef.current);
       window.addEventListener('scroll', onScrollResize, { passive: true, capture: true });
       window.addEventListener('resize', onScrollResize, { passive: true });
       return () => {
+        observer?.disconnect();
         window.removeEventListener('scroll', onScrollResize, true);
         window.removeEventListener('resize', onScrollResize);
       };
@@ -640,7 +646,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
       <>
         {renderAnchor()}
         {open && isMounted && typeof document !== 'undefined'
-          ? createPortal(renderPanel(), document.body)
+          ? createPortal(renderPanel(), portalContainer ?? document.body)
           : null}
       </>
     );

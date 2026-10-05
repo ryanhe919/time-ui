@@ -165,11 +165,11 @@ function normalizePage<T extends AsyncOptionLike>(
   pageSize: number,
 ): AsyncOptionsPage<T> {
   if (Array.isArray(raw)) {
-    return { items: raw, hasMore: raw.length >= pageSize };
+    return { items: appendUnique([], raw), hasMore: raw.length >= pageSize };
   }
   const items = raw.items ?? [];
   return {
-    items,
+    items: appendUnique([], items),
     hasMore: raw.hasMore ?? items.length >= pageSize,
     total: raw.total,
   };
@@ -177,9 +177,12 @@ function normalizePage<T extends AsyncOptionLike>(
 
 /** 按 value 去重地把新页追加到已有列表后面，避免后端分页重叠导致 React key 重复。 */
 function appendUnique<T extends AsyncOptionLike>(prev: T[], next: T[]): T[] {
-  if (prev.length === 0) return next;
   const seen = new Set(prev.map((it) => it.value));
-  const fresh = next.filter((it) => !seen.has(it.value));
+  const fresh = next.filter((it) => {
+    if (seen.has(it.value)) return false;
+    seen.add(it.value);
+    return true;
+  });
   return fresh.length === 0 ? prev : [...prev, ...fresh];
 }
 
@@ -220,6 +223,7 @@ export function useAsyncOptions<T extends AsyncOptionLike, P = Record<string, un
 
   /** 请求序号：只有序号等于最新值的响应才允许写回 state，天然丢弃乱序返回。 */
   const requestIdRef = useRef(0);
+  const requestInFlightRef = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
   /** 记录最近一次请求的入参，供 retry 复用。 */
   const lastRequestRef = useRef<{ keyword: string; page: number } | null>(null);
@@ -253,6 +257,7 @@ export function useAsyncOptions<T extends AsyncOptionLike, P = Record<string, un
 
       requestIdRef.current += 1;
       const requestId = requestIdRef.current;
+      requestInFlightRef.current = true;
       const isAppend = page > 1;
       lastRequestRef.current = { keyword: activeKeyword, page };
 
@@ -280,6 +285,7 @@ export function useAsyncOptions<T extends AsyncOptionLike, P = Record<string, un
       ).then(
         (raw) => {
           if (!mountedRef.current || requestId !== requestIdRef.current) return;
+          requestInFlightRef.current = false;
           const normalized = normalizePage(raw, currentPageSize);
           setState((prev) => ({
             items: isAppend ? appendUnique(prev.items, normalized.items) : normalized.items,
@@ -293,6 +299,7 @@ export function useAsyncOptions<T extends AsyncOptionLike, P = Record<string, un
         },
         (err: unknown) => {
           if (!mountedRef.current || requestId !== requestIdRef.current) return;
+          requestInFlightRef.current = false;
           // 主动取消不是错误，静默丢弃即可（新请求已经接管 loading 态）。
           if (controller.signal.aborted) return;
           setState((prev) => ({
@@ -317,6 +324,7 @@ export function useAsyncOptions<T extends AsyncOptionLike, P = Record<string, un
       abortRef.current = null;
       // 使序号失效，防止收起后到达的响应写回已清空的列表。
       requestIdRef.current += 1;
+      requestInFlightRef.current = false;
       if (resetOnClose) {
         lastRequestRef.current = null;
         lastParamsKeyRef.current = null;
@@ -344,12 +352,12 @@ export function useAsyncOptions<T extends AsyncOptionLike, P = Record<string, un
   }, [isEnabled, isOpen, debouncedKeyword, paramsKey, resetOnClose, fetchPage]);
 
   const loadMore = useCallback(() => {
-    if (!loaderRef.current) return;
+    if (!isOpen || !loaderRef.current || requestInFlightRef.current) return;
     const snapshot = stateRef.current;
     if (snapshot.isLoading || snapshot.isLoadingMore) return;
     if (!snapshot.hasMore || snapshot.error !== undefined) return;
     fetchPage(snapshot.page + 1, 'loadMore', debouncedKeyword);
-  }, [fetchPage, debouncedKeyword]);
+  }, [fetchPage, debouncedKeyword, isOpen]);
 
   const retry = useCallback(() => {
     const last = lastRequestRef.current;

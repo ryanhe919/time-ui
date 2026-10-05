@@ -126,8 +126,11 @@ export function useModalDragResize(args: UseModalDragResizeArgs): UseModalDragRe
       if (shouldConstrainToViewport && typeof window !== 'undefined') {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
-        const maxWidth = Math.max(minWidth, vw - viewportPadding * 2);
-        const maxHeight = Math.max(minHeight, vh - viewportPadding * 2);
+        // 小视口时优先保证窗口可见，允许暂时小于交互最小尺寸。
+        const paddingX = Math.min(viewportPadding, Math.max(0, (vw - 1) / 2));
+        const paddingY = Math.min(viewportPadding, Math.max(0, (vh - 1) / 2));
+        const maxWidth = Math.max(1, vw - paddingX * 2);
+        const maxHeight = Math.max(1, vh - paddingY * 2);
 
         if (width > maxWidth) {
           if (anchor?.right) x = next.x + next.width - maxWidth;
@@ -138,14 +141,8 @@ export function useModalDragResize(args: UseModalDragResizeArgs): UseModalDragRe
           height = maxHeight;
         }
 
-        x = Math.min(
-          Math.max(x, viewportPadding),
-          Math.max(viewportPadding, vw - width - viewportPadding),
-        );
-        y = Math.min(
-          Math.max(y, viewportPadding),
-          Math.max(viewportPadding, vh - height - viewportPadding),
-        );
+        x = Math.min(Math.max(x, paddingX), Math.max(paddingX, vw - width - paddingX));
+        y = Math.min(Math.max(y, paddingY), Math.max(paddingY, vh - height - paddingY));
       }
 
       return round({ x, y, width, height });

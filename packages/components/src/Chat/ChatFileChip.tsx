@@ -138,7 +138,6 @@ export const ChatFileChip = forwardRef<HTMLDivElement, ChatFileChipProps>(
     const showProgress = typeof progress === 'number' && progress >= 0 && progress < 100;
 
     const isInteractive = typeof onClick === 'function';
-    const Tag = isInteractive ? ('button' as const) : ('div' as const);
 
     const wrapperCss = css`
       position: relative;
@@ -260,17 +259,8 @@ export const ChatFileChip = forwardRef<HTMLDivElement, ChatFileChipProps>(
       onRemove?.(e);
     };
 
-    return (
-      <Tag
-        ref={ref as never}
-        id={id}
-        className={className}
-        css={wrapperCss}
-        onClick={isInteractive ? (onClick as never) : undefined}
-        type={isInteractive ? 'button' : undefined}
-        data-kind={resolvedKind}
-        data-error={isError || undefined}
-      >
+    const content = (
+      <>
         <span css={badgeCss} aria-hidden>
           {startContent ?? KIND_LETTER[resolvedKind]}
         </span>
@@ -278,6 +268,47 @@ export const ChatFileChip = forwardRef<HTMLDivElement, ChatFileChipProps>(
           {name}
         </span>
         {size ? <span css={sizeCss}>{size}</span> : null}
+      </>
+    );
+
+    return (
+      <div
+        ref={ref}
+        id={id}
+        className={className}
+        css={wrapperCss}
+        onClick={onClick}
+        data-kind={resolvedKind}
+        data-error={isError || undefined}
+      >
+        {isInteractive ? (
+          <button
+            type="button"
+            css={css`
+              display: inline-flex;
+              align-items: center;
+              flex: 1 1 auto;
+              min-width: 0;
+              gap: 6px;
+              border: 0;
+              padding: 0;
+              background: transparent;
+              color: inherit;
+              font: inherit;
+              text-align: inherit;
+              cursor: pointer;
+              border-radius: inherit;
+              &:focus-visible {
+                outline: 2px solid ${focusColor};
+                outline-offset: 2px;
+              }
+            `}
+          >
+            {content}
+          </button>
+        ) : (
+          content
+        )}
         {onRemove ? (
           <button
             type="button"
@@ -291,7 +322,7 @@ export const ChatFileChip = forwardRef<HTMLDivElement, ChatFileChipProps>(
         {showProgress ? (
           <span aria-hidden css={progressCss} data-testid="chat-file-chip-progress" />
         ) : null}
-      </Tag>
+      </div>
     );
   },
 );

@@ -58,6 +58,8 @@ export interface PopoverProps {
   closeOnBlur?: boolean;
   /** ESC 关闭，默认 true。 */
   closeOnEsc?: boolean;
+  /** Portal 容器，默认 document.body。 */
+  portalContainer?: HTMLElement;
   /** 顶部 header slot。 */
   header?: ReactNode;
   /** 底部 footer slot。 */

@@ -8,6 +8,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { MarkdownViewer } from '../';
+import { extractHeadings } from '../MarkdownViewer.toc';
 import { renderWithProviders } from '@timeui/react/test-utils';
 
 /**
@@ -24,6 +25,21 @@ function renderViewer(
 // ─── 1. Markdown rendering ────────────────────────────────────────────────────
 
 describe('MarkdownViewer — markdown rendering', () => {
+  it('keeps headings inside longer or mismatched code fences out of the TOC', () => {
+    const source = '# Visible\n\n````md\n```\n# Hidden\n~~~\n````\n\n## Visible again';
+    expect(extractHeadings(source, 6).map((heading) => heading.text)).toEqual([
+      'Visible',
+      'Visible again',
+    ]);
+    renderViewer(<MarkdownViewer aria-label="Doc" source={source} showToc />);
+    expect(screen.getByRole('link', { name: 'Visible' })).toHaveAttribute('href', '#visible');
+    expect(screen.getByRole('link', { name: 'Visible again' })).toHaveAttribute(
+      'href',
+      '#visible-again',
+    );
+    expect(screen.queryByRole('link', { name: 'Hidden' })).not.toBeInTheDocument();
+  });
+
   it('renders headings as h1/h2/h3 with generated ids', () => {
     renderViewer(
       <MarkdownViewer aria-label="Doc" source={'# Hello world\n\n## Sub heading\n\n### Deeper'} />,

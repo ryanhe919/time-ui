@@ -95,6 +95,23 @@ describe('Textarea — showCount', () => {
     expect(screen.getByText('2 of 10 characters used')).toBeInTheDocument();
   });
 
+  it('lays out the counter below the textarea and end content without covering either', () => {
+    renderWithProviders(
+      <Textarea
+        aria-label="Notes"
+        rows={1}
+        showCount
+        maxLength={100}
+        defaultValue="A full final line"
+        endContent={<span>Attachments</span>}
+      />,
+    );
+    const counter = screen.getByText('17/100');
+    expect(getComputedStyle(counter).position).not.toBe('absolute');
+    expect(getComputedStyle(counter).alignSelf).toBe('flex-end');
+    expect(counter.previousElementSibling).toContainElement(screen.getByText('Attachments'));
+  });
+
   it('updates the counter as the user types and aria-describedby includes the count id', async () => {
     function Harness() {
       const [v, setV] = useState('');
@@ -223,9 +240,10 @@ describe('Textarea — layout branches', () => {
     vi.spyOn(window, 'getComputedStyle').mockImplementation((element: Element) => {
       const computed = original(element);
       return new Proxy(computed, {
-        get(target, prop, receiver) {
+        get(target, prop) {
           if (prop === 'lineHeight') return 'normal';
-          return Reflect.get(target, prop, receiver);
+          const value = Reflect.get(target, prop, target);
+          return typeof value === 'function' ? value.bind(target) : value;
         },
       });
     });

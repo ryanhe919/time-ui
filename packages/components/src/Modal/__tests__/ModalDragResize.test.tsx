@@ -136,6 +136,37 @@ describe('Modal — resize', () => {
   const handleOf = (dir: string) =>
     document.querySelector<HTMLElement>(`[data-timeui-modal-resize-handle="${dir}"]`)!;
 
+  it('fits a viewport smaller than minWidth and minHeight after resize', () => {
+    const onRectChange = vi.fn();
+    renderWithProviders(
+      <Modal isOpen aria-label="m" isResizable defaultRect={RECT} onRectChange={onRectChange}>
+        body
+      </Modal>,
+    );
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    try {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: 200 });
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 100 });
+      fireEvent.resize(window);
+      const dialog = getDialog();
+      expect(px(dialog.style.width)).toBe(184);
+      expect(px(dialog.style.height)).toBe(84);
+      expect(px(dialog.style.left)).toBe(8);
+      expect(px(dialog.style.top)).toBe(8);
+      expect(onRectChange).toHaveBeenLastCalledWith(
+        { x: 8, y: 8, width: 184, height: 84 },
+        { reason: 'constrain' },
+      );
+      dragBy(handleOf('se'), 9999, 9999);
+      expect(px(dialog.style.width)).toBe(184);
+      expect(px(dialog.style.height)).toBe(84);
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: height });
+    }
+  });
+
   it('renders no handles unless isResizable', () => {
     renderWithProviders(
       <Modal isOpen aria-label="m">

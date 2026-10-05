@@ -8,6 +8,8 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    // Keep DOM/axe workers bounded on large development machines and in CI.
+    maxWorkers: 4,
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],

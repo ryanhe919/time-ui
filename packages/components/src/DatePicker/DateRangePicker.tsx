@@ -91,7 +91,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       showTodayButton = false,
       startContent,
       endContent,
-      portalContainer: _portalContainer, // eslint-disable-line @typescript-eslint/no-unused-vars
+      portalContainer,
       className,
       style,
       id: idProp,
@@ -253,8 +253,14 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       setOpen(false);
     }, [minValue, maxValue, setCurrentValue, setOpen]);
 
-    // 当外部 value 变化时，把 leftAnchor 也同步到新 start 所在月（仅在 panel 关闭后）。
-    // 本轮简化：只在打开 popover 时由 initialAnchor 决定，运行中不强制同步。
+    // 关闭面板后丢弃未完成的区间，并让下次打开显示当前值所在月份。
+    useEffect(() => {
+      if (open) return;
+      setWorkingStart(null);
+      setHoverEnd(null);
+      const nextAnchor = startOfMonth(currentValue?.start ?? new Date());
+      setLeftAnchor((prev) => (prev.getTime() === nextAnchor.getTime() ? prev : nextAnchor));
+    }, [open, currentValue]);
 
     // ── 选 preset ──
     const handlePresetClick = useCallback(
@@ -465,6 +471,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         placement={placement}
         hasArrow={false}
         trigger="manual"
+        portalContainer={portalContainer}
         offset={parseInt(tokens.panelOffset, 10) || 8}
         id={`${baseId}-panel`}
         aria-label={pickerAriaLabel}

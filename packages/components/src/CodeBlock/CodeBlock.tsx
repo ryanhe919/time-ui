@@ -33,11 +33,23 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
   const theme = useTheme();
   const i18n = useI18n();
   const [copied, setCopied] = useState(false);
-  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
+  const [highlighted, setHighlighted] = useState<{
+    code: string;
+    language: string;
+    mode: string;
+    html: string;
+  } | null>(null);
+  const highlightedHtml =
+    !disableHighlight &&
+    highlighted?.code === code &&
+    highlighted.language === language &&
+    highlighted.mode === theme.mode
+      ? highlighted.html
+      : null;
 
   useEffect(() => {
     if (disableHighlight) {
-      setHighlightedHtml(null);
+      setHighlighted(null);
       return;
     }
     let cancelled = false;
@@ -58,7 +70,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
           themes: { light: 'github-light', dark: 'github-dark' },
           defaultColor: theme.mode === 'dark' ? 'dark' : 'light',
         });
-        if (!cancelled) setHighlightedHtml(html);
+        if (!cancelled) setHighlighted({ code, language, mode: theme.mode, html });
       } catch (err) {
         // 高亮失败时回退到纯文本，保证内容可读且不阻塞渲染。
         if (process.env.NODE_ENV !== 'production') {
@@ -67,7 +79,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
             err,
           );
         }
-        if (!cancelled) setHighlightedHtml(null);
+        if (!cancelled) setHighlighted(null);
       }
     })();
     return () => {

@@ -62,6 +62,46 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
+
+describe('Tooltip — responsive content', () => {
+  it('keeps its position aligned when content or anchor size changes', () => {
+    const panelSize = { width: 120, height: 40 };
+    const anchorRect = { top: 100, left: 50, width: 100, height: 40 };
+    installRectAutoMocks(anchorRect, panelSize);
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    let onResize = () => {};
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: () => void) {
+          onResize = callback;
+        }
+        observe = observe;
+        disconnect = disconnect;
+      },
+    );
+    const { unmount } = renderWithProviders(
+      <Tooltip content="Dynamic hint" placement="top" isOpen>
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
+    const panel = screen.getByRole('tooltip');
+    expect(panel.style.top).toBe('54px');
+    expect(observe).toHaveBeenCalledWith(panel);
+    expect(observe).toHaveBeenCalledWith(screen.getByRole('button'));
+
+    panelSize.height = 80;
+    anchorRect.width = 140;
+    act(() => onResize());
+    expect(panel.style.top).toBe('14px');
+    expect(panel.style.left).toBe('60px');
+
+    unmount();
+    expect(disconnect).toHaveBeenCalledTimes(1);
+  });
 });
 
 // ────────────────────────────────────────────────────────────

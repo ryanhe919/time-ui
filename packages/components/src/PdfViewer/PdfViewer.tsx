@@ -18,7 +18,7 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
-import { useTheme } from '@emotion/react';
+import { css, useTheme } from '@emotion/react';
 
 import { PdfViewerToolbar } from './PdfViewer.toolbar';
 import {
@@ -47,14 +47,20 @@ interface PdfPageViewport {
 interface PdfPageProxy {
   getViewport(opts: { scale: number }): PdfPageViewport;
   render(opts: {
+    canvas: HTMLCanvasElement;
     canvasContext: CanvasRenderingContext2D;
     viewport: PdfPageViewport;
+    transform?: number[];
   }): PdfRenderTask;
 }
 
 interface PdfDocumentProxy {
   numPages: number;
   getPage(pageNumber: number): Promise<PdfPageProxy>;
+}
+
+interface PdfDocumentLoadingTask {
+  promise: Promise<PdfDocumentProxy>;
   destroy(): Promise<void> | void;
 }
 
@@ -62,7 +68,7 @@ interface PdfDocumentProxy {
 // 上无法解析 .d.ts 子路径的问题（不同 pdfjs-dist 版本 .d.ts 拓扑差异较大）。
 interface PdfjsModule {
   GlobalWorkerOptions: { workerSrc: string };
-  getDocument(src: unknown): { promise: Promise<PdfDocumentProxy> };
+  getDocument(src: unknown): PdfDocumentLoadingTask;
 }
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -156,8 +162,10 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
 
   // ─── state ────────────────────────────────────────────────────────────────
   const [numPages, setNumPages] = useState(0);
+  const [documentVersion, setDocumentVersion] = useState(0);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const [internalPage, setInternalPage] = useState(Math.max(1, defaultPage));
-  const currentPage = pageProp ?? internalPage;
+  const currentPage = clamp(pageProp ?? internalPage, 1, Math.max(1, numPages));
 
   const [zoomMode, setZoomMode] = useState<'fit' | 'width' | 'custom'>(() =>
     resolveDefaultZoomMode(defaultZoom),
@@ -201,6 +209,7 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
   // ─── document load ────────────────────────────────────────────────────────
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    setNumPages(0);
     if (source === undefined || source === null || source === '') {
       setError(new Error('PDF source is empty'));
       setIsLoading(false);
@@ -209,6 +218,19 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
     }
 
     let cancelled = false;
+    let loadingTask: PdfDocumentLoadingTask | null = null;
+    const destroyLoadingTask = () => {
+      const task = loadingTask;
+      loadingTask = null;
+      if (!task) return;
+      try {
+        // LoadingTask owns both the pending load and document resources in
+        // PDF.js 4/5/6; DocumentProxy.destroy was removed in PDF.js 6.
+        void Promise.resolve(task.destroy()).catch(() => undefined);
+      } catch {
+        // A failed load may have already torn down its worker.
+      }
+    };
     setIsLoading(true);
     setError(null);
 
@@ -230,29 +252,21 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
         const data = await sourceToBuffer(source);
         if (cancelled) return;
 
-        const loadingTask = mod.getDocument({ data });
+        loadingTask = mod.getDocument({ data });
         const doc = await loadingTask.promise;
-        if (cancelled) {
-          void doc.destroy();
-          return;
-        }
-
-        // Tear down any previous doc.
-        const prev = pdfDocRef.current;
+        if (cancelled) return;
         pdfDocRef.current = doc;
-        if (prev) {
-          try {
-            void prev.destroy();
-          } catch {
-            // ignore
-          }
-        }
 
         setNumPages(doc.numPages);
+        // A replacement PDF may have the same page count. Its identity must
+        // still trigger rendering, including recovery from a previous error.
+        setDocumentVersion((version) => version + 1);
         setIsLoading(false);
         onLoadRef.current?.({ numPages: doc.numPages });
       } catch (err) {
         if (cancelled) return;
+        destroyLoadingTask();
+        pdfDocRef.current = null;
         const e = err instanceof Error ? err : new Error(String(err));
         setError(e);
         setIsLoading(false);
@@ -271,18 +285,27 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
         }
         renderTaskRef.current = null;
       }
-      const doc = pdfDocRef.current;
-      if (doc) {
-        try {
-          void doc.destroy();
-        } catch {
-          // ignore
-        }
-        pdfDocRef.current = null;
-      }
+      pdfDocRef.current = null;
+      destroyLoadingTask();
     };
     // workerSrc / source change → reload from scratch
   }, [source, workerSrc]);
+
+  // Fit modes follow the page area's dimensions when a responsive layout,
+  // drawer or resized window changes the available space.
+  useEffect(() => {
+    const area = scrollAreaRef.current;
+    if (!area || zoomMode === 'custom' || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      const width = area.clientWidth;
+      const height = area.clientHeight;
+      setViewportSize((previous) =>
+        previous.width === width && previous.height === height ? previous : { width, height },
+      );
+    });
+    observer.observe(area);
+    return () => observer.disconnect();
+  }, [zoomMode, documentVersion, error]);
 
   // ─── page render ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -342,8 +365,14 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
         }
 
         const viewport = pageObj.getViewport({ scale });
-        canvas.width = Math.max(1, Math.floor(viewport.width));
-        canvas.height = Math.max(1, Math.floor(viewport.height));
+        if (zoomProp === undefined && zoomMode !== 'custom') {
+          // The percentage display and +/- actions use the scale actually
+          // applied to the canvas rather than the initial 100% placeholder.
+          setInternalZoom(scale);
+        }
+        const pixelRatio = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.floor(viewport.width * pixelRatio));
+        canvas.height = Math.max(1, Math.floor(viewport.height * pixelRatio));
         canvas.style.width = `${Math.floor(viewport.width)}px`;
         canvas.style.height = `${Math.floor(viewport.height)}px`;
 
@@ -351,7 +380,12 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
         if (!ctx) return;
 
         if (isStale()) return;
-        const task = pageObj.render({ canvasContext: ctx, viewport });
+        const task = pageObj.render({
+          canvas,
+          canvasContext: ctx,
+          viewport,
+          transform: pixelRatio === 1 ? undefined : [pixelRatio, 0, 0, pixelRatio, 0, 0],
+        });
         renderTaskRef.current = task;
         await task.promise;
         if (isStale()) return;
@@ -371,7 +405,17 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
       cancelled = true;
     };
     // We intentionally include numPages so the first render fires after the doc loads.
-  }, [currentPage, effectiveZoom, zoomMode, numPages, minZoom, maxZoom]);
+  }, [
+    currentPage,
+    effectiveZoom,
+    zoomMode,
+    numPages,
+    minZoom,
+    maxZoom,
+    documentVersion,
+    viewportSize,
+    zoomProp,
+  ]);
 
   // ─── controlled-zoom sync ─────────────────────────────────────────────────
   useEffect(() => {
@@ -564,7 +608,16 @@ export const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(function Pdf
             />
           )}
           {showLoading && (
-            <div css={overlayCss} data-slot="pdf-viewer-loading">
+            <div
+              css={[
+                overlayCss,
+                css`
+                  position: absolute;
+                  inset: 0;
+                `,
+              ]}
+              data-slot="pdf-viewer-loading"
+            >
               {loadingContent}
             </div>
           )}

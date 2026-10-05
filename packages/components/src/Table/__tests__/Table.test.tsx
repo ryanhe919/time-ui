@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { fireEvent, screen, within } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { renderWithProviders } from '../../test-utils';
@@ -704,6 +704,38 @@ describe('Table — visual options', () => {
     expect(style.position).toBe('sticky');
   });
 
+  it.each(['divided', 'quiet'] as const)(
+    '%s sticky headers cover rows behind them in both themes',
+    (variant) => {
+      for (const theme of ['light', 'dark'] as const) {
+        const { unmount } = renderWithProviders(
+          <Table columns={BASIC_COLUMNS} data={PEOPLE} variant={variant} isStickyHeader />,
+          { theme },
+        );
+        const header = screen.getAllByRole('columnheader')[0]!;
+        const background = window.getComputedStyle(header).backgroundColor;
+        expect(background).not.toBe('rgba(0, 0, 0, 0)');
+        expect(background).not.toBe('transparent');
+        unmount();
+      }
+    },
+  );
+
+  it('quiet fixed column headers cover horizontally scrolling columns', () => {
+    renderWithProviders(
+      <Table
+        columns={[
+          { columnKey: 'name', title: 'Name', fixed: 'left', width: 120 },
+          BASIC_COLUMNS[1]!,
+        ]}
+        data={PEOPLE}
+        variant="quiet"
+      />,
+    );
+    const header = screen.getByRole('columnheader', { name: 'Name' });
+    expect(window.getComputedStyle(header).backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  });
+
   it('maxHeight sets overflow on container', () => {
     const { container } = renderWithProviders(
       <Table columns={BASIC_COLUMNS} data={PEOPLE} rowKey="id" aria-label="P" maxHeight={300} />,
@@ -716,6 +748,54 @@ describe('Table — visual options', () => {
 
 // ────────────────────────────────────────────────────────────
 describe('Table — fixed columns', () => {
+  it('uses rendered column widths for left and right sticky offsets after resize', () => {
+    const widths: Record<string, number> = { name: 180, age: 140, email: 220 };
+    const columns: ReadonlyArray<TableColumn<Person>> = [
+      { columnKey: 'name', title: 'Name', fixed: 'left', width: 120 },
+      { columnKey: 'age', title: 'Age', fixed: 'left', width: 100 },
+      { columnKey: 'spacer', title: 'Spacer', width: 600 },
+      { columnKey: 'status', title: 'Status', fixed: 'right', width: 100 },
+      { columnKey: 'email', title: 'Email', fixed: 'right', width: 120 },
+    ];
+    const original = HTMLElement.prototype.getBoundingClientRect;
+    const rectSpy = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        const rect = original.call(this);
+        const width = this.matches('th[data-selection-column]')
+          ? 60
+          : widths[this.dataset.columnKey ?? ''];
+        return width === undefined ? rect : { ...rect, width };
+      });
+    const callbacks: Array<() => void> = [];
+    const Observer = globalThis.ResizeObserver;
+    const observerSpy = vi
+      .spyOn(globalThis, 'ResizeObserver')
+      .mockImplementation(function (callback) {
+        callbacks.push(() => callback([], {} as ResizeObserver));
+        return new Observer(() => {});
+      });
+    try {
+      renderWithProviders(<Table columns={columns} data={PEOPLE} selectionMode="multiple" />);
+      const offset = (name: string, side: 'left' | 'right') => {
+        const value = window.getComputedStyle(screen.getByRole('columnheader', { name }))[side];
+        // jsdom may retain calc() instead of resolving it to a single length.
+        return [...value.matchAll(/([\d.]+)px/g)].reduce((sum, match) => sum + Number(match[1]), 0);
+      };
+      expect(offset('Name', 'left')).toBe(60);
+      expect(offset('Age', 'left')).toBe(240);
+      expect(offset('Status', 'right')).toBe(220);
+      widths.name = 260;
+      widths.email = 280;
+      act(() => callbacks.forEach((callback) => callback()));
+      expect(offset('Age', 'left')).toBe(320);
+      expect(offset('Status', 'right')).toBe(280);
+    } finally {
+      rectSpy.mockRestore();
+      observerSpy.mockRestore();
+    }
+  });
+
   const FIXED_COLUMNS: ReadonlyArray<TableColumn<Person>> = [
     { columnKey: 'name', title: 'Name', fixed: 'left', width: 120 },
     { columnKey: 'age', title: 'Age' },

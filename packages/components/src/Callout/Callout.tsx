@@ -65,7 +65,7 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function Callout
         border-left: ${tk.borderLeftWidth} solid ${accent};
         background: ${theme.colors.bg.surface};
         display: grid;
-        grid-template-columns: ${icon === false ? '1fr' : 'auto 1fr'};
+        grid-template-columns: ${icon === false ? 'minmax(0, 1fr)' : 'auto minmax(0, 1fr)'};
         gap: ${tk.gap};
         align-items: start;
         color: ${theme.colors.text.primary};
@@ -88,7 +88,12 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function Callout
           {glyph}
         </div>
       )}
-      <div>
+      <div
+        css={css`
+          min-width: 0;
+          overflow-wrap: anywhere;
+        `}
+      >
         {title && (
           <div
             css={css`
