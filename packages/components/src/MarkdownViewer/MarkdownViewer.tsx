@@ -38,6 +38,7 @@ import { CodeBlock } from '../CodeBlock';
 import { createMarkdownViewerTypography } from './MarkdownViewer.theme';
 import { MarkdownViewerToolbar, DEFAULT_TOOLBAR_LABELS } from './MarkdownViewer.toolbar';
 import { MarkdownViewerToc, baseSlug, extractHeadings } from './MarkdownViewer.toc';
+import { getMarkdownAnchorTarget, scrollToMarkdownHeading } from './MarkdownViewer.scroll';
 import type { MarkdownViewerProps, MarkdownViewerToolbarLabels } from './MarkdownViewer.types';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -209,18 +210,13 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
         if (event.defaultPrevented) return;
         if (!isAnchorHref(href)) return;
 
-        // 站内锚点：阻止默认（避免修改 location.hash），改在内容容器内 scrollIntoView。
+        // 受限阅读区域局部滚动；自动高度文档保留页面导航，均不修改 location.hash。
         event.preventDefault();
         const targetId = href.slice(1);
-        const target = contentRef.current?.querySelector<HTMLElement>(`#${CSS.escape(targetId)}`);
+        const target = getMarkdownAnchorTarget(contentRef.current, targetId);
         if (!target) return;
 
-        const reduced =
-          typeof window !== 'undefined' &&
-          typeof window.matchMedia === 'function' &&
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        scrollToMarkdownHeading(scrollContainerRef.current, target, targetId === '');
       },
       [onLinkClick],
     );

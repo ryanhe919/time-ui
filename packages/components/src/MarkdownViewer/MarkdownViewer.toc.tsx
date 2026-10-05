@@ -17,6 +17,7 @@ import { css, useTheme } from '@emotion/react';
 import type {} from '@timeui/themes';
 
 import type { MarkdownTocItem } from './MarkdownViewer.types';
+import { getMarkdownAnchorTarget, scrollToMarkdownHeading } from './MarkdownViewer.scroll';
 
 // ─── slug ─────────────────────────────────────────────────────────────────────
 
@@ -24,7 +25,7 @@ import type { MarkdownTocItem } from './MarkdownViewer.types';
  * Github-flavored 简化 slugger：保留 unicode 字母数字与连字符，空白合并为 `-`。
  *
  * 与 react-markdown 的 `<h*>` 自定义渲染器使用的 slug 生成必须保持一致，
- * 才能让"点击 TOC → scrollIntoView" 找到正确的目标 id。
+ * 才能让点击 TOC 找到正确的滚动目标 id。
  */
 export function baseSlug(text: string): string {
   return text
@@ -211,18 +212,12 @@ export function MarkdownViewerToc(props: MarkdownViewerTocProps): ReactElement |
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     event.preventDefault();
-    const container = contentRef.current;
-    const target = container?.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
+    const target = getMarkdownAnchorTarget(contentRef.current, id);
     if (!target) return;
 
     setActiveId(id);
 
-    const reduced =
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    scrollToMarkdownHeading(scrollContainerRef.current, target);
   };
 
   // Find the shallowest level so we anchor depth 0 at it (h2-only docs still
@@ -236,6 +231,7 @@ export function MarkdownViewerToc(props: MarkdownViewerTocProps): ReactElement |
   // Defensive resets via `!important` —— TOC may live inside a host that
   // sprays prose styles onto every `<ul>` / `<li>` / `<a>` (Tailwind prose,
   // docs editorial CSS, etc.). The component must look correct regardless.
+  // Narrow readers keep a bounded TOC above the independently scrolling body.
   const navCss = css`
     flex: 0 0 220px;
     min-width: 0;
@@ -250,8 +246,6 @@ export function MarkdownViewerToc(props: MarkdownViewerTocProps): ReactElement |
     font-size: ${theme.typography.fontSize.sm};
     color: ${theme.colors.text.secondary};
 
-    /* Keep the document readable in narrow drawers and mobile layouts. The
-       bounded TOC remains available above the independently scrolling body. */
     @container timeui-markdown-viewer (max-width: 640px) {
       order: -1;
       flex: 0 0 auto;
