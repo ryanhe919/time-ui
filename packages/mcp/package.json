@@ -1,6 +1,6 @@
 {
   "name": "@timeui/mcp",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "MCP server and shared documentation index for TimeUI components.",
   "license": "MIT",
   "sideEffects": false,
