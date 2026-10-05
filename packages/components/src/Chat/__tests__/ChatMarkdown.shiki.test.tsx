@@ -60,6 +60,29 @@ describe('ChatMarkdown — shiki async highlighting', () => {
     expect(shikiMock.codeToHtml).toHaveBeenCalledTimes(1);
   });
 
+  it('shows newly streamed code immediately while its highlighting is pending', async () => {
+    shikiMock.codeToHtml.mockReturnValue('<pre class="shiki"><code>old source</code></pre>');
+    const { container, rerender } = renderWithProviders(
+      <ChatMarkdown>{'```ts\nold source\n```'}</ChatMarkdown>,
+    );
+    await waitFor(() => expect(container.querySelector('pre.shiki')).not.toBeNull());
+    let complete: ((highlighter: unknown) => void) | undefined;
+    shikiMock.getSingletonHighlighter.mockReturnValueOnce(
+      new Promise((resolve) => {
+        complete = resolve;
+      }),
+    );
+    rerender(<ChatMarkdown>{'```ts\nnew source\n```'}</ChatMarkdown>);
+    expect(container.querySelector('pre')?.textContent).toBe('new source');
+    expect(container.querySelector('pre.shiki')).toBeNull();
+    await waitFor(() => expect(complete).toBeDefined());
+    shikiMock.codeToHtml.mockReturnValue('<pre class="shiki"><code>new source</code></pre>');
+    await act(async () => {
+      complete?.(shikiMock);
+    });
+    expect(container.querySelector('pre.shiki')?.textContent).toBe('new source');
+  });
+
   it('preloads a language that is not yet in getLoadedLanguages', async () => {
     shikiMock.getLoadedLanguages.mockReturnValue(['js']); // 'ts' missing
     const { container } = renderWithProviders(

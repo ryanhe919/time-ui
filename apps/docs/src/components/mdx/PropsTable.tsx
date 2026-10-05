@@ -31,6 +31,10 @@ export function PropsTable({ props }: PropsTableProps) {
         border-top: 1px solid var(--c-hairline);
         border-bottom: 1px solid var(--c-hairline);
         font-family: var(--docs-sans);
+        overflow-x: auto;
+        & > div {
+          min-width: 610px;
+        }
       `}
     >
       {/*

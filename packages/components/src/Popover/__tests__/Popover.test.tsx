@@ -63,6 +63,50 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
+
+describe('Popover — responsive content', () => {
+  it('repositions when panel or anchor size changes and disconnects on close', () => {
+    const panelSize = { width: 200, height: 100 };
+    const anchorRect = { top: 300, left: 200, width: 100, height: 40 };
+    installRectAutoMocks(anchorRect, panelSize);
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    let onResize = () => {};
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: () => void) {
+          onResize = callback;
+        }
+        observe = observe;
+        disconnect = disconnect;
+      },
+    );
+    const { rerender } = renderWithProviders(
+      <Popover anchor={<button type="button">Trigger</button>} placement="top" isOpen>
+        Async content
+      </Popover>,
+    );
+    const panel = screen.getByRole('dialog');
+    expect(panel.style.top).toBe('192px');
+    expect(observe).toHaveBeenCalledWith(panel);
+    expect(observe).toHaveBeenCalledWith(screen.getByRole('button'));
+
+    panelSize.height = 160;
+    anchorRect.width = 140;
+    act(() => onResize());
+    expect(panel.style.top).toBe('132px');
+    expect(panel.style.left).toBe('170px');
+
+    rerender(
+      <Popover anchor={<button type="button">Trigger</button>} isOpen={false}>
+        Async content
+      </Popover>,
+    );
+    expect(disconnect).toHaveBeenCalledTimes(1);
+  });
 });
 
 // ────────────────────────────────────────────────────────────

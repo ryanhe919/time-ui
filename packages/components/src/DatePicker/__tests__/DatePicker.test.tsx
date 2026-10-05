@@ -144,6 +144,18 @@ describe('DatePicker — open / close', () => {
     expect(screen.getByRole('grid')).toBeInTheDocument();
   });
 
+  it('renders the calendar inside a requested portal container', () => {
+    installRectMocks();
+    const portalContainer = document.createElement('div');
+    document.body.append(portalContainer);
+    const { unmount } = renderWithProviders(
+      <DatePicker isOpen portalContainer={portalContainer} />,
+    );
+    expect(portalContainer.querySelector('[role="dialog"]')).toBeInTheDocument();
+    unmount();
+    portalContainer.remove();
+  });
+
   it('controlled isOpen=false suppresses calendar even after click', async () => {
     installRectMocks();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
@@ -188,6 +200,17 @@ describe('DatePicker — open / close', () => {
 // ────────────────────────────────────────────────────────────
 
 describe('DatePicker — value', () => {
+  it('opens the month belonging to a value changed while the calendar is closed', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const { rerender } = renderWithProviders(
+      <DatePicker value={new Date(2026, 3, 17)} aria-label="Date" />,
+    );
+    rerender(<DatePicker value={new Date(2027, 8, 5)} aria-label="Date" />);
+    const grid = await openCalendar(user);
+    expect(within(grid).getByRole('gridcell', { selected: true })).toHaveTextContent('5');
+  });
+
   it('uncontrolled: clicking a cell selects + closes + fires onChange', async () => {
     installRectMocks();
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
@@ -601,6 +624,17 @@ describe('DatePicker — disabled / readonly', () => {
   it('isReadOnly disables the calendar trigger', () => {
     renderWithProviders(<DatePicker isReadOnly aria-label="d" />);
     expect(screen.getByLabelText('Open calendar')).toBeDisabled();
+  });
+
+  it('isReadOnly prevents ArrowDown from opening an editable calendar', async () => {
+    installRectMocks();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const onOpenChange = vi.fn();
+    renderWithProviders(<DatePicker isReadOnly aria-label="Date" onOpenChange={onOpenChange} />);
+    screen.getByRole('textbox', { name: 'Date' }).focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.queryByRole('grid')).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 
   it('isInvalid sets aria-invalid on the input', () => {

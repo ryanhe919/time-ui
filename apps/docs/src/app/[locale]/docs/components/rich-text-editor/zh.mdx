@@ -29,7 +29,8 @@ export function BasicEditor() {
 
 三种视觉样式（`flat`、`bordered`、`faded`）+ 五档尺寸（`xs`、`sm`、`md`、`lg`、`xl`）。复用 `Input` / `Textarea` 同一组 field-style 工具，所以间距、聚焦环、invalid 配色完全一致。
 
-<LiveDemo code={`<Stack spacing={24}>
+<LiveDemo
+  code={`<Stack spacing={24}>
   {/* Variants */}
   <RichTextEditor variant="flat" defaultValue="<p>flat</p>" toolbar="minimal" />
   <RichTextEditor variant="bordered" defaultValue="<p>bordered（默认）</p>" toolbar="minimal" />
@@ -38,7 +39,8 @@ export function BasicEditor() {
   <RichTextEditor size="sm" defaultValue="<p>sm</p>" toolbar="minimal" />
   <RichTextEditor size="md" defaultValue="<p>md（默认）</p>" toolbar="minimal" />
   <RichTextEditor size="lg" defaultValue="<p>lg</p>" toolbar="minimal" />
-</Stack>`}>
+</Stack>`}
+>
   <RichTextEditorVariantsDemo />
 </LiveDemo>
 
@@ -85,7 +87,8 @@ export function ToolbarPresets() {
 
 `isDisabled` 阻断所有交互（同时关闭指针事件）；`isReadOnly` 保留聚焦与选区但拒绝写入；`isInvalid` 通过共享 field-style 工具显示 danger 颜色。
 
-<LiveDemo code={`<Stack spacing={16}>
+<LiveDemo
+  code={`<Stack spacing={16}>
   <RichTextEditor
     aria-label="禁用编辑器"
     isDisabled
@@ -104,7 +107,8 @@ export function ToolbarPresets() {
     defaultValue="<p>校验未通过。</p>"
     toolbar="minimal"
   />
-</Stack>`}>
+</Stack>`}
+>
   <Stack spacing={16}>
     <RichTextEditor
       aria-label="禁用编辑器"
@@ -131,11 +135,13 @@ export function ToolbarPresets() {
 
 文档为空时通过 TipTap 的 `Placeholder` 扩展渲染 `placeholder`，颜色取自 `theme.colors.text.muted`。
 
-<LiveDemo code={`<RichTextEditor
+<LiveDemo
+  code={`<RichTextEditor
   aria-label="带 placeholder 的编辑器"
   placeholder="今天想写点什么？"
   toolbar="minimal"
-/>`}>
+/>`}
+>
   <RichTextEditor
     aria-label="带 placeholder 的编辑器"
     placeholder="今天想写点什么？"
@@ -147,11 +153,13 @@ export function ToolbarPresets() {
 
 传 `toolbar={false}` 即可得到无 chrome 编辑区——适用于聊天 composer、评论框等不希望 toolbar 抢眼的场景。键盘快捷键（`Cmd/Ctrl+B`、`Cmd/Ctrl+I` 等）依然有效。
 
-<LiveDemo code={`<RichTextEditor
+<LiveDemo
+  code={`<RichTextEditor
   aria-label="无工具条编辑器"
   toolbar={false}
   placeholder="自由书写——没有 toolbar。"
-/>`}>
+/>`}
+>
   <RichTextEditor
     aria-label="无工具条编辑器"
     toolbar={false}
@@ -173,11 +181,7 @@ export function ExtendedEditor() {
   return (
     <RichTextEditor
       placeholder="智能引号、省略号、任务列表已开启。"
-      extensions={[
-        Typography,
-        TaskList,
-        TaskItem.configure({ nested: true }),
-      ]}
+      extensions={[Typography, TaskList, TaskItem.configure({ nested: true })]}
     />
   );
 }
@@ -222,22 +226,80 @@ export function ProgrammaticEditor() {
 
 ## API
 
-<PropsTable props={[
-  { name: 'value', type: 'string', description: '受控 HTML 内容。' },
-  { name: 'defaultValue', type: 'string', default: "''", description: '非受控初始 HTML 内容。' },
-  { name: 'onChange', type: '(html: string) => void', description: '文档每次变更后触发，回调收到序列化后的 HTML。' },
-  { name: 'placeholder', type: 'string', description: '空状态占位文字，通过 TipTap 的 `Placeholder` 扩展渲染。' },
-  { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: '尺寸预设；控制内边距、字号与默认 min-height。' },
-  { name: 'variant', type: "'flat' | 'bordered' | 'faded'", default: "'bordered'", description: '视觉样式 —— 与 Input / Textarea 共享。' },
-  { name: 'isDisabled', type: 'boolean', default: 'false', description: '禁用所有交互；同时关闭 pointer events。' },
-  { name: 'isReadOnly', type: 'boolean', default: 'false', description: '可聚焦、可选中，但拒绝写入。' },
-  { name: 'isInvalid', type: 'boolean', default: 'false', description: '应用 invalid（danger）配色。' },
-  { name: 'minHeight', type: 'number | string', description: '编辑区 min-height。默认 sm 120 / md 160 / lg 220。' },
-  { name: 'maxHeight', type: 'number | string | null', default: "'60vh'", description: '滚动区域 max-height。传 `null` 取消上限。' },
-  { name: 'toolbar', type: "'minimal' | 'basic' | 'full' | ToolbarItem[] | false", default: "'basic'", description: '选 preset、列出显式 items，或传 `false` 隐藏 toolbar。' },
-  { name: 'extensions', type: 'AnyExtension[]', description: '追加在内置扩展（`StarterKit`、`Underline`、`Link`、`Placeholder`）之后的额外 TipTap 扩展。' },
-  { name: 'onCreate', type: '(editor: Editor) => void', description: '组件挂载完成后接收 TipTap `Editor` 实例 —— 用于做高级操作。' }
-]} />
+<PropsTable
+  props={[
+    { name: 'value', type: 'string', description: '受控 HTML 内容。' },
+    { name: 'defaultValue', type: 'string', default: "''", description: '非受控初始 HTML 内容。' },
+    {
+      name: 'onChange',
+      type: '(html: string) => void',
+      description: '文档每次变更后触发，回调收到序列化后的 HTML。',
+    },
+    {
+      name: 'placeholder',
+      type: 'string',
+      description: '空状态占位文字，通过 TipTap 的 `Placeholder` 扩展渲染。',
+    },
+    {
+      name: 'size',
+      type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'",
+      default: "'md'",
+      description: '尺寸预设；控制内边距、字号与默认 min-height。',
+    },
+    {
+      name: 'variant',
+      type: "'flat' | 'bordered' | 'faded'",
+      default: "'bordered'",
+      description: '视觉样式 —— 与 Input / Textarea 共享。',
+    },
+    {
+      name: 'isDisabled',
+      type: 'boolean',
+      default: 'false',
+      description: '禁用所有交互；同时关闭 pointer events。',
+    },
+    {
+      name: 'isReadOnly',
+      type: 'boolean',
+      default: 'false',
+      description: '可聚焦、可选中，但拒绝写入。',
+    },
+    {
+      name: 'isInvalid',
+      type: 'boolean',
+      default: 'false',
+      description: '应用 invalid（danger）配色。',
+    },
+    {
+      name: 'minHeight',
+      type: 'number | string',
+      description: '编辑区 min-height。默认 sm 120 / md 160 / lg 220。',
+    },
+    {
+      name: 'maxHeight',
+      type: 'number | string | null',
+      default: "'60vh'",
+      description: '滚动区域 max-height。传 `null` 取消上限。',
+    },
+    {
+      name: 'toolbar',
+      type: "'minimal' | 'basic' | 'full' | ToolbarItem[] | false",
+      default: "'basic'",
+      description: '选 preset、列出显式 items，或传 `false` 隐藏 toolbar。',
+    },
+    {
+      name: 'extensions',
+      type: 'AnyExtension[]',
+      description:
+        '追加在内置扩展（`StarterKit`、`Underline`、`Link`、`Placeholder`）之后的额外 TipTap 扩展。',
+    },
+    {
+      name: 'onCreate',
+      type: '(editor: Editor) => void',
+      description: '组件挂载完成后接收 TipTap `Editor` 实例 —— 用于做高级操作。',
+    },
+  ]}
+/>
 
 ### `ToolbarItem` 取值
 
@@ -252,7 +314,10 @@ pnpm add @tiptap/core @tiptap/react @tiptap/pm \
   @tiptap/extension-link @tiptap/extension-placeholder
 ```
 
+这七个包必须使用同一 Tiptap 主版本：2.x 至少为 2.27.3，3.x 至少为 3.30.4。这些最低版本已修复 `mergeAttributes` 的安全问题，混用 Tiptap 2 和 3 会导致扩展类型不兼容。
+
 请只从专属 subpath 导入 —— `import { RichTextEditor } from '@timeui/react/rich-text-editor'` —— tree-shaking 才能确保不渲染编辑器的页面不引入 TipTap。
+
 </Callout>
 
 <Callout variant="info" title="可访问性">

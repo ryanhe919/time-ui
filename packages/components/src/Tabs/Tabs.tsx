@@ -179,6 +179,14 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(props, f
     [resolvedTabs, selected],
   );
 
+  useSafeLayoutEffect(() => {
+    if (selectedKey !== undefined) return;
+    const currentTab = resolvedTabs.find((tab) => tab.key === selected);
+    if (currentTab && !currentTab.isDisabled) return;
+    const next = findFirstEnabled(resolvedTabs);
+    if (next !== undefined && next !== selected) setSelected(next);
+  }, [resolvedTabs, selected, selectedKey, setSelected]);
+
   // 选择某个 key（跳过禁用 / 全局禁用）。
   const select = useCallback(
     (key: string) => {

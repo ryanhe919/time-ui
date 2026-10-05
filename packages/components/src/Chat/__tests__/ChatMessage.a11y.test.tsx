@@ -9,6 +9,16 @@ import { renderWithProviders, expectA11y } from '../../test-utils';
 import { ChatMessage } from '../ChatMessage';
 
 describe('ChatMessage — a11y', () => {
+  it('labels default avatars when a message has no display name', async () => {
+    const { container } = renderWithProviders(
+      <>
+        <ChatMessage role="user">Question</ChatMessage>
+        <ChatMessage role="assistant">Answer</ChatMessage>
+      </>,
+    );
+    await expectA11y(container);
+  });
+
   it.each([['light'], ['dark']] as const)(
     'has zero axe violations across all roles in %s theme',
     async (theme) => {

@@ -46,6 +46,8 @@ export function Doc() {
 export function MarkdownViewerBasicDemo() {
   return (
     <div
+      data-livedemo="custom"
+      data-live-preview=""
       css={css`
         width: min(820px, 100%);
       `}

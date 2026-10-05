@@ -192,7 +192,7 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
   `;
 
   // ——— 单个 step 的容器 ———
-  // horizontal: 整个 step 是 [indicator + text] 组合，flex:none；后跟 connector flex:1
+  // horizontal: 每个 step 平分整行，内部内容允许收缩，connector 填满剩余宽度。
   // vertical: 每个 step 是 row，icon 列固定宽，text 列 flex:1，connector 绝对定位在 icon 列下
   const itemCss = css`
     position: relative;
@@ -207,7 +207,8 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
       : `
         flex-direction: row;
         align-items: flex-start;
-        flex: none;
+        flex: 1 1 0;
+        min-width: 0;
         padding: ${stepsTokens.itemPaddingY} 0;
       `}
     gap: ${sizeTokens.itemGap};
@@ -217,8 +218,8 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
   // horizontal connector 位于两个 item 之间，flex:1 撑满。
   const horizontalConnectorWrapCss = css`
     position: relative;
-    flex: 1 1 auto;
-    min-width: ${stepsTokens.connectorMinLength};
+    flex: 1 1 ${stepsTokens.connectorMinLength};
+    min-width: 0;
     align-self: flex-start;
     margin-top: calc(
       ${sizeTokens.iconSize} / 2 - ${sizeTokens.connectorThickness} / 2 +
@@ -356,6 +357,7 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
           ? dangerColor
           : textPrimary};
     line-height: 1.4;
+    overflow-wrap: anywhere;
   `;
 
   const descCss = (isDisabled: boolean) => css`
@@ -363,6 +365,7 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
     font-weight: 400;
     color: ${isDisabled ? textDisabled : textSecondary};
     line-height: 1.4;
+    overflow-wrap: anywhere;
   `;
 
   // navigation variant 的可点击按钮包裹。
@@ -376,6 +379,8 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
     font: inherit;
     color: inherit;
     width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
     cursor: ${isDisabled ? 'not-allowed' : 'pointer'};
     display: flex;
     flex-direction: row;
@@ -409,6 +414,8 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
     align-items: flex-start;
     gap: ${sizeTokens.itemGap};
     width: ${isVertical ? '100%' : 'auto'};
+    min-width: 0;
+    flex: 0 1 auto;
     &:focus-visible {
       outline: 2px solid ${focusColor};
       outline-offset: 2px;
@@ -539,6 +546,8 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
               align-items: flex-start;
               gap: ${sizeTokens.itemGap};
               width: ${isVertical ? '100%' : 'auto'};
+              min-width: 0;
+              flex: 0 1 auto;
             `}
           >
             {stepInner}
@@ -562,7 +571,7 @@ export const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(pro
                     width: 100%;
                   `
                 : css`
-                    flex: none;
+                    flex: 1 1 0;
                   `,
             ]}
           >

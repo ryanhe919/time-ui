@@ -46,13 +46,14 @@ export function buildContainerCss(
 
 export function buildScrollAreaCss(theme: TimeUITheme): SerializedStyles {
   return css`
+    position: relative;
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
     background-color: ${theme.colors.bg.muted};
     display: flex;
     align-items: flex-start;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 16px;
     outline: none;
 
@@ -65,6 +66,8 @@ export function buildScrollAreaCss(theme: TimeUITheme): SerializedStyles {
 export function buildCanvasCss(theme: TimeUITheme): SerializedStyles {
   return css`
     display: block;
+    flex: none;
+    margin-inline: auto;
     background-color: ${theme.colors.bg.canvas};
     box-shadow: ${theme.shadows.sm};
     max-width: none;

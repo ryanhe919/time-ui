@@ -111,6 +111,16 @@ const getItems = (root?: HTMLElement) => {
 // ────────────────────────────────────────────────────────────
 
 describe('Menu — open/close', () => {
+  it('renders inside its requested portal container', () => {
+    installRectMocks();
+    const portalContainer = document.createElement('div');
+    document.body.append(portalContainer);
+    const { unmount } = renderBasic({ items: ITEMS, defaultOpen: true, portalContainer });
+    expect(portalContainer).toContainElement(getMenu());
+    unmount();
+    expect(portalContainer).toBeEmptyDOMElement();
+    portalContainer.remove();
+  });
   it('does not render the menu when closed', () => {
     renderBasic({ items: ITEMS });
     expect(screen.queryByRole('menu')).toBeNull();

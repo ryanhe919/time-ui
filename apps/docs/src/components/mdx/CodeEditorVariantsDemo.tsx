@@ -14,7 +14,11 @@ const SAMPLE = `const x = 42;`;
 
 export function CodeEditorVariantsDemo() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div
+      data-livedemo="custom"
+      data-live-preview=""
+      style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+    >
       <CodeEditor value={SAMPLE} variant="bordered" aria-label="Bordered variant" toolbar={false} />
       <CodeEditor value={SAMPLE} variant="faded" aria-label="Faded variant" toolbar={false} />
       <CodeEditor value={SAMPLE} variant="flat" aria-label="Flat variant" toolbar={false} />

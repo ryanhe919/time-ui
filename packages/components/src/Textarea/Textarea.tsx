@@ -191,9 +191,8 @@ function TextareaShell({
   `;
 
   const counterCss = css`
-    position: absolute;
-    right: ${sizeTokens.paddingX};
-    bottom: ${theme.spacing['1'] ?? '4px'};
+    align-self: flex-end;
+    flex-shrink: 0;
     font-size: 11px;
     line-height: 1.2;
     color: ${countStatusColor ?? theme.colors.text.muted};

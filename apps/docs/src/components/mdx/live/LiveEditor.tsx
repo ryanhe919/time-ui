@@ -277,6 +277,7 @@ function LiveEditor({
 
       {/* ─── Preview ───────────────────────────────────────────────────── */}
       <div
+        data-live-preview=""
         role="region"
         aria-label="Preview"
         css={css`
@@ -288,6 +289,11 @@ function LiveEditor({
           gap: 16px;
           min-height: ${previewMinHeight}px;
           background: var(--c-bg-secondary);
+          min-width: 0;
+          overflow-x: auto;
+          @media (max-width: 959px) {
+            padding: 32px 16px;
+          }
         `}
       >
         {isTranspileRuntimeError ? (

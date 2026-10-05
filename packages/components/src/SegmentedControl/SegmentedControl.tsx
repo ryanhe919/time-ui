@@ -131,8 +131,7 @@ const SegmentedControlInner = forwardRef<HTMLDivElement, SegmentedControlProps<s
       [isReadOnly, selected, setSelected],
     );
 
-    // input 透明覆盖整个 segment：focus-visible 时 outline 渲染在 segment 边缘。
-    // 用 :focus-visible 而非 :focus-within，避免鼠标点击后残留蓝色边框。
+    // input 透明覆盖整个 segment；焦点环由可见的兄弟元素绘制，避免被 opacity: 0 隐藏。
     const overlayInput = css`
       position: absolute;
       inset: 0;
@@ -146,9 +145,16 @@ const SegmentedControlInner = forwardRef<HTMLDivElement, SegmentedControlProps<s
       opacity: 0;
       border-radius: 9999px;
       cursor: inherit;
-      &:focus-visible {
-        outline: 2px solid ${focusColor};
-        outline-offset: 2px;
+    `;
+
+    const focusRingCss = css`
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      input:focus-visible ~ & {
+        outline: ${theme.borders.width.thick} solid ${focusColor};
+        outline-offset: ${theme.spacing['0.5']};
       }
     `;
 
@@ -366,6 +372,7 @@ const SegmentedControlInner = forwardRef<HTMLDivElement, SegmentedControlProps<s
                   onChange={handleChange}
                   css={overlayInput}
                 />
+                <span aria-hidden data-segmented-focus-ring="" css={focusRingCss} />
                 {iconNode ? (
                   <span aria-hidden css={iconCss}>
                     {iconNode}

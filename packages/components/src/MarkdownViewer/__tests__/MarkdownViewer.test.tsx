@@ -8,6 +8,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { MarkdownViewer } from '../';
+import { extractHeadings } from '../MarkdownViewer.toc';
 import { renderWithProviders } from '@timeui/react/test-utils';
 
 /**
@@ -24,6 +25,21 @@ function renderViewer(
 // ─── 1. Markdown rendering ────────────────────────────────────────────────────
 
 describe('MarkdownViewer — markdown rendering', () => {
+  it('keeps headings inside longer or mismatched code fences out of the TOC', () => {
+    const source = '# Visible\n\n````md\n```\n# Hidden\n~~~\n````\n\n## Visible again';
+    expect(extractHeadings(source, 6).map((heading) => heading.text)).toEqual([
+      'Visible',
+      'Visible again',
+    ]);
+    renderViewer(<MarkdownViewer aria-label="Doc" source={source} showToc />);
+    expect(screen.getByRole('link', { name: 'Visible' })).toHaveAttribute('href', '#visible');
+    expect(screen.getByRole('link', { name: 'Visible again' })).toHaveAttribute(
+      'href',
+      '#visible-again',
+    );
+    expect(screen.queryByRole('link', { name: 'Hidden' })).not.toBeInTheDocument();
+  });
+
   it('renders headings as h1/h2/h3 with generated ids', () => {
     renderViewer(
       <MarkdownViewer aria-label="Doc" source={'# Hello world\n\n## Sub heading\n\n### Deeper'} />,
@@ -135,6 +151,123 @@ describe('MarkdownViewer — markdown rendering', () => {
     const { container } = renderViewer(<MarkdownViewer aria-label="Doc" source={md} />);
     const ids = Array.from(container.querySelectorAll('h1, h2, h3')).map((h) => h.id);
     expect(ids).toEqual(['welcome', 'section', 'welcome-1']);
+  });
+});
+
+describe('MarkdownViewer — internal anchor scrolling', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it.each([
+    { entry: 'toc', reduced: false },
+    { entry: 'toc', reduced: true },
+    { entry: 'inline', reduced: false },
+    { entry: 'inline', reduced: true },
+  ])(
+    'scrolls only the reader through $entry links (reduced=$reduced)',
+    async ({ entry, reduced }) => {
+      const user = userEvent.setup();
+      vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+        matches: reduced,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }));
+      const windowScroll = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+      const { container } = renderViewer(
+        <div data-testid="outer-scroll">
+          <MarkdownViewer
+            aria-label="Doc"
+            source={'# Start\n\n[Jump](#notes)\n\n## Notes'}
+            showToc
+          />
+        </div>,
+      );
+      const outer = screen.getByTestId('outer-scroll');
+      outer.scrollTop = 75;
+      const content = container.querySelector<HTMLElement>('[data-slot="markdown-content"]')!;
+      const reader = content.parentElement!.parentElement!;
+      Object.defineProperties(reader, {
+        scrollHeight: { configurable: true, value: 1000 },
+        clientHeight: { configurable: true, value: 250 },
+      });
+      reader.scrollTop = 40;
+      const target = screen.getByRole('heading', { name: 'Notes' });
+      target.style.scrollMarginTop = '20px';
+      vi.spyOn(reader, 'getBoundingClientRect').mockReturnValue({ top: 200 } as DOMRect);
+      vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({ top: 500 } as DOMRect);
+      const scrollReader = vi.fn((options: ScrollToOptions) => {
+        reader.scrollTop = options.top!;
+      });
+      Object.defineProperty(reader, 'scrollTo', { configurable: true, value: scrollReader });
+      const scrollAncestors = vi.fn(() => {
+        outer.scrollTop = 500;
+        window.scrollTo(0, 500);
+      });
+      target.scrollIntoView = scrollAncestors;
+      const pageY = window.scrollY;
+      const url = window.location.href;
+
+      const link =
+        entry === 'toc'
+          ? screen.getByRole('link', { name: 'Notes' })
+          : screen.getByRole('link', { name: 'Jump' });
+      await user.click(link);
+
+      expect(reader.scrollTop).toBe(320);
+      expect(scrollReader).toHaveBeenCalledWith({
+        top: 320,
+        behavior: reduced ? 'auto' : 'smooth',
+      });
+      expect(outer.scrollTop).toBe(75);
+      expect(window.scrollY).toBe(pageY);
+      expect(windowScroll).not.toHaveBeenCalled();
+      expect(scrollAncestors).not.toHaveBeenCalled();
+      expect(window.location.href).toBe(url);
+    },
+  );
+  it('keeps document navigation available when the auto-height reader has no internal overflow', async () => {
+    const user = userEvent.setup();
+    renderViewer(<MarkdownViewer aria-label="Doc" source={'# Start\n\n## Notes'} showToc />);
+    const target = screen.getByRole('heading', { name: 'Notes' });
+    const navigateDocument = vi.fn();
+    target.scrollIntoView = navigateDocument;
+    await user.click(screen.getByRole('link', { name: 'Notes' }));
+    expect(navigateDocument).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+  });
+
+  it.each([
+    { name: 'Back to top', source: '# Start\n\n[Back to top](#)\n\n## Notes', expected: 0 },
+    { name: '跳转', source: '# Start\n\n[跳转](#%E7%AB%A0%E8%8A%82)\n\n## 章节', expected: 340 },
+    { name: 'Malformed', source: '# Start\n\n[Malformed](#missing%)\n\n## Notes', expected: 40 },
+  ])('handles the $name fragment without moving the page', async ({ name, source, expected }) => {
+    const user = userEvent.setup();
+    const { container } = renderViewer(<MarkdownViewer aria-label="Doc" source={source} />);
+    const content = container.querySelector<HTMLElement>('[data-slot="markdown-content"]')!;
+    const reader = content.parentElement!.parentElement!;
+    Object.defineProperties(reader, {
+      scrollHeight: { configurable: true, value: 1000 },
+      clientHeight: { configurable: true, value: 250 },
+    });
+    reader.scrollTop = 40;
+    const scroll = vi.fn((options: ScrollToOptions) => {
+      reader.scrollTop = options.top!;
+    });
+    Object.defineProperty(reader, 'scrollTo', { configurable: true, value: scroll });
+    vi.spyOn(reader, 'getBoundingClientRect').mockReturnValue({ top: 200 } as DOMRect);
+    for (const heading of content.querySelectorAll<HTMLElement>('h1,h2')) {
+      vi.spyOn(heading, 'getBoundingClientRect').mockReturnValue({ top: 500 } as DOMRect);
+      heading.style.scrollMarginTop = '0px';
+    }
+    const windowScroll = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+    const url = window.location.href;
+    await user.click(screen.getByRole('link', { name }));
+    expect(reader.scrollTop).toBe(expected);
+    expect(windowScroll).not.toHaveBeenCalled();
+    expect(window.location.href).toBe(url);
   });
 });
 

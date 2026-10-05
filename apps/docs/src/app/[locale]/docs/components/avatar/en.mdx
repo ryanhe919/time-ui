@@ -6,15 +6,17 @@ A square / round avatar for users or entities: image-load failures fall back to 
 
 The minimal form: pass `src` for an image avatar; always include `name` as a fallback.
 
-<LiveDemo code={`<Avatar src="https://i.pravatar.cc/64?u=ada" name="Ada Lovelace" />
+<LiveDemo code={`<Avatar src="/avatars/ada.svg" name="Ada Lovelace" />
 <Avatar name="Alan Turing" />
 <Avatar />`}>
   <Flex gap={12} align="center">
-    <Avatar src="https://i.pravatar.cc/64?u=ada" name="Ada Lovelace" />
+    <Avatar src="/avatars/ada.svg" name="Ada Lovelace" />
     <Avatar name="Alan Turing" />
     <Avatar />
   </Flex>
 </LiveDemo>
+
+The image example uses a [local illustration](/avatars/ada.svg). Replace `src` with your own image URL in your application.
 
 ## Sizes
 
@@ -25,7 +27,7 @@ Five named sizes — `xs` / `sm` / `md` (default) / `lg` / `xl` — plus arbitra
 <Avatar size="md" name="A B" />
 <Avatar size="lg" name="A B" />
 <Avatar size="xl" name="A B" />
-<Avatar size={56}  name="A B" />`}>
+<Avatar size={56} name="A B" />`}>
   <Flex gap={12} align="center">
     <Avatar size="xs" name="A B" />
     <Avatar size="sm" name="A B" />
@@ -87,11 +89,11 @@ Five named sizes — `xs` / `sm` / `md` (default) / `lg` / `xl` — plus arbitra
 Stack several avatars into one cluster. `max` caps the visible count; the remainder is folded into a `+N` chip. `spacing` controls the overlap.
 
 <LiveDemo code={`<AvatarGroup max={3}>
-  <Avatar name="Ada" />
-  <Avatar name="Bob" />
-  <Avatar name="Carol" />
-  <Avatar name="Dan" />
-  <Avatar name="Eve" />
+  <Avatar name="Ada" color="auto" />
+  <Avatar name="Bob" color="auto" />
+  <Avatar name="Carol" color="auto" />
+  <Avatar name="Dan" color="auto" />
+  <Avatar name="Eve" color="auto" />
 </AvatarGroup>`}>
   <AvatarGroup max={3}>
     <Avatar name="Ada" color="auto" />

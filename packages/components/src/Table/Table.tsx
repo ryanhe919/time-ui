@@ -22,7 +22,7 @@ import {
   type ReactNode,
 } from 'react';
 import { css, useTheme } from '@emotion/react';
-import { mergeRefs, useControllableState } from '../utils';
+import { mergeRefs, useControllableState, useIsomorphicLayoutEffect } from '../utils';
 import { Checkbox } from '../Checkbox';
 import type { CheckboxSize } from '../Checkbox/Checkbox.types';
 import type {
@@ -301,17 +301,67 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
   // 选中列在最左：若有任何 fixed=left 的列，selection 列自动 sticky 到 0。
   const selectionColumnIsFixed = showSelectionColumn && leftFixedColumns.length > 0;
 
+  const headerRefs = useRef(new Map<string, HTMLTableCellElement>());
+  const selectionHeaderRef = useRef<HTMLTableCellElement | null>(null);
+  const [measuredWidths, setMeasuredWidths] = useState({
+    columns: new Map<string, number>(),
+    selection: 0,
+  });
+
+  // auto table layout may expand a column past its declared width. Sticky
+  // offsets must follow the rendered widths to avoid covering adjacent cells.
+  useIsomorphicLayoutEffect(() => {
+    if (!columns.some((column) => column.fixed)) return;
+    const measure = () => {
+      const nextColumns = new Map<string, number>();
+      for (const column of columns) {
+        if (!column.fixed) continue;
+        const width = headerRefs.current.get(column.columnKey)?.getBoundingClientRect().width;
+        if (width && width > 0) nextColumns.set(column.columnKey, width);
+      }
+      const selection = selectionHeaderRef.current?.getBoundingClientRect().width ?? 0;
+      setMeasuredWidths((previous) => {
+        if (
+          previous.selection === selection &&
+          previous.columns.size === nextColumns.size &&
+          [...nextColumns].every(([key, width]) => previous.columns.get(key) === width)
+        ) {
+          return previous;
+        }
+        return { columns: nextColumns, selection };
+      });
+    };
+    measure();
+    const observer =
+      typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(measure);
+    for (const column of columns) {
+      const header = headerRefs.current.get(column.columnKey);
+      if (column.fixed && header) observer?.observe(header);
+    }
+    if (selectionHeaderRef.current) observer?.observe(selectionHeaderRef.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [columns, data, selectionMode, density]);
+
   // 计算每一列的 sticky offset。这里用 px 字符串相加。
   const leftOffsets = useMemo(() => {
     const map = new Map<string, string>();
-    let acc = selectionColumnIsFixed ? selectionColumnWidth : '0px';
+    let acc = selectionColumnIsFixed
+      ? measuredWidths.selection > 0
+        ? `${measuredWidths.selection}px`
+        : selectionColumnWidth
+      : '0px';
     for (const col of leftFixedColumns) {
       map.set(col.columnKey, acc);
-      const w = asLength(col.width) ?? '160px';
+      const measured = measuredWidths.columns.get(col.columnKey);
+      const w = measured !== undefined ? `${measured}px` : (asLength(col.width) ?? '160px');
       acc = `calc(${acc} + ${w})`;
     }
     return map;
-  }, [leftFixedColumns, selectionColumnIsFixed, selectionColumnWidth]);
+  }, [leftFixedColumns, selectionColumnIsFixed, selectionColumnWidth, measuredWidths]);
 
   const rightOffsets = useMemo(() => {
     const map = new Map<string, string>();
@@ -319,11 +369,12 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     for (let i = rightFixedColumns.length - 1; i >= 0; i -= 1) {
       const col = rightFixedColumns[i]!;
       map.set(col.columnKey, acc);
-      const w = asLength(col.width) ?? '160px';
+      const measured = measuredWidths.columns.get(col.columnKey);
+      const w = measured !== undefined ? `${measured}px` : (asLength(col.width) ?? '160px');
       acc = `calc(${acc} + ${w})`;
     }
     return map;
-  }, [rightFixedColumns]);
+  }, [rightFixedColumns, measuredWidths]);
 
   // ── 行选择：全选状态 ──
   const selectableRowKeys = useMemo(() => {
@@ -513,7 +564,11 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     font-weight: ${variantStyle.header.fontWeight};
     letter-spacing: ${variantStyle.header.letterSpacing};
     color: ${variantStyle.header.color};
-    background: ${variantStyle.header.bg};
+    background: ${isStickyHeader || isSticky
+      ? variantStyle.header.bg === 'transparent'
+        ? surfaceBg
+        : variantStyle.header.bg
+      : variantStyle.header.bg};
     border-bottom: ${variantStyle.header.borderBottomWidth} solid
       ${variantStyle.header.borderBottomColor};
     user-select: none;
@@ -620,6 +675,7 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
     <tr role="row" css={theadRowCss}>
       {showSelectionColumn ? (
         <th
+          ref={selectionHeaderRef}
           role="columnheader"
           scope="col"
           css={headerSelectionCellCss}
@@ -669,6 +725,10 @@ function TableInner<T>(props: TableProps<T>, forwardedRef: React.ForwardedRef<HT
         return (
           <th
             key={col.columnKey}
+            ref={(node) => {
+              if (node) headerRefs.current.set(col.columnKey, node);
+              else headerRefs.current.delete(col.columnKey);
+            }}
             role="columnheader"
             scope="col"
             data-column-key={col.columnKey}

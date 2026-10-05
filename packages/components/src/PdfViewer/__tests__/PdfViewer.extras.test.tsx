@@ -35,9 +35,12 @@ const mockPage = {
 const mockDoc = {
   numPages: 5,
   getPage: vi.fn(() => Promise.resolve(mockPage)),
-  destroy: vi.fn(() => Promise.resolve()),
 };
-const getDocumentMock = vi.fn(() => ({ promise: Promise.resolve(mockDoc) }));
+const destroyLoadingTask = vi.fn(() => Promise.resolve());
+const getDocumentMock = vi.fn(() => ({
+  promise: Promise.resolve(mockDoc),
+  destroy: destroyLoadingTask,
+}));
 
 vi.mock('pdfjs-dist', () => ({
   GlobalWorkerOptions: { workerSrc: '' },
@@ -56,6 +59,7 @@ beforeEach(() => {
   getDocumentMock.mockClear();
   mockPage.render.mockClear();
   mockDoc.getPage.mockClear();
+  destroyLoadingTask.mockClear();
 });
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -348,16 +352,21 @@ describe('PdfViewer — lifecycle', () => {
     const { unmount } = renderWithProviders(<PdfViewer source="/sample.pdf" />);
     await waitForLoaded();
     expect(() => unmount()).not.toThrow();
-    expect(mockDoc.destroy).toHaveBeenCalled();
+    expect(destroyLoadingTask).toHaveBeenCalledOnce();
   });
 
   it('handles a getDocument promise rejection by surfacing onError', async () => {
     getDocumentMock.mockImplementationOnce(
-      () => ({ promise: Promise.reject(new Error('parse-fail')) }) as never,
+      () =>
+        ({
+          promise: Promise.reject(new Error('parse-fail')),
+          destroy: destroyLoadingTask,
+        }) as never,
     );
     const onError = vi.fn();
     renderWithProviders(<PdfViewer source="/sample.pdf" onError={onError} />);
     await waitFor(() => expect(onError).toHaveBeenCalled());
     expect((onError.mock.calls[0]![0] as Error).message).toBe('parse-fail');
+    expect(destroyLoadingTask).toHaveBeenCalledOnce();
   });
 });

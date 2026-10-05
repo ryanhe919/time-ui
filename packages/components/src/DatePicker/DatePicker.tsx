@@ -92,7 +92,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       showTodayButton = true,
       startContent,
       endContent,
-      portalContainer: _portalContainer, // eslint-disable-line @typescript-eslint/no-unused-vars
+      portalContainer,
       className,
       style,
       id: idProp,
@@ -201,12 +201,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
     }, [setCurrentValue]);
 
     // ── CalendarPanel callbacks ──
-    const initialAnchor = useMemo(
-      () => startOfMonth(currentValue ?? new Date()),
-      // 仅在 mount 时取一次；后续 anchor 由 CalendarPanel 内部维护。
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [],
-    );
+    const initialAnchor = useMemo(() => startOfMonth(currentValue ?? new Date()), [currentValue]);
 
     const handleSelectDate = useCallback(
       (d: Date) => {
@@ -318,7 +313,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
               e.preventDefault();
               // 把当前 draft 作为正式值（已在 onChange 中即时 parse）。
               setOpen(false);
-            } else if (e.key === 'ArrowDown' && !open) {
+            } else if (e.key === 'ArrowDown' && !open && !isDisabled && !isReadOnly) {
               e.preventDefault();
               setOpen(true);
             }
@@ -366,6 +361,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         placement={placement}
         hasArrow={false}
         trigger="manual"
+        portalContainer={portalContainer}
         offset={parseInt(tokens.panelOffset, 10) || 8}
         id={`${baseId}-panel`}
         aria-label={pickerAriaLabel}

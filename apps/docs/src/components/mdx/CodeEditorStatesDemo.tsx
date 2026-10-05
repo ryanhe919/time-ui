@@ -14,7 +14,11 @@ const SAMPLE = `const x = 42;`;
 
 export function CodeEditorStatesDemo() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div
+      data-livedemo="custom"
+      data-live-preview=""
+      style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+    >
       <CodeEditor value={SAMPLE} isDisabled aria-label="Disabled" />
       <CodeEditor value={SAMPLE} isReadOnly aria-label="Read only" />
       <CodeEditor value={SAMPLE} isInvalid aria-label="Invalid" />

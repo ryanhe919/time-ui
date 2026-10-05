@@ -213,6 +213,39 @@ describe('Toast — duration / hover pause', () => {
     expect(screen.queryByText('hover')).toBeNull();
   });
 
+  it('keeps a duration update paused until pointerleave', () => {
+    const { getApi } = renderProvider();
+    let id = '';
+    act(() => {
+      id = getApi().loading('Working');
+    });
+    const item = screen.getByTestId('timeui-toast');
+    fireEvent.pointerEnter(item);
+    act(() => {
+      getApi().update(id, { title: 'Finished', status: 'success', duration: 1000 });
+    });
+    const progress = item.querySelector('span[aria-hidden]:last-child')!;
+    expect(window.getComputedStyle(progress).animationPlayState).toBe('paused');
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(item).toHaveAttribute('data-state', 'open');
+    fireEvent.pointerLeave(item);
+    expect(window.getComputedStyle(progress).animationPlayState).toBe('running');
+    act(() => {
+      vi.advanceTimersByTime(999);
+    });
+    expect(item).toHaveAttribute('data-state', 'open');
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(item).toHaveAttribute('data-state', 'closed');
+    act(() => {
+      vi.advanceTimersByTime(180);
+    });
+    expect(screen.queryByText('Finished')).toBeNull();
+  });
+
   it('default status (info) gets default 5000ms duration', () => {
     const { getApi } = renderProvider();
     act(() => {

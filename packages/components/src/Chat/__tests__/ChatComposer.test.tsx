@@ -228,6 +228,28 @@ describe('ChatComposer — focus state', () => {
 });
 
 describe('ChatComposer — auto-grow', () => {
+  it('includes textarea padding in row heights and honors maxRows beyond the default CSS cap', () => {
+    const originalGetComputedStyle = window.getComputedStyle.bind(window);
+    const style = vi.spyOn(window, 'getComputedStyle').mockImplementation((element) => {
+      const computed = originalGetComputedStyle(element);
+      return new Proxy(computed, {
+        get(target, property) {
+          if (property === 'lineHeight') return '20px';
+          if (property === 'paddingTop' || property === 'paddingBottom') return '6px';
+          return Reflect.get(target, property);
+        },
+      });
+    });
+    try {
+      renderWithProviders(<ChatComposer aria-label="x" minRows={3} maxRows={12} />);
+      const textarea = getTextarea();
+      expect(textarea.style.height).toBe('72px');
+      expect(textarea.style.maxHeight).toBe('252px');
+    } finally {
+      style.mockRestore();
+    }
+  });
+
   it('sets an inline height on mount', () => {
     renderWithProviders(<ChatComposer aria-label="x" defaultValue="line1" />);
     const ta = getTextarea();

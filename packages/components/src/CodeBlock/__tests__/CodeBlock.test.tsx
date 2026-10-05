@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CodeBlock } from '../';
 import { renderWithProviders } from '@timeui/react/test-utils';
@@ -93,6 +93,28 @@ describe('CodeBlock', () => {
       expect(screen.getByText('highlighted')).toBeInTheDocument();
       expect(shikiMock.codeToHtml).toHaveBeenCalled();
     });
+  });
+
+  it('shows the current source while updated highlighting is pending', async () => {
+    shikiMock.codeToHtml.mockReturnValue('<pre class="shiki"><code>old source</code></pre>');
+    const { container, rerender } = renderWithProviders(<CodeBlock code="old source" />);
+    await waitFor(() => expect(container.querySelector('pre.shiki')).not.toBeNull());
+
+    let complete: ((highlighter: unknown) => void) | undefined;
+    shikiMock.getSingletonHighlighter.mockReturnValueOnce(
+      new Promise((resolve) => {
+        complete = resolve;
+      }),
+    );
+    rerender(<CodeBlock code="new source" />);
+    expect(container.querySelector('pre')?.textContent).toBe('new source');
+    expect(container.querySelector('pre.shiki')).toBeNull();
+    await waitFor(() => expect(complete).toBeDefined());
+    shikiMock.codeToHtml.mockReturnValue('<pre class="shiki"><code>new source</code></pre>');
+    await act(async () => {
+      complete?.(shikiMock);
+    });
+    expect(container.querySelector('pre.shiki')?.textContent).toBe('new source');
   });
 
   it('falls back to plain text when highlighter throws', async () => {

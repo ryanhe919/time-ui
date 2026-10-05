@@ -294,6 +294,21 @@ describe('SegmentedControl — keyboard interaction', () => {
     expect(getRadios()[0]).toHaveFocus();
   });
 
+  it('draws keyboard focus on a visible sibling of the transparent radio', async () => {
+    renderWithProviders(<SegmentedControl aria-label="Range" options={RANGE_OPTIONS} />);
+    await userEvent.tab();
+    const radio = getRadios()[0]!;
+    const focusRing = radio.parentElement!.querySelector('[data-segmented-focus-ring]');
+    expect(radio).toHaveFocus();
+    expect(getComputedStyle(radio).opacity).toBe('0');
+    expect(focusRing).toBeInTheDocument();
+    expect(getComputedStyle(focusRing as HTMLElement).opacity).not.toBe('0');
+    const styles = Array.from(document.querySelectorAll('style'))
+      .map((s) => s.textContent ?? '')
+      .join('\n');
+    expect(styles).toMatch(/input:focus-visible\s*~\s*[^{}]+\{outline:/);
+  });
+
   it('Space activates the focused radio', async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();

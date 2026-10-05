@@ -14,6 +14,7 @@ import timeuiPkg from '@timeui/react/package.json';
 
 const timeuiVersion = timeuiPkg.version;
 import type { Locale } from '@timeui/react';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,17 +33,25 @@ export default async function DocsLayout({ children, params }: Props) {
     <div style={{ minHeight: '100vh', background: 'var(--c-bg)' }}>
       <TopNav navigation={navigation} messages={messages} locale={lc} version={timeuiVersion} />
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '220px minmax(0, 1fr) 220px',
-          maxWidth: 1440,
-          margin: '0 auto',
-          gap: 48,
-          padding: '0 32px',
-        }}
-      >
+      <details className="docs-mobile-navigation">
+        <summary>{lc === 'en' ? 'Browse documentation' : '浏览文档'}</summary>
+        <nav aria-label={lc === 'en' ? 'Documentation' : '文档导航'}>
+          {navigation.sections.map((section) => (
+            <div key={section.slug}>
+              <strong>{messages.sections[section.slug] ?? section.slug}</strong>
+              {section.items.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  {messages.pages[item.slug] ?? item.slug}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </nav>
+      </details>
+
+      <div className="docs-layout">
         <aside
+          className="docs-sidebar"
           style={{
             position: 'sticky',
             top: 48,
@@ -54,20 +63,12 @@ export default async function DocsLayout({ children, params }: Props) {
           <Sidebar navigation={navigation} messages={messages} />
         </aside>
 
-        <main
-          style={{
-            minWidth: 0,
-            maxWidth: 760,
-            padding: '64px 0 160px',
-            margin: '0 auto',
-            width: '100%',
-          }}
-        >
+        <main className="docs-main">
           <Breadcrumb messages={messages} />
           <article className="mdx-article">{children}</article>
         </main>
 
-        <aside>
+        <aside className="docs-toc">
           <TableOfContents label={messages.nav.onThisPage} />
         </aside>
       </div>

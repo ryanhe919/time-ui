@@ -25,16 +25,18 @@ export function CodeEditorLanguagesDemo() {
   const [code, setCode] = useState<string>(SAMPLES.typescript);
 
   return (
-    <CodeEditor
-      value={code}
-      onChange={setCode}
-      language={language}
-      onLanguageChange={(next) => {
-        setLanguage(next);
-        setCode(SAMPLES[next]);
-      }}
-      toolbar={{ showLanguageSelect: true }}
-      aria-label="Language demo"
-    />
+    <div data-livedemo="custom" data-live-preview="">
+      <CodeEditor
+        value={code}
+        onChange={setCode}
+        language={language}
+        onLanguageChange={(next) => {
+          setLanguage(next);
+          setCode(SAMPLES[next]);
+        }}
+        toolbar={{ showLanguageSelect: true }}
+        aria-label="Language demo"
+      />
+    </div>
   );
 }

@@ -6,7 +6,7 @@
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=22",
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0",
     "pnpm": ">=9"
   },
   "scripts": {
@@ -31,20 +31,20 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
+    "@changesets/cli": "^3.0.3",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.0",
     "@eslint/js": "^9.39.4",
     "@next/eslint-plugin-next": "^15.5.18",
     "@size-limit/preset-big-lib": "^11.2.0",
-    "@types/node": "^22.19.17",
-    "@typescript-eslint/eslint-plugin": "^8.59.1",
-    "@typescript-eslint/parser": "^8.59.1",
+    "@types/node": "^24.19.1",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/parser": "^8.70.0",
     "eslint": "^9.39.4",
-    "eslint-config-prettier": "^9.1.2",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "globals": "^17.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.8.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "prettier": "^3.8.3",
@@ -52,7 +52,7 @@
     "size-limit": "^11.2.0",
     "stylelint": "^16.26.1",
     "stylelint-config-standard": "^36.0.1",
-    "turbo": "^2.9.14",
+    "turbo": "^2.10.7",
     "typescript": "^5.9.3"
   },
   "lint-staged": {
@@ -62,24 +62,6 @@
     ],
     "*.{json,md,yml,yaml,css}": [
       "prettier --write"
-    ]
-  },
-  "pnpm": {
-    "overrides": {
-      "vite@<6.4.2": ">=6.4.2",
-      "esbuild@<0.25.0": ">=0.25.0",
-      "basic-ftp@<5.3.0": ">=5.3.0",
-      "postcss@<8.5.10": ">=8.5.10",
-      "fast-uri@<3.1.2": ">=3.1.2",
-      "hono@<4.12.18": ">=4.12.18",
-      "ip-address@<10.1.1": ">=10.1.1",
-      "qs@<6.15.2": ">=6.15.2",
-      "ws@<8.20.1": ">=8.20.1"
-    },
-    "ignoredBuiltDependencies": [
-      "@swc/core",
-      "esbuild",
-      "sharp"
     ]
   }
 }

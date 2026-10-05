@@ -97,13 +97,24 @@ interface CodeBlockInlineProps {
 function CodeBlockInline({ code, language }: CodeBlockInlineProps): ReactNode {
   const theme = useTheme();
   const i18n = useI18n();
-  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
+  const [highlighted, setHighlighted] = useState<{
+    code: string;
+    language: string;
+    mode: string;
+    html: string;
+  } | null>(null);
+  const highlightedHtml =
+    highlighted?.code === code &&
+    highlighted.language === language &&
+    highlighted.mode === theme.mode
+      ? highlighted.html
+      : null;
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     // 未指定语言时跳过 shiki，回退到纯 <pre><code>，避免无谓的异步加载。
     if (!language) {
-      setHighlightedHtml(null);
+      setHighlighted(null);
       return;
     }
     let cancelled = false;
@@ -124,7 +135,7 @@ function CodeBlockInline({ code, language }: CodeBlockInlineProps): ReactNode {
           themes: { light: 'github-light', dark: 'github-dark' },
           defaultColor: theme.mode === 'dark' ? 'dark' : 'light',
         });
-        if (!cancelled) setHighlightedHtml(html);
+        if (!cancelled) setHighlighted({ code, language, mode: theme.mode, html });
       } catch (err) {
         // shiki 未安装 / 语言解析失败：降级纯文本，不阻塞渲染。
         if (process.env.NODE_ENV !== 'production') {
@@ -133,7 +144,7 @@ function CodeBlockInline({ code, language }: CodeBlockInlineProps): ReactNode {
             err,
           );
         }
-        if (!cancelled) setHighlightedHtml(null);
+        if (!cancelled) setHighlighted(null);
       }
     })();
     return () => {

@@ -9,6 +9,15 @@ import { Tag } from '../';
 import { renderWithProviders, expectA11y } from '@timeui/react/test-utils';
 
 describe('Tag a11y', () => {
+  it('supports pressing and closing without nested interactive controls', async () => {
+    const { container } = renderWithProviders(
+      <Tag isInteractive isClosable onPress={() => {}} onClose={() => {}}>
+        Filter
+      </Tag>,
+    );
+    await expectA11y(container);
+  });
+
   it('passes axe a11y check', async () => {
     const { container } = renderWithProviders(
       <Tag isClosable onClose={() => {}} aria-label="Remove tag">

@@ -240,7 +240,6 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
         box-sizing: border-box;
         height: ${sizeTokens.height};
         min-width: ${isIconOnly ? sizeTokens.height : sizeTokens.minWidth};
-        ${isIconOnly ? `width: ${sizeTokens.height};` : ''}
         padding: ${isIconOnly ? '0' : `0 ${sizeTokens.paddingX}`};
         font-family: inherit;
         font-size: ${sizeTokens.fontSize};
@@ -251,7 +250,7 @@ export const Button = forwardRef<Element, ButtonProps>(function Button(
         overflow: hidden;
         cursor: pointer;
         user-select: none;
-        width: ${isFullWidth ? '100%' : 'auto'};
+        width: ${isFullWidth ? '100%' : isIconOnly ? sizeTokens.height : 'auto'};
         background-color: ${bg};
         color: ${fg};
         border: ${border};

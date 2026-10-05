@@ -203,6 +203,27 @@ describe('Button', () => {
     expect(styles).toContain('padding:0 16px');
   });
 
+  it('keeps the effective icon-only width equal to its height in a stretched layout', () => {
+    renderWithProviders(
+      <div style={{ display: 'flex', flexDirection: 'column', width: 300 }}>
+        <Button isIconOnly aria-label="Close" size="lg">
+          ×
+        </Button>
+      </div>,
+    );
+    const buttonStyle = getComputedStyle(screen.getByRole('button', { name: 'Close' }));
+    expect(buttonStyle.width).toBe(buttonStyle.height);
+  });
+
+  it('supports full width for icon-only buttons when explicitly requested', () => {
+    renderWithProviders(
+      <Button isIconOnly isFullWidth aria-label="Close">
+        ×
+      </Button>,
+    );
+    expect(getComputedStyle(screen.getByRole('button', { name: 'Close' })).width).toBe('100%');
+  });
+
   it('falls back title to aria-label on icon-only buttons (native hover tooltip)', () => {
     renderWithProviders(
       <Button isIconOnly aria-label="Close dialog">

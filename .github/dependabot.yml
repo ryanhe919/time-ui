@@ -13,7 +13,11 @@ updates:
       include: scope
     groups:
       eslint:
-        patterns: ['eslint*', '@typescript-eslint/*']
+        patterns: ['eslint*', '@eslint/*', '@typescript-eslint/*']
+      tiptap:
+        patterns: ['@tiptap/*']
+      commitlint:
+        patterns: ['@commitlint/*']
       testing:
         patterns: ['vitest', '@vitest/*', '@testing-library/*', 'jsdom', 'vitest-axe']
       types:
@@ -23,6 +27,17 @@ updates:
       build:
         patterns: ['tsup', 'turbo', 'rimraf', 'vite', '@vitejs/*']
     ignore:
+      # Runtime stays on Node 24; declarations must not silently target Node 26.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # React plugin 7 does not support ESLint 10 yet.
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@eslint/js'
+        update-types: ['version-update:semver-major']
+      # Tiptap 3 changes commands and extension composition; migrate the family together.
+      - dependency-name: '@tiptap/*'
+        update-types: ['version-update:semver-major']
       # React 18 is pinned intentionally — promote to 19 only after confirming
       # peer-range compatibility with downstream consumers.
       - dependency-name: react

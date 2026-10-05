@@ -4,13 +4,34 @@
  * @description 验证 ChatMessageList 模块的行为与回归。
  */
 
-import { describe, it, expect } from 'vitest';
-import { screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { renderWithProviders } from '../../test-utils';
 import { ChatMessageList } from '../ChatMessageList';
 import { ChatMessage } from '../ChatMessage';
 
 describe('ChatMessageList — base rendering', () => {
+  it('exposes the conversation name through aria-label', () => {
+    renderWithProviders(
+      <ChatMessageList aria-label="Assistant conversation">
+        <ChatMessage role="assistant">Hello</ChatMessage>
+      </ChatMessageList>,
+    );
+    expect(screen.getByRole('log', { name: 'Assistant conversation' })).toBeInTheDocument();
+  });
+
+  it('names a region from an external heading through aria-labelledby', () => {
+    renderWithProviders(
+      <>
+        <h2 id="conversation-heading">Conversation history</h2>
+        <ChatMessageList role="region" aria-labelledby="conversation-heading">
+          <ChatMessage role="assistant">Hello</ChatMessage>
+        </ChatMessageList>
+      </>,
+    );
+    expect(screen.getByRole('region', { name: 'Conversation history' })).toBeInTheDocument();
+  });
+
   it('defaults to role="log" + aria-live="polite"', () => {
     renderWithProviders(
       <ChatMessageList>
@@ -58,6 +79,60 @@ describe('ChatMessageList — base rendering', () => {
 });
 
 describe('ChatMessageList — scrolling', () => {
+  it('follows streamed text while the message count stays the same', () => {
+    const { container, rerender } = renderWithProviders(
+      <ChatMessageList maxHeight={200}>
+        <ChatMessage role="assistant">First token</ChatMessage>
+      </ChatMessageList>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    Object.defineProperty(root, 'scrollHeight', { configurable: true, value: 500 });
+    rerender(
+      <ChatMessageList maxHeight={200}>
+        <ChatMessage role="assistant">First token followed by more text</ChatMessage>
+      </ChatMessageList>,
+    );
+    expect(root.scrollTop).toBe(500);
+  });
+
+  it('follows asynchronous content growth but preserves a reader scrolling through history', () => {
+    let resize: ResizeObserverCallback | undefined;
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: ResizeObserverCallback) {
+          resize = callback;
+        }
+        observe = observe;
+        disconnect = disconnect;
+      },
+    );
+    try {
+      const { container, unmount } = renderWithProviders(
+        <ChatMessageList maxHeight={200}>
+          <ChatMessage role="assistant">Message with an image</ChatMessage>
+        </ChatMessageList>,
+      );
+      const root = container.firstElementChild as HTMLElement;
+      Object.defineProperty(root, 'scrollHeight', { configurable: true, value: 500 });
+      Object.defineProperty(root, 'clientHeight', { configurable: true, value: 200 });
+      expect(observe).toHaveBeenCalledWith(root.querySelector('[role="article"]'));
+      act(() => resize?.([], {} as ResizeObserver));
+      expect(root.scrollTop).toBe(500);
+
+      root.scrollTop = 100;
+      fireEvent.scroll(root);
+      act(() => resize?.([], {} as ResizeObserver));
+      expect(root.scrollTop).toBe(100);
+      unmount();
+      expect(disconnect).toHaveBeenCalledOnce();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('does not enable scroll when maxHeight is omitted', () => {
     const { container } = renderWithProviders(
       <ChatMessageList>

@@ -77,7 +77,9 @@ export default [
     rules: {
       ...tseslint.configs.recommended.rules,
       ...react.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
+      // Keep the React 18 hooks contract; compiler-specific rules require a separate migration.
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/no-unknown-property': ['error', { ignore: ['css'] }],

@@ -38,6 +38,7 @@ import { CodeBlock } from '../CodeBlock';
 import { createMarkdownViewerTypography } from './MarkdownViewer.theme';
 import { MarkdownViewerToolbar, DEFAULT_TOOLBAR_LABELS } from './MarkdownViewer.toolbar';
 import { MarkdownViewerToc, baseSlug, extractHeadings } from './MarkdownViewer.toc';
+import { getMarkdownAnchorTarget, scrollToMarkdownHeading } from './MarkdownViewer.scroll';
 import type { MarkdownViewerProps, MarkdownViewerToolbarLabels } from './MarkdownViewer.types';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -209,18 +210,13 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
         if (event.defaultPrevented) return;
         if (!isAnchorHref(href)) return;
 
-        // 站内锚点：阻止默认（避免修改 location.hash），改在内容容器内 scrollIntoView。
+        // 受限阅读区域局部滚动；自动高度文档保留页面导航，均不修改 location.hash。
         event.preventDefault();
         const targetId = href.slice(1);
-        const target = contentRef.current?.querySelector<HTMLElement>(`#${CSS.escape(targetId)}`);
+        const target = getMarkdownAnchorTarget(contentRef.current, targetId);
         if (!target) return;
 
-        const reduced =
-          typeof window !== 'undefined' &&
-          typeof window.matchMedia === 'function' &&
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        scrollToMarkdownHeading(scrollContainerRef.current, target, targetId === '');
       },
       [onLinkClick],
     );
@@ -320,6 +316,7 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
       box-sizing: border-box;
       width: 100%;
       min-width: 0;
+      container: timeui-markdown-viewer / inline-size;
       border: 1px solid ${theme.colors.border.subtle};
       border-radius: ${theme.componentRadius.md};
       background: ${theme.colors.bg.surface};
@@ -332,6 +329,10 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
       flex-direction: ${tocPosition === 'left' ? 'row-reverse' : 'row'};
       min-height: 0;
       flex: 1 1 auto;
+
+      @container timeui-markdown-viewer (max-width: 640px) {
+        flex-direction: column;
+      }
     `;
 
     // 细滚动条：默认透明，hover / 滚动期内才浮现；theme-aware；Firefox 走标准属性。
@@ -342,6 +343,7 @@ export const MarkdownViewer = forwardRef<HTMLDivElement, MarkdownViewerProps>(
     const scrollCss = css`
       flex: 1 1 auto;
       min-width: 0;
+      min-height: 0;
       overflow: auto;
       padding: 1.25em 1.5em;
 

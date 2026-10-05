@@ -541,7 +541,8 @@ const MenuPanel = forwardRef<HTMLDivElement, MenuPanelProps>(function MenuPanel(
     margin: 0;
     padding: ${tokens.paddingY} 0;
     /* Popover bodyCss 自带 padding，这里通过 negative margin 抵消，使 list 占满 panel。 */
-    margin: -8px -12px;
+    margin: calc(-1 * ${theme.components.popover.paddingY})
+      calc(-1 * ${theme.components.popover.paddingX});
     min-width: ${tokens.minWidth};
     max-width: ${tokens.maxWidth};
     max-height: ${tokens.maxHeight};
@@ -669,8 +670,7 @@ const MenuImpl = forwardRef<HTMLDivElement, MenuProps>(function Menu(props, forw
     onAction,
     closeOnSelect,
     isDisabled = false,
-    // portalContainer 在当前实现下交由 Popover 控制（默认 document.body），保留 props 类型以便后续接入。
-    portalContainer: _portalContainer, // eslint-disable-line @typescript-eslint/no-unused-vars
+    portalContainer,
     className,
     style,
     id,
@@ -963,6 +963,7 @@ const MenuImpl = forwardRef<HTMLDivElement, MenuProps>(function Menu(props, forw
       hasArrow={false}
       closeOnBlur
       closeOnEsc
+      portalContainer={portalContainer}
       aria-label={ariaLabel ?? 'Menu'}
     >
       <MenuPanel

@@ -24,7 +24,9 @@ export interface DateTimePickerProps extends DatePickerCommonProps {
   secondStep?: number;
   /** 12 小时制（AM/PM）；默认 false（24 小时制）。 */
   is12Hour?: boolean;
-  /** 底部 [Now] 按钮是否显示，默认 true —— 点击填入当前日期时间。 */
+  /** Now 按钮可见性的兼容别名；显式 showNowButton 优先。 */
+  showTodayButton?: boolean;
+  /** 底部 [Now] 按钮是否显示；默认继承 showTodayButton（true）。点击填入当前日期时间。 */
   showNowButton?: boolean;
   /** 底部 [OK] 按钮是否显示，默认 true —— 点击确认并关闭面板。 */
   showConfirmButton?: boolean;

@@ -184,6 +184,11 @@ function StaticPreview({ children, minHeight }: { children?: ReactNode; minHeigh
         gap: 16px;
         min-height: ${minHeight}px;
         background: var(--c-bg-secondary);
+        min-width: 0;
+        overflow-x: auto;
+        @media (max-width: 959px) {
+          padding: 32px 16px;
+        }
       `}
     >
       {children}

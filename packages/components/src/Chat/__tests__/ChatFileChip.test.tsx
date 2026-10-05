@@ -8,6 +8,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { renderWithProviders, expectA11y } from '../../test-utils';
 import { ChatFileChip } from '../ChatFileChip';
 
@@ -73,6 +74,24 @@ describe('ChatFileChip', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  it('keeps preview and remove controls as siblings with independent keyboard actions', async () => {
+    const onClick = vi.fn();
+    const onRemove = vi.fn();
+    const { container } = renderWithProviders(
+      <ChatFileChip name="preview.pdf" onClick={onClick} onRemove={onRemove} />,
+    );
+    expect(container.querySelector('button button')).toBeNull();
+    screen.getByRole('button', { name: 'preview.pdf' }).focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(onRemove).not.toHaveBeenCalled();
+    await userEvent.tab();
+    expect(screen.getByRole('button', { name: 'Remove preview.pdf' })).toHaveFocus();
+    await userEvent.keyboard(' ');
+    expect(onRemove).toHaveBeenCalledOnce();
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
   it('uses custom removeAriaLabel', () => {
     renderWithProviders(
       <ChatFileChip name="x.png" onRemove={() => {}} removeAriaLabel="移除附件" />,
@@ -88,6 +107,7 @@ describe('ChatFileChip a11y', () => {
         <ChatFileChip name="brief.pdf" size="1.4 MB" onRemove={() => {}} />
         <ChatFileChip name="hero.png" kind="image" progress={56} />
         <ChatFileChip name="bad.zip" isError />
+        <ChatFileChip name="preview.pdf" onClick={() => {}} onRemove={() => {}} />
       </>,
       { theme },
     );

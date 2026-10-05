@@ -117,6 +117,58 @@ describe('Tabs — children (declarative) API', () => {
 });
 
 describe('Tabs — controlled / uncontrolled', () => {
+  it('selects an available panel when an uncontrolled selected item is removed', () => {
+    const onChange = vi.fn();
+    const { rerender } = renderWithProviders(
+      <Tabs items={ITEMS} defaultSelectedKey="settings" onSelectionChange={onChange} />,
+    );
+    rerender(
+      <Tabs
+        items={ITEMS.filter((item) => item.itemKey !== 'settings')}
+        onSelectionChange={onChange}
+      />,
+    );
+    expect(screen.getByRole('tab', { name: 'Profile' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel')).toHaveTextContent('Profile panel');
+    expect(onChange).toHaveBeenLastCalledWith('profile');
+  });
+
+  it('recovers after asynchronous items arrive or the current tab is disabled', () => {
+    const { rerender } = renderWithProviders(<Tabs items={[]} />);
+    rerender(<Tabs items={ITEMS} />);
+    expect(screen.getByRole('tabpanel')).toHaveTextContent('Profile panel');
+    rerender(<Tabs items={ITEMS} disabledKeys={['profile']} />);
+    expect(screen.getByRole('tabpanel')).toHaveTextContent('Settings panel');
+    expect(screen.getByRole('tab', { name: 'Settings' })).toHaveAttribute('tabindex', '0');
+  });
+
+  it('only reports string selections when all remaining tabs are disabled', () => {
+    const onChange = vi.fn();
+    const { rerender } = renderWithProviders(<Tabs items={ITEMS} onSelectionChange={onChange} />);
+    const remaining = ITEMS.filter((item) => item.itemKey === 'settings');
+    rerender(<Tabs items={remaining} disabledKeys={['settings']} onSelectionChange={onChange} />);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.queryByRole('tabpanel')).toBeNull();
+    rerender(<Tabs items={remaining} onSelectionChange={onChange} />);
+    expect(onChange).toHaveBeenCalledWith('settings');
+    expect(screen.getByRole('tabpanel')).toHaveTextContent('Settings panel');
+  });
+
+  it('leaves selection driven by props when a controlled item becomes unavailable', () => {
+    const onChange = vi.fn();
+    const { rerender } = renderWithProviders(
+      <Tabs items={ITEMS} selectedKey="settings" onSelectionChange={onChange} />,
+    );
+    rerender(
+      <Tabs
+        items={ITEMS.filter((item) => item.itemKey !== 'settings')}
+        selectedKey="settings"
+        onSelectionChange={onChange}
+      />,
+    );
+    expect(screen.queryByRole('tabpanel')).toBeNull();
+    expect(onChange).not.toHaveBeenCalled();
+  });
   it('uncontrolled: clicking a tab updates selection and fires onSelectionChange', async () => {
     const onChange = vi.fn();
     renderWithProviders(

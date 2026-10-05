@@ -1,0 +1,53 @@
+# osv-scanner 配置 —— 被 .github/workflows/security-audit.yml 的
+# `osv-scanner scan source --lockfile=pnpm-lock.yaml` 自动读取。
+#
+# 仅对没有上游补丁且已评估风险的漏洞，或经源码与真实回归验证的数据库误报，
+# 添加有到期时间的说明。能靠 overrides 修复的一律升级，不豁免。
+
+[[IgnoredVulns]]
+id = "GHSA-cp6q-959q-f8rh"
+ignoreUntil = 2026-11-05
+reason = """
+这是 @tiptap/core 2.27.3 的已核实数据库误报，非接受未修复的风险。
+OSV 范围尚写 <3.30.4；官方 2.27.3 tarball 已 backport mergeAttributes 的修复：
+对 JSON 来源的 own __proto__ 键使用 Object.defineProperty，保留 Object.prototype。
+components 与 docs 依赖最低版本统一 2.27.3，pnpm-lock.yaml 当前锁定 2.27.3。
+RichTextEditor.test.tsx 的真实 mergeAttributes → DOMSerializer 安全回归验证
+对象原型及事件属性不会被注入；CI verify 必须通过此测试。只用于此 backport，
+若改变依赖版本须重新评估；一个月后检查 OSV 范围是否已修正并删除此条。
+https://registry.npmjs.org/@tiptap/core/-/core-2.27.3.tgz
+https://github.com/ueberdosis/tiptap/commit/01d7af8c983ee5954c63734f4fa46cb23ae3246d
+"""
+
+[[IgnoredVulns]]
+id = "GHSA-vfj7-8cjw-p6xm"
+ignoreUntil = 2026-11-05
+reason = """
+截至 2026-10-05，braces 最新 3.0.3 无上游补丁。
+仅由 Changesets、ESLint、lint-staged、stylelint 的开发工具链引用，解析仓库中
+受维护的 glob 配置；不会打入发布组件或 MCP 运行时，不接受用户输入的 glob。
+一个月后复审上游补丁；有补丁即通过 overrides 更新并删除此条。
+https://github.com/advisories/GHSA-vfj7-8cjw-p6xm
+"""
+
+[[IgnoredVulns]]
+id = "GHSA-jmr9-qjv8-65gv"
+ignoreUntil = 2026-11-05
+reason = """
+截至 2026-10-05，extract-zip 最新 2.0.1 无上游补丁。
+仅由 size-limit 的浏览器计时开发工具链引用，用于解压从官方浏览器分发源
+下载的归档；仓库产品不提供 ZIP 解压，不会将用户上传文件交给该依赖。
+一个月后复审上游补丁；有补丁即更新并删除此条。
+https://github.com/advisories/GHSA-jmr9-qjv8-65gv
+"""
+
+[[IgnoredVulns]]
+id = "GHSA-7pqw-9j4j-h8q3"
+ignoreUntil = 2026-11-05
+reason = """
+截至 2026-10-05，extract-zip 最新 2.0.1 无上游补丁。
+与 GHSA-jmr9-qjv8-65gv 相同，只存在于 size-limit 浏览器计时开发依赖链，
+处理官方浏览器分发归档，不处理用户上传的 ZIP，也不进入发布包运行时。
+一个月后复审上游补丁；有补丁即更新并删除此条。
+https://github.com/advisories/GHSA-7pqw-9j4j-h8q3
+"""

@@ -21,6 +21,7 @@ import logo from '@/assets/logo.png';
 import { AssistantDrawer } from '@/components/assistant/AssistantDrawer';
 import { ThemeToggle } from './ThemeToggle';
 import { LocaleToggle } from './LocaleToggle';
+import { SearchIcon } from '@timeui/icons';
 
 interface Props {
   navigation: Navigation;
@@ -83,6 +84,26 @@ export function TopNav({ navigation, messages, locale, version }: Props) {
         @media (prefers-reduced-motion: reduce) {
           transition: none;
         }
+        @media (max-width: 1000px) {
+          height: auto;
+          .docs-nav-brand img,
+          .docs-nav-brand [data-docs-label] {
+            display: none;
+          }
+          .docs-nav-search,
+          .docs-nav-divider,
+          .docs-nav-spacer {
+            display: none;
+          }
+        }
+        .docs-mobile-search {
+          display: none;
+        }
+        @media (max-width: 1000px) {
+          .docs-mobile-search {
+            display: inline-flex;
+          }
+        }
       `}
     >
       <div
@@ -95,9 +116,16 @@ export function TopNav({ navigation, messages, locale, version }: Props) {
           align-items: center;
           gap: 28px;
           font-family: var(--docs-sans);
+          @media (max-width: 1000px) {
+            padding: 8px 20px;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+          }
         `}
       >
         <Link
+          className="docs-nav-brand"
           href={`/${locale}/docs/getting-started/introduction`}
           aria-label="TimeUI"
           css={css`
@@ -163,6 +191,7 @@ export function TopNav({ navigation, messages, locale, version }: Props) {
             </span>
           )}
           <span
+            data-docs-label
             aria-hidden
             css={css`
               display: inline-flex;
@@ -194,6 +223,12 @@ export function TopNav({ navigation, messages, locale, version }: Props) {
             align-items: center;
             gap: 4px;
             height: 100%;
+            @media (max-width: 1000px) {
+              order: 3;
+              width: 100%;
+              height: 36px;
+              overflow-x: auto;
+            }
           `}
         >
           {navigation.sections.map((s) => {
@@ -248,12 +283,14 @@ export function TopNav({ navigation, messages, locale, version }: Props) {
         </nav>
 
         <div
+          className="docs-nav-spacer"
           css={css`
             flex: 1;
           `}
         />
 
         <span
+          className="docs-nav-divider"
           aria-hidden
           css={css`
             display: inline-block;
@@ -265,6 +302,7 @@ export function TopNav({ navigation, messages, locale, version }: Props) {
         />
 
         <Search
+          className="docs-nav-search"
           size="sm"
           placeholder={messages.nav.searchPlaceholder}
           shortcut="⌘K"
@@ -293,6 +331,17 @@ export function TopNav({ navigation, messages, locale, version }: Props) {
             gap: 2px;
           `}
         >
+          <Button
+            className="docs-mobile-search"
+            isIconOnly
+            size="xs"
+            variant="light"
+            color="default"
+            aria-label={messages.nav.searchPlaceholder}
+            onClick={() => setSearchOpen(true)}
+          >
+            <SearchIcon size={16} />
+          </Button>
           <Button
             isIconOnly
             variant="light"

@@ -130,8 +130,11 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     const editable = !isDisabled && !isReadOnly;
 
     const tiptapExtensions = useMemo<AnyExtension[]>(() => {
+      // Tiptap 3 includes Link and Underline in StarterKit. Tiptap 2 ignores
+      // these options, so both versions use our explicitly configured marks.
+      const starterOptions = { link: false as const, underline: false as const, heading: {} };
       const list: AnyExtension[] = [
-        StarterKit,
+        StarterKit.configure(starterOptions),
         Underline,
         Link.configure({ openOnClick: false, autolink: true }),
         Placeholder.configure({ placeholder: placeholder ?? '' }),
@@ -149,6 +152,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         editable,
         // 避免 SSR 阶段 immediatelyRender 触发 hydration mismatch
         immediatelyRender: false,
+        shouldRerenderOnTransaction: true,
         onCreate: ({ editor: created }) => {
           onCreateRef.current?.(created as Editor);
         },
@@ -156,8 +160,9 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
           onChangeRef.current?.(updated.getHTML());
         },
       },
-      // 仅在扩展集合 / 可编辑性变化时重建 editor。
-      [tiptapExtensions, editable],
+      // Editable changes are applied below without discarding the document,
+      // selection and undo history of an uncontrolled editor.
+      [tiptapExtensions],
     );
 
     // 受控同步：当外部 value 变化且与编辑器当前内容不同时，setContent。
@@ -166,7 +171,17 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       if (value === undefined) return;
       const current = editor.getHTML();
       if (value === current) return;
-      editor.commands.setContent(value, false);
+      // The second setContent argument changed from a boolean in Tiptap 2 to
+      // an options object in 3. A shared transaction keeps external updates
+      // silent in both versions without a feedback loop through onChange.
+      editor
+        .chain()
+        .setContent(value)
+        .command(({ tr }) => {
+          tr.setMeta('preventUpdate', true);
+          return true;
+        })
+        .run();
     }, [editor, value]);
 
     // 切换 editable 时 keep TipTap 同步（`editable` 仅在初始化时生效，所以这里再补一遍）。
