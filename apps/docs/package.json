@@ -48,7 +48,7 @@
     "react-dom": "^18.3.1",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.1",
-    "shiki": "^1.0.0",
+    "shiki": "^4.5.0",
     "styled-jsx": "5.1.6",
     "sucrase": "^3.35.1"
   },
