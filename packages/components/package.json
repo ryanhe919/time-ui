@@ -185,7 +185,7 @@
   },
   "devDependencies": {
     "@emotion/react": "^11.13.3",
-    "shiki": "^1.0.0",
+    "shiki": "^4.5.0",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.0",
     "@tiptap/core": "^2.27.3",
