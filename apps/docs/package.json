@@ -60,7 +60,7 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@vitest/coverage-v8": "^4.1.11",
-    "axe-core": "^4.12.1",
+    "axe-core": "^4.14.0",
     "jsdom": "^30.0.1",
     "pdfjs-dist": "^6.1.200",
     "rimraf": "^6.0.1",
